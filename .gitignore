@@ -1,0 +1,14 @@
+node_modules
+.env
+dist
+
+yarn-error.log
+
+# Coverage
+coverage
+junit.xml
+
+.DS_Store
+
+# MySQL data
+data
