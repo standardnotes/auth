@@ -1,0 +1,19 @@
+name: PR
+
+on:
+  pull_request:
+    branches: [ develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v1
+      with:
+        node-version: '14.x'
+    - run: yarn install --pure-lockfile
+    - run: yarn build
+    - run: yarn lint
+    - run: yarn coverage
