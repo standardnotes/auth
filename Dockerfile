@@ -5,6 +5,9 @@ ARG GID=1001
 
 RUN addgroup -S auth -g $GID && adduser -D -S auth -G auth -u $UID
 
+RUN apk add --update --no-cache \
+    curl
+
 WORKDIR /var/www
 
 RUN chown -R $UID:$GID .
