@@ -18,7 +18,8 @@
     "coverage": "jest --coverage",
     "pretest": "yarn lint && yarn build",
     "test": "jest spec",
-    "start": "node dist/bin/server.js"
+    "start": "node dist/bin/server.js",
+    "worker": "node dist/bin/worker.js"
   },
   "dependencies": {
     "@standardnotes/domain-events": "^1.0.2",
