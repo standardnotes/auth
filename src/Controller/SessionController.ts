@@ -1,6 +1,13 @@
 import { Request, Response } from 'express'
 import { inject } from 'inversify'
-import { BaseHttpController, controller, httpDelete, httpPost, results } from 'inversify-express-utils'
+import {
+  BaseHttpController,
+  controller,
+  httpDelete,
+  httpPost,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  results
+} from 'inversify-express-utils'
 import TYPES from '../Bootstrap/Types'
 import { DeletePreviousSessionsForUser } from '../Domain/UseCase/DeletePreviousSessionsForUser'
 import { DeleteSessionForUser } from '../Domain/UseCase/DeleteSessionForUser'

@@ -1,6 +1,13 @@
 import { Request, Response } from 'express'
 import { inject } from 'inversify'
-import { BaseHttpController, controller, httpGet, httpPost, results } from 'inversify-express-utils'
+import {
+  BaseHttpController,
+  controller,
+  httpGet,
+  httpPost,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  results
+} from 'inversify-express-utils'
 import { DomainEventFactoryInterface, DomainEventPublisherInterface } from '@standardnotes/domain-events'
 
 import TYPES from '../Bootstrap/Types'

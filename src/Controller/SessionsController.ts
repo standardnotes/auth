@@ -1,8 +1,17 @@
 import { Request, Response } from 'express'
 import { inject } from 'inversify'
-import { BaseHttpController, controller, httpGet, results } from 'inversify-express-utils'
+import {
+  BaseHttpController,
+  controller,
+  httpGet,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  results
+} from 'inversify-express-utils'
 import TYPES from '../Bootstrap/Types'
-import { Session } from '../Domain/Session/Session'
+import {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  Session
+} from '../Domain/Session/Session'
 import { GetActiveSessionsForUser } from '../Domain/UseCase/GetActiveSessionsForUser'
 import { ProjectorInterface } from '../Projection/ProjectorInterface'
 import { SessionProjector } from '../Projection/SessionProjector'

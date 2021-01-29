@@ -1,6 +1,12 @@
 import { Request, Response } from 'express'
 import { inject } from 'inversify'
-import { BaseHttpController, controller, httpPatch, results } from 'inversify-express-utils'
+import {
+  BaseHttpController,
+  controller,
+  httpPatch,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  results
+} from 'inversify-express-utils'
 import TYPES from '../Bootstrap/Types'
 import { UpdateUser } from '../Domain/UseCase/UpdateUser'
 
