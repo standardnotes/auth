@@ -3,6 +3,10 @@ import 'reflect-metadata'
 import './tracer'
 
 import '../src/Controller/HealthCheckController'
+import '../src/Controller/SessionController'
+import '../src/Controller/SessionsController'
+import '../src/Controller/AuthController'
+import '../src/Controller/UsersController'
 
 import * as cors from 'cors'
 import * as bodyParser from 'body-parser'
