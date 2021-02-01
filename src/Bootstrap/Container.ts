@@ -59,6 +59,7 @@ import { RevokedSession } from '../Domain/Session/RevokedSession'
 import { UserRegisteredEventHandler } from '../Domain/Handler/UserRegisteredEventHandler'
 import { ChangePassword } from '../Domain/UseCase/ChangePassword'
 import { DomainEventFactory } from '../Domain/Event/DomainEventFactory'
+import { AuthenticateRequest } from '../Domain/UseCase/AuthenticateRequest'
 
 export class ContainerConfigLoader {
     async load(): Promise<Container> {
@@ -159,6 +160,7 @@ export class ContainerConfigLoader {
         // env vars
         container.bind(TYPES.JWT_SECRET).toConstantValue(env.get('JWT_SECRET'))
         container.bind(TYPES.LEGACY_JWT_SECRET).toConstantValue(env.get('LEGACY_JWT_SECRET'))
+        container.bind(TYPES.AUTH_JWT_SECRET).toConstantValue(env.get('AUTH_JWT_SECRET'))
         container.bind(TYPES.ACCESS_TOKEN_AGE).toConstantValue(env.get('ACCESS_TOKEN_AGE'))
         container.bind(TYPES.REFRESH_TOKEN_AGE).toConstantValue(env.get('REFRESH_TOKEN_AGE'))
         container.bind(TYPES.MAX_LOGIN_ATTEMPTS).toConstantValue(env.get('MAX_LOGIN_ATTEMPTS'))
@@ -176,6 +178,7 @@ export class ContainerConfigLoader {
 
         // use cases
         container.bind<AuthenticateUser>(TYPES.AuthenticateUser).to(AuthenticateUser)
+        container.bind<AuthenticateRequest>(TYPES.AuthenticateRequest).to(AuthenticateRequest)
         container.bind<RefreshSessionToken>(TYPES.RefreshSessionToken).to(RefreshSessionToken)
         container.bind<SignIn>(TYPES.SignIn).to(SignIn)
         container.bind<VerifyMFA>(TYPES.VerifyMFA).to(VerifyMFA)

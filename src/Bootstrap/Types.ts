@@ -22,6 +22,7 @@ const TYPES = {
   // env vars
   JWT_SECRET: Symbol.for('JWT_SECRET'),
   LEGACY_JWT_SECRET: Symbol.for('LEGACY_JWT_SECRET'),
+  AUTH_JWT_SECRET: Symbol.for('AUTH_JWT_SECRET'),
   ACCESS_TOKEN_AGE: Symbol.for('ACCESS_TOKEN_AGE'),
   REFRESH_TOKEN_AGE: Symbol.for('REFRESH_TOKEN_AGE'),
   EPHEMERAL_SESSION_AGE: Symbol.for('EPHEMERAL_SESSION_AGE'),
@@ -39,6 +40,7 @@ const TYPES = {
   REDIS_EVENTS_CHANNEL: Symbol.for('REDIS_EVENTS_CHANNEL'),
   // use cases
   AuthenticateUser: Symbol.for('AuthenticateUser'),
+  AuthenticateRequest: Symbol.for('AuthenticateRequest'),
   RefreshSessionToken: Symbol.for('RefreshSessionToken'),
   VerifyMFA: Symbol.for('VerifyMFA'),
   SignIn: Symbol.for('SignIn'),
