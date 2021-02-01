@@ -4,15 +4,16 @@ import {
   BaseHttpController,
   controller,
   httpGet,
+  httpPost,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   results
 } from 'inversify-express-utils'
+import { sign } from 'jsonwebtoken'
 import TYPES from '../Bootstrap/Types'
-import {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  Session
-} from '../Domain/Session/Session'
+import { Session } from '../Domain/Session/Session'
+import { AuthenticateRequest } from '../Domain/UseCase/AuthenticateRequest'
 import { GetActiveSessionsForUser } from '../Domain/UseCase/GetActiveSessionsForUser'
+import { User } from '../Domain/User/User'
 import { ProjectorInterface } from '../Projection/ProjectorInterface'
 import { SessionProjector } from '../Projection/SessionProjector'
 
@@ -20,9 +21,37 @@ import { SessionProjector } from '../Projection/SessionProjector'
 export class SessionsController extends BaseHttpController {
   constructor(
     @inject(TYPES.GetActiveSessionsForUser) private getActiveSessionsForUser: GetActiveSessionsForUser,
-    @inject(TYPES.SessionProjector) private sessionProjector: ProjectorInterface<Session>
+    @inject(TYPES.AuthenticateRequest) private authenticateRequest: AuthenticateRequest,
+    @inject(TYPES.UserProjector) private userProjector: ProjectorInterface<User>,
+    @inject(TYPES.SessionProjector) private sessionProjector: ProjectorInterface<Session>,
+    @inject(TYPES.AUTH_JWT_SECRET) private jwtSecret: string
   ) {
       super()
+  }
+
+  @httpPost('/validate')
+  async validate(request: Request): Promise<results.JsonResult> {
+    const authenticateRequestResponse = await this.authenticateRequest.execute({
+      authorizationHeader: request.headers.authorization
+    })
+
+    if (!authenticateRequestResponse.success) {
+      return this.json({
+        error: {
+          tag: authenticateRequestResponse.errorTag,
+          message: authenticateRequestResponse.errorMessage,
+        },
+      }, authenticateRequestResponse.responseCode)
+    }
+
+    const authTokenData = {
+      user: this.userProjector.projectSimple(<User> authenticateRequestResponse.user),
+      session: this.sessionProjector.projectSimple(<Session> authenticateRequestResponse.session)
+    }
+
+    const authToken = sign(authTokenData, this.jwtSecret, { algorithm: 'HS256' })
+
+    return this.json({ authToken })
   }
 
   @httpGet('/')
