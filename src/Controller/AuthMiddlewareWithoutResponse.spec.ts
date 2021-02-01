@@ -1,29 +1,22 @@
 import 'reflect-metadata'
 
-import * as winston from 'winston'
-
 import { AuthMiddlewareWithoutResponse } from './AuthMiddlewareWithoutResponse'
-import { AuthenticateUser } from '../Domain/UseCase/AuthenticateUser'
 import { NextFunction, Request, Response } from 'express'
 import { User } from '../Domain/User/User'
+import { AuthenticateRequest } from '../Domain/UseCase/AuthenticateRequest'
+import { Session } from '../Domain/Session/Session'
 
 describe('AuthMiddlewareWithoutResponse', () => {
-  let logger: winston.Logger
-  let authenticateUser: AuthenticateUser
+  let authenticateRequest: AuthenticateRequest
   let request: Request
   let response: Response
   let next: NextFunction
 
-  const createMiddleware = () => new AuthMiddlewareWithoutResponse(authenticateUser, logger)
+  const createMiddleware = () => new AuthMiddlewareWithoutResponse(authenticateRequest)
 
   beforeEach(() => {
-    authenticateUser = {} as jest.Mocked<AuthenticateUser>
-    authenticateUser.execute = jest.fn()
-
-    logger = {} as jest.Mocked<winston.Logger>
-    logger.info = jest.fn()
-    logger.warn = jest.fn()
-    logger.error = jest.fn()
+    authenticateRequest = {} as jest.Mocked<AuthenticateRequest>
+    authenticateRequest.execute = jest.fn()
 
     request = {
       headers: {}
@@ -36,58 +29,26 @@ describe('AuthMiddlewareWithoutResponse', () => {
     next = jest.fn()
   })
 
-  it('should authorize user based on a jwt token', async () => {
-    request.headers.authorization = 'Bearer test'
-
+  it('should authorize user', async () => {
     const user = {} as jest.Mocked<User>
-    authenticateUser.execute = jest.fn().mockReturnValue({
+    const session = {} as jest.Mocked<Session>
+    authenticateRequest.execute = jest.fn().mockReturnValue({
       success: true,
-      user: user
+      user,
+      session
     })
 
     await createMiddleware().handler(request, response, next)
 
     expect(response.locals.user).toEqual(user)
-
-    expect(next).toHaveBeenCalled()
-  })
-
-  it('should skip middleware if authorization header is missing', async () => {
-    await createMiddleware().handler(request, response, next)
-
-    expect(next).toHaveBeenCalled()
-  })
-
-  it('should skip middleware if an error occurres', async () => {
-    request.headers.authorization = 'Bearer test'
-    authenticateUser.execute = jest.fn().mockImplementation(() => {
-      throw new Error('something bad happened')
-    })
-
-    await createMiddleware().handler(request, response, next)
+    expect(response.locals.session).toEqual(session)
 
     expect(next).toHaveBeenCalled()
   })
 
   it('should skip middleware if authentication fails', async () => {
-    request.headers.authorization = 'Bearer test'
-
-    authenticateUser.execute = jest.fn().mockReturnValue({
-      success: false,
-      failureType: 'INVALID_AUTH',
-    })
-
-    await createMiddleware().handler(request, response, next)
-
-    expect(next).toHaveBeenCalled()
-  })
-
-  it('should skip middleware if the token is expired', async () => {
-    request.headers.authorization = 'Bearer test'
-
-    authenticateUser.execute = jest.fn().mockReturnValue({
-      success: false,
-      failureType: 'EXPIRED_TOKEN',
+    authenticateRequest.execute = jest.fn().mockReturnValue({
+      success: false
     })
 
     await createMiddleware().handler(request, response, next)
