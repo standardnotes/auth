@@ -60,6 +60,11 @@ import { UserRegisteredEventHandler } from '../Domain/Handler/UserRegisteredEven
 import { ChangePassword } from '../Domain/UseCase/ChangePassword'
 import { DomainEventFactory } from '../Domain/Event/DomainEventFactory'
 import { AuthenticateRequest } from '../Domain/UseCase/AuthenticateRequest'
+import { Role } from '../Domain/Role/Role'
+import { Permission } from '../Domain/Permission/Permission'
+import { RoleProjector } from '../Projection/RoleProjector'
+import { PermissionProjector } from '../Projection/PermissionProjector'
+import { MySQLRoleRepository } from '../Infra/MySQL/MySQLRoleRepository'
 
 export class ContainerConfigLoader {
     async load(): Promise<Container> {
@@ -93,6 +98,8 @@ export class ContainerConfigLoader {
             Session,
             RevokedSession,
             Item,
+            Role,
+            Permission
           ],
           migrations: [
             env.get('DB_MIGRATIONS_PATH')
@@ -144,6 +151,7 @@ export class ContainerConfigLoader {
         container.bind<MySQLRevokedSessionRepository>(TYPES.RevokedSessionRepository).toConstantValue(connection.getCustomRepository(MySQLRevokedSessionRepository))
         container.bind<MySQLUserRepository>(TYPES.UserRepository).toConstantValue(connection.getCustomRepository(MySQLUserRepository))
         container.bind<MySQLItemRepository>(TYPES.ItemRepository).toConstantValue(connection.getCustomRepository(MySQLItemRepository))
+        container.bind<MySQLRoleRepository>(TYPES.RoleRepository).toConstantValue(connection.getCustomRepository(MySQLRoleRepository))
         container.bind<RedisEphemeralSessionRepository>(TYPES.EphemeralSessionRepository).to(RedisEphemeralSessionRepository)
         container.bind<LockRepository>(TYPES.LockRepository).to(LockRepository)
 
@@ -156,6 +164,8 @@ export class ContainerConfigLoader {
         // Projectors
         container.bind<SessionProjector>(TYPES.SessionProjector).to(SessionProjector)
         container.bind<UserProjector>(TYPES.UserProjector).to(UserProjector)
+        container.bind<RoleProjector>(TYPES.RoleProjector).to(RoleProjector)
+        container.bind<PermissionProjector>(TYPES.PermissionProjector).to(PermissionProjector)
 
         // env vars
         container.bind(TYPES.JWT_SECRET).toConstantValue(env.get('JWT_SECRET'))

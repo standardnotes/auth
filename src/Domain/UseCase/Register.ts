@@ -10,11 +10,14 @@ import { RegisterDTO } from './RegisterDTO'
 import { RegisterResponse } from './RegisterResponse'
 import { UseCaseInterface } from './UseCaseInterface'
 import { AuthResponseFactoryResolverInterface } from '../Auth/AuthResponseFactoryResolverInterface'
+import { RoleRepositoryInterface } from '../Role/RoleRepositoryInterface'
+import { ROLES } from '../Role/Roles'
 
 @injectable()
 export class Register implements UseCaseInterface {
   constructor(
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
+    @inject(TYPES.RoleRepository) private roleRepository: RoleRepositoryInterface,
     @inject(TYPES.AuthResponseFactoryResolver) private authResponseFactoryResolver: AuthResponseFactoryResolverInterface,
     @inject(TYPES.DISABLE_USER_REGISTRATION) private disableUserRegistration: boolean
   ) {
@@ -44,6 +47,11 @@ export class Register implements UseCaseInterface {
     user.createdAt = dayjs.utc().toDate()
     user.updatedAt = dayjs.utc().toDate()
     user.encryptedPassword = await bcrypt.hash(password, User.PASSWORD_HASH_COST)
+
+    const defaultRole = await this.roleRepository.findOneByName(ROLES.USER)
+    if (defaultRole) {
+      user.roles = Promise.resolve([ defaultRole ])
+    }
 
     Object.assign(user, registrationFields)
 

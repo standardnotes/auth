@@ -13,6 +13,8 @@ import TYPES from '../Bootstrap/Types'
 import { Session } from '../Domain/Session/Session'
 import { AuthenticateRequest } from '../Domain/UseCase/AuthenticateRequest'
 import { GetActiveSessionsForUser } from '../Domain/UseCase/GetActiveSessionsForUser'
+import { Permission } from '../Domain/Permission/Permission'
+import { Role } from '../Domain/Role/Role'
 import { User } from '../Domain/User/User'
 import { ProjectorInterface } from '../Projection/ProjectorInterface'
 import { SessionProjector } from '../Projection/SessionProjector'
@@ -24,6 +26,8 @@ export class SessionsController extends BaseHttpController {
     @inject(TYPES.AuthenticateRequest) private authenticateRequest: AuthenticateRequest,
     @inject(TYPES.UserProjector) private userProjector: ProjectorInterface<User>,
     @inject(TYPES.SessionProjector) private sessionProjector: ProjectorInterface<Session>,
+    @inject(TYPES.RoleProjector) private roleProjector: ProjectorInterface<Role>,
+    @inject(TYPES.PermissionProjector) private permissionProjector: ProjectorInterface<Permission>,
     @inject(TYPES.AUTH_JWT_SECRET) private jwtSecret: string
   ) {
       super()
@@ -44,9 +48,18 @@ export class SessionsController extends BaseHttpController {
       }, authenticateRequestResponse.responseCode)
     }
 
+    const roles = await (<User> authenticateRequestResponse.user).roles
+    const permissions: Map<string, Permission> = new Map()
+    await Promise.all(roles.map(async (role: Role) => {
+      const rolePermissions = await role.permissions
+      rolePermissions.forEach(permission => permissions.set(permission.uuid, permission))
+    }))
+
     const authTokenData = {
       user: this.userProjector.projectSimple(<User> authenticateRequestResponse.user),
-      session: this.sessionProjector.projectSimple(<Session> authenticateRequestResponse.session)
+      session: this.sessionProjector.projectSimple(<Session> authenticateRequestResponse.session),
+      roles: roles.map(role => this.roleProjector.projectSimple(role)),
+      permissions: [...permissions.values()].map(permission => this.permissionProjector.projectSimple(permission))
     }
 
     const authToken = sign(authTokenData, this.jwtSecret, { algorithm: 'HS256' })
