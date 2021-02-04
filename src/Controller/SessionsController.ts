@@ -28,7 +28,8 @@ export class SessionsController extends BaseHttpController {
     @inject(TYPES.SessionProjector) private sessionProjector: ProjectorInterface<Session>,
     @inject(TYPES.RoleProjector) private roleProjector: ProjectorInterface<Role>,
     @inject(TYPES.PermissionProjector) private permissionProjector: ProjectorInterface<Permission>,
-    @inject(TYPES.AUTH_JWT_SECRET) private jwtSecret: string
+    @inject(TYPES.AUTH_JWT_SECRET) private jwtSecret: string,
+    @inject(TYPES.AUTH_JWT_TTL) private jwtTTL: number,
   ) {
       super()
   }
@@ -62,7 +63,7 @@ export class SessionsController extends BaseHttpController {
       permissions: [...permissions.values()].map(permission => this.permissionProjector.projectSimple(permission))
     }
 
-    const authToken = sign(authTokenData, this.jwtSecret, { algorithm: 'HS256' })
+    const authToken = sign(authTokenData, this.jwtSecret, { algorithm: 'HS256', expiresIn: this.jwtTTL })
 
     return this.json({ authToken })
   }

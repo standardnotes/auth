@@ -18,6 +18,7 @@ describe('SessionsController', () => {
   let authenticateRequest: AuthenticateRequest
   let userProjector: ProjectorInterface<User>
   const jwtSecret = 'auth_jwt_secret'
+  const jwtTTL = 60
   let sessionProjector: ProjectorInterface<Session>
   let roleProjector: ProjectorInterface<Role>
   let permissionProjector: ProjectorInterface<Permission>
@@ -35,7 +36,8 @@ describe('SessionsController', () => {
     sessionProjector,
     roleProjector,
     permissionProjector,
-    jwtSecret
+    jwtSecret,
+    jwtTTL
   )
 
   beforeEach(() => {
@@ -114,6 +116,7 @@ describe('SessionsController', () => {
     const httpResponseJSON = JSON.parse(httpResponseContent)
 
     expect(decode(httpResponseJSON.authToken)).toEqual({
+      exp: expect.any(Number),
       iat: expect.any(Number),
       session: {
         test: 'test',

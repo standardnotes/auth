@@ -171,6 +171,7 @@ export class ContainerConfigLoader {
         container.bind(TYPES.JWT_SECRET).toConstantValue(env.get('JWT_SECRET'))
         container.bind(TYPES.LEGACY_JWT_SECRET).toConstantValue(env.get('LEGACY_JWT_SECRET'))
         container.bind(TYPES.AUTH_JWT_SECRET).toConstantValue(env.get('AUTH_JWT_SECRET'))
+        container.bind(TYPES.AUTH_JWT_TTL).toConstantValue(env.get('AUTH_JWT_TTL'))
         container.bind(TYPES.ACCESS_TOKEN_AGE).toConstantValue(env.get('ACCESS_TOKEN_AGE'))
         container.bind(TYPES.REFRESH_TOKEN_AGE).toConstantValue(env.get('REFRESH_TOKEN_AGE'))
         container.bind(TYPES.MAX_LOGIN_ATTEMPTS).toConstantValue(env.get('MAX_LOGIN_ATTEMPTS'))
