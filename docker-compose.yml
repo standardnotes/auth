@@ -15,7 +15,7 @@ services:
       DB_HOST: db
       DB_REPLICA_HOST: db
     ports:
-      - 3000:${PORT}
+      - 3002:${PORT}
     networks:
       standardnotes_proxy:
         aliases:
