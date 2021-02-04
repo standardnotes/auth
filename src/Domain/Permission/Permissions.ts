@@ -1,5 +1,7 @@
 /* istanbul ignore file */
 
 export enum Permissions {
-  SYNC_ITEMS = 'SYNC_ITEMS'
+  SYNC_ITEMS = 'SYNC_ITEMS',
+  EXTENDED_NOTE_HISTORY = 'EXTENDED_NOTE_HISTORY',
+  UNLIMITED_NOTE_HISTORY = 'UNLIMITED_NOTE_HISTORY'
 }
