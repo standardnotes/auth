@@ -11,6 +11,7 @@ const TYPES = {
   RevokedSessionRepository: Symbol.for('RevokedSessionRepository'),
   ItemRepository: Symbol.for('ItemRepository'),
   LockRepository: Symbol.for('LockRepository'),
+  RoleRepository: Symbol.for('RoleRepository'),
   // Middleware
   AuthMiddleware: Symbol.for('AuthMiddleware'),
   AuthMiddlewareWithoutResponse: Symbol.for('AuthMiddlewareWithoutResponse'),
@@ -19,10 +20,13 @@ const TYPES = {
   // Projectors
   SessionProjector: Symbol.for('SessionProjector'),
   UserProjector: Symbol.for('UserProjector'),
+  RoleProjector: Symbol.for('RoleProjector'),
+  PermissionProjector: Symbol.for('PermissionProjector'),
   // env vars
   JWT_SECRET: Symbol.for('JWT_SECRET'),
   LEGACY_JWT_SECRET: Symbol.for('LEGACY_JWT_SECRET'),
   AUTH_JWT_SECRET: Symbol.for('AUTH_JWT_SECRET'),
+  AUTH_JWT_TTL: Symbol.for('AUTH_JWT_TTL'),
   ACCESS_TOKEN_AGE: Symbol.for('ACCESS_TOKEN_AGE'),
   REFRESH_TOKEN_AGE: Symbol.for('REFRESH_TOKEN_AGE'),
   EPHEMERAL_SESSION_AGE: Symbol.for('EPHEMERAL_SESSION_AGE'),

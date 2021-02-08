@@ -1,5 +1,6 @@
-import { Column, Entity, Index, OneToMany, PrimaryColumn } from 'typeorm'
+import { Column, Entity, Index, JoinTable, ManyToMany, OneToMany, PrimaryColumn } from 'typeorm'
 import { RevokedSession } from '../Session/RevokedSession'
+import { Role } from '../Role/Role'
 
 @Entity({ name: 'users' })
 export class User {
@@ -129,6 +130,23 @@ export class User {
     revokedSession => revokedSession.user
   )
   revokedSessions: Promise<RevokedSession[]>
+
+  @ManyToMany(
+    /* istanbul ignore next */
+    () => Role
+  )
+  @JoinTable({
+    name: 'user_roles',
+    joinColumn: {
+        name: 'user_uuid',
+        referencedColumnName: 'uuid'
+    },
+    inverseJoinColumn: {
+        name: 'role_uuid',
+        referencedColumnName: 'uuid'
+    },
+  })
+  roles: Promise<Array<Role>>
 
   supportsSessions(): boolean {
     return parseInt(this.version) >= this.SESSIONS_PROTOCOL_VERSION
