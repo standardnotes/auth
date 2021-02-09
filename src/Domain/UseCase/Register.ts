@@ -1,5 +1,6 @@
 import * as dayjs from 'dayjs'
 import * as bcrypt from 'bcryptjs'
+import { ROLES } from '@standardnotes/auth'
 
 import { v4 as uuidv4 } from 'uuid'
 import { inject, injectable } from 'inversify'
@@ -11,7 +12,6 @@ import { RegisterResponse } from './RegisterResponse'
 import { UseCaseInterface } from './UseCaseInterface'
 import { AuthResponseFactoryResolverInterface } from '../Auth/AuthResponseFactoryResolverInterface'
 import { RoleRepositoryInterface } from '../Role/RoleRepositoryInterface'
-import { ROLES } from '../Role/Roles'
 
 @injectable()
 export class Register implements UseCaseInterface {
