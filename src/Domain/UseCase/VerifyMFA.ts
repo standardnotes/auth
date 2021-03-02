@@ -1,8 +1,8 @@
 import { inject, injectable } from 'inversify'
 import { authenticator } from 'otplib'
 import TYPES from '../../Bootstrap/Types'
-import { ContentDecoderInterface } from '../Item/ContentDecoderInterface'
-import { ItemRepositoryInterface } from '../Item/ItemRepositoryInterface'
+import { SettingRepositoryInterface } from '../Setting/SettingRepositoryInterface'
+import { SETTINGS } from '../Setting/Settings'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { UseCaseInterface } from './UseCaseInterface'
 import { VerifyMFADTO } from './VerifyMFADTO'
@@ -12,8 +12,7 @@ import { VerifyMFAResponse } from './VerifyMFAResponse'
 export class VerifyMFA implements UseCaseInterface {
   constructor(
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
-    @inject(TYPES.ItemRepository) private itemsRepository: ItemRepositoryInterface,
-    @inject(TYPES.ContentDecoder) private contentDecoder: ContentDecoderInterface,
+    @inject(TYPES.SettingRepository) private settingRepository: SettingRepositoryInterface
   ) {
   }
 
@@ -26,32 +25,27 @@ export class VerifyMFA implements UseCaseInterface {
       }
     }
 
-    const mfaExtension = await this.itemsRepository.findMFAExtensionByUserUuid(user.uuid)
+    const mfaSecret = await this.settingRepository.findOneByNameAndUserUuid(SETTINGS.MFA_SECRET, user.uuid)
 
-    if (!mfaExtension) {
+    if (!mfaSecret) {
       return {
         success: true
       }
     }
 
-    const mfaParamKey = `mfa_${mfaExtension.uuid}`
-    if (!dto.requestParams[mfaParamKey]) {
+    if (!dto.token) {
       return {
         success: false,
         errorTag: 'mfa-required',
-        errorMessage: 'Please enter your two-factor authentication code.',
-        errorPayload: { mfa_key: mfaParamKey }
+        errorMessage: 'Please enter your two-factor authentication code.'
       }
     }
 
-    const mfaContent = this.contentDecoder.decode(mfaExtension.content)
-
-    if (!authenticator.verify({ token: <string> dto.requestParams[mfaParamKey], secret: <string> mfaContent.secret })) {
+    if (!authenticator.verify({ token: dto.token, secret: mfaSecret.value })) {
       return {
         success: false,
         errorTag: 'mfa-invalid',
-        errorMessage: 'The two-factor authentication code you entered is incorrect. Please try again.',
-        errorPayload: { mfa_key: mfaParamKey },
+        errorMessage: 'The two-factor authentication code you entered is incorrect. Please try again.'
       }
     }
 

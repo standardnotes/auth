@@ -10,6 +10,7 @@ const TYPES = {
   EphemeralSessionRepository: Symbol.for('EphemeralSessionRepository'),
   RevokedSessionRepository: Symbol.for('RevokedSessionRepository'),
   ItemRepository: Symbol.for('ItemRepository'),
+  SettingRepository: Symbol.for('SettingRepository'),
   LockRepository: Symbol.for('LockRepository'),
   RoleRepository: Symbol.for('RoleRepository'),
   // Middleware

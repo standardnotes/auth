@@ -60,15 +60,14 @@ export class AuthController extends BaseHttpController {
 
     const verifyMFAResponse = await this.verifyMFA.execute({
       email: <string> request.query.email,
-      requestParams: request.query
+      token: <string> request.query.mfa_key
     })
 
     if (!verifyMFAResponse.success) {
       return this.json({
         error: {
           tag: verifyMFAResponse.errorTag,
-          message: verifyMFAResponse.errorMessage,
-          payload: verifyMFAResponse.errorPayload,
+          message: verifyMFAResponse.errorMessage
         }
       }, 401)
     }
@@ -95,15 +94,14 @@ export class AuthController extends BaseHttpController {
 
     const verifyMFAResponse = await this.verifyMFA.execute({
       email: request.body.email,
-      requestParams: request.body
+      token: request.body.mfa_key
     })
 
     if (!verifyMFAResponse.success) {
       return this.json({
         error: {
           tag: verifyMFAResponse.errorTag,
-          message: verifyMFAResponse.errorMessage,
-          payload: verifyMFAResponse.errorPayload,
+          message: verifyMFAResponse.errorMessage
         }
       }, 401)
     }
