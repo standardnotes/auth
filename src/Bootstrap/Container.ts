@@ -209,7 +209,6 @@ export class ContainerConfigLoader {
         // Services
         container.bind<UAParser>(TYPES.DeviceDetector).toConstantValue(new UAParser())
         container.bind<SessionService>(TYPES.SessionService).to(SessionService)
-        container.bind<ContentDecoder>(TYPES.ContentDecoder).to(ContentDecoder)
         container.bind<AuthResponseFactory20161215>(TYPES.AuthResponseFactory20161215).to(AuthResponseFactory20161215)
         container.bind<AuthResponseFactory20190520>(TYPES.AuthResponseFactory20190520).to(AuthResponseFactory20190520)
         container.bind<AuthResponseFactory20200115>(TYPES.AuthResponseFactory20200115).to(AuthResponseFactory20200115)
