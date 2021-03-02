@@ -1,8 +1,6 @@
 import 'reflect-metadata'
 import { authenticator } from 'otplib'
 
-import { ContentDecoderInterface } from '../Item/ContentDecoderInterface'
-import { Item } from '../Item/Item'
 import { User } from '../User/User'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { VerifyMFA } from './VerifyMFA'
@@ -11,27 +9,19 @@ import { SETTINGS } from '../Setting/Settings'
 
 describe('VerifyMFA', () => {
   let user: User
-  let item: Item
   let userRepository: UserRepositoryInterface
   let settingRepository: SettingRepositoryInterface
-  let contentDecoder: ContentDecoderInterface
 
   const createVerifyMFA = () => new VerifyMFA(userRepository, settingRepository)
 
   beforeEach(() => {
     user = {} as jest.Mocked<User>
 
-    item = {} as jest.Mocked<Item>
-    item.uuid = '1-2-3'
-
     userRepository = {} as jest.Mocked<UserRepositoryInterface>
     userRepository.findOneByEmail = jest.fn().mockReturnValue(user)
 
     settingRepository = {} as jest.Mocked<SettingRepositoryInterface>
     settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue(null)
-
-    contentDecoder = {} as jest.Mocked<ContentDecoderInterface>
-    contentDecoder.decode = jest.fn().mockReturnValue({})
   })
 
   it('should pass MFA verification if user has no MFA enabled', async () => {

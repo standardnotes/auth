@@ -26,15 +26,13 @@ import { Session } from '../Domain/Session/Session'
 import { SessionService } from '../Domain/Session/SessionService'
 import { MySQLSessionRepository } from '../Infra/MySQL/MySQLSessionRepository'
 import { MySQLUserRepository } from '../Infra/MySQL/MySQLUserRepository'
-import { Item } from '../Domain/Item/Item'
+import DeviceDetector = require('device-detector-js')
 import { SessionProjector } from '../Projection/SessionProjector'
 import { SessionMiddleware } from '../Controller/SessionMiddleware'
 import { RefreshSessionToken } from '../Domain/UseCase/RefreshSessionToken'
 import { KeyParamsFactory } from '../Domain/User/KeyParamsFactory'
-import { MySQLItemRepository } from '../Infra/MySQL/MySQLItemRepository'
 import { SignIn } from '../Domain/UseCase/SignIn'
 import { VerifyMFA } from '../Domain/UseCase/VerifyMFA'
-import { ContentDecoder } from '../Domain/Item/ContentDecoder'
 import { UserProjector } from '../Projection/UserProjector'
 import { AuthResponseFactory20161215 } from '../Domain/Auth/AuthResponseFactory20161215'
 import { AuthResponseFactory20190520 } from '../Domain/Auth/AuthResponseFactory20190520'
@@ -99,7 +97,6 @@ export class ContainerConfigLoader {
             User,
             Session,
             RevokedSession,
-            Item,
             Role,
             Permission,
             Setting
@@ -153,7 +150,6 @@ export class ContainerConfigLoader {
         container.bind<MySQLSessionRepository>(TYPES.SessionRepository).toConstantValue(connection.getCustomRepository(MySQLSessionRepository))
         container.bind<MySQLRevokedSessionRepository>(TYPES.RevokedSessionRepository).toConstantValue(connection.getCustomRepository(MySQLRevokedSessionRepository))
         container.bind<MySQLUserRepository>(TYPES.UserRepository).toConstantValue(connection.getCustomRepository(MySQLUserRepository))
-        container.bind<MySQLItemRepository>(TYPES.ItemRepository).toConstantValue(connection.getCustomRepository(MySQLItemRepository))
         container.bind<MySQLSettingRepository>(TYPES.SettingRepository).toConstantValue(connection.getCustomRepository(MySQLSettingRepository))
         container.bind<MySQLRoleRepository>(TYPES.RoleRepository).toConstantValue(connection.getCustomRepository(MySQLRoleRepository))
         container.bind<RedisEphemeralSessionRepository>(TYPES.EphemeralSessionRepository).to(RedisEphemeralSessionRepository)
