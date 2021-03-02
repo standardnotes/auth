@@ -20,6 +20,13 @@ export class Setting {
   value: string
 
   @Column({
+    type: 'tinyint',
+    width: 1,
+    default: 0
+  })
+  encrypted: boolean
+
+  @Column({
     name: 'created_at',
     type: 'datetime',
     default:
