@@ -65,6 +65,7 @@ import { Permission } from '../Domain/Permission/Permission'
 import { RoleProjector } from '../Projection/RoleProjector'
 import { PermissionProjector } from '../Projection/PermissionProjector'
 import { MySQLRoleRepository } from '../Infra/MySQL/MySQLRoleRepository'
+import { Setting } from '../Domain/Setting/Setting'
 
 export class ContainerConfigLoader {
     async load(): Promise<Container> {
@@ -99,7 +100,8 @@ export class ContainerConfigLoader {
             RevokedSession,
             Item,
             Role,
-            Permission
+            Permission,
+            Setting
           ],
           migrations: [
             env.get('DB_MIGRATIONS_PATH')
