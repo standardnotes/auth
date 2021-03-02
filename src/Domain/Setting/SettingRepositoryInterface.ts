@@ -1,5 +1,5 @@
 import { Setting } from './Setting'
 
 export interface SettingRepositoryInterface {
-  findOneByName(name: string): Promise<Setting | undefined>
+  findOneByNameAndUserUuid(name: string, userUuid: string): Promise<Setting | undefined>
 }

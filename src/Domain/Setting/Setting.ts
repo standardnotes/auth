@@ -1,7 +1,8 @@
-import { Column, Entity, ManyToOne, PrimaryColumn } from 'typeorm'
+import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm'
 import { User } from '../User/User'
 
 @Entity({ name: 'settings' })
+@Index('index_settings_on_name_and_user_uuid', ['name', 'user'])
 export class Setting {
   @PrimaryColumn({
     length: 36
@@ -38,7 +39,12 @@ export class Setting {
 
   @ManyToOne(
     /* istanbul ignore next */
-    () => User, user => user.settings, { onDelete: 'CASCADE', nullable: false }
+    () => User,
+    /* istanbul ignore next */
+    user => user.settings,
+    /* istanbul ignore next */
+    { onDelete: 'CASCADE', nullable: false }
   )
+  @JoinColumn({ name: 'user_uuid', referencedColumnName: 'uuid' })
   user: Promise<User>
 }
