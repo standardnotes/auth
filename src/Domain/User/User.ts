@@ -1,6 +1,7 @@
 import { Column, Entity, Index, JoinTable, ManyToMany, OneToMany, PrimaryColumn } from 'typeorm'
 import { RevokedSession } from '../Session/RevokedSession'
 import { Role } from '../Role/Role'
+import { Setting } from '../Setting/Setting'
 
 @Entity({ name: 'users' })
 export class User {
@@ -130,6 +131,14 @@ export class User {
     revokedSession => revokedSession.user
   )
   revokedSessions: Promise<RevokedSession[]>
+
+  @OneToMany(
+    /* istanbul ignore next */
+    () => Setting,
+    /* istanbul ignore next */
+    setting => setting.user
+  )
+  settings: Promise<Setting[]>
 
   @ManyToMany(
     /* istanbul ignore next */
