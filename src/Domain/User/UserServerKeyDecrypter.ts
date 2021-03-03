@@ -14,7 +14,7 @@ export class UserServerKeyDecrypter {
   async decrypt(user: User): Promise<string> {
     return this.crypter.decrypt(
       user.encryptionVersion,
-      <string> user.serverKey,
+      <string> user.encryptedServerKey,
       this.encryptionServerKey
     )
   }

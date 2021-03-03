@@ -19,7 +19,7 @@ export class UserKeyRotator implements UserKeyRotatorInterface {
   async rotateServerKey(user: User): Promise<void> {
     const unencryptedServerKey = cryptoRandomString({ length: 32, type: 'base64' })
 
-    user.serverKey = await this.crypter.encrypt(Crypter.ENCRYPTION_VERSION_1, unencryptedServerKey, this.encryptionServerKey)
+    user.encryptedServerKey = await this.crypter.encrypt(Crypter.ENCRYPTION_VERSION_1, unencryptedServerKey, this.encryptionServerKey)
 
     await this.userRepository.save(user)
   }

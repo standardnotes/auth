@@ -34,12 +34,12 @@ export class User {
   pwNonce: string
 
   @Column({
-    name: 'server_key',
+    name: 'encrypted_server_key',
     length: 255,
     type: 'varchar',
     nullable: true
   })
-  serverKey: string | null
+  encryptedServerKey: string | null
 
   @Column({
     name: 'encryption_version',
