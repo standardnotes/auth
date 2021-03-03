@@ -36,6 +36,7 @@ export class User {
   @Column({
     name: 'server_key',
     length: 255,
+    type: 'varchar',
     nullable: true
   })
   serverKey: string | null
