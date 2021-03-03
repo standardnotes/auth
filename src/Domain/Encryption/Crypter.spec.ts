@@ -26,11 +26,7 @@ describe('Crypter', () => {
 
     const encryptedSampleData1 = await createCrypter().encrypt(Crypter.ENCRYPTION_VERSION_1, sampleData, userServerKey)
 
-    expect(encryptedSampleData1).toHaveLength(156)
-
     const encryptedSampleData2 = await createCrypter().encrypt(Crypter.ENCRYPTION_VERSION_1, sampleData, userServerKey)
-
-    expect(encryptedSampleData2).toHaveLength(156)
 
     expect(encryptedSampleData1).not.toEqual(encryptedSampleData2)
   })
