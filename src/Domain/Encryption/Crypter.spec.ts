@@ -1,11 +1,11 @@
 import 'reflect-metadata'
 
-import * as cryptoRandomString from 'crypto-random-string'
+import { randomBytes } from 'crypto'
 
 import { Crypter } from './Crypter'
 
 describe('Crypter', () => {
-  const userServerKey = cryptoRandomString({ length: 32, type: 'base64' })
+  const userServerKey = randomBytes(32).toString('base64').slice(0, 32)
 
   const createCrypter = () => new Crypter()
 
