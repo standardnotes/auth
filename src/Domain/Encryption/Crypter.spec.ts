@@ -1,12 +1,13 @@
 import 'reflect-metadata'
 
+import * as cryptoRandomString from 'crypto-random-string'
+
 import { Crypter } from './Crypter'
 
 describe('Crypter', () => {
-  const encryptionIterations = 1000
-  const userServerKey = 'my-private-key'
+  const userServerKey = cryptoRandomString({ length: 32, type: 'base64' })
 
-  const createCrypter = () => new Crypter(encryptionIterations)
+  const createCrypter = () => new Crypter()
 
   it('should encrypt and decrypt data', async () => {
     const sampleData = 'My-Super-Secret-Data'

@@ -7,14 +7,16 @@ import { VerifyMFA } from './VerifyMFA'
 import { SettingRepositoryInterface } from '../Setting/SettingRepositoryInterface'
 import { SETTINGS } from '../Setting/Settings'
 import { CrypterInterface } from '../Encryption/CrypterInterface'
+import { UserServerKeyDecrypterInterface } from '../User/UserServerKeyDecrypterInterface'
 
 describe('VerifyMFA', () => {
   let user: User
   let userRepository: UserRepositoryInterface
   let crypter: CrypterInterface
   let settingRepository: SettingRepositoryInterface
+  let userServerKeyDecrypter: UserServerKeyDecrypterInterface
 
-  const createVerifyMFA = () => new VerifyMFA(userRepository, settingRepository, crypter)
+  const createVerifyMFA = () => new VerifyMFA(userRepository, settingRepository, crypter, userServerKeyDecrypter)
 
   beforeEach(() => {
     user = {} as jest.Mocked<User>
@@ -27,6 +29,9 @@ describe('VerifyMFA', () => {
 
     crypter = {} as jest.Mocked<CrypterInterface>
     crypter.decrypt = jest.fn()
+
+    userServerKeyDecrypter = {} as jest.Mocked<UserServerKeyDecrypterInterface>
+    userServerKeyDecrypter.decrypt = jest.fn().mockReturnValue('test')
   })
 
   it('should pass MFA verification if user has no MFA enabled', async () => {

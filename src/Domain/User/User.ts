@@ -42,6 +42,13 @@ export class User {
   serverKey: string | null
 
   @Column({
+    name: 'encryption_version',
+    type: 'tinyint',
+    default: 0
+  })
+  encryptionVersion: number
+
+  @Column({
     name: 'kp_created',
     length: 255,
     nullable: true

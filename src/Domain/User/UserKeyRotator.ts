@@ -1,5 +1,5 @@
 import { inject, injectable } from 'inversify'
-import { randomBytes } from 'crypto'
+import * as cryptoRandomString from 'crypto-random-string'
 import TYPES from '../../Bootstrap/Types'
 import { Crypter } from '../Encryption/Crypter'
 import { CrypterInterface } from '../Encryption/CrypterInterface'
@@ -17,7 +17,7 @@ export class UserKeyRotator implements UserKeyRotatorInterface {
   }
 
   async rotateServerKey(user: User): Promise<void> {
-    const unencryptedServerKey = randomBytes(16).toString('base64')
+    const unencryptedServerKey = cryptoRandomString({ length: 32, type: 'base64' })
 
     user.serverKey = await this.crypter.encrypt(Crypter.ENCRYPTION_VERSION_1, unencryptedServerKey, this.encryptionServerKey)
 
