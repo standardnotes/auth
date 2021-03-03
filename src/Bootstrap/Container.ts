@@ -65,6 +65,10 @@ import { PermissionProjector } from '../Projection/PermissionProjector'
 import { MySQLRoleRepository } from '../Infra/MySQL/MySQLRoleRepository'
 import { Setting } from '../Domain/Setting/Setting'
 import { MySQLSettingRepository } from '../Infra/MySQL/MySQLSettingRepository'
+import { CrypterInterface } from '../Domain/Encryption/CrypterInterface'
+import { Crypter } from '../Domain/Encryption/Crypter'
+import { UserKeyRotatorInterface } from '../Domain/User/UserKeyRotatorInterface'
+import { UserKeyRotator } from '../Domain/User/UserKeyRotator'
 
 export class ContainerConfigLoader {
     async load(): Promise<Container> {
@@ -172,6 +176,8 @@ export class ContainerConfigLoader {
         container.bind(TYPES.LEGACY_JWT_SECRET).toConstantValue(env.get('LEGACY_JWT_SECRET'))
         container.bind(TYPES.AUTH_JWT_SECRET).toConstantValue(env.get('AUTH_JWT_SECRET'))
         container.bind(TYPES.AUTH_JWT_TTL).toConstantValue(env.get('AUTH_JWT_TTL'))
+        container.bind(TYPES.ENCRYPTION_SERVER_KEY).toConstantValue(env.get('ENCRYPTION_SERVER_KEY'))
+        container.bind(TYPES.ENCRYPTION_ITERATIONS).toConstantValue(env.get('ENCRYPTION_ITERATIONS'))
         container.bind(TYPES.ACCESS_TOKEN_AGE).toConstantValue(env.get('ACCESS_TOKEN_AGE'))
         container.bind(TYPES.REFRESH_TOKEN_AGE).toConstantValue(env.get('REFRESH_TOKEN_AGE'))
         container.bind(TYPES.MAX_LOGIN_ATTEMPTS).toConstantValue(env.get('MAX_LOGIN_ATTEMPTS'))
@@ -218,6 +224,8 @@ export class ContainerConfigLoader {
         container.bind<AuthenticationMethodResolver>(TYPES.AuthenticationMethodResolver).to(AuthenticationMethodResolver)
         container.bind<DomainEventFactory>(TYPES.DomainEventFactory).to(DomainEventFactory)
         container.bind<superagent.SuperAgentStatic>(TYPES.HTTPClient).toConstantValue(superagent)
+        container.bind<CrypterInterface>(TYPES.Crypter).to(Crypter)
+        container.bind<UserKeyRotatorInterface>(TYPES.UserKeyRotator).to(UserKeyRotator)
 
         if (env.get('SNS_TOPIC_ARN', true)) {
           container.bind<SNSDomainEventPublisher>(TYPES.DomainEventPublisher).toConstantValue(

@@ -34,6 +34,13 @@ export class User {
   pwNonce: string
 
   @Column({
+    name: 'server_key',
+    length: 255,
+    nullable: true
+  })
+  serverKey: string | null
+
+  @Column({
     name: 'kp_created',
     length: 255,
     nullable: true

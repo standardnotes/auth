@@ -1,6 +1,7 @@
 import { inject, injectable } from 'inversify'
 import { authenticator } from 'otplib'
 import TYPES from '../../Bootstrap/Types'
+import { CrypterInterface } from '../Encryption/CrypterInterface'
 import { SettingRepositoryInterface } from '../Setting/SettingRepositoryInterface'
 import { SETTINGS } from '../Setting/Settings'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
@@ -12,7 +13,8 @@ import { VerifyMFAResponse } from './VerifyMFAResponse'
 export class VerifyMFA implements UseCaseInterface {
   constructor(
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
-    @inject(TYPES.SettingRepository) private settingRepository: SettingRepositoryInterface
+    @inject(TYPES.SettingRepository) private settingRepository: SettingRepositoryInterface,
+    @inject(TYPES.Crypter) private crypter: CrypterInterface
   ) {
   }
 
@@ -25,9 +27,9 @@ export class VerifyMFA implements UseCaseInterface {
       }
     }
 
-    const mfaSecret = await this.settingRepository.findOneByNameAndUserUuid(SETTINGS.MFA_SECRET, user.uuid)
+    const mfaSecretSetting = await this.settingRepository.findOneByNameAndUserUuid(SETTINGS.MFA_SECRET, user.uuid)
 
-    if (!mfaSecret) {
+    if (!mfaSecretSetting) {
       return {
         success: true
       }
@@ -41,7 +43,13 @@ export class VerifyMFA implements UseCaseInterface {
       }
     }
 
-    if (!authenticator.verify({ token: dto.token, secret: mfaSecret.value })) {
+    const decryptedValue = await this.crypter.decrypt(
+      mfaSecretSetting.encryptionVersion,
+      mfaSecretSetting.value,
+      <string> user.serverKey
+    )
+
+    if (!authenticator.verify({ token: dto.token, secret: decryptedValue })) {
       return {
         success: false,
         errorTag: 'mfa-invalid',

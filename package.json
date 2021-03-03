@@ -2,7 +2,7 @@
   "name": "auth",
   "version": "1.0.0",
   "engines": {
-    "node": ">=14.0.0 <15.0.0"
+    "node": ">=15.0.0 <16.0.0"
   },
   "description": "Auth Server",
   "main": "dist/src/index.js",

@@ -6,13 +6,15 @@ import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { VerifyMFA } from './VerifyMFA'
 import { SettingRepositoryInterface } from '../Setting/SettingRepositoryInterface'
 import { SETTINGS } from '../Setting/Settings'
+import { CrypterInterface } from '../Encryption/CrypterInterface'
 
 describe('VerifyMFA', () => {
   let user: User
   let userRepository: UserRepositoryInterface
+  let crypter: CrypterInterface
   let settingRepository: SettingRepositoryInterface
 
-  const createVerifyMFA = () => new VerifyMFA(userRepository, settingRepository)
+  const createVerifyMFA = () => new VerifyMFA(userRepository, settingRepository, crypter)
 
   beforeEach(() => {
     user = {} as jest.Mocked<User>
@@ -22,6 +24,9 @@ describe('VerifyMFA', () => {
 
     settingRepository = {} as jest.Mocked<SettingRepositoryInterface>
     settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue(null)
+
+    crypter = {} as jest.Mocked<CrypterInterface>
+    crypter.decrypt = jest.fn()
   })
 
   it('should pass MFA verification if user has no MFA enabled', async () => {
@@ -57,7 +62,9 @@ describe('VerifyMFA', () => {
       value: 'shhhh'
     })
 
-    expect(await createVerifyMFA().execute({ email: 'test@test.te', token: 'test' })).toEqual({
+    crypter.decrypt = jest.fn().mockReturnValue('test')
+
+    expect(await createVerifyMFA().execute({ email: 'test@test.te', token: 'invalid-token' })).toEqual({
       success: false,
       errorTag: 'mfa-invalid',
       errorMessage: 'The two-factor authentication code you entered is incorrect. Please try again.'
@@ -70,7 +77,9 @@ describe('VerifyMFA', () => {
       value: 'shhhh'
     })
 
-    expect(await createVerifyMFA().execute({ email: 'test@test.te', token: authenticator.generate('shhhh') })).toEqual({
+    crypter.decrypt = jest.fn().mockReturnValue('test')
+
+    expect(await createVerifyMFA().execute({ email: 'test@test.te', token: authenticator.generate('test') })).toEqual({
       success: true,
     })
   })

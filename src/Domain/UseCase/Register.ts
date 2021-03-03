@@ -12,6 +12,7 @@ import { RegisterResponse } from './RegisterResponse'
 import { UseCaseInterface } from './UseCaseInterface'
 import { AuthResponseFactoryResolverInterface } from '../Auth/AuthResponseFactoryResolverInterface'
 import { RoleRepositoryInterface } from '../Role/RoleRepositoryInterface'
+import { UserKeyRotatorInterface } from '../User/UserKeyRotatorInterface'
 
 @injectable()
 export class Register implements UseCaseInterface {
@@ -19,6 +20,7 @@ export class Register implements UseCaseInterface {
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
     @inject(TYPES.RoleRepository) private roleRepository: RoleRepositoryInterface,
     @inject(TYPES.AuthResponseFactoryResolver) private authResponseFactoryResolver: AuthResponseFactoryResolverInterface,
+    @inject(TYPES.UserKeyRotator) private userKeyRotator: UserKeyRotatorInterface,
     @inject(TYPES.DISABLE_USER_REGISTRATION) private disableUserRegistration: boolean
   ) {
   }
@@ -56,6 +58,8 @@ export class Register implements UseCaseInterface {
     Object.assign(user, registrationFields)
 
     user = await this.userRepository.save(user)
+
+    await this.userKeyRotator.rotateServerKey(user)
 
     const authResponseFactory = this.authResponseFactoryResolver.resolveAuthResponseFactoryVersion(apiVersion)
 

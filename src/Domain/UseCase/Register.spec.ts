@@ -4,6 +4,7 @@ import { AuthResponseFactoryResolverInterface } from '../Auth/AuthResponseFactor
 import { Role } from '../Role/Role'
 import { RoleRepositoryInterface } from '../Role/RoleRepositoryInterface'
 import { User } from '../User/User'
+import { UserKeyRotatorInterface } from '../User/UserKeyRotatorInterface'
 
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { Register } from './Register'
@@ -14,8 +15,9 @@ describe('Register', () => {
   let authResponseFactoryResolver: AuthResponseFactoryResolverInterface
   let authResponseFactory: AuthResponseFactoryInterface
   let user: User
+  let userKeyRotator: UserKeyRotatorInterface
 
-  const createUseCase = () => new Register(userRepository, roleRepository, authResponseFactoryResolver, false)
+  const createUseCase = () => new Register(userRepository, roleRepository, authResponseFactoryResolver, userKeyRotator, false)
 
   beforeEach(() => {
     userRepository = {} as jest.Mocked<UserRepositoryInterface>
@@ -30,6 +32,9 @@ describe('Register', () => {
 
     authResponseFactoryResolver = {} as jest.Mocked<AuthResponseFactoryResolverInterface>
     authResponseFactoryResolver.resolveAuthResponseFactoryVersion = jest.fn().mockReturnValue(authResponseFactory)
+
+    userKeyRotator = {} as jest.Mocked<UserKeyRotatorInterface>
+    userKeyRotator.rotateServerKey = jest.fn()
 
     user = {} as jest.Mocked<User>
   })
@@ -60,6 +65,8 @@ describe('Register', () => {
       updatedAt: expect.any(Date),
       SESSIONS_PROTOCOL_VERSION: 4
     })
+
+    expect(userKeyRotator.rotateServerKey).toHaveBeenCalled()
   })
 
   it('should register a new user with default role', async () => {
@@ -93,6 +100,8 @@ describe('Register', () => {
       SESSIONS_PROTOCOL_VERSION: 4,
       roles: Promise.resolve([ role ])
     })
+
+    expect(userKeyRotator.rotateServerKey).toHaveBeenCalled()
   })
 
   it('should fail to register if a user already exists', async () => {
@@ -114,12 +123,13 @@ describe('Register', () => {
     })
 
     expect(userRepository.save).not.toHaveBeenCalled()
+    expect(userKeyRotator.rotateServerKey).not.toHaveBeenCalled()
   })
 
   it('should fail to register if a registration is disabled', async () => {
     userRepository.findOneByEmail = jest.fn().mockReturnValue(user)
 
-    expect(await new Register(userRepository, roleRepository, authResponseFactoryResolver, true).execute({
+    expect(await new Register(userRepository, roleRepository, authResponseFactoryResolver, userKeyRotator, true).execute({
       email: 'test@test.te',
       password: 'asdzxc',
       updatedWithUserAgent: 'Mozilla',
@@ -135,5 +145,6 @@ describe('Register', () => {
     })
 
     expect(userRepository.save).not.toHaveBeenCalled()
+    expect(userKeyRotator.rotateServerKey).not.toHaveBeenCalled()
   })
 })

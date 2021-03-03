@@ -27,6 +27,8 @@ const TYPES = {
   LEGACY_JWT_SECRET: Symbol.for('LEGACY_JWT_SECRET'),
   AUTH_JWT_SECRET: Symbol.for('AUTH_JWT_SECRET'),
   AUTH_JWT_TTL: Symbol.for('AUTH_JWT_TTL'),
+  ENCRYPTION_SERVER_KEY: Symbol.for('ENCRYPTION_SERVER_KEY'),
+  ENCRYPTION_ITERATIONS: Symbol.for('ENCRYPTION_ITERATIONS'),
   ACCESS_TOKEN_AGE: Symbol.for('ACCESS_TOKEN_AGE'),
   REFRESH_TOKEN_AGE: Symbol.for('REFRESH_TOKEN_AGE'),
   EPHEMERAL_SESSION_AGE: Symbol.for('EPHEMERAL_SESSION_AGE'),
@@ -74,7 +76,9 @@ const TYPES = {
   DomainEventSubscriberFactory: Symbol.for('DomainEventSubscriberFactory'),
   DomainEventFactory: Symbol.for('DomainEventFactory'),
   DomainEventMessageHandler: Symbol.for('DomainEventMessageHandler'),
-  HTTPClient: Symbol.for('HTTPClient')
+  HTTPClient: Symbol.for('HTTPClient'),
+  Crypter: Symbol.for('Crypter'),
+  UserKeyRotator: Symbol.for('UserKeyRotator'),
 }
 
 export default TYPES
