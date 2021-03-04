@@ -9,6 +9,7 @@ import { EphemeralSessionRepositoryInterface } from './EphemeralSessionRepositor
 import { EphemeralSession } from './EphemeralSession'
 import { RevokedSessionRepositoryInterface } from './RevokedSessionRepositoryInterface'
 import { RevokedSession } from './RevokedSession'
+import { RandomStringGeneratorInterface } from '../Encryption/RandomStringGeneratorInterface'
 
 describe('SessionService', () => {
   let sessionRepository: SessionRepositoryInterface
@@ -25,6 +26,7 @@ describe('SessionService', () => {
     ephemeralSessionRepository,
     revokedSessionRepository,
     deviceDetector,
+    randomStringGenerator,
     logger,
     123,
     234
@@ -76,6 +78,9 @@ describe('SessionService', () => {
         version: '10.13'
       }
     })
+
+    randomStringGenerator = {} as jest.Mocked<RandomStringGeneratorInterface>
+    randomStringGenerator.generateUrlSafe = jest.fn().mockImplementation(length => randomBytes(length).toString('base64').slice(0, length))
 
     logger = {} as jest.Mocked<winston.Logger>
     logger.warning = jest.fn()

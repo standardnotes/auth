@@ -71,6 +71,8 @@ import { UserKeyRotatorInterface } from '../Domain/User/UserKeyRotatorInterface'
 import { UserKeyRotator } from '../Domain/User/UserKeyRotator'
 import { UserServerKeyDecrypter } from '../Domain/User/UserServerKeyDecrypter'
 import { UserServerKeyDecrypterInterface } from '../Domain/User/UserServerKeyDecrypterInterface'
+import { RandomStringGeneratorInterface } from '../Domain/Encryption/RandomStringGeneratorInterface'
+import { RandomStringGenerator } from '../Domain/Encryption/RandomStringGenerator'
 
 export class ContainerConfigLoader {
     async load(): Promise<Container> {
@@ -179,6 +181,8 @@ export class ContainerConfigLoader {
         container.bind(TYPES.AUTH_JWT_SECRET).toConstantValue(env.get('AUTH_JWT_SECRET'))
         container.bind(TYPES.AUTH_JWT_TTL).toConstantValue(env.get('AUTH_JWT_TTL'))
         container.bind(TYPES.ENCRYPTION_SERVER_KEY).toConstantValue(env.get('ENCRYPTION_SERVER_KEY'))
+        container.bind(TYPES.ENCRYPTION_SALT_LENGTH).toConstantValue(env.get('ENCRYPTION_SALT_LENGTH'))
+        container.bind(TYPES.ENCRYPTION_IV_LENGTH).toConstantValue(env.get('ENCRYPTION_IV_LENGTH'))
         container.bind(TYPES.ACCESS_TOKEN_AGE).toConstantValue(env.get('ACCESS_TOKEN_AGE'))
         container.bind(TYPES.REFRESH_TOKEN_AGE).toConstantValue(env.get('REFRESH_TOKEN_AGE'))
         container.bind(TYPES.MAX_LOGIN_ATTEMPTS).toConstantValue(env.get('MAX_LOGIN_ATTEMPTS'))
@@ -228,6 +232,7 @@ export class ContainerConfigLoader {
         container.bind<CrypterInterface>(TYPES.Crypter).to(Crypter)
         container.bind<UserKeyRotatorInterface>(TYPES.UserKeyRotator).to(UserKeyRotator)
         container.bind<UserServerKeyDecrypterInterface>(TYPES.UserServerKeyDecrypter).to(UserServerKeyDecrypter)
+        container.bind<RandomStringGeneratorInterface>(TYPES.RandomStringGenerator).to(RandomStringGenerator)
 
         if (env.get('SNS_TOPIC_ARN', true)) {
           container.bind<SNSDomainEventPublisher>(TYPES.DomainEventPublisher).toConstantValue(

@@ -28,6 +28,8 @@ const TYPES = {
   AUTH_JWT_SECRET: Symbol.for('AUTH_JWT_SECRET'),
   AUTH_JWT_TTL: Symbol.for('AUTH_JWT_TTL'),
   ENCRYPTION_SERVER_KEY: Symbol.for('ENCRYPTION_SERVER_KEY'),
+  ENCRYPTION_SALT_LENGTH: Symbol.for('ENCRYPTION_SALT_LENGTH'),
+  ENCRYPTION_IV_LENGTH: Symbol.for('ENCRYPTION_IV_LENGTH'),
   ACCESS_TOKEN_AGE: Symbol.for('ACCESS_TOKEN_AGE'),
   REFRESH_TOKEN_AGE: Symbol.for('REFRESH_TOKEN_AGE'),
   EPHEMERAL_SESSION_AGE: Symbol.for('EPHEMERAL_SESSION_AGE'),
@@ -79,6 +81,7 @@ const TYPES = {
   Crypter: Symbol.for('Crypter'),
   UserKeyRotator: Symbol.for('UserKeyRotator'),
   UserServerKeyDecrypter: Symbol.for('UserServerKeyDecrypter'),
+  RandomStringGenerator: Symbol.for('RandomStringGenerator')
 }
 
 export default TYPES

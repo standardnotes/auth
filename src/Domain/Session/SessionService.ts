@@ -16,6 +16,7 @@ import { EphemeralSessionRepositoryInterface } from './EphemeralSessionRepositor
 import { EphemeralSession } from './EphemeralSession'
 import { RevokedSession } from './RevokedSession'
 import { RevokedSessionRepositoryInterface } from './RevokedSessionRepositoryInterface'
+import { RandomStringGeneratorInterface } from '../Encryption/RandomStringGeneratorInterface'
 
 @injectable()
 export class SessionService implements SessionServiceInterace {
@@ -47,8 +48,8 @@ export class SessionService implements SessionServiceInterace {
   }
 
   async createTokens(session: Session): Promise<SessionPayload> {
-    const accessToken = cryptoRandomString({ length: 16, type: 'url-safe' })
-    const refreshToken = cryptoRandomString({ length: 16, type: 'url-safe' })
+    const accessToken = this.randomStringGenerator.generateUrlSafe(16)
+    const refreshToken = this.randomStringGenerator.generateUrlSafe(16)
 
     const hashedAccessToken = crypto.createHash('sha256').update(accessToken).digest('hex')
     const hashedRefreshToken = crypto.createHash('sha256').update(refreshToken).digest('hex')

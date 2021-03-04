@@ -3,11 +3,21 @@ import 'reflect-metadata'
 import { randomBytes } from 'crypto'
 
 import { Crypter } from './Crypter'
+import { RandomStringGeneratorInterface } from './RandomStringGeneratorInterface'
 
 describe('Crypter', () => {
-  const userServerKey = randomBytes(32).toString('base64').slice(0, 32)
+  let randomStringGenerator: RandomStringGeneratorInterface
 
-  const createCrypter = () => new Crypter()
+  const userServerKey = randomBytes(32).toString('base64').slice(0, 32)
+  const saltLength = 64
+  const ivLength = 16
+
+  const createCrypter = () => new Crypter(randomStringGenerator, saltLength, ivLength)
+
+  beforeEach(() => {
+    randomStringGenerator = {} as jest.Mocked<RandomStringGeneratorInterface>
+    randomStringGenerator.generate = jest.fn().mockImplementation(length => randomBytes(length).toString('base64').slice(0, length))
+  })
 
   it('should encrypt and decrypt data', async () => {
     const sampleData = 'My-Super-Secret-Data'
