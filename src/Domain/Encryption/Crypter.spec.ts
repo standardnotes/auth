@@ -9,10 +9,8 @@ describe('Crypter', () => {
   let randomStringGenerator: RandomStringGeneratorInterface
 
   const userServerKey = randomBytes(32).toString('base64').slice(0, 32)
-  const saltLength = 64
-  const ivLength = 16
 
-  const createCrypter = () => new Crypter(randomStringGenerator, saltLength, ivLength)
+  const createCrypter = () => new Crypter(randomStringGenerator)
 
   beforeEach(() => {
     randomStringGenerator = {} as jest.Mocked<RandomStringGeneratorInterface>
@@ -24,7 +22,7 @@ describe('Crypter', () => {
 
     const encryptedSampleData = await createCrypter().encrypt(Crypter.ENCRYPTION_VERSION_1, sampleData, userServerKey)
 
-    expect(encryptedSampleData).toHaveLength(156)
+    expect(encryptedSampleData).toHaveLength(135)
 
     expect(
       await createCrypter().decrypt(Crypter.ENCRYPTION_VERSION_1, encryptedSampleData, userServerKey)

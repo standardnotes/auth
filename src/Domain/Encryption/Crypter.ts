@@ -9,12 +9,11 @@ import { RandomStringGeneratorInterface } from './RandomStringGeneratorInterface
 export class Crypter implements CrypterInterface {
   static readonly ENCRYPTION_VERSION_1 = 1
 
-  private readonly AES_GCM_AUTH_TAG_LENGTH = 16
+  private readonly IV_LENGTH = 16
+  private readonly SALT_LENGTH = 64
 
   constructor (
     @inject(TYPES.RandomStringGenerator) private randomStringGenerator: RandomStringGeneratorInterface,
-    @inject(TYPES.ENCRYPTION_SALT_LENGTH) private encryptionSaltLength: number,
-    @inject(TYPES.ENCRYPTION_IV_LENGTH) private encryptionIVLength: number
   ) {
   }
 
@@ -23,17 +22,17 @@ export class Crypter implements CrypterInterface {
       throw new Error(`Supported versions of encryption: ${Crypter.ENCRYPTION_VERSION_1}`)
     }
 
-    const iv = Buffer.from(this.randomStringGenerator.generate(this.encryptionIVLength))
+    const iv = this.randomStringGenerator.generate(this.IV_LENGTH)
 
-    const salt = Buffer.from(this.randomStringGenerator.generate(this.encryptionSaltLength))
+    const salt = this.randomStringGenerator.generate(this.SALT_LENGTH)
 
     const cipher = createCipheriv('aes-256-gcm', masterKey, iv)
 
-    const encrypted = Buffer.concat([cipher.update(data, 'utf8'), cipher.final()])
+    const encrypted = Buffer.concat([cipher.update(data, 'utf8'), cipher.final()]).toString('base64')
 
-    const tag = cipher.getAuthTag()
+    const tag = cipher.getAuthTag().toString('base64')
 
-    return Buffer.concat([salt, iv, tag, encrypted]).toString('base64')
+    return [salt, iv, tag, encrypted].join(':')
   }
 
   async decrypt(encryptionVersion: number, data: string, masterKey: string): Promise<string> {
@@ -41,18 +40,14 @@ export class Crypter implements CrypterInterface {
       throw new Error(`Supported versions of encryption: ${Crypter.ENCRYPTION_VERSION_1}`)
     }
 
-    const bData = Buffer.from(data, 'base64')
-
-    const saltAndIvLength = this.encryptionSaltLength + this.encryptionIVLength
-
-    const iv = bData.slice(this.encryptionSaltLength, saltAndIvLength)
-    const tag = bData.slice(saltAndIvLength, saltAndIvLength + this.AES_GCM_AUTH_TAG_LENGTH)
-    const text = bData.slice(saltAndIvLength + this.AES_GCM_AUTH_TAG_LENGTH)
+    const dataParts = data.split(':')
+    dataParts.shift()
+    const [iv, tag, encrypted] = dataParts
 
     const decipher = createDecipheriv('aes-256-gcm', masterKey, iv)
-    decipher.setAuthTag(tag)
+    decipher.setAuthTag(Buffer.from(tag, 'base64'))
 
-    const decrypted = decipher.update(text, undefined, 'utf8') + decipher.final('utf8')
+    const decrypted = decipher.update(Buffer.from(encrypted, 'base64'), undefined, 'utf8') + decipher.final('utf8')
 
     return decrypted
   }
