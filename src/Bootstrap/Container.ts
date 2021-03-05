@@ -65,14 +65,14 @@ import { PermissionProjector } from '../Projection/PermissionProjector'
 import { MySQLRoleRepository } from '../Infra/MySQL/MySQLRoleRepository'
 import { Setting } from '../Domain/Setting/Setting'
 import { MySQLSettingRepository } from '../Infra/MySQL/MySQLSettingRepository'
-import { CrypterInterface } from '../Domain/Encryption/CrypterInterface'
-import { Crypter } from '../Domain/Encryption/Crypter'
 import { UserKeyRotatorInterface } from '../Domain/User/UserKeyRotatorInterface'
 import { UserKeyRotator } from '../Domain/User/UserKeyRotator'
 import { UserServerKeyDecrypter } from '../Domain/User/UserServerKeyDecrypter'
 import { UserServerKeyDecrypterInterface } from '../Domain/User/UserServerKeyDecrypterInterface'
 import { RandomStringGeneratorInterface } from '../Domain/Encryption/RandomStringGeneratorInterface'
 import { RandomStringGenerator } from '../Domain/Encryption/RandomStringGenerator'
+import { SNWebCrypto } from '@standardnotes/sncrypto-web'
+import { SNPureCrypto } from '@standardnotes/sncrypto-common'
 
 export class ContainerConfigLoader {
     async load(): Promise<Container> {
@@ -227,7 +227,7 @@ export class ContainerConfigLoader {
         container.bind<AuthenticationMethodResolver>(TYPES.AuthenticationMethodResolver).to(AuthenticationMethodResolver)
         container.bind<DomainEventFactory>(TYPES.DomainEventFactory).to(DomainEventFactory)
         container.bind<superagent.SuperAgentStatic>(TYPES.HTTPClient).toConstantValue(superagent)
-        container.bind<CrypterInterface>(TYPES.Crypter).to(Crypter)
+        container.bind<SNPureCrypto>(TYPES.Crypter).to(SNWebCrypto)
         container.bind<UserKeyRotatorInterface>(TYPES.UserKeyRotator).to(UserKeyRotator)
         container.bind<UserServerKeyDecrypterInterface>(TYPES.UserServerKeyDecrypter).to(UserServerKeyDecrypter)
         container.bind<RandomStringGeneratorInterface>(TYPES.RandomStringGenerator).to(RandomStringGenerator)

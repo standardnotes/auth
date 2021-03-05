@@ -42,6 +42,14 @@ export class User {
   encryptedServerKey: string | null
 
   @Column({
+    name: 'server_key_nonce',
+    length: 255,
+    type: 'varchar',
+    nullable: true
+  })
+  serverKeyNonce: string | null
+
+  @Column({
     name: 'encryption_version',
     type: 'tinyint',
     default: 0

@@ -1,18 +1,18 @@
 import 'reflect-metadata'
 import { authenticator } from 'otplib'
+import { SNPureCrypto } from '@standardnotes/sncrypto-common'
 
 import { User } from '../User/User'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { VerifyMFA } from './VerifyMFA'
 import { SettingRepositoryInterface } from '../Setting/SettingRepositoryInterface'
 import { SETTINGS } from '../Setting/Settings'
-import { CrypterInterface } from '../Encryption/CrypterInterface'
 import { UserServerKeyDecrypterInterface } from '../User/UserServerKeyDecrypterInterface'
 
 describe('VerifyMFA', () => {
   let user: User
   let userRepository: UserRepositoryInterface
-  let crypter: CrypterInterface
+  let crypter: SNPureCrypto
   let settingRepository: SettingRepositoryInterface
   let userServerKeyDecrypter: UserServerKeyDecrypterInterface
 
@@ -27,8 +27,8 @@ describe('VerifyMFA', () => {
     settingRepository = {} as jest.Mocked<SettingRepositoryInterface>
     settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue(null)
 
-    crypter = {} as jest.Mocked<CrypterInterface>
-    crypter.decrypt = jest.fn()
+    crypter = {} as jest.Mocked<SNPureCrypto>
+    crypter.xchacha20Decrypt = jest.fn()
 
     userServerKeyDecrypter = {} as jest.Mocked<UserServerKeyDecrypterInterface>
     userServerKeyDecrypter.decrypt = jest.fn().mockReturnValue('test')
@@ -67,7 +67,7 @@ describe('VerifyMFA', () => {
       value: 'shhhh'
     })
 
-    crypter.decrypt = jest.fn().mockReturnValue('test')
+    crypter.xchacha20Decrypt = jest.fn().mockReturnValue('test')
 
     expect(await createVerifyMFA().execute({ email: 'test@test.te', token: 'invalid-token' })).toEqual({
       success: false,
@@ -82,7 +82,7 @@ describe('VerifyMFA', () => {
       value: 'shhhh'
     })
 
-    crypter.decrypt = jest.fn().mockReturnValue('test')
+    crypter.xchacha20Decrypt = jest.fn().mockReturnValue('test')
 
     expect(await createVerifyMFA().execute({ email: 'test@test.te', token: authenticator.generate('test') })).toEqual({
       success: true,

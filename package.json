@@ -25,6 +25,8 @@
     "@standardnotes/auth": "^1.0.0",
     "@standardnotes/domain-events": "^1.0.2",
     "@types/ua-parser-js": "^0.7.35",
+    "@standardnotes/sncrypto-common": "^1.2.10",
+    "@standardnotes/sncrypto-web": "^1.2.10",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dayjs": "^1.10.4",

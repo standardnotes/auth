@@ -1,7 +1,7 @@
 import { inject, injectable } from 'inversify'
+import { SNPureCrypto } from '@standardnotes/sncrypto-common'
 import { authenticator } from 'otplib'
 import TYPES from '../../Bootstrap/Types'
-import { CrypterInterface } from '../Encryption/CrypterInterface'
 import { SettingRepositoryInterface } from '../Setting/SettingRepositoryInterface'
 import { SETTINGS } from '../Setting/Settings'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
@@ -15,7 +15,7 @@ export class VerifyMFA implements UseCaseInterface {
   constructor(
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
     @inject(TYPES.SettingRepository) private settingRepository: SettingRepositoryInterface,
-    @inject(TYPES.Crypter) private crypter: CrypterInterface,
+    @inject(TYPES.Crypter) private crypter: SNPureCrypto,
     @inject(TYPES.UserServerKeyDecrypter) private userServerKeyDecrypter: UserServerKeyDecrypterInterface
   ) {
   }
@@ -47,13 +47,14 @@ export class VerifyMFA implements UseCaseInterface {
 
     const decryptedUserServerKey = await this.userServerKeyDecrypter.decrypt(user)
 
-    const decryptedValue = await this.crypter.decrypt(
-      mfaSecretSetting.encryptionVersion,
+    const decryptedValue = await this.crypter.xchacha20Decrypt(
       mfaSecretSetting.value,
-      decryptedUserServerKey
+      <string> user.serverKeyNonce,
+      <string> decryptedUserServerKey,
+      ''
     )
 
-    if (!authenticator.verify({ token: dto.token, secret: decryptedValue })) {
+    if (!authenticator.verify({ token: dto.token, secret: <string> decryptedValue })) {
       return {
         success: false,
         errorTag: 'mfa-invalid',
