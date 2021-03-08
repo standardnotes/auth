@@ -2,7 +2,7 @@ import * as crypto from 'crypto'
 import * as winston from 'winston'
 import * as dayjs from 'dayjs'
 import * as cryptoRandomString from 'crypto-random-string'
-import DeviceDetector = require('device-detector-js')
+import { UAParser } from 'ua-parser-js'
 import { inject, injectable } from 'inversify'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -25,7 +25,7 @@ export class SessionService implements SessionServiceInterace {
     @inject(TYPES.SessionRepository) private sessionRepository: SessionRepositoryInterface,
     @inject(TYPES.EphemeralSessionRepository) private ephemeralSessionRepository: EphemeralSessionRepositoryInterface,
     @inject(TYPES.RevokedSessionRepository) private revokedSessionRepository: RevokedSessionRepositoryInterface,
-    @inject(TYPES.DeviceDetector) private deviceDetector: DeviceDetector,
+    @inject(TYPES.DeviceDetector) private deviceDetector: UAParser,
     @inject(TYPES.Logger) private logger: winston.Logger,
     @inject(TYPES.ACCESS_TOKEN_AGE) private accessTokenAge: number,
     @inject(TYPES.REFRESH_TOKEN_AGE) private refreshTokenAge: number
@@ -88,19 +88,18 @@ export class SessionService implements SessionServiceInterace {
 
   getDeviceInfo(session: Session): string {
     try {
-      const userAgentParsed = this.deviceDetector.parse(session.userAgent)
+      const userAgentParsed = this.deviceDetector.setUA(session.userAgent).getResult()
 
-      let osInfo = ''
-      if (userAgentParsed.os) {
-        osInfo = `${userAgentParsed.os.name ?? ''} ${userAgentParsed.os.version ?? ''}`.trim()
-      }
-      let clientInfo = ''
-      if (userAgentParsed.client) {
-        clientInfo = `${userAgentParsed.client.name ?? ''} ${userAgentParsed.client.version ?? ''}`.trim()
-      }
+      const osInfo = `${userAgentParsed.os.name ?? ''} ${userAgentParsed.os.version ?? ''}`.trim()
+      let clientInfo = `${userAgentParsed.browser.name ?? ''} ${userAgentParsed.browser.version ?? ''}`.trim()
 
       if (clientInfo.indexOf('okHttp') >= 0) {
         return osInfo
+      }
+
+      const desktopAppMatches = [...userAgentParsed.ua.matchAll(/(.*)StandardNotes\/((0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*))/g)]
+      if (desktopAppMatches[0] && desktopAppMatches[0][2]) {
+        clientInfo = `Standard Notes Desktop ${desktopAppMatches[0][2]}`
       }
 
       if (osInfo && clientInfo) {
