@@ -24,11 +24,11 @@
   "dependencies": {
     "@standardnotes/auth": "^1.0.0",
     "@standardnotes/domain-events": "^1.0.2",
+    "@types/ua-parser-js": "^0.7.35",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "crypto-random-string": "^3.3.0",
     "dayjs": "^1.10.4",
-    "device-detector-js": "^2.2.7",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-winston": "^4.0.5",
@@ -42,6 +42,7 @@
     "reflect-metadata": "^0.1.13",
     "superagent": "^6.1.0",
     "typeorm": "^0.2.30",
+    "ua-parser-js": "^0.7.24",
     "uuid": "^8.3.2",
     "winston": "^3.3.3"
   },
