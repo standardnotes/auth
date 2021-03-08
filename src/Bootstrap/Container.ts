@@ -14,6 +14,7 @@ import {
   SQSDomainEventSubscriberFactory,
   SQSEventMessageHandler
 } from '@standardnotes/domain-events'
+import { UAParser } from 'ua-parser-js'
 
 import { Env } from './Env'
 import TYPES from './Types'
@@ -26,7 +27,6 @@ import { SessionService } from '../Domain/Session/SessionService'
 import { MySQLSessionRepository } from '../Infra/MySQL/MySQLSessionRepository'
 import { MySQLUserRepository } from '../Infra/MySQL/MySQLUserRepository'
 import { Item } from '../Domain/Item/Item'
-import DeviceDetector = require('device-detector-js')
 import { SessionProjector } from '../Projection/SessionProjector'
 import { SessionMiddleware } from '../Controller/SessionMiddleware'
 import { RefreshSessionToken } from '../Domain/UseCase/RefreshSessionToken'
@@ -207,7 +207,7 @@ export class ContainerConfigLoader {
         container.bind<UserRegisteredEventHandler>(TYPES.UserRegisteredEventHandler).to(UserRegisteredEventHandler)
 
         // Services
-        container.bind<DeviceDetector>(TYPES.DeviceDetector).toConstantValue(new DeviceDetector())
+        container.bind<UAParser>(TYPES.DeviceDetector).toConstantValue(new UAParser())
         container.bind<SessionService>(TYPES.SessionService).to(SessionService)
         container.bind<ContentDecoder>(TYPES.ContentDecoder).to(ContentDecoder)
         container.bind<AuthResponseFactory20161215>(TYPES.AuthResponseFactory20161215).to(AuthResponseFactory20161215)
