@@ -1,23 +1,20 @@
 import { inject, injectable } from 'inversify'
-import { SNPureCrypto } from '@standardnotes/sncrypto-common'
 import { authenticator } from 'otplib'
 import TYPES from '../../Bootstrap/Types'
 import { SettingRepositoryInterface } from '../Setting/SettingRepositoryInterface'
 import { SETTINGS } from '../Setting/Settings'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
-import { UserServerKeyDecrypterInterface } from '../User/UserServerKeyDecrypterInterface'
 import { UseCaseInterface } from './UseCaseInterface'
 import { VerifyMFADTO } from './VerifyMFADTO'
 import { VerifyMFAResponse } from './VerifyMFAResponse'
-import { User } from '../User/User'
+import { CrypterInterface } from '../Encryption/CrypterInterface'
 
 @injectable()
 export class VerifyMFA implements UseCaseInterface {
   constructor(
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
     @inject(TYPES.SettingRepository) private settingRepository: SettingRepositoryInterface,
-    @inject(TYPES.Crypter) private crypter: SNPureCrypto,
-    @inject(TYPES.UserServerKeyDecrypter) private userServerKeyDecrypter: UserServerKeyDecrypterInterface
+    @inject(TYPES.Crypter) private crypter: CrypterInterface
   ) {
   }
 
@@ -46,18 +43,7 @@ export class VerifyMFA implements UseCaseInterface {
       }
     }
 
-    const decryptedUserServerKey = await this.userServerKeyDecrypter.decrypt(user)
-    const [ version, mfaKey, mfaNonce ] = mfaSecretSetting.value.split(':')
-    if (+version !== User.ENCRYPTION_VERSION_1) {
-      throw Error (`Not supported encryption version: ${version}`)
-    }
-
-    const decryptedValue = await this.crypter.xchacha20Decrypt(
-      mfaKey,
-      mfaNonce,
-      <string> decryptedUserServerKey,
-      ''
-    )
+    const decryptedValue = await this.crypter.decryptForUser(mfaSecretSetting.value, user)
 
     if (!authenticator.verify({ token: dto.token, secret: <string> decryptedValue })) {
       return {

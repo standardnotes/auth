@@ -12,7 +12,7 @@ import { RegisterResponse } from './RegisterResponse'
 import { UseCaseInterface } from './UseCaseInterface'
 import { AuthResponseFactoryResolverInterface } from '../Auth/AuthResponseFactoryResolverInterface'
 import { RoleRepositoryInterface } from '../Role/RoleRepositoryInterface'
-import { UserKeyRotatorInterface } from '../User/UserKeyRotatorInterface'
+import { CrypterInterface } from '../Encryption/CrypterInterface'
 
 @injectable()
 export class Register implements UseCaseInterface {
@@ -20,7 +20,7 @@ export class Register implements UseCaseInterface {
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
     @inject(TYPES.RoleRepository) private roleRepository: RoleRepositoryInterface,
     @inject(TYPES.AuthResponseFactoryResolver) private authResponseFactoryResolver: AuthResponseFactoryResolverInterface,
-    @inject(TYPES.UserKeyRotator) private userKeyRotator: UserKeyRotatorInterface,
+    @inject(TYPES.Crypter) private crypter: CrypterInterface,
     @inject(TYPES.DISABLE_USER_REGISTRATION) private disableUserRegistration: boolean
   ) {
   }
@@ -49,6 +49,8 @@ export class Register implements UseCaseInterface {
     user.createdAt = dayjs.utc().toDate()
     user.updatedAt = dayjs.utc().toDate()
     user.encryptedPassword = await bcrypt.hash(password, User.PASSWORD_HASH_COST)
+    user.encryptedServerKey = await this.crypter.generateEncryptedUserServerKey()
+    user.encryptionVersion = User.ENCRYPTION_VERSION_1
 
     const defaultRole = await this.roleRepository.findOneByName(ROLES.USER)
     if (defaultRole) {
@@ -58,8 +60,6 @@ export class Register implements UseCaseInterface {
     Object.assign(user, registrationFields)
 
     user = await this.userRepository.save(user)
-
-    await this.userKeyRotator.rotateServerKey(user)
 
     const authResponseFactory = this.authResponseFactoryResolver.resolveAuthResponseFactoryVersion(apiVersion)
 

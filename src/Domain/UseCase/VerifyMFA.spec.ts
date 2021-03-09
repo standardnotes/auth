@@ -1,22 +1,20 @@
 import 'reflect-metadata'
 import { authenticator } from 'otplib'
-import { SNPureCrypto } from '@standardnotes/sncrypto-common'
 
 import { User } from '../User/User'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { VerifyMFA } from './VerifyMFA'
 import { SettingRepositoryInterface } from '../Setting/SettingRepositoryInterface'
 import { SETTINGS } from '../Setting/Settings'
-import { UserServerKeyDecrypterInterface } from '../User/UserServerKeyDecrypterInterface'
+import { CrypterInterface } from '../Encryption/CrypterInterface'
 
 describe('VerifyMFA', () => {
   let user: User
   let userRepository: UserRepositoryInterface
-  let crypter: SNPureCrypto
+  let crypter: CrypterInterface
   let settingRepository: SettingRepositoryInterface
-  let userServerKeyDecrypter: UserServerKeyDecrypterInterface
 
-  const createVerifyMFA = () => new VerifyMFA(userRepository, settingRepository, crypter, userServerKeyDecrypter)
+  const createVerifyMFA = () => new VerifyMFA(userRepository, settingRepository, crypter)
 
   beforeEach(() => {
     user = {} as jest.Mocked<User>
@@ -27,11 +25,8 @@ describe('VerifyMFA', () => {
     settingRepository = {} as jest.Mocked<SettingRepositoryInterface>
     settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue(null)
 
-    crypter = {} as jest.Mocked<SNPureCrypto>
-    crypter.xchacha20Decrypt = jest.fn()
-
-    userServerKeyDecrypter = {} as jest.Mocked<UserServerKeyDecrypterInterface>
-    userServerKeyDecrypter.decrypt = jest.fn().mockReturnValue('test')
+    crypter = {} as jest.Mocked<CrypterInterface>
+    crypter.decryptForUser = jest.fn()
   })
 
   it('should pass MFA verification if user has no MFA enabled', async () => {
@@ -64,10 +59,10 @@ describe('VerifyMFA', () => {
   it('should not pass MFA verification if mfa is not correct', async () => {
     settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue({
       name: SETTINGS.MFA_SECRET,
-      value: '1:shhhh:qwerty'
+      value: '1:zzqwrq:qwerty'
     })
 
-    crypter.xchacha20Decrypt = jest.fn().mockReturnValue('test')
+    crypter.decryptForUser = jest.fn().mockReturnValue('shhhh')
 
     expect(await createVerifyMFA().execute({ email: 'test@test.te', token: 'invalid-token' })).toEqual({
       success: false,
@@ -76,31 +71,13 @@ describe('VerifyMFA', () => {
     })
   })
 
-  it('should not pass MFA verification if encryption version is incorrect', async () => {
-    settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue({
-      name: SETTINGS.MFA_SECRET,
-      value: '2:shhhh:qwerty'
-    })
-
-    crypter.xchacha20Decrypt = jest.fn().mockReturnValue('test')
-
-    let error = null
-    try {
-      await createVerifyMFA().execute({ email: 'test@test.te', token: 'invalid-token' })
-    } catch (e) {
-      error = e
-    }
-
-    expect(error).not.toBeNull()
-  })
-
   it('should pass MFA verification if mfa key is correct', async () => {
     settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue({
       name: SETTINGS.MFA_SECRET,
       value: '1:shhhh:qwerty'
     })
 
-    crypter.xchacha20Decrypt = jest.fn().mockReturnValue('test')
+    crypter.decryptForUser = jest.fn().mockReturnValue('test')
 
     expect(await createVerifyMFA().execute({ email: 'test@test.te', token: authenticator.generate('test') })).toEqual({
       success: true,
