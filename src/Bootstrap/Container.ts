@@ -26,7 +26,6 @@ import { Session } from '../Domain/Session/Session'
 import { SessionService } from '../Domain/Session/SessionService'
 import { MySQLSessionRepository } from '../Infra/MySQL/MySQLSessionRepository'
 import { MySQLUserRepository } from '../Infra/MySQL/MySQLUserRepository'
-import DeviceDetector = require('device-detector-js')
 import { SessionProjector } from '../Projection/SessionProjector'
 import { SessionMiddleware } from '../Controller/SessionMiddleware'
 import { RefreshSessionToken } from '../Domain/UseCase/RefreshSessionToken'
@@ -69,8 +68,6 @@ import { UserKeyRotatorInterface } from '../Domain/User/UserKeyRotatorInterface'
 import { UserKeyRotator } from '../Domain/User/UserKeyRotator'
 import { UserServerKeyDecrypter } from '../Domain/User/UserServerKeyDecrypter'
 import { UserServerKeyDecrypterInterface } from '../Domain/User/UserServerKeyDecrypterInterface'
-import { RandomStringGeneratorInterface } from '../Domain/Encryption/RandomStringGeneratorInterface'
-import { RandomStringGenerator } from '../Domain/Encryption/RandomStringGenerator'
 import { SNWebCrypto } from '@standardnotes/sncrypto-web'
 import { SNPureCrypto } from '@standardnotes/sncrypto-common'
 
@@ -230,7 +227,6 @@ export class ContainerConfigLoader {
         container.bind<SNPureCrypto>(TYPES.Crypter).to(SNWebCrypto)
         container.bind<UserKeyRotatorInterface>(TYPES.UserKeyRotator).to(UserKeyRotator)
         container.bind<UserServerKeyDecrypterInterface>(TYPES.UserServerKeyDecrypter).to(UserServerKeyDecrypter)
-        container.bind<RandomStringGeneratorInterface>(TYPES.RandomStringGenerator).to(RandomStringGenerator)
 
         if (env.get('SNS_TOPIC_ARN', true)) {
           container.bind<SNSDomainEventPublisher>(TYPES.DomainEventPublisher).toConstantValue(

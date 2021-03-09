@@ -9,7 +9,7 @@ import { EphemeralSessionRepositoryInterface } from './EphemeralSessionRepositor
 import { EphemeralSession } from './EphemeralSession'
 import { RevokedSessionRepositoryInterface } from './RevokedSessionRepositoryInterface'
 import { RevokedSession } from './RevokedSession'
-import { RandomStringGeneratorInterface } from '../Encryption/RandomStringGeneratorInterface'
+import { SNPureCrypto } from '@standardnotes/sncrypto-common'
 
 describe('SessionService', () => {
   let sessionRepository: SessionRepositoryInterface
@@ -19,6 +19,7 @@ describe('SessionService', () => {
   let ephemeralSession: EphemeralSession
   let revokedSession: RevokedSession
   let deviceDetector: UAParser
+  let crypter: SNPureCrypto
   let logger: winston.Logger
 
   const createService = () => new SessionService(
@@ -26,7 +27,7 @@ describe('SessionService', () => {
     ephemeralSessionRepository,
     revokedSessionRepository,
     deviceDetector,
-    randomStringGenerator,
+    crypter,
     logger,
     123,
     234
@@ -79,8 +80,8 @@ describe('SessionService', () => {
       }
     })
 
-    randomStringGenerator = {} as jest.Mocked<RandomStringGeneratorInterface>
-    randomStringGenerator.generateUrlSafe = jest.fn().mockImplementation(length => randomBytes(length).toString('base64').slice(0, length))
+    crypter = {} as jest.Mocked<SNPureCrypto>
+    crypter.generateRandomKey = jest.fn().mockReturnValue('test')
 
     logger = {} as jest.Mocked<winston.Logger>
     logger.warning = jest.fn()

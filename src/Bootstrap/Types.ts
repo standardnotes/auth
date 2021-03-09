@@ -78,8 +78,7 @@ const TYPES = {
   HTTPClient: Symbol.for('HTTPClient'),
   Crypter: Symbol.for('Crypter'),
   UserKeyRotator: Symbol.for('UserKeyRotator'),
-  UserServerKeyDecrypter: Symbol.for('UserServerKeyDecrypter'),
-  RandomStringGenerator: Symbol.for('RandomStringGenerator')
+  UserServerKeyDecrypter: Symbol.for('UserServerKeyDecrypter')
 }
 
 export default TYPES
