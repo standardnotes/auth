@@ -27,7 +27,7 @@ describe('UserKeyRotator', () => {
     await createRotator().rotateServerKey(user)
 
     expect(userRepository.save).toHaveBeenCalledWith({
-      encryptedServerKey: 'test:test-key',
+      encryptedServerKey: '1:test:test-key',
       encryptionVersion: 1
     })
   })

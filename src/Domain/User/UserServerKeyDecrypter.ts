@@ -12,7 +12,10 @@ export class UserServerKeyDecrypter {
   }
 
   async decrypt(user: User): Promise<string | null> {
-    const [ key, nonce ] = (<string> user.encryptedServerKey).split(':')
+    const [ version, key, nonce ] = (<string> user.encryptedServerKey).split(':')
+    if (+version !== User.ENCRYPTION_VERSION_1) {
+      throw Error (`Not supported encryption version: ${version}`)
+    }
 
     return this.crypter.xchacha20Decrypt(
       key,

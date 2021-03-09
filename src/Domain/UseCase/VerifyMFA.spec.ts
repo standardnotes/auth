@@ -51,7 +51,7 @@ describe('VerifyMFA', () => {
   it('should not pass MFA verification if mfa param is not found in the request', async () => {
     settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue({
       name: SETTINGS.MFA_SECRET,
-      value: 'shhhh'
+      value: '1:shhhh:qwerty'
     })
 
     expect(await createVerifyMFA().execute({ email: 'test@test.te', token: '' })).toEqual({
@@ -64,7 +64,7 @@ describe('VerifyMFA', () => {
   it('should not pass MFA verification if mfa is not correct', async () => {
     settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue({
       name: SETTINGS.MFA_SECRET,
-      value: 'shhhh'
+      value: '1:shhhh:qwerty'
     })
 
     crypter.xchacha20Decrypt = jest.fn().mockReturnValue('test')
@@ -76,10 +76,28 @@ describe('VerifyMFA', () => {
     })
   })
 
+  it('should not pass MFA verification if encryption version is incorrect', async () => {
+    settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue({
+      name: SETTINGS.MFA_SECRET,
+      value: '2:shhhh:qwerty'
+    })
+
+    crypter.xchacha20Decrypt = jest.fn().mockReturnValue('test')
+
+    let error = null
+    try {
+      await createVerifyMFA().execute({ email: 'test@test.te', token: 'invalid-token' })
+    } catch (e) {
+      error = e
+    }
+
+    expect(error).not.toBeNull()
+  })
+
   it('should pass MFA verification if mfa key is correct', async () => {
     settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue({
       name: SETTINGS.MFA_SECRET,
-      value: 'shhhh'
+      value: '1:shhhh:qwerty'
     })
 
     crypter.xchacha20Decrypt = jest.fn().mockReturnValue('test')

@@ -26,8 +26,8 @@ export class UserKeyRotator implements UserKeyRotatorInterface {
       ''
     )
 
-    user.encryptedServerKey = [ encryptedKey, nonce ].join(':')
-    user.encryptionVersion = User.USER_ENCRYPTION_VERSION_1
+    user.encryptedServerKey = [ User.ENCRYPTION_VERSION_1, encryptedKey, nonce ].join(':')
+    user.encryptionVersion = User.ENCRYPTION_VERSION_1
 
     await this.userRepository.save(user)
   }

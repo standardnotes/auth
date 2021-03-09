@@ -9,6 +9,7 @@ import { UserServerKeyDecrypterInterface } from '../User/UserServerKeyDecrypterI
 import { UseCaseInterface } from './UseCaseInterface'
 import { VerifyMFADTO } from './VerifyMFADTO'
 import { VerifyMFAResponse } from './VerifyMFAResponse'
+import { User } from '../User/User'
 
 @injectable()
 export class VerifyMFA implements UseCaseInterface {
@@ -46,7 +47,10 @@ export class VerifyMFA implements UseCaseInterface {
     }
 
     const decryptedUserServerKey = await this.userServerKeyDecrypter.decrypt(user)
-    const [ mfaKey, mfaNonce ] = mfaSecretSetting.value.split(':')
+    const [ version, mfaKey, mfaNonce ] = mfaSecretSetting.value.split(':')
+    if (+version !== User.ENCRYPTION_VERSION_1) {
+      throw Error (`Not supported encryption version: ${version}`)
+    }
 
     const decryptedValue = await this.crypter.xchacha20Decrypt(
       mfaKey,

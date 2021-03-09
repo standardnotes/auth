@@ -17,12 +17,28 @@ describe('UserServerKeyDecrypter', () => {
 
   it('should decrypt the user server key', async () => {
     const user = {
-      encryptedServerKey: 'private-key:user-nonce',
+      encryptedServerKey: '1:private-key:user-nonce',
       encryptionVersion: 1,
     } as jest.Mocked<User>
 
     expect(await createDecrypter().decrypt(user)).toEqual('test')
 
     expect(crypter.xchacha20Decrypt).toHaveBeenCalledWith('private-key', 'user-nonce', 'secret-key', '')
+  })
+
+  it('should indicate not supported encryption version of the user server key', async () => {
+    const user = {
+      encryptedServerKey: '2:private-key:user-nonce',
+      encryptionVersion: 2,
+    } as jest.Mocked<User>
+
+    let error = null
+    try {
+      await createDecrypter().decrypt(user)
+    } catch (e) {
+      error = e
+    }
+
+    expect(error).not.toBeNull()
   })
 })
