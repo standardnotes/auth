@@ -46,10 +46,11 @@ export class VerifyMFA implements UseCaseInterface {
     }
 
     const decryptedUserServerKey = await this.userServerKeyDecrypter.decrypt(user)
+    const [ mfaKey, mfaNonce ] = mfaSecretSetting.value.split(':')
 
     const decryptedValue = await this.crypter.xchacha20Decrypt(
-      mfaSecretSetting.value,
-      <string> user.serverKeyNonce,
+      mfaKey,
+      mfaNonce,
       <string> decryptedUserServerKey,
       ''
     )

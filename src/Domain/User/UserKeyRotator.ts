@@ -19,13 +19,15 @@ export class UserKeyRotator implements UserKeyRotatorInterface {
     const unencryptedServerKey = await this.crypter.generateRandomKey(32)
     const nonce = await this.crypter.generateRandomKey(16)
 
-    user.encryptedServerKey = await this.crypter.xchacha20Encrypt(
+    const encryptedKey = await this.crypter.xchacha20Encrypt(
       unencryptedServerKey,
       nonce,
       this.encryptionServerKey,
       ''
     )
-    user.serverKeyNonce = nonce
+
+    user.encryptedServerKey = [ encryptedKey, nonce ].join(':')
+    user.encryptionVersion = User.USER_ENCRYPTION_VERSION_1
 
     await this.userRepository.save(user)
   }

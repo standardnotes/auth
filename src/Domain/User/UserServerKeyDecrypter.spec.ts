@@ -17,8 +17,7 @@ describe('UserServerKeyDecrypter', () => {
 
   it('should decrypt the user server key', async () => {
     const user = {
-      encryptedServerKey: 'private-key',
-      serverKeyNonce: 'user-nonce',
+      encryptedServerKey: 'private-key:user-nonce',
       encryptionVersion: 1,
     } as jest.Mocked<User>
 

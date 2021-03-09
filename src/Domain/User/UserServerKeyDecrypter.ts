@@ -12,9 +12,11 @@ export class UserServerKeyDecrypter {
   }
 
   async decrypt(user: User): Promise<string | null> {
+    const [ key, nonce ] = (<string> user.encryptedServerKey).split(':')
+
     return this.crypter.xchacha20Decrypt(
-      <string> user.encryptedServerKey,
-      <string> user.serverKeyNonce,
+      key,
+      nonce,
       this.encryptionServerKey,
       ''
     )

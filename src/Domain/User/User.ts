@@ -7,6 +7,7 @@ import { Setting } from '../Setting/Setting'
 export class User {
   private readonly SESSIONS_PROTOCOL_VERSION = 4
   static readonly PASSWORD_HASH_COST = 11
+  static readonly USER_ENCRYPTION_VERSION_1 = 1
 
   @PrimaryColumn({
     length: 36
@@ -40,14 +41,6 @@ export class User {
     nullable: true
   })
   encryptedServerKey: string | null
-
-  @Column({
-    name: 'server_key_nonce',
-    length: 255,
-    type: 'varchar',
-    nullable: true
-  })
-  serverKeyNonce: string | null
 
   @Column({
     name: 'encryption_version',
