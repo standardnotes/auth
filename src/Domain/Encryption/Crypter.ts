@@ -14,7 +14,7 @@ export class Crypter implements CrypterInterface {
 
   async encryptForUser(value: string, user: User): Promise<string> {
     const decryptedUserServerKey = await this.decryptUserServerKey(user)
-    const nonce = await this.snCrypto.generateRandomKey(16)
+    const nonce = await this.snCrypto.generateRandomKey(192)
 
     const encryptedValue = <string> await this.snCrypto.xchacha20Encrypt(
       value,
@@ -45,7 +45,7 @@ export class Crypter implements CrypterInterface {
 
   async generateEncryptedUserServerKey(): Promise<string> {
     const unencryptedServerKey = await this.snCrypto.generateRandomKey(256)
-    const nonce = await this.snCrypto.generateRandomKey(16)
+    const nonce = await this.snCrypto.generateRandomKey(192)
 
     const encryptedKey = await this.snCrypto.xchacha20Encrypt(
       unencryptedServerKey,
