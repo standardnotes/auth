@@ -9,6 +9,7 @@ import { EphemeralSessionRepositoryInterface } from './EphemeralSessionRepositor
 import { EphemeralSession } from './EphemeralSession'
 import { RevokedSessionRepositoryInterface } from './RevokedSessionRepositoryInterface'
 import { RevokedSession } from './RevokedSession'
+import { SNPureCrypto } from '@standardnotes/sncrypto-common'
 
 describe('SessionService', () => {
   let sessionRepository: SessionRepositoryInterface
@@ -18,6 +19,7 @@ describe('SessionService', () => {
   let ephemeralSession: EphemeralSession
   let revokedSession: RevokedSession
   let deviceDetector: UAParser
+  let crypter: SNPureCrypto
   let logger: winston.Logger
 
   const createService = () => new SessionService(
@@ -25,6 +27,7 @@ describe('SessionService', () => {
     ephemeralSessionRepository,
     revokedSessionRepository,
     deviceDetector,
+    crypter,
     logger,
     123,
     234
@@ -76,6 +79,9 @@ describe('SessionService', () => {
         version: '10.13'
       }
     })
+
+    crypter = {} as jest.Mocked<SNPureCrypto>
+    crypter.generateRandomKey = jest.fn().mockReturnValue('test')
 
     logger = {} as jest.Mocked<winston.Logger>
     logger.warning = jest.fn()
