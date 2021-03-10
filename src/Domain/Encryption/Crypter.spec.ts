@@ -73,4 +73,28 @@ describe('Crypter', () => {
 
     expect(error).not.toBeNull()
   })
+
+  it('should throw an error if the user server key is encrypted with unsupported version', async () => {
+    let error = null
+    user.encryptedServerKey = '2:my-secret-key:my-nonce'
+    try {
+      await createCrypter().decryptUserServerKey(user)
+    } catch (e) {
+      error = e
+    }
+
+    expect(error).not.toBeNull()
+  })
+
+  it('should throw an error if the user server key failed to decrypt', async () => {
+    let error = null
+    snCrypto.xchacha20Decrypt = jest.fn().mockReturnValue(null)
+    try {
+      await createCrypter().decryptUserServerKey(user)
+    } catch (e) {
+      error = e
+    }
+
+    expect(error).not.toBeNull()
+  })
 })

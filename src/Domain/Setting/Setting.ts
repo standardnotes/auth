@@ -20,11 +20,11 @@ export class Setting {
   value: string
 
   @Column({
-    name: 'encryption_version',
+    name: 'server_encryption_version',
     type: 'tinyint',
     default: 0
   })
-  encryptionVersion: number
+  serverEncryptionVersion: number
 
   @Column({
     name: 'created_at',

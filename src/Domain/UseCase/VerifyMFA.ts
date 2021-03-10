@@ -44,8 +44,7 @@ export class VerifyMFA implements UseCaseInterface {
     }
 
     const decryptedValue = await this.crypter.decryptForUser(mfaSecretSetting.value, user)
-
-    if (!authenticator.verify({ token: dto.token, secret: <string> decryptedValue })) {
+    if (!decryptedValue || !authenticator.verify({ token: dto.token, secret: decryptedValue })) {
       return {
         success: false,
         errorTag: 'mfa-invalid',

@@ -19,7 +19,7 @@ export class Crypter implements CrypterInterface {
     const encryptedValue = <string> await this.snCrypto.xchacha20Encrypt(
       value,
       nonce,
-      <string> decryptedUserServerKey,
+      decryptedUserServerKey,
       ''
     )
 
@@ -30,15 +30,15 @@ export class Crypter implements CrypterInterface {
   async decryptForUser(value: string, user: User): Promise<string | null> {
     const decryptedUserServerKey = await this.decryptUserServerKey(user)
 
-    const [ version, key, nonce ] = value.split(':')
+    const [ version, ciphertext, nonce ] = value.split(':')
     if (+version !== User.ENCRYPTION_VERSION_1) {
       throw Error (`Not supported encryption version: ${version}`)
     }
 
     return this.snCrypto.xchacha20Decrypt(
-      key,
+      ciphertext,
       nonce,
-      <string> decryptedUserServerKey,
+      decryptedUserServerKey,
       ''
     )
   }
@@ -57,18 +57,24 @@ export class Crypter implements CrypterInterface {
     return this.formatEncryptedValue(User.ENCRYPTION_VERSION_1, encryptedKey, nonce)
   }
 
-  async decryptUserServerKey(user: User): Promise<string | null> {
-    const [ version, key, nonce ] = (<string> user.encryptedServerKey).split(':')
+  async decryptUserServerKey(user: User): Promise<string> {
+    const [ version, ciphertext, nonce ] = (<string> user.encryptedServerKey).split(':')
     if (+version !== User.ENCRYPTION_VERSION_1) {
       throw Error (`Not supported encryption version: ${version}`)
     }
 
-    return this.snCrypto.xchacha20Decrypt(
-      key,
+    const decryptedUserServerKey = await this.snCrypto.xchacha20Decrypt(
+      ciphertext,
       nonce,
       this.encryptionServerKey,
       ''
     )
+
+    if (!decryptedUserServerKey) {
+      throw Error('Could not decrypt user server key')
+    }
+
+    return decryptedUserServerKey
   }
 
   private formatEncryptedValue(version: number, encryptedValue: string, nonce: string): string {
