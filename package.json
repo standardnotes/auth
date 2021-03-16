@@ -2,7 +2,7 @@
   "name": "auth",
   "version": "1.0.0",
   "engines": {
-    "node": ">=14.0.0 <15.0.0"
+    "node": ">=15.0.0 <16.0.0"
   },
   "description": "Auth Server",
   "main": "dist/src/index.js",
@@ -25,9 +25,10 @@
     "@standardnotes/auth": "^1.0.0",
     "@standardnotes/domain-events": "^1.0.2",
     "@types/ua-parser-js": "^0.7.35",
+    "@standardnotes/sncrypto-common": "^1.2.10",
+    "@standardnotes/sncrypto-web": "^1.2.10",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
-    "crypto-random-string": "^3.3.0",
     "dayjs": "^1.10.4",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",

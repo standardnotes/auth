@@ -26,15 +26,12 @@ import { Session } from '../Domain/Session/Session'
 import { SessionService } from '../Domain/Session/SessionService'
 import { MySQLSessionRepository } from '../Infra/MySQL/MySQLSessionRepository'
 import { MySQLUserRepository } from '../Infra/MySQL/MySQLUserRepository'
-import { Item } from '../Domain/Item/Item'
 import { SessionProjector } from '../Projection/SessionProjector'
 import { SessionMiddleware } from '../Controller/SessionMiddleware'
 import { RefreshSessionToken } from '../Domain/UseCase/RefreshSessionToken'
 import { KeyParamsFactory } from '../Domain/User/KeyParamsFactory'
-import { MySQLItemRepository } from '../Infra/MySQL/MySQLItemRepository'
 import { SignIn } from '../Domain/UseCase/SignIn'
 import { VerifyMFA } from '../Domain/UseCase/VerifyMFA'
-import { ContentDecoder } from '../Domain/Item/ContentDecoder'
 import { UserProjector } from '../Projection/UserProjector'
 import { AuthResponseFactory20161215 } from '../Domain/Auth/AuthResponseFactory20161215'
 import { AuthResponseFactory20190520 } from '../Domain/Auth/AuthResponseFactory20190520'
@@ -65,6 +62,12 @@ import { Permission } from '../Domain/Permission/Permission'
 import { RoleProjector } from '../Projection/RoleProjector'
 import { PermissionProjector } from '../Projection/PermissionProjector'
 import { MySQLRoleRepository } from '../Infra/MySQL/MySQLRoleRepository'
+import { Setting } from '../Domain/Setting/Setting'
+import { MySQLSettingRepository } from '../Infra/MySQL/MySQLSettingRepository'
+import { SNWebCrypto } from '@standardnotes/sncrypto-web'
+import { SNPureCrypto } from '@standardnotes/sncrypto-common'
+import { CrypterInterface } from '../Domain/Encryption/CrypterInterface'
+import { Crypter } from '../Domain/Encryption/Crypter'
 
 export class ContainerConfigLoader {
     async load(): Promise<Container> {
@@ -97,9 +100,9 @@ export class ContainerConfigLoader {
             User,
             Session,
             RevokedSession,
-            Item,
             Role,
-            Permission
+            Permission,
+            Setting
           ],
           migrations: [
             env.get('DB_MIGRATIONS_PATH')
@@ -150,7 +153,7 @@ export class ContainerConfigLoader {
         container.bind<MySQLSessionRepository>(TYPES.SessionRepository).toConstantValue(connection.getCustomRepository(MySQLSessionRepository))
         container.bind<MySQLRevokedSessionRepository>(TYPES.RevokedSessionRepository).toConstantValue(connection.getCustomRepository(MySQLRevokedSessionRepository))
         container.bind<MySQLUserRepository>(TYPES.UserRepository).toConstantValue(connection.getCustomRepository(MySQLUserRepository))
-        container.bind<MySQLItemRepository>(TYPES.ItemRepository).toConstantValue(connection.getCustomRepository(MySQLItemRepository))
+        container.bind<MySQLSettingRepository>(TYPES.SettingRepository).toConstantValue(connection.getCustomRepository(MySQLSettingRepository))
         container.bind<MySQLRoleRepository>(TYPES.RoleRepository).toConstantValue(connection.getCustomRepository(MySQLRoleRepository))
         container.bind<RedisEphemeralSessionRepository>(TYPES.EphemeralSessionRepository).to(RedisEphemeralSessionRepository)
         container.bind<LockRepository>(TYPES.LockRepository).to(LockRepository)
@@ -172,6 +175,7 @@ export class ContainerConfigLoader {
         container.bind(TYPES.LEGACY_JWT_SECRET).toConstantValue(env.get('LEGACY_JWT_SECRET'))
         container.bind(TYPES.AUTH_JWT_SECRET).toConstantValue(env.get('AUTH_JWT_SECRET'))
         container.bind(TYPES.AUTH_JWT_TTL).toConstantValue(env.get('AUTH_JWT_TTL'))
+        container.bind(TYPES.ENCRYPTION_SERVER_KEY).toConstantValue(env.get('ENCRYPTION_SERVER_KEY'))
         container.bind(TYPES.ACCESS_TOKEN_AGE).toConstantValue(env.get('ACCESS_TOKEN_AGE'))
         container.bind(TYPES.REFRESH_TOKEN_AGE).toConstantValue(env.get('REFRESH_TOKEN_AGE'))
         container.bind(TYPES.MAX_LOGIN_ATTEMPTS).toConstantValue(env.get('MAX_LOGIN_ATTEMPTS'))
@@ -209,7 +213,6 @@ export class ContainerConfigLoader {
         // Services
         container.bind<UAParser>(TYPES.DeviceDetector).toConstantValue(new UAParser())
         container.bind<SessionService>(TYPES.SessionService).to(SessionService)
-        container.bind<ContentDecoder>(TYPES.ContentDecoder).to(ContentDecoder)
         container.bind<AuthResponseFactory20161215>(TYPES.AuthResponseFactory20161215).to(AuthResponseFactory20161215)
         container.bind<AuthResponseFactory20190520>(TYPES.AuthResponseFactory20190520).to(AuthResponseFactory20190520)
         container.bind<AuthResponseFactory20200115>(TYPES.AuthResponseFactory20200115).to(AuthResponseFactory20200115)
@@ -219,6 +222,8 @@ export class ContainerConfigLoader {
         container.bind<AuthenticationMethodResolver>(TYPES.AuthenticationMethodResolver).to(AuthenticationMethodResolver)
         container.bind<DomainEventFactory>(TYPES.DomainEventFactory).to(DomainEventFactory)
         container.bind<superagent.SuperAgentStatic>(TYPES.HTTPClient).toConstantValue(superagent)
+        container.bind<SNPureCrypto>(TYPES.SNCrypto).to(SNWebCrypto)
+        container.bind<CrypterInterface>(TYPES.Crypter).to(Crypter)
 
         if (env.get('SNS_TOPIC_ARN', true)) {
           container.bind<SNSDomainEventPublisher>(TYPES.DomainEventPublisher).toConstantValue(

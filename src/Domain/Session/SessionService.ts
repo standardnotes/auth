@@ -1,7 +1,6 @@
 import * as crypto from 'crypto'
 import * as winston from 'winston'
 import * as dayjs from 'dayjs'
-import * as cryptoRandomString from 'crypto-random-string'
 import { UAParser } from 'ua-parser-js'
 import { inject, injectable } from 'inversify'
 import { v4 as uuidv4 } from 'uuid'
@@ -16,6 +15,7 @@ import { EphemeralSessionRepositoryInterface } from './EphemeralSessionRepositor
 import { EphemeralSession } from './EphemeralSession'
 import { RevokedSession } from './RevokedSession'
 import { RevokedSessionRepositoryInterface } from './RevokedSessionRepositoryInterface'
+import { SNPureCrypto } from '@standardnotes/sncrypto-common'
 
 @injectable()
 export class SessionService implements SessionServiceInterace {
@@ -26,6 +26,7 @@ export class SessionService implements SessionServiceInterace {
     @inject(TYPES.EphemeralSessionRepository) private ephemeralSessionRepository: EphemeralSessionRepositoryInterface,
     @inject(TYPES.RevokedSessionRepository) private revokedSessionRepository: RevokedSessionRepositoryInterface,
     @inject(TYPES.DeviceDetector) private deviceDetector: UAParser,
+    @inject(TYPES.Crypter) private crypter: SNPureCrypto,
     @inject(TYPES.Logger) private logger: winston.Logger,
     @inject(TYPES.ACCESS_TOKEN_AGE) private accessTokenAge: number,
     @inject(TYPES.REFRESH_TOKEN_AGE) private refreshTokenAge: number
@@ -47,8 +48,8 @@ export class SessionService implements SessionServiceInterace {
   }
 
   async createTokens(session: Session): Promise<SessionPayload> {
-    const accessToken = cryptoRandomString({ length: 16, type: 'url-safe' })
-    const refreshToken = cryptoRandomString({ length: 16, type: 'url-safe' })
+    const accessToken = await this.crypter.generateRandomKey(64)
+    const refreshToken = await this.crypter.generateRandomKey(64)
 
     const hashedAccessToken = crypto.createHash('sha256').update(accessToken).digest('hex')
     const hashedRefreshToken = crypto.createHash('sha256').update(refreshToken).digest('hex')

@@ -645,6 +645,19 @@
     sqs-consumer "^5.5.0"
     winston "^3.3.3"
 
+"@standardnotes/sncrypto-common@^1.2.10", "@standardnotes/sncrypto-common@^1.2.7":
+  version "1.2.10"
+  resolved "https://registry.yarnpkg.com/@standardnotes/sncrypto-common/-/sncrypto-common-1.2.10.tgz#c806a397446239676cda55dd8cc53f3636bf2c0b"
+  integrity sha512-YfPQ4pxlGZOYb62Mu7m9UWduJKn3/txE7tQ6G3qjq6suD0Asdwf9W2h4P5Wa6aYMfHWk2enBfQo9hBg3ScnyOQ==
+
+"@standardnotes/sncrypto-web@^1.2.10":
+  version "1.2.10"
+  resolved "https://registry.yarnpkg.com/@standardnotes/sncrypto-web/-/sncrypto-web-1.2.10.tgz#ddda0c8ec92754c1334d9a83be7b320433c55b79"
+  integrity sha512-mmHlXFFovBqOdctpMkyXTpK0zI/k4NuXoV5LRGLKIXUktT9/cZg1pgNNfGPFUP+g4C5M2qxeFmZKFh581ipolQ==
+  dependencies:
+    "@standardnotes/sncrypto-common" "^1.2.7"
+    libsodium-wrappers "^0.7.8"
+
 "@types/babel__core@^7.0.0", "@types/babel__core@^7.1.7":
   version "7.1.12"
   resolved "https://registry.yarnpkg.com/@types/babel__core/-/babel__core-7.1.12.tgz#4d8e9e51eb265552a7e4f1ff2219ab6133bdfb2d"
@@ -1727,13 +1740,6 @@ cross-spawn@^7.0.0, cross-spawn@^7.0.2:
     path-key "^3.1.0"
     shebang-command "^2.0.0"
     which "^2.0.1"
-
-crypto-random-string@^3.3.0:
-  version "3.3.0"
-  resolved "https://registry.yarnpkg.com/crypto-random-string/-/crypto-random-string-3.3.0.tgz#c7a4682b2a87146a1f8b7378ea2606f95775e7e6"
-  integrity sha512-teWAwfMb1d6brahYyKqcBEb5Yp8PJPvPOdOonXDnvaKOTmKDFNVE8E3Y2XQuzjNV/3XMwHbrX9fHWvrhRKt4Gg==
-  dependencies:
-    type-fest "^0.8.1"
 
 cssom@^0.4.4:
   version "0.4.4"
@@ -3750,6 +3756,18 @@ levn@~0.3.0:
   dependencies:
     prelude-ls "~1.1.2"
     type-check "~0.3.2"
+
+libsodium-wrappers@^0.7.8:
+  version "0.7.9"
+  resolved "https://registry.yarnpkg.com/libsodium-wrappers/-/libsodium-wrappers-0.7.9.tgz#4ffc2b69b8f7c7c7c5594a93a4803f80f6d0f346"
+  integrity sha512-9HaAeBGk1nKTRFRHkt7nzxqCvnkWTjn1pdjKgcUnZxj0FyOP4CnhgFhMdrFfgNsukijBGyBLpP2m2uKT1vuWhQ==
+  dependencies:
+    libsodium "^0.7.0"
+
+libsodium@^0.7.0:
+  version "0.7.9"
+  resolved "https://registry.yarnpkg.com/libsodium/-/libsodium-0.7.9.tgz#4bb7bcbf662ddd920d8795c227ae25bbbfa3821b"
+  integrity sha512-gfeADtR4D/CM0oRUviKBViMGXZDgnFdMKMzHsvBdqLBHd9ySi6EtYnmuhHVDDYgYpAO8eU8hEY+F8vIUAPh08A==
 
 limiter@^1.1.4:
   version "1.1.5"

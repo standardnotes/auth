@@ -1,6 +1,7 @@
 import 'reflect-metadata'
 import { AuthResponseFactoryInterface } from '../Auth/AuthResponseFactoryInterface'
 import { AuthResponseFactoryResolverInterface } from '../Auth/AuthResponseFactoryResolverInterface'
+import { CrypterInterface } from '../Encryption/CrypterInterface'
 import { Role } from '../Role/Role'
 import { RoleRepositoryInterface } from '../Role/RoleRepositoryInterface'
 import { User } from '../User/User'
@@ -14,8 +15,9 @@ describe('Register', () => {
   let authResponseFactoryResolver: AuthResponseFactoryResolverInterface
   let authResponseFactory: AuthResponseFactoryInterface
   let user: User
+  let crypter: CrypterInterface
 
-  const createUseCase = () => new Register(userRepository, roleRepository, authResponseFactoryResolver, false)
+  const createUseCase = () => new Register(userRepository, roleRepository, authResponseFactoryResolver, crypter, false)
 
   beforeEach(() => {
     userRepository = {} as jest.Mocked<UserRepositoryInterface>
@@ -30,6 +32,9 @@ describe('Register', () => {
 
     authResponseFactoryResolver = {} as jest.Mocked<AuthResponseFactoryResolverInterface>
     authResponseFactoryResolver.resolveAuthResponseFactoryVersion = jest.fn().mockReturnValue(authResponseFactory)
+
+    crypter = {} as jest.Mocked<CrypterInterface>
+    crypter.generateEncryptedUserServerKey = jest.fn().mockReturnValue('test')
 
     user = {} as jest.Mocked<User>
   })
@@ -50,6 +55,8 @@ describe('Register', () => {
     expect(userRepository.save).toHaveBeenCalledWith({
       email: 'test@test.te',
       encryptedPassword: expect.any(String),
+      encryptedServerKey: 'test',
+      serverEncryptionVersion: 1,
       pwCost: 11,
       pwNonce: undefined,
       pwSalt: 'qweqwe',
@@ -82,6 +89,8 @@ describe('Register', () => {
     expect(userRepository.save).toHaveBeenCalledWith({
       email: 'test@test.te',
       encryptedPassword: expect.any(String),
+      encryptedServerKey: 'test',
+      serverEncryptionVersion: 1,
       pwCost: 11,
       pwNonce: undefined,
       pwSalt: 'qweqwe',
@@ -119,7 +128,7 @@ describe('Register', () => {
   it('should fail to register if a registration is disabled', async () => {
     userRepository.findOneByEmail = jest.fn().mockReturnValue(user)
 
-    expect(await new Register(userRepository, roleRepository, authResponseFactoryResolver, true).execute({
+    expect(await new Register(userRepository, roleRepository, authResponseFactoryResolver, crypter, true).execute({
       email: 'test@test.te',
       password: 'asdzxc',
       updatedWithUserAgent: 'Mozilla',

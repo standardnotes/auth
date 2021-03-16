@@ -1,11 +1,13 @@
 import { Column, Entity, Index, JoinTable, ManyToMany, OneToMany, PrimaryColumn } from 'typeorm'
 import { RevokedSession } from '../Session/RevokedSession'
 import { Role } from '../Role/Role'
+import { Setting } from '../Setting/Setting'
 
 @Entity({ name: 'users' })
 export class User {
   private readonly SESSIONS_PROTOCOL_VERSION = 4
   static readonly PASSWORD_HASH_COST = 11
+  static readonly ENCRYPTION_VERSION_1 = 1
 
   @PrimaryColumn({
     length: 36
@@ -31,6 +33,21 @@ export class User {
     nullable: true
   })
   pwNonce: string
+
+  @Column({
+    name: 'encrypted_server_key',
+    length: 255,
+    type: 'varchar',
+    nullable: true
+  })
+  encryptedServerKey: string | null
+
+  @Column({
+    name: 'server_encryption_version',
+    type: 'tinyint',
+    default: 0
+  })
+  serverEncryptionVersion: number
 
   @Column({
     name: 'kp_created',
@@ -130,6 +147,14 @@ export class User {
     revokedSession => revokedSession.user
   )
   revokedSessions: Promise<RevokedSession[]>
+
+  @OneToMany(
+    /* istanbul ignore next */
+    () => Setting,
+    /* istanbul ignore next */
+    setting => setting.user
+  )
+  settings: Promise<Setting[]>
 
   @ManyToMany(
     /* istanbul ignore next */

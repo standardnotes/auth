@@ -9,7 +9,7 @@ const TYPES = {
   SessionRepository: Symbol.for('SessionRepository'),
   EphemeralSessionRepository: Symbol.for('EphemeralSessionRepository'),
   RevokedSessionRepository: Symbol.for('RevokedSessionRepository'),
-  ItemRepository: Symbol.for('ItemRepository'),
+  SettingRepository: Symbol.for('SettingRepository'),
   LockRepository: Symbol.for('LockRepository'),
   RoleRepository: Symbol.for('RoleRepository'),
   // Middleware
@@ -27,6 +27,7 @@ const TYPES = {
   LEGACY_JWT_SECRET: Symbol.for('LEGACY_JWT_SECRET'),
   AUTH_JWT_SECRET: Symbol.for('AUTH_JWT_SECRET'),
   AUTH_JWT_TTL: Symbol.for('AUTH_JWT_TTL'),
+  ENCRYPTION_SERVER_KEY: Symbol.for('ENCRYPTION_SERVER_KEY'),
   ACCESS_TOKEN_AGE: Symbol.for('ACCESS_TOKEN_AGE'),
   REFRESH_TOKEN_AGE: Symbol.for('REFRESH_TOKEN_AGE'),
   EPHEMERAL_SESSION_AGE: Symbol.for('EPHEMERAL_SESSION_AGE'),
@@ -74,7 +75,9 @@ const TYPES = {
   DomainEventSubscriberFactory: Symbol.for('DomainEventSubscriberFactory'),
   DomainEventFactory: Symbol.for('DomainEventFactory'),
   DomainEventMessageHandler: Symbol.for('DomainEventMessageHandler'),
-  HTTPClient: Symbol.for('HTTPClient')
+  HTTPClient: Symbol.for('HTTPClient'),
+  Crypter: Symbol.for('Crypter'),
+  SNCrypto: Symbol.for('SNCrypto')
 }
 
 export default TYPES
