@@ -64,10 +64,8 @@ import { PermissionProjector } from '../Projection/PermissionProjector'
 import { MySQLRoleRepository } from '../Infra/MySQL/MySQLRoleRepository'
 import { Setting } from '../Domain/Setting/Setting'
 import { MySQLSettingRepository } from '../Infra/MySQL/MySQLSettingRepository'
-import { SNWebCrypto } from '@standardnotes/sncrypto-web'
-import { SNPureCrypto } from '@standardnotes/sncrypto-common'
 import { CrypterInterface } from '../Domain/Encryption/CrypterInterface'
-import { Crypter } from '../Domain/Encryption/Crypter'
+import { CrypterNode } from '../Domain/Encryption/CrypterNode'
 
 export class ContainerConfigLoader {
     async load(): Promise<Container> {
@@ -222,8 +220,7 @@ export class ContainerConfigLoader {
         container.bind<AuthenticationMethodResolver>(TYPES.AuthenticationMethodResolver).to(AuthenticationMethodResolver)
         container.bind<DomainEventFactory>(TYPES.DomainEventFactory).to(DomainEventFactory)
         container.bind<superagent.SuperAgentStatic>(TYPES.HTTPClient).toConstantValue(superagent)
-        container.bind<SNPureCrypto>(TYPES.SNCrypto).to(SNWebCrypto)
-        container.bind<CrypterInterface>(TYPES.Crypter).to(Crypter)
+        container.bind<CrypterInterface>(TYPES.Crypter).to(CrypterNode)
 
         if (env.get('SNS_TOPIC_ARN', true)) {
           container.bind<SNSDomainEventPublisher>(TYPES.DomainEventPublisher).toConstantValue(

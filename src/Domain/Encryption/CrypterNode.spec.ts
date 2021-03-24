@@ -1,54 +1,54 @@
-import { SNPureCrypto } from '@standardnotes/sncrypto-common'
+import { SnCryptoNode } from '@standardnotes/sncrypto-node'
 import { User } from '../User/User'
-import { Crypter } from './Crypter'
+import { CrypterNode } from './CrypterNode'
 
-describe('Crypter', () => {
-  let snCrypto: SNPureCrypto
+describe('CrypterNode', () => {
+  let crypto: SnCryptoNode
   const encryptionServerKey = 'secret-key'
   let user: User
 
-  const createCrypter = () => new Crypter(snCrypto, encryptionServerKey)
+  const createCrypter = () => new CrypterNode(encryptionServerKey, crypto)
 
   beforeEach(() => {
-    snCrypto = {} as jest.Mocked<SNPureCrypto>
-    snCrypto.xchacha20Decrypt = jest.fn().mockReturnValue('decrypted-test')
-    snCrypto.xchacha20Encrypt = jest.fn().mockReturnValue('encrypted-test')
-    snCrypto.generateRandomKey = jest.fn().mockReturnValue('random-nonce')
+    crypto = {} as jest.Mocked<SnCryptoNode>
+    crypto.aes256GcmEncrypt = jest.fn().mockReturnValue('encrypted-test')
+    crypto.aes256GcmDecrypt = jest.fn().mockReturnValue('decrypted-test')
+    crypto.generateRandomKey = jest.fn().mockReturnValue('random-nonce')
 
     user = {} as jest.Mocked<User>
-    user.encryptedServerKey = '1:my-secret-key:my-nonce'
+    user.encryptedServerKey = '1:"my-secret-key"'
   })
 
   it('should encrypt a value for user', async () => {
-    expect(await createCrypter().encryptForUser('test', user)).toEqual('1:encrypted-test:random-nonce')
+    expect(await createCrypter().encryptForUser('test', user)).toEqual('1:"encrypted-test"')
 
-    expect(snCrypto.xchacha20Decrypt).toHaveBeenCalledWith('my-secret-key', 'my-nonce', 'secret-key', '')
+    expect(crypto.aes256GcmDecrypt).toHaveBeenCalledWith('my-secret-key', 'secret-key')
 
-    expect(snCrypto.xchacha20Encrypt).toHaveBeenCalledWith('test', 'random-nonce', 'decrypted-test', '')
+    expect(crypto.aes256GcmEncrypt).toHaveBeenCalledWith({ unencrypted: 'test', iv: 'random-nonce', key: 'decrypted-test' })
   })
 
   it('should decrypt a value for user', async () => {
-    expect(await createCrypter().decryptForUser('1:test:some-nonce', user)).toEqual('decrypted-test')
+    expect(await createCrypter().decryptForUser('1:"test"', user)).toEqual('decrypted-test')
 
-    expect(snCrypto.xchacha20Decrypt).toHaveBeenNthCalledWith(1, 'my-secret-key', 'my-nonce', 'secret-key', '')
+    expect(crypto.aes256GcmDecrypt).toHaveBeenNthCalledWith(1, 'my-secret-key', 'secret-key')
 
-    expect(snCrypto.xchacha20Decrypt).toHaveBeenNthCalledWith(2, 'test', 'some-nonce', 'decrypted-test', '')
+    expect(crypto.aes256GcmDecrypt).toHaveBeenNthCalledWith(2, 'test', 'decrypted-test')
   })
 
   it('should generate an encrypted server key', async () => {
-    snCrypto.generateRandomKey = jest.fn()
+    crypto.generateRandomKey = jest.fn()
       .mockReturnValueOnce('server-key')
       .mockReturnValueOnce('random-nonce')
 
-    expect(await createCrypter().generateEncryptedUserServerKey()).toEqual('1:encrypted-test:random-nonce')
+    expect(await createCrypter().generateEncryptedUserServerKey()).toEqual('1:"encrypted-test"')
 
-    expect(snCrypto.xchacha20Encrypt).toHaveBeenCalledWith('server-key', 'random-nonce', 'secret-key', '')
+    expect(crypto.aes256GcmEncrypt).toHaveBeenCalledWith({ unencrypted: 'server-key', iv: 'random-nonce', key: 'secret-key' })
   })
 
   it('should decrypt a user server key', async () => {
     expect(await createCrypter().decryptUserServerKey(user)).toEqual('decrypted-test')
 
-    expect(snCrypto.xchacha20Decrypt).toHaveBeenCalledWith('my-secret-key', 'my-nonce', 'secret-key', '')
+    expect(crypto.aes256GcmDecrypt).toHaveBeenCalledWith('my-secret-key', 'secret-key')
   })
 
   it('should throw an error if the user server key is encrypted with unsupported version', async () => {
@@ -88,7 +88,9 @@ describe('Crypter', () => {
 
   it('should throw an error if the user server key failed to decrypt', async () => {
     let error = null
-    snCrypto.xchacha20Decrypt = jest.fn().mockReturnValue(null)
+    crypto.aes256GcmDecrypt = jest.fn().mockImplementation(() => {
+      throw Error('encryption error')
+    })
     try {
       await createCrypter().decryptUserServerKey(user)
     } catch (e) {
