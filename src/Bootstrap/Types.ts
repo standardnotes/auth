@@ -77,6 +77,7 @@ const TYPES = {
   DomainEventMessageHandler: Symbol.for('DomainEventMessageHandler'),
   HTTPClient: Symbol.for('HTTPClient'),
   Crypter: Symbol.for('Crypter'),
+  SnCryptoNode: Symbol.for('SnCryptoNode'),
 }
 
 export default TYPES

@@ -9,9 +9,7 @@ import { CrypterInterface } from './CrypterInterface'
 export class CrypterNode implements CrypterInterface {
   constructor (
     @inject(TYPES.ENCRYPTION_SERVER_KEY) private encryptionServerKey: string,
-    // have to exclude from coverage because of https://github.com/istanbuljs/istanbuljs/issues/70
-    /* istanbul ignore next */
-    private cryptoNode: SnCryptoNode = new SnCryptoNode(),
+    @inject(TYPES.SnCryptoNode) private cryptoNode: SnCryptoNode,
   ) {
   }
 

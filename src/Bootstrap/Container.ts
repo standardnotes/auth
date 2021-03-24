@@ -66,6 +66,7 @@ import { Setting } from '../Domain/Setting/Setting'
 import { MySQLSettingRepository } from '../Infra/MySQL/MySQLSettingRepository'
 import { CrypterInterface } from '../Domain/Encryption/CrypterInterface'
 import { CrypterNode } from '../Domain/Encryption/CrypterNode'
+import { SnCryptoNode } from '@standardnotes/sncrypto-node'
 
 export class ContainerConfigLoader {
     async load(): Promise<Container> {
@@ -221,6 +222,8 @@ export class ContainerConfigLoader {
         container.bind<DomainEventFactory>(TYPES.DomainEventFactory).to(DomainEventFactory)
         container.bind<superagent.SuperAgentStatic>(TYPES.HTTPClient).toConstantValue(superagent)
         container.bind<CrypterInterface>(TYPES.Crypter).to(CrypterNode)
+
+        container.bind<SnCryptoNode>(TYPES.SnCryptoNode).toConstantValue(new SnCryptoNode())
 
         if (env.get('SNS_TOPIC_ARN', true)) {
           container.bind<SNSDomainEventPublisher>(TYPES.DomainEventPublisher).toConstantValue(
