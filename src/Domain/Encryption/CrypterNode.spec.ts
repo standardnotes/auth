@@ -1,59 +1,95 @@
+import { Aes256GcmEncrypted } from '@standardnotes/sncrypto-common'
 import { SnCryptoNode } from '@standardnotes/sncrypto-node'
 import { User } from '../User/User'
 import { CrypterNode } from './CrypterNode'
 
 describe('CrypterNode', () => {
   let crypto: SnCryptoNode
-  const encryptionServerKey = 'secret-key'
   let user: User
+  
+  const iv = 'iv'
 
-  const createCrypter = () => new CrypterNode(encryptionServerKey, crypto)
+  const createCrypter = () => new CrypterNode(serverKey, crypto)
+
+  const makeEncrypted = (ciphertext: string): Aes256GcmEncrypted<string> => {
+    return {
+      iv,
+      tag: 'tag',
+      ciphertext,
+      encoding: 'encoding',
+      aad: '',
+    }
+  }
+
+  const version = (encrypted: Aes256GcmEncrypted<string>, v = 1) => {
+    return JSON.stringify({
+      version: v, 
+      encrypted,
+    })
+  }
+
+  const unencrypted = 'unencrypted'
+  const decrypted = 'decrypted'
+  const encryptedUserKey = makeEncrypted('encryptedUserKey')
+  const serverKey = 'serverKey'
+  const unsupportedVersion = 999999
+  const encrypted = makeEncrypted('encrypted')
 
   beforeEach(() => {
     crypto = {} as jest.Mocked<SnCryptoNode>
-    crypto.aes256GcmEncrypt = jest.fn().mockReturnValue('encrypted-test')
-    crypto.aes256GcmDecrypt = jest.fn().mockReturnValue('decrypted-test')
-    crypto.generateRandomKey = jest.fn().mockReturnValue('random-nonce')
+    crypto.aes256GcmEncrypt = jest.fn().mockReturnValue(encrypted)
+    crypto.aes256GcmDecrypt = jest.fn().mockReturnValue(decrypted)
+    crypto.generateRandomKey = jest.fn().mockReturnValue(iv)
 
     user = {} as jest.Mocked<User>
-    user.encryptedServerKey = '1:"my-secret-key"'
+    user.encryptedServerKey = version(encryptedUserKey)
   })
 
   it('should encrypt a value for user', async () => {
-    expect(await createCrypter().encryptForUser('test', user)).toEqual('1:"encrypted-test"')
+    expect(await createCrypter().encryptForUser(unencrypted, user))
+      .toEqual(version(encrypted))
 
-    expect(crypto.aes256GcmDecrypt).toHaveBeenCalledWith('my-secret-key', 'secret-key')
+    expect(crypto.aes256GcmDecrypt).toHaveBeenCalledWith(
+      encryptedUserKey, 
+      serverKey,
+    )
 
-    expect(crypto.aes256GcmEncrypt).toHaveBeenCalledWith({ unencrypted: 'test', iv: 'random-nonce', key: 'decrypted-test' })
+    expect(crypto.aes256GcmEncrypt).toHaveBeenCalledWith({ unencrypted, iv, key: decrypted })
   })
 
   it('should decrypt a value for user', async () => {
-    expect(await createCrypter().decryptForUser('1:"test"', user)).toEqual('decrypted-test')
+    expect(await createCrypter().decryptForUser(version(encrypted), user)).toEqual(decrypted)
 
-    expect(crypto.aes256GcmDecrypt).toHaveBeenNthCalledWith(1, 'my-secret-key', 'secret-key')
+    expect(crypto.aes256GcmDecrypt).toHaveBeenNthCalledWith(1, encryptedUserKey, serverKey)
 
-    expect(crypto.aes256GcmDecrypt).toHaveBeenNthCalledWith(2, 'test', 'decrypted-test')
+    expect(crypto.aes256GcmDecrypt).toHaveBeenNthCalledWith(2, encrypted, decrypted)
   })
 
-  it('should generate an encrypted server key', async () => {
+  it('should generate an encrypted user server key', async () => {
+    const anotherUserKey = 'anotherUserKey'
     crypto.generateRandomKey = jest.fn()
-      .mockReturnValueOnce('server-key')
-      .mockReturnValueOnce('random-nonce')
+      .mockReturnValueOnce(anotherUserKey)
+      .mockReturnValueOnce(iv)
 
-    expect(await createCrypter().generateEncryptedUserServerKey()).toEqual('1:"encrypted-test"')
+    expect(await createCrypter().generateEncryptedUserServerKey())
+      .toEqual(version(encrypted))
 
-    expect(crypto.aes256GcmEncrypt).toHaveBeenCalledWith({ unencrypted: 'server-key', iv: 'random-nonce', key: 'secret-key' })
+    expect(crypto.aes256GcmEncrypt).toHaveBeenCalledWith({ 
+      unencrypted: anotherUserKey, 
+      iv, 
+      key: serverKey,
+    })
   })
 
   it('should decrypt a user server key', async () => {
-    expect(await createCrypter().decryptUserServerKey(user)).toEqual('decrypted-test')
+    expect(await createCrypter().decryptUserServerKey(user)).toEqual(decrypted)
 
-    expect(crypto.aes256GcmDecrypt).toHaveBeenCalledWith('my-secret-key', 'secret-key')
+    expect(crypto.aes256GcmDecrypt).toHaveBeenCalledWith(encryptedUserKey, serverKey)
   })
 
   it('should throw an error if the user server key is encrypted with unsupported version', async () => {
     let error = null
-    user.encryptedServerKey = '2:my-secret-key:my-nonce'
+    user.encryptedServerKey = version(encryptedUserKey, unsupportedVersion)
     try {
       await createCrypter().decryptUserServerKey(user)
     } catch (e) {
@@ -66,7 +102,7 @@ describe('CrypterNode', () => {
   it('should throw an error if the value is encrypted with unsupported version', async () => {
     let error = null
     try {
-      await createCrypter().decryptForUser('2:test:some-nonce', user)
+      await createCrypter().decryptForUser(version(encrypted, unsupportedVersion), user)
     } catch (e) {
       error = e
     }
@@ -76,7 +112,7 @@ describe('CrypterNode', () => {
 
   it('should throw an error if the user server key is encrypted with unsupported version', async () => {
     let error = null
-    user.encryptedServerKey = '2:my-secret-key:my-nonce'
+    user.encryptedServerKey = version(encryptedUserKey, unsupportedVersion)
     try {
       await createCrypter().decryptUserServerKey(user)
     } catch (e) {

@@ -57,17 +57,17 @@ export class CrypterNode implements CrypterInterface {
     version: number, 
     encrypted: Aes256GcmEncrypted<BufferEncoding>,
   ): string {
-    return [version, JSON.stringify(encrypted)].join(':')
+    return JSON.stringify({ version, encrypted })
   }
 
   private parseVersionedEncrypted(
     versionedEncryptedString: string,
   ): Aes256GcmEncrypted<BufferEncoding> {
-    const [version, encryptedStringified] = versionedEncryptedString.split(':')
+    const { version, encrypted } = JSON.parse(versionedEncryptedString)
     if (+version !== User.ENCRYPTION_VERSION_1) {
       throw Error (`Not supported encryption version: ${version}`)
     }
 
-    return JSON.parse(encryptedStringified)
+    return encrypted
   }
 }
