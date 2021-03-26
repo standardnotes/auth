@@ -67,6 +67,7 @@ import { MySQLSettingRepository } from '../Infra/MySQL/MySQLSettingRepository'
 import { CrypterInterface } from '../Domain/Encryption/CrypterInterface'
 import { CrypterNode } from '../Domain/Encryption/CrypterNode'
 import { SnCryptoNode } from '@standardnotes/sncrypto-node'
+import { GetSettings } from '../Domain/UseCase/GetSettings/GetSettings'
 
 export class ContainerConfigLoader {
     async load(): Promise<Container> {
@@ -205,6 +206,7 @@ export class ContainerConfigLoader {
         container.bind<DeletePreviousSessionsForUser>(TYPES.DeletePreviousSessionsForUser).to(DeletePreviousSessionsForUser)
         container.bind<DeleteSessionForUser>(TYPES.DeleteSessionForUser).to(DeleteSessionForUser)
         container.bind<ChangePassword>(TYPES.ChangePassword).to(ChangePassword)
+        container.bind<GetSettings>(TYPES.GetSettings).to(GetSettings)
 
         // Handlers
         container.bind<UserRegisteredEventHandler>(TYPES.UserRegisteredEventHandler).to(UserRegisteredEventHandler)

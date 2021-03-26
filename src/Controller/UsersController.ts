@@ -3,17 +3,20 @@ import { inject } from 'inversify'
 import {
   BaseHttpController,
   controller,
+  httpGet,
   httpPatch,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   results
 } from 'inversify-express-utils'
 import TYPES from '../Bootstrap/Types'
+import { GetSettings } from '../Domain/UseCase/GetSettings/GetSettings'
 import { UpdateUser } from '../Domain/UseCase/UpdateUser'
 
 @controller('/users', TYPES.AuthMiddleware)
 export class UsersController extends BaseHttpController {
   constructor(
     @inject(TYPES.UpdateUser) private updateUser: UpdateUser,
+    @inject(TYPES.GetSettings) private doGetSettings: GetSettings,
   ) {
     super()
   }
@@ -44,5 +47,21 @@ export class UsersController extends BaseHttpController {
     })
 
     return this.json(updateResult.authResponse)
+  }
+
+  @httpGet('/:userId/settings')
+  async getSettings(request: Request, response: Response): Promise<results.JsonResult> {
+    if (request.params.userId !== response.locals.user.uuid) {
+      return this.json({
+        error: {
+          message: 'Operation not allowed.'
+        }
+      }, 401)
+    }
+
+    const { userId } = request.params
+    const result = await this.doGetSettings.execute({ userUuid: userId })
+
+    return this.json(result)
   }
 }

@@ -17,4 +17,14 @@ export class MySQLSettingRepository extends Repository<Setting> implements Setti
       )
       .getOne()
   }
+  async findAllByUserUuid(userUuid: string): Promise<Setting[]> {
+    return this.createQueryBuilder('setting')
+      .where(
+        'setting.user_uuid = :user_uuid',
+        {
+          user_uuid: userUuid,
+        }
+      )
+      .getMany()
+  }
 }
