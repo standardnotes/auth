@@ -1,7 +1,7 @@
 import { Setting } from '../../Setting/Setting'
+import { Uuid } from '../../Uuid/Uuid'
 
 export type GetSettingsResponse = {
-  // todo: uuid
-  userUuid: string,
+  userUuid: Uuid,
   settings: Setting[],
 }

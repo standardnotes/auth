@@ -1,4 +1,5 @@
+import { Uuid } from '../../Uuid/Uuid'
+
 export type GetSettingsDto = {
-  // todo: uuid?
-  userUuid: string,
+  userUuid: Uuid,
 }
