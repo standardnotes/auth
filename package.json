@@ -24,9 +24,9 @@
   "dependencies": {
     "@standardnotes/auth": "^1.0.0",
     "@standardnotes/domain-events": "^1.0.2",
+    "@standardnotes/sncrypto-common": "^1.3.0",
+    "@standardnotes/sncrypto-node": "^1.3.0",
     "@types/ua-parser-js": "^0.7.35",
-    "@standardnotes/sncrypto-common": "^1.2.10",
-    "@standardnotes/sncrypto-web": "^1.2.10",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dayjs": "^1.10.4",
@@ -64,7 +64,7 @@
     "jest": "^26.6.3",
     "pre-push": "^0.1.1",
     "ts-jest": "^26.4.4",
-    "typescript": "^4.1.3"
+    "typescript": "4.1.3"
   },
   "pre-push": [
     "lint"
