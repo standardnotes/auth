@@ -6,7 +6,7 @@ import { GetSettings } from './GetSettings'
 
 describe('GetSettings', () => {
   const userUuid = 'user-uuid'
-  const user = UserTest.make({ 
+  const user = UserTest.makeSubject({ 
     uuid: userUuid,
   }, {
     settings: [
