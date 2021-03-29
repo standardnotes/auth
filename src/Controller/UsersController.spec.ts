@@ -6,6 +6,8 @@ import { UsersController } from './UsersController'
 import { results } from 'inversify-express-utils'
 import { User } from '../Domain/User/User'
 import { UpdateUser } from '../Domain/UseCase/UpdateUser'
+import { GetSettingsTest } from '../Domain/UseCase/GetSettings/test/GetSettingsTest'
+import { UserTest } from '../Domain/User/test/UserTest'
 
 describe('UsersController', () => {
   let updateUser: UpdateUser
@@ -13,7 +15,10 @@ describe('UsersController', () => {
   let response: express.Response
   let user: User
 
-  const createController = () => new UsersController(updateUser)
+  const createController = () => new UsersController(
+    updateUser,
+    GetSettingsTest.makeSubject(),
+  )
 
   beforeEach(() => {
     updateUser = {} as jest.Mocked<UpdateUser>
@@ -75,5 +80,52 @@ describe('UsersController', () => {
 
     expect(result.statusCode).toEqual(401)
     expect(await result.content.readAsStringAsync()).toEqual('{"error":{"message":"Operation not allowed."}}')
+  })
+
+  // todo: most likely json returned from controller should not be straight stringified settings
+  it('shoud get user settings for vaild user uuid', async () => {
+    const userUuid = 'user-1'
+    const user = UserTest.makeSubject({ 
+      uuid: userUuid
+    }, {
+      settings: [
+        { uuid: 'setting-1' },
+      ]
+    })
+    Object.assign(request, {
+      params: { userId: userUuid }
+    })
+    response.locals.user = user
+
+    const settings = await user.settings
+
+    const subject = new UsersController(
+      updateUser,
+      GetSettingsTest.makeSubject(settings),
+    )
+    const actual = await subject.getSettings(request, response)
+
+    expect(actual.statusCode).toEqual(200)
+    expect(actual.json).toEqual({
+      userUuid,
+      settings,
+    })
+  })
+
+  it('shoud error when geting user settings for invaild user uuid', async () => {
+    const userUuid = 'user-1'
+    const badUserUuid = 'BAD-user-uuid'
+    const user = UserTest.makeSubject({ 
+      uuid: userUuid
+    })
+    Object.assign(request, {
+      params: { userId: badUserUuid }
+    })
+    response.locals.user = user
+
+    const actual = await createController().getSettings(request, response)
+
+    expect(actual.statusCode).toEqual(401)
+    expect(actual.json).toHaveProperty('error')
   })
 })

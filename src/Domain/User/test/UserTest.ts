@@ -18,17 +18,16 @@ export class UserTest {
     } = {}
   ): User {
     const user: User = new User()
-    const userPromise = (async () => user)()
 
     const { 
       settings: partialSettings = [],
     } = associated
 
     const settings = partialSettings.map(setting => 
-      SettingTest.makeSubject({ ...setting, user: userPromise })
+      SettingTest.makeSubject(setting, user)
     )
-    
-    Object.assign(user, {
+
+    const defaults = {
       uuid: UserTest.defaultStringPrefix + 'uuid',
       version: UserTest.defaultStringPrefix + 'version',
       createdAt: UserTest.defaultDate,
@@ -52,8 +51,9 @@ export class UserTest {
       settings: (async () => settings)(),
       supportsSessions: (): boolean => true,
       updatedWithUserAgent: null,
-      ...props,
-    })
+    }
+    
+    Object.assign(user, defaults, props)
 
     return user
   }

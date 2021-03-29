@@ -1,8 +1,7 @@
 import 'reflect-metadata'
 import { Setting } from '../../Setting/Setting'
-import { SettingRepostioryStub } from '../../Setting/test/SettingRepositoryStub'
 import { UserTest } from '../../User/test/UserTest'
-import { GetSettings } from './GetSettings'
+import { GetSettingsTest } from './test/GetSettingsTest'
 
 describe('GetSettings', () => {
   const userUuid = 'user-uuid'
@@ -20,9 +19,7 @@ describe('GetSettings', () => {
     settings = await user.settings
   })
 
-  const makeSubject = () => new GetSettings(
-    new SettingRepostioryStub(settings),
-  )
+  const makeSubject = () => GetSettingsTest.makeSubject(settings)
 
   it('should get associated settings for a valid user uuid', async () => {
     const actual = await makeSubject().execute({ userUuid })
