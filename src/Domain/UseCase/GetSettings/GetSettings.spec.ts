@@ -1,31 +1,27 @@
 import 'reflect-metadata'
-import { SettingProjector } from '../../../Projection/SettingProjector'
+import { SettingProjectorTest } from '../../../Projection/test/SettingProjectorTest'
 import { Setting } from '../../Setting/Setting'
 import { SimpleSetting } from '../../Setting/SimpleSetting'
-import { UserTest } from '../../User/test/UserTest'
+import { userWithSettings } from '../../User/test/data'
 import { GetSettingsTest } from './test/GetSettingsTest'
 
 describe('GetSettings', () => {
-  const userUuid = 'user-uuid'
-  const user = UserTest.makeSubject({ 
-    uuid: userUuid,
-  }, {
-    settings: [
-      { uuid: 'setting-1' },
-      { uuid: 'setting-2' },
-    ]
-  })
+  const user = userWithSettings
+  const userUuid = userWithSettings.uuid
 
-  const settingProjector = new SettingProjector()
+  const projector = SettingProjectorTest.get()
 
   let settings: Setting[]
   let simpleSettings: SimpleSetting[]
   beforeAll(async () => {
     settings = await user.settings
-    simpleSettings = await settingProjector.projectManySimple(settings)
+    simpleSettings = await projector.projectManySimple(settings)
   })
 
-  const makeSubject = () => GetSettingsTest.makeSubject(settings, settingProjector)
+  const makeSubject = () => GetSettingsTest.makeSubject({
+    settings,
+    projector,
+  })
 
   it('should get associated settings for a valid user uuid', async () => {
     const actual = await makeSubject().execute({ userUuid })
