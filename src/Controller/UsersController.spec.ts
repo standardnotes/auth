@@ -82,7 +82,6 @@ describe('UsersController', () => {
     expect(await result.content.readAsStringAsync()).toEqual('{"error":{"message":"Operation not allowed."}}')
   })
 
-  // todo: most likely json returned from controller should not be straight stringified settings
   it('shoud get user settings for vaild user uuid', async () => {
     const userUuid = 'user-1'
     const user = UserTest.makeSubject({ 
