@@ -10,6 +10,7 @@ export class SettingRepostioryStub implements SettingRepositoryInterface {
         return setting
       }
     }
+
     return undefined
   }
   async findAllByUserUuid(userUuid: string): Promise<Setting[]> {
@@ -19,6 +20,7 @@ export class SettingRepostioryStub implements SettingRepositoryInterface {
         found.push(setting)
       }
     }
+    
     return found
   }
 }

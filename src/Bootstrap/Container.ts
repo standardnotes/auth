@@ -68,6 +68,7 @@ import { CrypterInterface } from '../Domain/Encryption/CrypterInterface'
 import { CrypterNode } from '../Domain/Encryption/CrypterNode'
 import { SnCryptoNode } from '@standardnotes/sncrypto-node'
 import { GetSettings } from '../Domain/UseCase/GetSettings/GetSettings'
+import { SettingProjector } from '../Projection/SettingProjector'
 
 export class ContainerConfigLoader {
     async load(): Promise<Container> {
@@ -169,6 +170,7 @@ export class ContainerConfigLoader {
         container.bind<UserProjector>(TYPES.UserProjector).to(UserProjector)
         container.bind<RoleProjector>(TYPES.RoleProjector).to(RoleProjector)
         container.bind<PermissionProjector>(TYPES.PermissionProjector).to(PermissionProjector)
+        container.bind<SettingProjector>(TYPES.SettingProjector).to(SettingProjector)
 
         // env vars
         container.bind(TYPES.JWT_SECRET).toConstantValue(env.get('JWT_SECRET'))

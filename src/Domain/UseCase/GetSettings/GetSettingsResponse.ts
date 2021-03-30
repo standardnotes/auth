@@ -1,7 +1,7 @@
-import { Setting } from '../../Setting/Setting'
+import { SimpleSetting } from '../../Setting/SimpleSetting'
 import { Uuid } from '../../Uuid/Uuid'
 
 export type GetSettingsResponse = {
   userUuid: Uuid,
-  settings: Setting[],
+  settings: SimpleSetting[],
 }

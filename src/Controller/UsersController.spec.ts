@@ -8,6 +8,7 @@ import { User } from '../Domain/User/User'
 import { UpdateUser } from '../Domain/UseCase/UpdateUser'
 import { GetSettingsTest } from '../Domain/UseCase/GetSettings/test/GetSettingsTest'
 import { UserTest } from '../Domain/User/test/UserTest'
+import { SettingProjector } from '../Projection/SettingProjector'
 
 describe('UsersController', () => {
   let updateUser: UpdateUser
@@ -98,16 +99,22 @@ describe('UsersController', () => {
 
     const settings = await user.settings
 
+    const projector = new SettingProjector()
+    const simpleSettings = await projector.projectManySimple(settings)
+
     const subject = new UsersController(
       updateUser,
-      GetSettingsTest.makeSubject(settings),
+      GetSettingsTest.makeSubject(
+        settings,
+        projector,
+      ),
     )
     const actual = await subject.getSettings(request, response)
 
     expect(actual.statusCode).toEqual(200)
     expect(actual.json).toEqual({
       userUuid,
-      settings,
+      settings: simpleSettings,
     })
   })
 
