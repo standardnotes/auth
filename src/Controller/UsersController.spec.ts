@@ -8,7 +8,6 @@ import { User } from '../Domain/User/User'
 import { UpdateUser } from '../Domain/UseCase/UpdateUser'
 import { UserTest } from '../Domain/User/test/UserTest'
 import { SettingProjectorTest } from '../Projection/test/SettingProjectorTest'
-import { userWithSettings } from '../Domain/User/test/data'
 import { SettingRepostioryStub } from '../Domain/Setting/test/SettingRepositoryStub'
 import { UsersControllerTest } from './test/UsersControllerTest'
 import { GetSettings } from '../Domain/UseCase/GetSettings/GetSettings'
@@ -143,7 +142,7 @@ describe('UsersController', () => {
   })
 
   it('should get user setting by name for vaild user uuid', async () => {
-    const user = userWithSettings
+    const user = UserTest.makeWithSettings()
     const userUuid = user.uuid
     response.locals.user = user
 
@@ -264,5 +263,40 @@ describe('UsersController', () => {
 
     expect(actual.statusCode).toEqual(400)
     expect(actual.json).toHaveProperty('error')
+  })
+  
+  it('should create user setting for vaild user uuid', async () => {
+    const user = UserTest.makeWithSettings()
+    const userUuid = user.uuid
+    response.locals.user = user
+
+    const settings = await user.settings
+    const setting = settings[0]
+
+    Object.assign(request, {
+      params: { userUuid, settingName: setting.name }
+    })    
+    
+    const repository = new SettingRepostioryStub(settings)
+    const projector = SettingProjectorTest.get()
+    const subject = UsersControllerTest.makeSubject({
+      updateUser,
+      repository,
+      projector,
+    })
+
+    const expectedSetting = await projector.projectSimple(setting)
+
+    const actual = await subject.updateSetting(
+      request, 
+      response,
+    )
+
+    expect(actual.statusCode).toEqual(200)
+    expect(actual.json).toEqual({
+      success: true,
+      userUuid,
+      setting: expectedSetting,
+    })
   })
 })

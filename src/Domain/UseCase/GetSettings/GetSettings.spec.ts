@@ -2,12 +2,12 @@ import 'reflect-metadata'
 import { SettingProjectorTest } from '../../../Projection/test/SettingProjectorTest'
 import { Setting } from '../../Setting/Setting'
 import { SimpleSetting } from '../../Setting/SimpleSetting'
-import { userWithSettings } from '../../User/test/data'
+import { UserTest } from '../../User/test/UserTest'
 import { GetSettingsTest } from './test/GetSettingsTest'
 
 describe('GetSettings', () => {
-  const user = userWithSettings
-  const userUuid = userWithSettings.uuid
+  const user = UserTest.makeWithSettings()
+  const userUuid = user.uuid
 
   const projector = SettingProjectorTest.get()
 

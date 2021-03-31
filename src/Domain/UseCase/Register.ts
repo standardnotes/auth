@@ -50,7 +50,7 @@ export class Register implements UseCaseInterface {
     user.updatedAt = dayjs.utc().toDate()
     user.encryptedPassword = await bcrypt.hash(password, User.PASSWORD_HASH_COST)
     user.encryptedServerKey = await this.crypter.generateEncryptedUserServerKey()
-    user.serverEncryptionVersion = User.ENCRYPTION_VERSION_1
+    user.serverEncryptionVersion = User.DEFAULT_ENCRYPTION_VERSION
 
     const defaultRole = await this.roleRepository.findOneByName(Role.User)
     if (defaultRole) {

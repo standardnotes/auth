@@ -7,7 +7,7 @@ import { Setting } from '../Setting/Setting'
 export class User {
   private readonly SESSIONS_PROTOCOL_VERSION = 4
   static readonly PASSWORD_HASH_COST = 11
-  static readonly ENCRYPTION_VERSION_1 = 1
+  static readonly DEFAULT_ENCRYPTION_VERSION = 1
 
   @PrimaryColumn({
     length: 36,
@@ -45,7 +45,7 @@ export class User {
   @Column({
     name: 'server_encryption_version',
     type: 'tinyint',
-    default: 0,
+    default: User.DEFAULT_ENCRYPTION_VERSION,
   })
   serverEncryptionVersion: number
 
