@@ -3,19 +3,12 @@ import { SettingProjectorTest } from '../../../Projection/test/SettingProjectorT
 import { Setting } from '../../Setting/Setting'
 import { SimpleSetting } from '../../Setting/SimpleSetting'
 import { userWithSettings } from '../../User/test/data'
-import { UserTest } from '../../User/test/UserTest'
 import { GetSettingTest } from './test/GetSettingTest'
 
 describe('GetSetting', () => {
-  const user = UserTest.makeSubject({ 
-    uuid: 'user-with-settings-uuid',
-  }, {
-    settings: [
-      { uuid: 'setting-1', name: 'setting-name-1' },
-      { uuid: 'setting-2', name: 'setting-name-2' },
-    ]
-  })
-  const userUuid = userWithSettings.uuid
+  const user = userWithSettings
+  const userUuid = user.uuid
+  const settingIndex = 0
 
   const projector = SettingProjectorTest.get()
 
@@ -25,7 +18,7 @@ describe('GetSetting', () => {
   beforeAll(async () => {
     settings = await user.settings
     simpleSettings = await projector.projectManySimple(settings)
-    settingName = simpleSettings[0].name
+    settingName = simpleSettings[settingIndex].name
   })
 
   const makeSubject = () => GetSettingTest.makeSubject({
@@ -39,7 +32,7 @@ describe('GetSetting', () => {
     expect(actual).toEqual({
       success: true,
       userUuid,
-      setting: simpleSettings[0]
+      setting: simpleSettings[settingIndex]
     })
   })
   
