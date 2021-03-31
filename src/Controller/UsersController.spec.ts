@@ -117,6 +117,7 @@ describe('UsersController', () => {
 
     expect(actual.statusCode).toEqual(200)
     expect(actual.json).toEqual({
+      success: true,
       userUuid,
       settings: simpleSettings,
     })
