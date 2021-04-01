@@ -1,8 +1,8 @@
 import 'reflect-metadata'
 
-import { KeyParamsFactoryInterface } from '../User/KeyParamsFactoryInterface'
-import { User } from '../User/User'
-import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
+import { KeyParamsFactoryInterface } from '../../User/KeyParamsFactoryInterface'
+import { User } from '../../User/User'
+import { UserRepositoryInterface } from '../../User/UserRepositoryInterface'
 import { GetUserKeyParams } from './GetUserKeyParams'
 
 describe('GetUserKeyParams', () => {

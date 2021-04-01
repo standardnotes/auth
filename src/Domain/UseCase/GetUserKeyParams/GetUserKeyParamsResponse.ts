@@ -1,4 +1,4 @@
-import { KeyParams } from '../User/KeyParams'
+import { KeyParams } from '../../User/KeyParams'
 
 export type GetUserKeyParamsResponse = {
   keyParams: KeyParams

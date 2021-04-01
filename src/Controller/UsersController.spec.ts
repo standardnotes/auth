@@ -13,6 +13,7 @@ import { SettingRepostioryStub } from '../Domain/Setting/test/SettingRepositoryS
 import { UsersControllerTest } from './test/UsersControllerTest'
 import { GetSettings } from '../Domain/UseCase/GetSettings/GetSettings'
 import { GetSetting } from '../Domain/UseCase/GetSetting/GetSetting'
+import { GetUserKeyParams } from '../Domain/UseCase/GetUserKeyParams/GetUserKeyParams'
 
 describe('UsersController', () => {
   let updateUser: UpdateUser
@@ -24,6 +25,7 @@ describe('UsersController', () => {
     updateUser,
     {} as jest.Mocked<GetSettings>,
     {} as jest.Mocked<GetSetting>,
+    {} as jest.Mocked<GetUserKeyParams>
   )
 
   beforeEach(() => {
@@ -90,7 +92,7 @@ describe('UsersController', () => {
 
   it('should get user settings for vaild user uuid', async () => {
     const userUuid = 'user-1'
-    const user = UserTest.makeSubject({ 
+    const user = UserTest.makeSubject({
       uuid: userUuid
     }, {
       settings: [
@@ -110,7 +112,7 @@ describe('UsersController', () => {
 
     const subject = UsersControllerTest.makeSubject({
       updateUser,
-      repository,
+      settingRepository: repository,
       projector,
     })
     const actual = await subject.getSettings(request, response)
@@ -126,7 +128,7 @@ describe('UsersController', () => {
   it('should error when geting user settings for invaild user uuid', async () => {
     const userUuid = 'user-1'
     const badUserUuid = 'BAD-user-uuid'
-    const user = UserTest.makeSubject({ 
+    const user = UserTest.makeSubject({
       uuid: userUuid
     })
     Object.assign(request, {
@@ -150,13 +152,13 @@ describe('UsersController', () => {
 
     Object.assign(request, {
       params: { userUuid, settingName: settings[settingIndex].name }
-    })    
-    
+    })
+
     const repository = new SettingRepostioryStub(settings)
     const projector = SettingProjectorTest.get()
     const subject = UsersControllerTest.makeSubject({
       updateUser,
-      repository,
+      settingRepository: repository,
       projector,
     })
 
@@ -175,7 +177,7 @@ describe('UsersController', () => {
   it('should error when geting user setting by name for invaild user uuid', async () => {
     const userUuid = 'user-1'
     const badUserUuid = 'BAD-user-uuid'
-    const user = UserTest.makeSubject({ 
+    const user = UserTest.makeSubject({
       uuid: userUuid
     })
     Object.assign(request, {
@@ -192,10 +194,10 @@ describe('UsersController', () => {
     expect(actual.statusCode).toEqual(401)
     expect(actual.json).toHaveProperty('error')
   })
-  
+
   it('should error when geting user setting by invalid name for vaild user uuid', async () => {
     const userUuid = 'user-1'
-    const user = UserTest.makeSubject({ 
+    const user = UserTest.makeSubject({
       uuid: userUuid
     })
     Object.assign(request, {
@@ -211,5 +213,23 @@ describe('UsersController', () => {
 
     expect(actual.statusCode).toEqual(400)
     expect(actual.json).toHaveProperty('error')
+  })
+
+  it('should get user key params', async () => {
+    const subject = UsersControllerTest.makeSubject({
+      updateUser,
+    })
+
+    Object.assign(request, {
+      query: { email: 'test@test.com' }
+    })
+
+    const actual = await subject.keyParams(request)
+
+    expect(actual.statusCode).toEqual(200)
+    expect(actual.json).toEqual({
+      identifier: 'test@test.com',
+      version: '004'
+    })
   })
 })

@@ -1,10 +1,10 @@
 import { inject, injectable } from 'inversify'
-import TYPES from '../../Bootstrap/Types'
-import { KeyParamsFactoryInterface } from '../User/KeyParamsFactoryInterface'
-import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
+import TYPES from '../../../Bootstrap/Types'
+import { KeyParamsFactoryInterface } from '../../User/KeyParamsFactoryInterface'
+import { UserRepositoryInterface } from '../../User/UserRepositoryInterface'
 import { GetUserKeyParamsDTO } from './GetUserKeyParamsDTO'
 import { GetUserKeyParamsResponse } from './GetUserKeyParamsResponse'
-import { UseCaseInterface } from './UseCaseInterface'
+import { UseCaseInterface } from '../UseCaseInterface'
 
 @injectable()
 export class GetUserKeyParams implements UseCaseInterface {
