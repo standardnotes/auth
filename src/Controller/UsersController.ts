@@ -9,6 +9,7 @@ import {
   results
 } from 'inversify-express-utils'
 import TYPES from '../Bootstrap/Types'
+import { GetSetting } from '../Domain/UseCase/GetSetting/GetSetting'
 import { GetSettings } from '../Domain/UseCase/GetSettings/GetSettings'
 import { UpdateUser } from '../Domain/UseCase/UpdateUser'
 
@@ -17,6 +18,7 @@ export class UsersController extends BaseHttpController {
   constructor(
     @inject(TYPES.UpdateUser) private updateUser: UpdateUser,
     @inject(TYPES.GetSettings) private doGetSettings: GetSettings,
+    @inject(TYPES.GetSetting) private doGetSetting: GetSetting,
   ) {
     super()
   }
@@ -49,9 +51,9 @@ export class UsersController extends BaseHttpController {
     return this.json(updateResult.authResponse)
   }
 
-  @httpGet('/:userId/settings')
+  @httpGet('/:userUuid/settings')
   async getSettings(request: Request, response: Response): Promise<results.JsonResult> {
-    if (request.params.userId !== response.locals.user.uuid) {
+    if (request.params.userUuid !== response.locals.user.uuid) {
       return this.json({
         error: {
           message: 'Operation not allowed.'
@@ -59,9 +61,27 @@ export class UsersController extends BaseHttpController {
       }, 401)
     }
 
-    const { userId } = request.params
-    const result = await this.doGetSettings.execute({ userUuid: userId })
+    const { userUuid } = request.params
+    const result = await this.doGetSettings.execute({ userUuid })
 
     return this.json(result)
+  }
+
+  @httpGet('/:userUuid/settings/:settingName')
+  async getSetting(request: Request, response: Response): Promise<results.JsonResult> {
+    if (request.params.userUuid !== response.locals.user.uuid) {
+      return this.json({
+        error: {
+          message: 'Operation not allowed.'
+        }
+      }, 401)
+    }
+
+    const { userUuid, settingName } = request.params
+    const result = await this.doGetSetting.execute({ userUuid, settingName })
+
+    if (result.success) return this.json(result)
+
+    return this.json(result, 400)
   }
 }

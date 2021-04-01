@@ -1,8 +1,11 @@
 import { SimpleSetting } from '../../Setting/SimpleSetting'
 import { Uuid } from '../../Uuid/Uuid'
 
-export type GetSettingsResponse = {
+export type GetSettingResponse = {
+  success: false,
+  error: string,
+} | {
   success: true,
   userUuid: Uuid,
-  settings: SimpleSetting[],
+  setting: SimpleSetting,
 }

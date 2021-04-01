@@ -3,9 +3,9 @@ import { SettingProjectorTest } from '../../../../Projection/test/SettingProject
 import { Setting } from '../../../Setting/Setting'
 import { SettingRepositoryInterface } from '../../../Setting/SettingRepositoryInterface'
 import { SettingRepostioryStub } from '../../../Setting/test/SettingRepositoryStub'
-import { GetSettings } from '../GetSettings'
+import { GetSetting } from '../GetSetting'
 
-export class GetSettingsTest {
+export class GetSettingTest {
   static makeSubject({
     settings = [],
     repository = new SettingRepostioryStub(settings),
@@ -14,8 +14,8 @@ export class GetSettingsTest {
     settings?: Setting[],
     repository?: SettingRepositoryInterface,
     projector?: SettingProjector,
-  } = {}): GetSettings {
-    return new GetSettings(
+  } = {}): GetSetting {
+    return new GetSetting(
       repository,
       projector,
     )

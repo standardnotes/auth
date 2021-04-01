@@ -18,7 +18,8 @@ export class GetSettings implements UseCaseInterface {
     const settings = await this.settingRepository.findAllByUserUuid(userUuid)
     const simpleSettings = await this.settingProjector.projectManySimple(settings)
 
-    return { 
+    return {
+      success: true,
       userUuid, 
       settings: simpleSettings,
     }

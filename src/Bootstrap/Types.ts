@@ -60,6 +60,7 @@ const TYPES = {
   DeleteSessionForUser: Symbol.for('DeleteSessionForUser'),
   ChangePassword: Symbol.for('ChangePassword'),
   GetSettings: Symbol.for('GetSettings'),
+  GetSetting: Symbol.for('GetSetting'),
   // Handlers
   UserRegisteredEventHandler: Symbol.for('UserRegisteredEventHandler'),
   // Services

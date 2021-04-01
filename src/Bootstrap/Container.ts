@@ -69,6 +69,7 @@ import { CrypterNode } from '../Domain/Encryption/CrypterNode'
 import { SnCryptoNode } from '@standardnotes/sncrypto-node'
 import { GetSettings } from '../Domain/UseCase/GetSettings/GetSettings'
 import { SettingProjector } from '../Projection/SettingProjector'
+import { GetSetting } from '../Domain/UseCase/GetSetting/GetSetting'
 
 export class ContainerConfigLoader {
     async load(): Promise<Container> {
@@ -209,6 +210,7 @@ export class ContainerConfigLoader {
         container.bind<DeleteSessionForUser>(TYPES.DeleteSessionForUser).to(DeleteSessionForUser)
         container.bind<ChangePassword>(TYPES.ChangePassword).to(ChangePassword)
         container.bind<GetSettings>(TYPES.GetSettings).to(GetSettings)
+        container.bind<GetSetting>(TYPES.GetSetting).to(GetSetting)
 
         // Handlers
         container.bind<UserRegisteredEventHandler>(TYPES.UserRegisteredEventHandler).to(UserRegisteredEventHandler)

@@ -7,6 +7,7 @@ import { SimpleSetting } from '../Domain/Setting/SimpleSetting'
 export class SettingProjector {
   async projectSimple(setting: Setting): Promise<SimpleSetting> {
     const { 
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       user,
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       createdAt,
@@ -17,10 +18,7 @@ export class SettingProjector {
       ...rest 
     } = setting
 
-    return {
-      ...rest,
-      userUuid: (await user).uuid
-    }
+    return rest
   }
   async projectManySimple(settings: Setting[]): Promise<SimpleSetting[]> {
     return Promise.all(

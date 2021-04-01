@@ -17,10 +17,7 @@ describe('SettingProjector', () => {
     UserTest.makeSubject(userProps),
   )
 
-  const expectedProjection = {
-    ...settingProps,
-    userUuid: userProps.uuid,
-  }
+  const expectedProjection = settingProps
 
   const createProjector = () => new SettingProjector()
 

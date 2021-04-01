@@ -6,9 +6,13 @@ import { UsersController } from './UsersController'
 import { results } from 'inversify-express-utils'
 import { User } from '../Domain/User/User'
 import { UpdateUser } from '../Domain/UseCase/UpdateUser'
-import { GetSettingsTest } from '../Domain/UseCase/GetSettings/test/GetSettingsTest'
 import { UserTest } from '../Domain/User/test/UserTest'
-import { SettingProjector } from '../Projection/SettingProjector'
+import { SettingProjectorTest } from '../Projection/test/SettingProjectorTest'
+import { userWithSettings } from '../Domain/User/test/data'
+import { SettingRepostioryStub } from '../Domain/Setting/test/SettingRepositoryStub'
+import { UsersControllerTest } from './test/UsersControllerTest'
+import { GetSettings } from '../Domain/UseCase/GetSettings/GetSettings'
+import { GetSetting } from '../Domain/UseCase/GetSetting/GetSetting'
 
 describe('UsersController', () => {
   let updateUser: UpdateUser
@@ -16,9 +20,10 @@ describe('UsersController', () => {
   let response: express.Response
   let user: User
 
-  const createController = () => new UsersController(
+  const createControllerWithMocks = () => new UsersController(
     updateUser,
-    GetSettingsTest.makeSubject(),
+    {} as jest.Mocked<GetSettings>,
+    {} as jest.Mocked<GetSetting>,
   )
 
   beforeEach(() => {
@@ -49,7 +54,7 @@ describe('UsersController', () => {
 
     updateUser.execute = jest.fn().mockReturnValue({ authResponse: { foo: 'bar' } })
 
-    const httpResponse = <results.JsonResult> await createController().update(request, response)
+    const httpResponse = <results.JsonResult> await createControllerWithMocks().update(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(updateUser.execute).toHaveBeenCalledWith({
@@ -74,7 +79,7 @@ describe('UsersController', () => {
     request.headers['user-agent'] = 'Google Chrome'
     response.locals.user = user
 
-    const httpResponse = <results.JsonResult> await createController().update(request, response)
+    const httpResponse = <results.JsonResult> await createControllerWithMocks().update(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(updateUser.execute).not.toHaveBeenCalled()
@@ -83,7 +88,7 @@ describe('UsersController', () => {
     expect(await result.content.readAsStringAsync()).toEqual('{"error":{"message":"Operation not allowed."}}')
   })
 
-  it('shoud get user settings for vaild user uuid', async () => {
+  it('should get user settings for vaild user uuid', async () => {
     const userUuid = 'user-1'
     const user = UserTest.makeSubject({ 
       uuid: userUuid
@@ -93,45 +98,118 @@ describe('UsersController', () => {
       ]
     })
     Object.assign(request, {
-      params: { userId: userUuid }
+      params: { userUuid }
     })
     response.locals.user = user
 
     const settings = await user.settings
 
-    const projector = new SettingProjector()
+    const projector = SettingProjectorTest.get()
     const simpleSettings = await projector.projectManySimple(settings)
+    const repository = new SettingRepostioryStub(settings)
 
-    const subject = new UsersController(
+    const subject = UsersControllerTest.makeSubject({
       updateUser,
-      GetSettingsTest.makeSubject(
-        settings,
-        projector,
-      ),
-    )
+      repository,
+      projector,
+    })
     const actual = await subject.getSettings(request, response)
 
     expect(actual.statusCode).toEqual(200)
     expect(actual.json).toEqual({
+      success: true,
       userUuid,
       settings: simpleSettings,
     })
   })
 
-  it('shoud error when geting user settings for invaild user uuid', async () => {
+  it('should error when geting user settings for invaild user uuid', async () => {
     const userUuid = 'user-1'
     const badUserUuid = 'BAD-user-uuid'
     const user = UserTest.makeSubject({ 
       uuid: userUuid
     })
     Object.assign(request, {
-      params: { userId: badUserUuid }
+      params: { userUuid: badUserUuid }
     })
     response.locals.user = user
 
-    const actual = await createController().getSettings(request, response)
+    const actual = await createControllerWithMocks().getSettings(request, response)
 
     expect(actual.statusCode).toEqual(401)
+    expect(actual.json).toHaveProperty('error')
+  })
+
+  it('should get user setting by name for vaild user uuid', async () => {
+    const user = userWithSettings
+    const userUuid = user.uuid
+    response.locals.user = user
+
+    const settings = await user.settings
+    const settingIndex = 0
+
+    Object.assign(request, {
+      params: { userUuid, settingName: settings[settingIndex].name }
+    })    
+    
+    const repository = new SettingRepostioryStub(settings)
+    const projector = SettingProjectorTest.get()
+    const subject = UsersControllerTest.makeSubject({
+      updateUser,
+      repository,
+      projector,
+    })
+
+    const expectedSetting = await projector.projectSimple(settings[settingIndex])
+
+    const actual = await subject.getSetting(request, response)
+
+    expect(actual.statusCode).toEqual(200)
+    expect(actual.json).toEqual({
+      success: true,
+      userUuid,
+      setting: expectedSetting,
+    })
+  })
+
+  it('should error when geting user setting by name for invaild user uuid', async () => {
+    const userUuid = 'user-1'
+    const badUserUuid = 'BAD-user-uuid'
+    const user = UserTest.makeSubject({ 
+      uuid: userUuid
+    })
+    Object.assign(request, {
+      params: { userUuid: badUserUuid, settingName: 'irrelevant' }
+    })
+    response.locals.user = user
+
+    const subject = UsersControllerTest.makeSubject({
+      updateUser,
+    })
+
+    const actual = await subject.getSetting(request, response)
+
+    expect(actual.statusCode).toEqual(401)
+    expect(actual.json).toHaveProperty('error')
+  })
+  
+  it('should error when geting user setting by invalid name for vaild user uuid', async () => {
+    const userUuid = 'user-1'
+    const user = UserTest.makeSubject({ 
+      uuid: userUuid
+    })
+    Object.assign(request, {
+      params: { userUuid, settingName: 'BAD' }
+    })
+    response.locals.user = user
+
+    const subject = UsersControllerTest.makeSubject({
+      updateUser,
+    })
+
+    const actual = await subject.getSetting(request, response)
+
+    expect(actual.statusCode).toEqual(400)
     expect(actual.json).toHaveProperty('error')
   })
 })
