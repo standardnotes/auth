@@ -14,7 +14,6 @@ import { UsersControllerTest } from './test/UsersControllerTest'
 import { GetSettings } from '../Domain/UseCase/GetSettings/GetSettings'
 import { GetSetting } from '../Domain/UseCase/GetSetting/GetSetting'
 import { GetUserKeyParams } from '../Domain/UseCase/GetUserKeyParams/GetUserKeyParams'
-import { UserRepostioryStub } from '../Domain/User/test/UserRepostioryStub'
 
 describe('UsersController', () => {
   let updateUser: UpdateUser
@@ -217,19 +216,12 @@ describe('UsersController', () => {
   })
 
   it('should get user key params', async () => {
-    const userUuid = '1-2-3'
-    const user = UserTest.makeSubject({
-      uuid: userUuid,
-    })
-    const userRepository = new UserRepostioryStub([ user ])
-
     const subject = UsersControllerTest.makeSubject({
       updateUser,
-      userRepository,
     })
 
     Object.assign(request, {
-      params: { userUuid },
+      query: { email: 'test@test.com' },
     })
 
     const actual = await subject.keyParams(request)
@@ -239,5 +231,20 @@ describe('UsersController', () => {
       identifier: 'test@test.com',
       version: '004',
     })
+  })
+
+  it('should error when email parameter is not given in query when gettting user key params', async () => {
+    const subject = UsersControllerTest.makeSubject({
+      updateUser,
+    })
+
+    Object.assign(request, {
+      query: {},
+    })
+
+    const actual = await subject.keyParams(request)
+
+    expect(actual.statusCode).toEqual(400)
+    expect(actual.json).toHaveProperty('error')
   })
 })

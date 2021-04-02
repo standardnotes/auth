@@ -87,11 +87,19 @@ export class UsersController extends BaseHttpController {
     return this.json(result, 400)
   }
 
-  @httpGet('/:userUuid/params')
+  @httpGet('/params')
   async keyParams(request: Request): Promise<results.JsonResult> {
-    const result = await this.getUserKeyParams.execute({
-      userUuid: request.params.userUuid,
-    })
+    const email = 'email' in request.query ? <string> request.query.email : undefined
+
+    if(!email) {
+      return this.json({
+        error: {
+          message: 'Missing mandatory request query parameters.',
+        },
+      }, 400)
+    }
+
+    const result = await this.getUserKeyParams.execute({ email })
 
     return this.json(result.keyParams)
   }
