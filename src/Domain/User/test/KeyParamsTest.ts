@@ -1,4 +1,4 @@
-import { KeyParams } from '../KeyParams'
+import { KeyParams } from '@standardnotes/auth'
 
 export class KeyParamsTest {
   static makeSubject(
