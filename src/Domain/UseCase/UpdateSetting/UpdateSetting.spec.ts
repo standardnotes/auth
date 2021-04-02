@@ -17,7 +17,6 @@ describe('UpdateSetting', () => {
   const user = UserTest.makeWithSettings()
   const userUuid = user.uuid
 
-  // todo: hmm
   const userRepositoryMock = {
     findOneByUuid: jest.fn().mockReturnValue(user)
   } as unknown as UserRepositoryInterface

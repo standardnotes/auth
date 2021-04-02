@@ -93,6 +93,41 @@ export class UsersController extends BaseHttpController {
     return this.json(result, 400)
   }
 
+  @httpPut('/:userUuid/settings', TYPES.AuthMiddleware)
+  async updateSetting(request: Request, response: Response): Promise<results.JsonResult> {
+    if (request.params.userUuid !== response.locals.user.uuid) {
+      return this.json({
+        error: {
+          message: 'Operation not allowed.',
+        },
+      }, 401)
+    }
+
+    const { 
+      name, 
+      value, 
+      serverEncryptionVersion = Setting.DEFAULT_ENCRYPTION_VERSION,
+    } = request.body
+
+    const props = {
+      name, 
+      value,
+      serverEncryptionVersion,
+    }
+
+    const { userUuid } = request.params
+    const result = await this.doUpdateSetting.execute({ 
+      userUuid,
+      props,
+    })
+
+    if (result.success) {
+      return this.json({}, result.statusCode)
+    }
+
+    return this.json(result, 400)
+  }
+
   @httpGet('/params')
   async keyParams(request: Request): Promise<results.JsonResult> {
     const email = 'email' in request.query ? <string> request.query.email : undefined
@@ -111,55 +146,5 @@ export class UsersController extends BaseHttpController {
     })
 
     return this.json(result.keyParams)
-  }
-
-  @httpPut('/:userUuid/settings', TYPES.AuthMiddleware)
-  async updateSetting(request: Request, response: Response): Promise<
-    results.StatusCodeResult | results.JsonResult
-  > {
-    if (request.params.userUuid !== response.locals.user.uuid) {
-      return this.json({
-        error: {
-          message: 'Operation not allowed.'
-        }
-      }, 401)
-    }
-
-    const { 
-      name, 
-      value, 
-      serverEncryptionVersion = Setting.DEFAULT_ENCRYPTION_VERSION,
-    } = request.body
-
-    if (typeof name !== 'string' || typeof value !== 'string') {
-      return this.json({
-        success: false,
-        error: 'The request body must contain the following properites of type string: `name`, `value`.'
-      }, 400)
-    }
-    if (typeof serverEncryptionVersion !== 'number') {
-      return this.json({
-        success: false,
-        error: 'The `serverEncryptionVersion` property of the request body must of type number.'
-      }, 400)
-    }
-
-    const props = {
-      name, 
-      value,
-      serverEncryptionVersion,
-    }
-
-    const { userUuid } = request.params
-    const result = await this.doUpdateSetting.execute({ 
-      userUuid,
-      props,
-    })
-
-    if (result.success) {
-      return this.statusCode(result.statusCode)
-    }
-
-    return this.json(result, 400)
   }
 }

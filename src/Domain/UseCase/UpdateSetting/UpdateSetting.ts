@@ -22,7 +22,7 @@ export class UpdateSetting implements UseCaseInterface {
     if (user === undefined) {
       return {
         success: false,
-        error: `User ${userUuid} not found.`
+        error: `User ${userUuid} not found.`,
       }
     }
     
@@ -37,6 +37,7 @@ export class UpdateSetting implements UseCaseInterface {
     }
   }
 
+  /* istanbul ignore next */
   private statusToStatusCode(status: CreateOrReplaceSettingStatus): number {
     if (status === 'created') {
       return 201
