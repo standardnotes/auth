@@ -1,10 +1,10 @@
 import { inject, injectable } from 'inversify'
-import TYPES from '../../Bootstrap/Types'
-import { KeyParamsFactoryInterface } from '../User/KeyParamsFactoryInterface'
-import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
+import TYPES from '../../../Bootstrap/Types'
+import { KeyParamsFactoryInterface } from '../../User/KeyParamsFactoryInterface'
+import { UserRepositoryInterface } from '../../User/UserRepositoryInterface'
 import { GetUserKeyParamsDTO } from './GetUserKeyParamsDTO'
 import { GetUserKeyParamsResponse } from './GetUserKeyParamsResponse'
-import { UseCaseInterface } from './UseCaseInterface'
+import { UseCaseInterface } from '../UseCaseInterface'
 
 @injectable()
 export class GetUserKeyParams implements UseCaseInterface {
@@ -21,11 +21,20 @@ export class GetUserKeyParams implements UseCaseInterface {
       }
     }
 
-    const user = await this.userRepository.findOneByEmail(dto.email)
-    if (!user) {
-      return {
-        keyParams: this.keyParamsFactory.createPseudoParams(dto.email)
+    let user = undefined
+    if (dto.email) {
+      user = await this.userRepository.findOneByEmail(dto.email)
+      if (user === undefined) {
+        return {
+          keyParams: this.keyParamsFactory.createPseudoParams(dto.email)
+        }
       }
+    } else if (dto.userUuid) {
+      user = await this.userRepository.findOneByUuid(dto.userUuid)
+    }
+
+    if (user === undefined) {
+      throw new Error(`User with uuid ${dto.userUuid} not found`)
     }
 
     return {

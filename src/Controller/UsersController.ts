@@ -11,19 +11,21 @@ import {
 import TYPES from '../Bootstrap/Types'
 import { GetSetting } from '../Domain/UseCase/GetSetting/GetSetting'
 import { GetSettings } from '../Domain/UseCase/GetSettings/GetSettings'
+import { GetUserKeyParams } from '../Domain/UseCase/GetUserKeyParams/GetUserKeyParams'
 import { UpdateUser } from '../Domain/UseCase/UpdateUser'
 
-@controller('/users', TYPES.AuthMiddleware)
+@controller('/users')
 export class UsersController extends BaseHttpController {
   constructor(
     @inject(TYPES.UpdateUser) private updateUser: UpdateUser,
     @inject(TYPES.GetSettings) private doGetSettings: GetSettings,
     @inject(TYPES.GetSetting) private doGetSetting: GetSetting,
+    @inject(TYPES.GetUserKeyParams) private getUserKeyParams: GetUserKeyParams,
   ) {
     super()
   }
 
-  @httpPatch('/:userId')
+  @httpPatch('/:userId', TYPES.AuthMiddleware)
   async update(request: Request, response: Response): Promise<results.JsonResult> {
     if (request.params.userId !== response.locals.user.uuid) {
       return this.json({
@@ -51,7 +53,7 @@ export class UsersController extends BaseHttpController {
     return this.json(updateResult.authResponse)
   }
 
-  @httpGet('/:userUuid/settings')
+  @httpGet('/:userUuid/settings', TYPES.AuthMiddleware)
   async getSettings(request: Request, response: Response): Promise<results.JsonResult> {
     if (request.params.userUuid !== response.locals.user.uuid) {
       return this.json({
@@ -67,7 +69,7 @@ export class UsersController extends BaseHttpController {
     return this.json(result)
   }
 
-  @httpGet('/:userUuid/settings/:settingName')
+  @httpGet('/:userUuid/settings/:settingName', TYPES.AuthMiddleware)
   async getSetting(request: Request, response: Response): Promise<results.JsonResult> {
     if (request.params.userUuid !== response.locals.user.uuid) {
       return this.json({
@@ -83,5 +85,14 @@ export class UsersController extends BaseHttpController {
     if (result.success) return this.json(result)
 
     return this.json(result, 400)
+  }
+
+  @httpGet('/:userUuid/params')
+  async keyParams(request: Request): Promise<results.JsonResult> {
+    const result = await this.getUserKeyParams.execute({
+      userUuid: request.params.userUuid
+    })
+
+    return this.json(result.keyParams)
   }
 }

@@ -17,7 +17,7 @@ import { ClearLoginAttempts } from '../Domain/UseCase/ClearLoginAttempts'
 import { VerifyMFA } from '../Domain/UseCase/VerifyMFA'
 import { IncreaseLoginAttempts } from '../Domain/UseCase/IncreaseLoginAttempts'
 import { Logger } from 'winston'
-import { GetUserKeyParams } from '../Domain/UseCase/GetUserKeyParams'
+import { GetUserKeyParams } from '../Domain/UseCase/GetUserKeyParams/GetUserKeyParams'
 import { Register } from '../Domain/UseCase/Register'
 import { ChangePassword } from '../Domain/UseCase/ChangePassword'
 
