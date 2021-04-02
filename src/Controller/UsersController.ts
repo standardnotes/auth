@@ -90,7 +90,7 @@ export class UsersController extends BaseHttpController {
   @httpGet('/:userUuid/params')
   async keyParams(request: Request): Promise<results.JsonResult> {
     const result = await this.getUserKeyParams.execute({
-      email: <string> request.query.email
+      userUuid: request.params.userUuid
     })
 
     return this.json(result.keyParams)

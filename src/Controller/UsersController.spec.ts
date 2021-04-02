@@ -14,6 +14,7 @@ import { UsersControllerTest } from './test/UsersControllerTest'
 import { GetSettings } from '../Domain/UseCase/GetSettings/GetSettings'
 import { GetSetting } from '../Domain/UseCase/GetSetting/GetSetting'
 import { GetUserKeyParams } from '../Domain/UseCase/GetUserKeyParams/GetUserKeyParams'
+import { UserRepostioryStub } from '../Domain/User/test/UserRepostioryStub'
 
 describe('UsersController', () => {
   let updateUser: UpdateUser
@@ -216,12 +217,19 @@ describe('UsersController', () => {
   })
 
   it('should get user key params', async () => {
+    const userUuid = '1-2-3'
+    const user = UserTest.makeSubject({
+      uuid: userUuid
+    })
+    const userRepository = new UserRepostioryStub([ user ])
+
     const subject = UsersControllerTest.makeSubject({
       updateUser,
+      userRepository,
     })
 
     Object.assign(request, {
-      query: { email: 'test@test.com' }
+      params: { userUuid }
     })
 
     const actual = await subject.keyParams(request)
