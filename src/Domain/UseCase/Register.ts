@@ -1,6 +1,6 @@
 import * as dayjs from 'dayjs'
 import * as bcrypt from 'bcryptjs'
-import { ROLES } from '@standardnotes/auth'
+import { Role } from '@standardnotes/auth'
 
 import { v4 as uuidv4 } from 'uuid'
 import { inject, injectable } from 'inversify'
@@ -52,7 +52,7 @@ export class Register implements UseCaseInterface {
     user.encryptedServerKey = await this.crypter.generateEncryptedUserServerKey()
     user.serverEncryptionVersion = User.ENCRYPTION_VERSION_1
 
-    const defaultRole = await this.roleRepository.findOneByName(ROLES.USER)
+    const defaultRole = await this.roleRepository.findOneByName(Role.User)
     if (defaultRole) {
       user.roles = Promise.resolve([ defaultRole ])
     }
