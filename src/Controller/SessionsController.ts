@@ -6,7 +6,7 @@ import {
   httpGet,
   httpPost,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  results
+  results,
 } from 'inversify-express-utils'
 import { sign } from 'jsonwebtoken'
 import TYPES from '../Bootstrap/Types'
@@ -31,13 +31,13 @@ export class SessionsController extends BaseHttpController {
     @inject(TYPES.AUTH_JWT_SECRET) private jwtSecret: string,
     @inject(TYPES.AUTH_JWT_TTL) private jwtTTL: number,
   ) {
-      super()
+    super()
   }
 
   @httpPost('/validate')
   async validate(request: Request): Promise<results.JsonResult> {
     const authenticateRequestResponse = await this.authenticateRequest.execute({
-      authorizationHeader: request.headers.authorization
+      authorizationHeader: request.headers.authorization,
     })
 
     if (!authenticateRequestResponse.success) {
@@ -60,7 +60,7 @@ export class SessionsController extends BaseHttpController {
       user: this.userProjector.projectSimple(<User> authenticateRequestResponse.user),
       session: this.sessionProjector.projectSimple(<Session> authenticateRequestResponse.session),
       roles: roles.map(role => this.roleProjector.projectSimple(role)),
-      permissions: [...permissions.values()].map(permission => this.permissionProjector.projectSimple(permission))
+      permissions: [...permissions.values()].map(permission => this.permissionProjector.projectSimple(permission)),
     }
 
     const authToken = sign(authTokenData, this.jwtSecret, { algorithm: 'HS256', expiresIn: this.jwtTTL })
@@ -71,7 +71,7 @@ export class SessionsController extends BaseHttpController {
   @httpGet('/')
   async getSessions(_request: Request, response: Response): Promise<results.JsonResult> {
     const useCaseResponse = await this.getActiveSessionsForUser.execute({
-      userUuid: response.locals.user.uuid
+      userUuid: response.locals.user.uuid,
     })
 
     return this.json(

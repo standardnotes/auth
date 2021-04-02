@@ -71,7 +71,7 @@ export class SessionService implements SessionServiceInterace {
       access_token: `${SessionService.SESSION_TOKEN_VERSION}:${session.uuid}:${accessToken}`,
       refresh_token: `${SessionService.SESSION_TOKEN_VERSION}:${session.uuid}:${refreshToken}`,
       access_expiration: dayjs.utc(accessTokenExpiration).valueOf(),
-      refresh_expiration: dayjs.utc(refreshTokenExpiration).valueOf()
+      refresh_expiration: dayjs.utc(refreshTokenExpiration).valueOf(),
     }
   }
 

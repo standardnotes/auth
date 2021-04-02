@@ -21,14 +21,14 @@ export class AuthenticateUser implements UseCaseInterface {
     if (!authenticationMethod) {
       return {
         success: false,
-        failureType: 'INVALID_AUTH'
+        failureType: 'INVALID_AUTH',
       }
     }
 
     if (authenticationMethod.type === 'revoked') {
       return {
         success: false,
-        failureType: 'REVOKED_SESSION'
+        failureType: 'REVOKED_SESSION',
       }
     }
 
@@ -36,61 +36,61 @@ export class AuthenticateUser implements UseCaseInterface {
     if (!user) {
       return {
         success: false,
-        failureType: 'INVALID_AUTH'
+        failureType: 'INVALID_AUTH',
       }
     }
 
     if(authenticationMethod.type == 'jwt' && user.supportsSessions()) {
       return {
         success: false,
-        failureType: 'INVALID_AUTH'
+        failureType: 'INVALID_AUTH',
       }
     }
 
     switch(authenticationMethod.type) {
-      case 'jwt': {
-        const pwHash = <string> (<Record<string, unknown>> authenticationMethod.claims).pw_hash
-        const encryptedPasswordDigest = crypto.createHash('sha256').update(user.encryptedPassword).digest('hex')
+    case 'jwt': {
+      const pwHash = <string> (<Record<string, unknown>> authenticationMethod.claims).pw_hash
+      const encryptedPasswordDigest = crypto.createHash('sha256').update(user.encryptedPassword).digest('hex')
 
-        if (!pwHash || !crypto.timingSafeEqual(Buffer.from(pwHash), Buffer.from(encryptedPasswordDigest))) {
-          return {
-            success: false,
-            failureType: 'INVALID_AUTH'
-          }
+      if (!pwHash || !crypto.timingSafeEqual(Buffer.from(pwHash), Buffer.from(encryptedPasswordDigest))) {
+        return {
+          success: false,
+          failureType: 'INVALID_AUTH',
         }
-        break
       }
-      case 'session_token': {
-        const session = authenticationMethod.session
-        if (!session) {
-          return {
-            success: false,
-            failureType: 'INVALID_AUTH'
-          }
+      break
+    }
+    case 'session_token': {
+      const session = authenticationMethod.session
+      if (!session) {
+        return {
+          success: false,
+          failureType: 'INVALID_AUTH',
         }
-
-        if (session.refreshExpiration < dayjs.utc().toDate()) {
-          return {
-            success: false,
-            failureType: 'INVALID_AUTH'
-          }
-        }
-
-        if (session.accessExpiration < dayjs.utc().toDate()) {
-          return {
-            success: false,
-            failureType: 'EXPIRED_TOKEN'
-          }
-        }
-
-        break
       }
+
+      if (session.refreshExpiration < dayjs.utc().toDate()) {
+        return {
+          success: false,
+          failureType: 'INVALID_AUTH',
+        }
+      }
+
+      if (session.accessExpiration < dayjs.utc().toDate()) {
+        return {
+          success: false,
+          failureType: 'EXPIRED_TOKEN',
+        }
+      }
+
+      break
+    }
     }
 
     return {
       success: true,
       user,
-      session: authenticationMethod.session
+      session: authenticationMethod.session,
     }
   }
 }

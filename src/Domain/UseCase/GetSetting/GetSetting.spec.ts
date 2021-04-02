@@ -32,7 +32,7 @@ describe('GetSetting', () => {
     expect(actual).toEqual({
       success: true,
       userUuid,
-      setting: simpleSettings[settingIndex]
+      setting: simpleSettings[settingIndex],
     })
   })
   
