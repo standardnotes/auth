@@ -11,7 +11,7 @@ export class GetUserKeyParamsTest {
     users = [],
     keyParams = { version: '004', identifier: 'test@test.com' },
     keyParamsFactory = new KeyParamsFactoryStub(keyParams),
-    repository = new UserRepostioryStub(users)
+    repository = new UserRepostioryStub(users),
   }: {
     users?: User[],
     keyParams?: KeyParams,

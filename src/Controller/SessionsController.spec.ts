@@ -72,11 +72,11 @@ describe('SessionsController', () => {
 
     request = {
       params: {},
-      headers: {}
+      headers: {},
     } as jest.Mocked<express.Request>
 
     response = {
-      locals: {}
+      locals: {},
     } as jest.Mocked<express.Response>
   })
 
@@ -102,7 +102,7 @@ describe('SessionsController', () => {
     authenticateRequest.execute = jest.fn().mockReturnValue({
       success: true,
       user,
-      session
+      session,
     })
 
     request.headers.authorization = 'test'
@@ -127,15 +127,15 @@ describe('SessionsController', () => {
       roles: [
         {
           uuid: '1-3-4',
-          name: 'role1'
-        }
+          name: 'role1',
+        },
       ],
       permissions: [
         {
           uuid: '1-2-3',
-          name: 'permission1'
-        }
-      ]
+          name: 'permission1',
+        },
+      ],
     })
   })
 
@@ -144,7 +144,7 @@ describe('SessionsController', () => {
       success: false,
       errorTag: 'invalid-auth',
       errorMessage: 'Invalid login credentials.',
-      responseCode: 401
+      responseCode: 401,
     })
 
     request.headers.authorization = 'test'

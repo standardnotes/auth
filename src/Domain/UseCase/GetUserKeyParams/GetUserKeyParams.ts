@@ -17,7 +17,7 @@ export class GetUserKeyParams implements UseCaseInterface {
   async execute(dto: GetUserKeyParamsDTO): Promise<GetUserKeyParamsResponse> {
     if (dto.authenticatedUser) {
       return {
-        keyParams: this.keyParamsFactory.create(dto.authenticatedUser, true)
+        keyParams: this.keyParamsFactory.create(dto.authenticatedUser, true),
       }
     }
 
@@ -26,7 +26,7 @@ export class GetUserKeyParams implements UseCaseInterface {
       user = await this.userRepository.findOneByEmail(dto.email)
       if (user === undefined) {
         return {
-          keyParams: this.keyParamsFactory.createPseudoParams(dto.email)
+          keyParams: this.keyParamsFactory.createPseudoParams(dto.email),
         }
       }
     } else if (dto.userUuid) {
@@ -38,7 +38,7 @@ export class GetUserKeyParams implements UseCaseInterface {
     }
 
     return {
-      keyParams: this.keyParamsFactory.create(user, false)
+      keyParams: this.keyParamsFactory.create(user, false),
     }
   }
 }

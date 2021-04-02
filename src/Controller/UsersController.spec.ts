@@ -39,11 +39,11 @@ describe('UsersController', () => {
     request = {
       headers: {},
       body: {},
-      params: {}
+      params: {},
     } as jest.Mocked<express.Request>
 
     response = {
-      locals: {}
+      locals: {},
     } as jest.Mocked<express.Response>
   })
 
@@ -66,8 +66,8 @@ describe('UsersController', () => {
       updatedWithUserAgent: 'Google Chrome',
       version: '002',
       user: {
-        uuid: '123'
-      }
+        uuid: '123',
+      },
     })
 
     expect(result.statusCode).toEqual(200)
@@ -94,14 +94,14 @@ describe('UsersController', () => {
   it('should get user settings for vaild user uuid', async () => {
     const userUuid = 'user-1'
     const user = UserTest.makeSubject({
-      uuid: userUuid
+      uuid: userUuid,
     }, {
       settings: [
         { uuid: 'setting-1' },
-      ]
+      ],
     })
     Object.assign(request, {
-      params: { userUuid }
+      params: { userUuid },
     })
     response.locals.user = user
 
@@ -130,10 +130,10 @@ describe('UsersController', () => {
     const userUuid = 'user-1'
     const badUserUuid = 'BAD-user-uuid'
     const user = UserTest.makeSubject({
-      uuid: userUuid
+      uuid: userUuid,
     })
     Object.assign(request, {
-      params: { userUuid: badUserUuid }
+      params: { userUuid: badUserUuid },
     })
     response.locals.user = user
 
@@ -152,7 +152,7 @@ describe('UsersController', () => {
     const settingIndex = 0
 
     Object.assign(request, {
-      params: { userUuid, settingName: settings[settingIndex].name }
+      params: { userUuid, settingName: settings[settingIndex].name },
     })
 
     const repository = new SettingRepostioryStub(settings)
@@ -179,10 +179,10 @@ describe('UsersController', () => {
     const userUuid = 'user-1'
     const badUserUuid = 'BAD-user-uuid'
     const user = UserTest.makeSubject({
-      uuid: userUuid
+      uuid: userUuid,
     })
     Object.assign(request, {
-      params: { userUuid: badUserUuid, settingName: 'irrelevant' }
+      params: { userUuid: badUserUuid, settingName: 'irrelevant' },
     })
     response.locals.user = user
 
@@ -199,10 +199,10 @@ describe('UsersController', () => {
   it('should error when geting user setting by invalid name for vaild user uuid', async () => {
     const userUuid = 'user-1'
     const user = UserTest.makeSubject({
-      uuid: userUuid
+      uuid: userUuid,
     })
     Object.assign(request, {
-      params: { userUuid, settingName: 'BAD' }
+      params: { userUuid, settingName: 'BAD' },
     })
     response.locals.user = user
 
@@ -219,7 +219,7 @@ describe('UsersController', () => {
   it('should get user key params', async () => {
     const userUuid = '1-2-3'
     const user = UserTest.makeSubject({
-      uuid: userUuid
+      uuid: userUuid,
     })
     const userRepository = new UserRepostioryStub([ user ])
 
@@ -229,7 +229,7 @@ describe('UsersController', () => {
     })
 
     Object.assign(request, {
-      params: { userUuid }
+      params: { userUuid },
     })
 
     const actual = await subject.keyParams(request)
@@ -237,7 +237,7 @@ describe('UsersController', () => {
     expect(actual.statusCode).toEqual(200)
     expect(actual.json).toEqual({
       identifier: 'test@test.com',
-      version: '004'
+      version: '004',
     })
   })
 })

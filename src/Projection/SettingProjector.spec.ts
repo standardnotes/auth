@@ -5,12 +5,12 @@ import { SettingProjector } from './SettingProjector'
 
 describe('SettingProjector', () => {
   const userProps = {
-    uuid: 'user-uuid'
+    uuid: 'user-uuid',
   }
   const settingProps = {
     uuid: 'setting-uuid',
     name: 'setting-name',
-    value: 'setting-value'
+    value: 'setting-value',
   }
   const setting = SettingTest.makeSubject(
     settingProps, 

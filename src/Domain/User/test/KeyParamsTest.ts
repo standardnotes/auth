@@ -8,7 +8,7 @@ export class KeyParamsTest {
       version: '004',
       identifier: 'test@test.com',
       created: new Date(1).toString(),
-      pw_nonce: 'test'
+      pw_nonce: 'test',
     }
 
     Object.assign(defaults, props)

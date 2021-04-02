@@ -17,51 +17,51 @@ export class AuthenticateRequest implements UseCaseInterface {
 
   async execute(dto: AuthenticateRequestDTO): Promise<AuthenticateRequestResponse> {
     if (!dto.authorizationHeader) {
-        return {
-          success: false,
-          responseCode: 401,
-          errorTag: 'invalid-auth',
-          errorMessage: 'Invalid login credentials.'
-        }
+      return {
+        success: false,
+        responseCode: 401,
+        errorTag: 'invalid-auth',
+        errorMessage: 'Invalid login credentials.',
+      }
     }
 
     let authenticateResponse: AuthenticateUserResponse
     try {
-        authenticateResponse = await this.authenticateUser.execute({ token: dto.authorizationHeader.replace('Bearer ', '') })
+      authenticateResponse = await this.authenticateUser.execute({ token: dto.authorizationHeader.replace('Bearer ', '') })
     } catch (error) {
-        this.logger.error('Error occurred during authentication of a user %o', error)
+      this.logger.error('Error occurred during authentication of a user %o', error)
 
-        return {
-          success: false,
-          responseCode: 401,
-          errorTag: 'invalid-auth',
-          errorMessage: 'Invalid login credentials.'
-        }
+      return {
+        success: false,
+        responseCode: 401,
+        errorTag: 'invalid-auth',
+        errorMessage: 'Invalid login credentials.',
+      }
     }
 
     if (!authenticateResponse.success) {
       switch (authenticateResponse.failureType) {
-        case 'EXPIRED_TOKEN':
-          return {
-            success: false,
-            responseCode: 498,
-            errorTag: 'expired-access-token',
-            errorMessage: 'The provided access token has expired.'
-          }
-        case 'INVALID_AUTH':
-          return {
-            success: false,
-            responseCode: 401,
-            errorTag: 'invalid-auth',
-            errorMessage: 'Invalid login credentials.'
-          }
-        case 'REVOKED_SESSION':
-          return {
-            success: false,
-            responseCode: 401,
-            errorTag: 'revoked-session',
-            errorMessage: 'Your session has been revoked.'
-          }
+      case 'EXPIRED_TOKEN':
+        return {
+          success: false,
+          responseCode: 498,
+          errorTag: 'expired-access-token',
+          errorMessage: 'The provided access token has expired.',
+        }
+      case 'INVALID_AUTH':
+        return {
+          success: false,
+          responseCode: 401,
+          errorTag: 'invalid-auth',
+          errorMessage: 'Invalid login credentials.',
+        }
+      case 'REVOKED_SESSION':
+        return {
+          success: false,
+          responseCode: 401,
+          errorTag: 'revoked-session',
+          errorMessage: 'Your session has been revoked.',
+        }
       }
     }
 
@@ -69,7 +69,7 @@ export class AuthenticateRequest implements UseCaseInterface {
       success: true,
       responseCode: 200,
       session: authenticateResponse.session,
-      user: authenticateResponse.user
+      user: authenticateResponse.user,
     }
   }
 }

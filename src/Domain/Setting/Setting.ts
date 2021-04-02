@@ -5,24 +5,24 @@ import { User } from '../User/User'
 @Index('index_settings_on_name_and_user_uuid', ['name', 'user'])
 export class Setting {
   @PrimaryColumn({
-    length: 36
+    length: 36,
   })
   uuid: string
 
   @Column({
-    length: 255
+    length: 255,
   })
   name: string
 
   @Column({
-    length: 255
+    length: 255,
   })
   value: string
 
   @Column({
     name: 'server_encryption_version',
     type: 'tinyint',
-    default: 0
+    default: 0,
   })
   serverEncryptionVersion: number
 
@@ -31,7 +31,7 @@ export class Setting {
     type: 'datetime',
     default:
       /* istanbul ignore next */
-      () => 'CURRENT_TIMESTAMP'
+      () => 'CURRENT_TIMESTAMP',
   })
   createdAt: Date
 
@@ -40,7 +40,7 @@ export class Setting {
     type: 'datetime',
     default:
       /* istanbul ignore next */
-      () => 'CURRENT_TIMESTAMP'
+      () => 'CURRENT_TIMESTAMP',
   })
   updatedAt: Date
 

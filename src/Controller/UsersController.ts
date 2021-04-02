@@ -6,7 +6,7 @@ import {
   httpGet,
   httpPatch,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  results
+  results,
 } from 'inversify-express-utils'
 import TYPES from '../Bootstrap/Types'
 import { GetSetting } from '../Domain/UseCase/GetSetting/GetSetting'
@@ -30,8 +30,8 @@ export class UsersController extends BaseHttpController {
     if (request.params.userId !== response.locals.user.uuid) {
       return this.json({
         error: {
-          message: 'Operation not allowed.'
-        }
+          message: 'Operation not allowed.',
+        },
       }, 401)
     }
 
@@ -58,8 +58,8 @@ export class UsersController extends BaseHttpController {
     if (request.params.userUuid !== response.locals.user.uuid) {
       return this.json({
         error: {
-          message: 'Operation not allowed.'
-        }
+          message: 'Operation not allowed.',
+        },
       }, 401)
     }
 
@@ -74,8 +74,8 @@ export class UsersController extends BaseHttpController {
     if (request.params.userUuid !== response.locals.user.uuid) {
       return this.json({
         error: {
-          message: 'Operation not allowed.'
-        }
+          message: 'Operation not allowed.',
+        },
       }, 401)
     }
 
@@ -90,7 +90,7 @@ export class UsersController extends BaseHttpController {
   @httpGet('/:userUuid/params')
   async keyParams(request: Request): Promise<results.JsonResult> {
     const result = await this.getUserKeyParams.execute({
-      userUuid: request.params.userUuid
+      userUuid: request.params.userUuid,
     })
 
     return this.json(result.keyParams)

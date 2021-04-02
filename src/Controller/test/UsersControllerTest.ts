@@ -18,7 +18,7 @@ export class UsersControllerTest {
     settingRepository = new SettingRepostioryStub([]),
     projector = SettingProjectorTest.get(),
     userRepository = new UserRepostioryStub([]),
-    keyParamsFactory = new KeyParamsFactoryStub({ version: '004', identifier: 'test@test.com' })
+    keyParamsFactory = new KeyParamsFactoryStub({ version: '004', identifier: 'test@test.com' }),
   }: {
     updateUser: UpdateUser,
     settingRepository?: SettingRepositoryInterface,
@@ -38,7 +38,7 @@ export class UsersControllerTest {
       }),
       GetUserKeyParamsTest.makeSubject({
         repository: userRepository,
-        keyParamsFactory
+        keyParamsFactory,
       })
     )
   }

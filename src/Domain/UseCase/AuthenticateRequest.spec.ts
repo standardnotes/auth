@@ -30,7 +30,7 @@ describe('AuthenticateRequest', () => {
     authenticateUser.execute = jest.fn().mockReturnValue({
       success: true,
       user,
-      session
+      session,
     })
 
     const response = await createUseCase().execute({ authorizationHeader: 'test' })

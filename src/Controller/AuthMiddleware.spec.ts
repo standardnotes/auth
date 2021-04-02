@@ -19,10 +19,10 @@ describe('AuthMiddleware', () => {
     authenticateRequest.execute = jest.fn()
 
     request = {
-      headers: {}
+      headers: {},
     } as jest.Mocked<Request>
     response = {
-      locals: {}
+      locals: {},
     } as jest.Mocked<Response>
     response.status = jest.fn().mockReturnThis()
     response.send = jest.fn()
@@ -35,7 +35,7 @@ describe('AuthMiddleware', () => {
     authenticateRequest.execute = jest.fn().mockReturnValue({
       success: true,
       user,
-      session
+      session,
     })
 
     await createMiddleware().handler(request, response, next)
@@ -49,7 +49,7 @@ describe('AuthMiddleware', () => {
   it('should not authorize if request authentication fails', async () => {
     authenticateRequest.execute = jest.fn().mockReturnValue({
       success: false,
-      responseCode: 401
+      responseCode: 401,
     })
 
     await createMiddleware().handler(request, response, next)

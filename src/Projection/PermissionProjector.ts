@@ -8,7 +8,7 @@ export class PermissionProjector implements ProjectorInterface<Permission> {
   projectSimple(permission: Permission): Record<string, unknown> {
     return {
       uuid: permission.uuid,
-      name: permission.name
+      name: permission.name,
     }
   }
 
