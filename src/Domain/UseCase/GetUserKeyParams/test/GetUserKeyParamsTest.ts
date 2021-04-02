@@ -1,4 +1,5 @@
-import { KeyParams } from '../../../User/KeyParams'
+import { KeyParams } from '@standardnotes/auth'
+
 import { KeyParamsFactoryInterface } from '../../../User/KeyParamsFactoryInterface'
 import { KeyParamsFactoryStub } from '../../../User/test/KeyParamsFactoryStub'
 import { UserRepostioryStub } from '../../../User/test/UserRepostioryStub'

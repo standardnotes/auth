@@ -1,8 +1,8 @@
 import * as crypto from 'crypto'
+import { KeyParams } from '@standardnotes/auth'
 
 import { inject, injectable } from 'inversify'
 import TYPES from '../../Bootstrap/Types'
-import { KeyParams } from './KeyParams'
 import { KeyParamsFactoryInterface } from './KeyParamsFactoryInterface'
 import { User } from './User'
 

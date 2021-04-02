@@ -1,4 +1,5 @@
-import { KeyParams } from '../KeyParams'
+import { KeyParams } from '@standardnotes/auth'
+
 import { KeyParamsFactoryInterface } from '../KeyParamsFactoryInterface'
 import { User } from '../User'
 
