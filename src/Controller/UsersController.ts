@@ -99,7 +99,10 @@ export class UsersController extends BaseHttpController {
       }, 400)
     }
 
-    const result = await this.getUserKeyParams.execute({ email })
+    const result = await this.getUserKeyParams.execute({
+      email,
+      authenticated: request.query.authenticated === 'true',
+    })
 
     return this.json(result.keyParams)
   }

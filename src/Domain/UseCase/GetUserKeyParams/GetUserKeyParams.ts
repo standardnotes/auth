@@ -29,7 +29,7 @@ export class GetUserKeyParams implements UseCaseInterface {
     }
 
     return {
-      keyParams: this.keyParamsFactory.create(user, false),
+      keyParams: this.keyParamsFactory.create(user, dto.authenticated),
     }
   }
 }
