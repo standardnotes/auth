@@ -45,7 +45,7 @@ export class User {
   @Column({
     name: 'server_encryption_version',
     type: 'tinyint',
-    default: User.DEFAULT_ENCRYPTION_VERSION,
+    default: 0,
   })
   serverEncryptionVersion: number
 
