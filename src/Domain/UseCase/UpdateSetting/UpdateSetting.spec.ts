@@ -18,7 +18,7 @@ describe('UpdateSetting', () => {
   const userUuid = user.uuid
 
   const userRepositoryMock = {
-    findOneByUuid: jest.fn().mockReturnValue(user)
+    findOneByUuid: jest.fn().mockReturnValue(user),
   } as unknown as UserRepositoryInterface
 
   const getSettings = async () => (await user.settings)

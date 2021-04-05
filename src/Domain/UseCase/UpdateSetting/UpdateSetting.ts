@@ -33,7 +33,7 @@ export class UpdateSetting implements UseCaseInterface {
 
     return { 
       success: true, 
-      statusCode: this.statusToStatusCode(status)
+      statusCode: this.statusToStatusCode(status),
     }
   }
 

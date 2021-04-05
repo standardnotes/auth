@@ -50,7 +50,7 @@ describe('MySQLSettingRepository', () => {
     const user = UserTest.makeSubject({})
     Object.assign(repository, {
       findOneByNameAndUserUuid: async () => undefined,
-      save: (async () => undefined)
+      save: (async () => undefined),
     })
 
     const result = await repository.createOrReplace({
@@ -69,7 +69,7 @@ describe('MySQLSettingRepository', () => {
     const user = UserTest.makeSubject({})
     Object.assign(repository, {
       findOneByNameAndUserUuid: async () => SettingTest.makeSubject({}, user),
-      save: (async () => undefined)
+      save: (async () => undefined),
     })
 
     const result = await repository.createOrReplace({
