@@ -24,7 +24,7 @@ describe('GetUserKeyParams', () => {
   })
 
   it('should get key params for an authenticated user', async () => {
-    expect(await createUseCase().execute({ email: 'test@test.te', authenticatedUser: user })).toEqual({
+    expect(await createUseCase().execute({ email: 'test@test.te', authenticated: true, authenticatedUser: user })).toEqual({
       keyParams: {
         foo: 'bar',
       },
@@ -34,7 +34,7 @@ describe('GetUserKeyParams', () => {
   })
 
   it('should get key params for an unauthenticated user', async () => {
-    expect(await createUseCase().execute({ email: 'test@test.te' })).toEqual({
+    expect(await createUseCase().execute({ email: 'test@test.te', authenticated: false })).toEqual({
       keyParams: {
         foo: 'bar',
       },
@@ -46,7 +46,7 @@ describe('GetUserKeyParams', () => {
   it('should get pseudo key params for a non existing user', async () => {
     userRepository.findOneByEmail = jest.fn().mockReturnValue(undefined)
 
-    expect(await createUseCase().execute({ email: 'test@test.te' })).toEqual({
+    expect(await createUseCase().execute({ email: 'test@test.te', authenticated: false })).toEqual({
       keyParams: {
         bar: 'baz',
       },

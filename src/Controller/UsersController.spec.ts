@@ -233,6 +233,24 @@ describe('UsersController', () => {
     })
   })
 
+  it('should get user key params for authenticated user', async () => {
+    const subject = UsersControllerTest.makeSubject({
+      updateUser,
+    })
+
+    Object.assign(request, {
+      query: { email: 'test@test.com', authenticated: 'true' },
+    })
+
+    const actual = await subject.keyParams(request)
+
+    expect(actual.statusCode).toEqual(200)
+    expect(actual.json).toEqual({
+      identifier: 'test@test.com',
+      version: '004',
+    })
+  })
+
   it('should error when email parameter is not given in query when gettting user key params', async () => {
     const subject = UsersControllerTest.makeSubject({
       updateUser,

@@ -44,6 +44,7 @@ export class AuthController extends BaseHttpController {
     if (response.locals.session) {
       const result = await this.getUserKeyParams.execute({
         email: response.locals.user.email,
+        authenticated: true,
         authenticatedUser: response.locals.user,
       })
 
@@ -74,6 +75,7 @@ export class AuthController extends BaseHttpController {
 
     const result = await this.getUserKeyParams.execute({
       email: <string> request.query.email,
+      authenticated: false,
     })
 
     return this.json(result.keyParams)

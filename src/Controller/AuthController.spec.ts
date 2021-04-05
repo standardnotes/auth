@@ -352,6 +352,7 @@ describe('AuthController', () => {
       authenticatedUser: {
         email: 'test@test.te',
       },
+      authenticated: true,
       email: 'test@test.te',
     })
 
@@ -375,6 +376,7 @@ describe('AuthController', () => {
 
     expect(getUserKeyParams.execute).toHaveBeenCalledWith({
       email: 'test2@test.te',
+      authenticated: false,
     })
 
     expect(result.statusCode).toEqual(200)
