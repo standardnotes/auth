@@ -5,13 +5,16 @@ import {
   controller,
   httpGet,
   httpPatch,
+  httpPut,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   results,
 } from 'inversify-express-utils'
 import TYPES from '../Bootstrap/Types'
+import { Setting } from '../Domain/Setting/Setting'
 import { GetSetting } from '../Domain/UseCase/GetSetting/GetSetting'
 import { GetSettings } from '../Domain/UseCase/GetSettings/GetSettings'
 import { GetUserKeyParams } from '../Domain/UseCase/GetUserKeyParams/GetUserKeyParams'
+import { UpdateSetting } from '../Domain/UseCase/UpdateSetting/UpdateSetting'
 import { UpdateUser } from '../Domain/UseCase/UpdateUser'
 
 @controller('/users')
@@ -21,6 +24,7 @@ export class UsersController extends BaseHttpController {
     @inject(TYPES.GetSettings) private doGetSettings: GetSettings,
     @inject(TYPES.GetSetting) private doGetSetting: GetSetting,
     @inject(TYPES.GetUserKeyParams) private getUserKeyParams: GetUserKeyParams,
+    @inject(TYPES.UpdateSetting) private doUpdateSetting: UpdateSetting,
   ) {
     super()
   }
@@ -82,7 +86,44 @@ export class UsersController extends BaseHttpController {
     const { userUuid, settingName } = request.params
     const result = await this.doGetSetting.execute({ userUuid, settingName })
 
-    if (result.success) return this.json(result)
+    if (result.success) {
+      return this.json(result)
+    }
+
+    return this.json(result, 400)
+  }
+
+  @httpPut('/:userUuid/settings', TYPES.AuthMiddleware)
+  async updateSetting(request: Request, response: Response): Promise<results.JsonResult> {
+    if (request.params.userUuid !== response.locals.user.uuid) {
+      return this.json({
+        error: {
+          message: 'Operation not allowed.',
+        },
+      }, 401)
+    }
+
+    const { 
+      name, 
+      value, 
+      serverEncryptionVersion = Setting.DEFAULT_ENCRYPTION_VERSION,
+    } = request.body
+
+    const props = {
+      name, 
+      value,
+      serverEncryptionVersion,
+    }
+
+    const { userUuid } = request.params
+    const result = await this.doUpdateSetting.execute({ 
+      userUuid,
+      props,
+    })
+
+    if (result.success) {
+      return this.json({}, result.statusCode)
+    }
 
     return this.json(result, 400)
   }

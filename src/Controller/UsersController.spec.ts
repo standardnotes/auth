@@ -8,12 +8,13 @@ import { User } from '../Domain/User/User'
 import { UpdateUser } from '../Domain/UseCase/UpdateUser'
 import { UserTest } from '../Domain/User/test/UserTest'
 import { SettingProjectorTest } from '../Projection/test/SettingProjectorTest'
-import { userWithSettings } from '../Domain/User/test/data'
 import { SettingRepostioryStub } from '../Domain/Setting/test/SettingRepositoryStub'
 import { UsersControllerTest } from './test/UsersControllerTest'
 import { GetSettings } from '../Domain/UseCase/GetSettings/GetSettings'
 import { GetSetting } from '../Domain/UseCase/GetSetting/GetSetting'
 import { GetUserKeyParams } from '../Domain/UseCase/GetUserKeyParams/GetUserKeyParams'
+import { UserRepostioryStub } from '../Domain/User/test/UserRepostioryStub'
+import { UpdateSetting } from '../Domain/UseCase/UpdateSetting/UpdateSetting'
 
 describe('UsersController', () => {
   let updateUser: UpdateUser
@@ -25,7 +26,8 @@ describe('UsersController', () => {
     updateUser,
     {} as jest.Mocked<GetSettings>,
     {} as jest.Mocked<GetSetting>,
-    {} as jest.Mocked<GetUserKeyParams>
+    {} as jest.Mocked<GetUserKeyParams>,
+    {} as jest.Mocked<UpdateSetting>,
   )
 
   beforeEach(() => {
@@ -143,7 +145,7 @@ describe('UsersController', () => {
   })
 
   it('should get user setting by name for vaild user uuid', async () => {
-    const user = userWithSettings
+    const user = UserTest.makeWithSettings()
     const userUuid = user.uuid
     response.locals.user = user
 
@@ -263,6 +265,105 @@ describe('UsersController', () => {
     const actual = await subject.keyParams(request)
 
     expect(actual.statusCode).toEqual(400)
+    expect(actual.json).toHaveProperty('error')
+  })
+  
+  it('should create user setting for vaild user uuid', async () => {
+    const user = UserTest.makeWithSettings()
+    const userUuid = user.uuid
+    response.locals.user = user
+
+    const settings = await user.settings
+
+    Object.assign(request, {
+      params: { userUuid },
+      body: { name: 'NEW-setting', value: 'value' },
+    })
+
+    const userRepository = new UserRepostioryStub([user])
+    const settingRepository = new SettingRepostioryStub(settings)
+    const subject = UsersControllerTest.makeSubject({
+      updateUser,
+      settingRepository,
+      userRepository,
+    })
+
+    const actual = await subject.updateSetting(
+      request, 
+      response,
+    )
+
+    expect(actual.statusCode).toEqual(201)
+  })
+
+  it('should replace user setting for vaild user uuid', async () => {
+    const user = UserTest.makeWithSettings()
+    const userUuid = user.uuid
+    response.locals.user = user
+
+    const settings = await user.settings
+    const setting = settings[0]
+
+    Object.assign(request, {
+      params: { userUuid },
+      body: { name: setting.name, value: 'NEW-value' },
+    })    
+    
+    const userRepository = new UserRepostioryStub([user])
+    const settingRepository = new SettingRepostioryStub(settings)
+    const subject = UsersControllerTest.makeSubject({
+      updateUser,
+      settingRepository,
+      userRepository,
+    })
+
+    const actual = await subject.updateSetting(
+      request, 
+      response,
+    )
+
+    expect(actual.statusCode).toEqual(204)
+  })
+  
+  it('should replace user setting for nonexistent user uuid', async () => {
+    const user = UserTest.makeWithSettings()
+    const userUuid = user.uuid
+    response.locals.user = user
+
+    Object.assign(request, {
+      params: { userUuid },
+      body: { name: 'NEW-name', value: 'NEW-value' },
+    })    
+    
+    const subject = UsersControllerTest.makeSubject({
+      updateUser,
+    })
+
+    const actual = await subject.updateSetting(
+      request, 
+      response,
+    )
+
+    expect(actual.statusCode).toEqual(400)
+  })
+
+  it('should error when creating/replacing user setting for invaild user uuid', async () => {
+    const userUuid = 'user-1'
+    const badUserUuid = 'BAD-user-uuid'
+    const user = UserTest.makeSubject({
+      uuid: userUuid,
+    })
+    Object.assign(request, {
+      params: { userUuid: badUserUuid, settingName: 'irrelevant' },
+    })
+    response.locals.user = user
+
+    const subject = UsersControllerTest.makeSubject({
+      updateUser,
+    })
+
+    const actual = await subject.updateSetting(request, response)
+
     expect(actual.json).toHaveProperty('error')
   })
 })

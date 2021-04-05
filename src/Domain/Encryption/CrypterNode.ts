@@ -23,7 +23,7 @@ export class CrypterNode implements CrypterInterface {
       key: decryptedUserServerKey,
     })
 
-    return this.stringifyVersionedEncrypted(User.ENCRYPTION_VERSION_1, encrypted)
+    return this.stringifyVersionedEncrypted(User.DEFAULT_ENCRYPTION_VERSION, encrypted)
   }
 
   async decryptForUser(formattedEncryptedValue: string, user: User): Promise<string | null> {
@@ -44,7 +44,7 @@ export class CrypterNode implements CrypterInterface {
       key: this.encryptionServerKey,
     })
 
-    return this.stringifyVersionedEncrypted(User.ENCRYPTION_VERSION_1, encrypted)
+    return this.stringifyVersionedEncrypted(User.DEFAULT_ENCRYPTION_VERSION, encrypted)
   }
 
   async decryptUserServerKey(user: User): Promise<string> {
@@ -64,7 +64,7 @@ export class CrypterNode implements CrypterInterface {
     versionedEncryptedString: string,
   ): Aes256GcmEncrypted<BufferEncoding> {
     const { version, encrypted } = JSON.parse(versionedEncryptedString)
-    if (+version !== User.ENCRYPTION_VERSION_1) {
+    if (+version !== User.DEFAULT_ENCRYPTION_VERSION) {
       throw Error (`Not supported encryption version: ${version}`)
     }
 

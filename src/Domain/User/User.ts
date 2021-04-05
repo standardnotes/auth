@@ -7,7 +7,7 @@ import { Setting } from '../Setting/Setting'
 export class User {
   private readonly SESSIONS_PROTOCOL_VERSION = 4
   static readonly PASSWORD_HASH_COST = 11
-  static readonly ENCRYPTION_VERSION_1 = 1
+  static readonly DEFAULT_ENCRYPTION_VERSION = 1
 
   @PrimaryColumn({
     length: 36,

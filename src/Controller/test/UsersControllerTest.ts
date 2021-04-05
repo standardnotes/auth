@@ -3,6 +3,7 @@ import { SettingRepostioryStub } from '../../Domain/Setting/test/SettingReposito
 import { GetSettingTest } from '../../Domain/UseCase/GetSetting/test/GetSettingTest'
 import { GetSettingsTest } from '../../Domain/UseCase/GetSettings/test/GetSettingsTest'
 import { GetUserKeyParamsTest } from '../../Domain/UseCase/GetUserKeyParams/test/GetUserKeyParamsTest'
+import { UpdateSettingTest } from '../../Domain/UseCase/UpdateSetting/test/UpdateSettingTest'
 import { UpdateUser } from '../../Domain/UseCase/UpdateUser'
 import { KeyParamsFactoryInterface } from '../../Domain/User/KeyParamsFactoryInterface'
 import { KeyParamsFactoryStub } from '../../Domain/User/test/KeyParamsFactoryStub'
@@ -39,7 +40,11 @@ export class UsersControllerTest {
       GetUserKeyParamsTest.makeSubject({
         repository: userRepository,
         keyParamsFactory,
-      })
+      }),
+      UpdateSettingTest.makeSubject({
+        settingRepository,
+        userRepository,
+      }),
     )
   }
 }

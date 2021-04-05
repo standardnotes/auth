@@ -2,6 +2,8 @@ import 'reflect-metadata'
 
 import { SelectQueryBuilder } from 'typeorm'
 import { Setting } from '../../Domain/Setting/Setting'
+import { SettingTest } from '../../Domain/Setting/test/SettingTest'
+import { UserTest } from '../../Domain/User/test/UserTest'
 
 import { MySQLSettingRepository } from './MySQLSettingRepository'
 
@@ -41,5 +43,44 @@ describe('MySQLSettingRepository', () => {
 
     expect(queryBuilder.where).toHaveBeenCalledWith('setting.user_uuid = :user_uuid', { user_uuid: userUuid })
     expect(result).toEqual(settings)
+  })
+
+  it('should create setting if it doesn\'t exist', async () => {
+    const repository = new MySQLSettingRepository()
+    const user = UserTest.makeSubject({})
+    Object.assign(repository, {
+      findOneByNameAndUserUuid: async () => undefined,
+      save: (async () => undefined),
+    })
+
+    const result = await repository.createOrReplace({
+      user: user,
+      props: {
+        name: 'name',
+        value: 'value',
+        serverEncryptionVersion: 999,
+      },
+    })
+
+    expect(result).toEqual('created')
+  })
+  it('should replace setting if it does exist', async () => {
+    const repository = new MySQLSettingRepository()
+    const user = UserTest.makeSubject({})
+    Object.assign(repository, {
+      findOneByNameAndUserUuid: async () => SettingTest.makeSubject({}, user),
+      save: (async () => undefined),
+    })
+
+    const result = await repository.createOrReplace({
+      user: user,
+      props: {
+        name: 'name',
+        value: 'value',
+        serverEncryptionVersion: 999,
+      },
+    })
+
+    expect(result).toEqual('replaced')
   })
 })

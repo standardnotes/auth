@@ -17,9 +17,11 @@ export class GetSetting implements UseCaseInterface {
     const { userUuid, settingName } = dto
     const setting = await this.settingRepository.findOneByNameAndUserUuid(settingName, userUuid)
     
-    if (setting === undefined) return {
-      success: false,
-      error: `Setting ${settingName} for user ${userUuid} not found!`,
+    if (setting === undefined) {
+      return {
+        success: false,
+        error: `Setting ${settingName} for user ${userUuid} not found!`,
+      }
     }
 
     const simpleSetting = await this.settingProjector.projectSimple(setting)
