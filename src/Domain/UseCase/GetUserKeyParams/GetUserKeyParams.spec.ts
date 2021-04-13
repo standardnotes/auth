@@ -1,4 +1,5 @@
 import 'reflect-metadata'
+import { Logger } from 'winston'
 
 import { KeyParamsFactoryInterface } from '../../User/KeyParamsFactoryInterface'
 import { User } from '../../User/User'
@@ -8,9 +9,10 @@ import { GetUserKeyParams } from './GetUserKeyParams'
 describe('GetUserKeyParams', () => {
   let keyParamsFactory: KeyParamsFactoryInterface
   let userRepository: UserRepositoryInterface
+  let logger: Logger
   let user: User
 
-  const createUseCase = () => new GetUserKeyParams(keyParamsFactory, userRepository)
+  const createUseCase = () => new GetUserKeyParams(keyParamsFactory, userRepository, logger)
 
   beforeEach(() => {
     keyParamsFactory = {} as jest.Mocked<KeyParamsFactoryInterface>
@@ -21,6 +23,9 @@ describe('GetUserKeyParams', () => {
 
     userRepository = {} as jest.Mocked<UserRepositoryInterface>
     userRepository.findOneByEmail = jest.fn().mockReturnValue(user)
+
+    logger = {} as jest.Mocked<Logger>
+    logger.debug = jest.fn()
   })
 
   it('should get key params for an authenticated user', async () => {

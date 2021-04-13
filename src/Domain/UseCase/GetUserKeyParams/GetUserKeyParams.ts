@@ -5,12 +5,14 @@ import { UserRepositoryInterface } from '../../User/UserRepositoryInterface'
 import { GetUserKeyParamsDTO } from './GetUserKeyParamsDTO'
 import { GetUserKeyParamsResponse } from './GetUserKeyParamsResponse'
 import { UseCaseInterface } from '../UseCaseInterface'
+import { Logger } from 'winston'
 
 @injectable()
 export class GetUserKeyParams implements UseCaseInterface {
   constructor (
     @inject(TYPES.KeyParamsFactory) private keyParamsFactory: KeyParamsFactoryInterface,
-    @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface
+    @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
+    @inject(TYPES.Logger) private logger: Logger
   ) {
   }
 
@@ -23,6 +25,8 @@ export class GetUserKeyParams implements UseCaseInterface {
 
     const user = await this.userRepository.findOneByEmail(dto.email)
     if (!user) {
+      this.logger.debug(`No user with email ${dto.email}. Creating pseudo key params.`)
+
       return {
         keyParams: this.keyParamsFactory.createPseudoParams(dto.email),
       }
