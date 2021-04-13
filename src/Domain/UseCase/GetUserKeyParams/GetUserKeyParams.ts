@@ -18,6 +18,8 @@ export class GetUserKeyParams implements UseCaseInterface {
 
   async execute(dto: GetUserKeyParamsDTO): Promise<GetUserKeyParamsResponse> {
     if (dto.authenticatedUser) {
+      this.logger.debug(`Creating key params for authenticated user ${dto.authenticatedUser.email}`)
+
       return {
         keyParams: this.keyParamsFactory.create(dto.authenticatedUser, true),
       }
@@ -31,6 +33,8 @@ export class GetUserKeyParams implements UseCaseInterface {
         keyParams: this.keyParamsFactory.createPseudoParams(dto.email),
       }
     }
+
+    this.logger.debug(`Creating key params for user ${user.email}. Authentication: ${dto.authenticated}`)
 
     return {
       keyParams: this.keyParamsFactory.create(user, dto.authenticated),

@@ -1,4 +1,5 @@
 import { KeyParams } from '@standardnotes/auth'
+import { Logger } from 'winston'
 
 import { KeyParamsFactoryInterface } from '../../../User/KeyParamsFactoryInterface'
 import { KeyParamsFactoryStub } from '../../../User/test/KeyParamsFactoryStub'
@@ -19,9 +20,13 @@ export class GetUserKeyParamsTest {
     keyParamsFactory?: KeyParamsFactoryInterface,
     repository?: UserRepositoryInterface,
   } = {}): GetUserKeyParams {
+    const logger = {} as jest.Mocked<Logger>
+    logger.debug = jest.fn()
+
     return new GetUserKeyParams(
       keyParamsFactory,
-      repository
+      repository,
+      logger
     )
   }
 }
