@@ -15,9 +15,11 @@ import { GetSetting } from '../Domain/UseCase/GetSetting/GetSetting'
 import { GetUserKeyParams } from '../Domain/UseCase/GetUserKeyParams/GetUserKeyParams'
 import { UserRepostioryStub } from '../Domain/User/test/UserRepostioryStub'
 import { UpdateSetting } from '../Domain/UseCase/UpdateSetting/UpdateSetting'
+import { DeleteAccount } from '../Domain/UseCase/DeleteAccount/DeleteAccount'
 
 describe('UsersController', () => {
   let updateUser: UpdateUser
+  let deleteAccount: DeleteAccount
   let request: express.Request
   let response: express.Response
   let user: User
@@ -28,11 +30,15 @@ describe('UsersController', () => {
     {} as jest.Mocked<GetSetting>,
     {} as jest.Mocked<GetUserKeyParams>,
     {} as jest.Mocked<UpdateSetting>,
+    deleteAccount,
   )
 
   beforeEach(() => {
     updateUser = {} as jest.Mocked<UpdateUser>
     updateUser.execute = jest.fn()
+
+    deleteAccount = {} as jest.Mocked<DeleteAccount>
+    deleteAccount.execute = jest.fn().mockReturnValue({ success: true, message: 'A OK', responseCode: 200 })
 
     user = {} as jest.Mocked<User>
     user.uuid = '123'
@@ -90,6 +96,18 @@ describe('UsersController', () => {
 
     expect(result.statusCode).toEqual(401)
     expect(await result.content.readAsStringAsync()).toEqual('{"error":{"message":"Operation not allowed."}}')
+  })
+
+  it('should delete user', async () => {
+    request.params.email = 'test@test.te'
+
+    const httpResponse = <results.JsonResult> await createControllerWithMocks().deleteAccount(request)
+    const result = await httpResponse.executeAsync()
+
+    expect(deleteAccount.execute).toHaveBeenCalledWith({ email: 'test@test.te' })
+
+    expect(result.statusCode).toEqual(200)
+    expect(await result.content.readAsStringAsync()).toEqual('{"message":"A OK"}')
   })
 
   it('should get user settings for vaild user uuid', async () => {
@@ -267,7 +285,7 @@ describe('UsersController', () => {
     expect(actual.statusCode).toEqual(400)
     expect(actual.json).toHaveProperty('error')
   })
-  
+
   it('should create user setting for vaild user uuid', async () => {
     const user = UserTest.makeWithSettings()
     const userUuid = user.uuid
@@ -289,7 +307,7 @@ describe('UsersController', () => {
     })
 
     const actual = await subject.updateSetting(
-      request, 
+      request,
       response,
     )
 
@@ -307,8 +325,8 @@ describe('UsersController', () => {
     Object.assign(request, {
       params: { userUuid },
       body: { name: setting.name, value: 'NEW-value' },
-    })    
-    
+    })
+
     const userRepository = new UserRepostioryStub([user])
     const settingRepository = new SettingRepostioryStub(settings)
     const subject = UsersControllerTest.makeSubject({
@@ -318,13 +336,13 @@ describe('UsersController', () => {
     })
 
     const actual = await subject.updateSetting(
-      request, 
+      request,
       response,
     )
 
     expect(actual.statusCode).toEqual(204)
   })
-  
+
   it('should replace user setting for nonexistent user uuid', async () => {
     const user = UserTest.makeWithSettings()
     const userUuid = user.uuid
@@ -333,14 +351,14 @@ describe('UsersController', () => {
     Object.assign(request, {
       params: { userUuid },
       body: { name: 'NEW-name', value: 'NEW-value' },
-    })    
-    
+    })
+
     const subject = UsersControllerTest.makeSubject({
       updateUser,
     })
 
     const actual = await subject.updateSetting(
-      request, 
+      request,
       response,
     )
 

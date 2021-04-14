@@ -44,6 +44,7 @@ const TYPES = {
   USER_SERVER_REGISTRATION_URL: Symbol.for('USER_SERVER_REGISTRATION_URL'),
   USER_SERVER_AUTH_KEY: Symbol.for('USER_SERVER_AUTH_KEY'),
   REDIS_EVENTS_CHANNEL: Symbol.for('REDIS_EVENTS_CHANNEL'),
+  ADMIN_KEY: Symbol.for('ADMIN_KEY'),
   // use cases
   AuthenticateUser: Symbol.for('AuthenticateUser'),
   AuthenticateRequest: Symbol.for('AuthenticateRequest'),
@@ -63,6 +64,7 @@ const TYPES = {
   GetSetting: Symbol.for('GetSetting'),
   UpdateSetting: Symbol.for('UpdateSetting'),
   GetAuthMethods: Symbol.for('GetAuthMethods'),
+  DeleteAccount: Symbol.for('DeleteAccount'),
   // Handlers
   UserRegisteredEventHandler: Symbol.for('UserRegisteredEventHandler'),
   AccountDeletionRequestedEventHandler: Symbol.for('AccountDeletionRequestedEventHandler'),

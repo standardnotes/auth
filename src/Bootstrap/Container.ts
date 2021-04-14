@@ -73,6 +73,7 @@ import { GetSetting } from '../Domain/UseCase/GetSetting/GetSetting'
 import { UpdateSetting } from '../Domain/UseCase/UpdateSetting/UpdateSetting'
 import { GetAuthMethods } from '../Domain/UseCase/GetAuthMethods/GetAuthMethods'
 import { AccountDeletionRequestedEventHandler } from '../Domain/Handler/AccountDeletionRequestedEventHandler'
+import { DeleteAccount } from '../Domain/UseCase/DeleteAccount/DeleteAccount'
 
 export class ContainerConfigLoader {
   async load(): Promise<Container> {
@@ -196,6 +197,7 @@ export class ContainerConfigLoader {
     container.bind(TYPES.USER_SERVER_REGISTRATION_URL).toConstantValue(env.get('USER_SERVER_REGISTRATION_URL', true))
     container.bind(TYPES.USER_SERVER_AUTH_KEY).toConstantValue(env.get('USER_SERVER_AUTH_KEY', true))
     container.bind(TYPES.REDIS_EVENTS_CHANNEL).toConstantValue(env.get('REDIS_EVENTS_CHANNEL'))
+    container.bind(TYPES.ADMIN_KEY).toConstantValue(env.get('ADMIN_KEY'))
 
     // use cases
     container.bind<AuthenticateUser>(TYPES.AuthenticateUser).to(AuthenticateUser)
@@ -216,6 +218,7 @@ export class ContainerConfigLoader {
     container.bind<GetSetting>(TYPES.GetSetting).to(GetSetting)
     container.bind<UpdateSetting>(TYPES.UpdateSetting).to(UpdateSetting)
     container.bind<GetAuthMethods>(TYPES.GetAuthMethods).to(GetAuthMethods)
+    container.bind<DeleteAccount>(TYPES.DeleteAccount).to(DeleteAccount)
 
     // Handlers
     container.bind<UserRegisteredEventHandler>(TYPES.UserRegisteredEventHandler).to(UserRegisteredEventHandler)

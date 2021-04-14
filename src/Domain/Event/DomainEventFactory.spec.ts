@@ -16,4 +16,15 @@ describe('DomainEventFactory', () => {
         type: 'USER_REGISTERED',
       })
   })
+
+  it('should create a ACCOUNT_DELETION_REQUESTED event', () => {
+    expect(createFactory().createAccountDeletionRequestedEvent('1-2-3'))
+      .toEqual({
+        createdAt: expect.any(Date),
+        payload: {
+          userUuid: '1-2-3',
+        },
+        type: 'ACCOUNT_DELETION_REQUESTED',
+      })
+  })
 })

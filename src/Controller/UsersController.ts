@@ -3,6 +3,7 @@ import { inject } from 'inversify'
 import {
   BaseHttpController,
   controller,
+  httpDelete,
   httpGet,
   httpPatch,
   httpPut,
@@ -11,6 +12,7 @@ import {
 } from 'inversify-express-utils'
 import TYPES from '../Bootstrap/Types'
 import { Setting } from '../Domain/Setting/Setting'
+import { DeleteAccount } from '../Domain/UseCase/DeleteAccount/DeleteAccount'
 import { GetSetting } from '../Domain/UseCase/GetSetting/GetSetting'
 import { GetSettings } from '../Domain/UseCase/GetSettings/GetSettings'
 import { GetUserKeyParams } from '../Domain/UseCase/GetUserKeyParams/GetUserKeyParams'
@@ -25,6 +27,7 @@ export class UsersController extends BaseHttpController {
     @inject(TYPES.GetSetting) private doGetSetting: GetSetting,
     @inject(TYPES.GetUserKeyParams) private getUserKeyParams: GetUserKeyParams,
     @inject(TYPES.UpdateSetting) private doUpdateSetting: UpdateSetting,
+    @inject(TYPES.DeleteAccount) private doDeleteAccount: DeleteAccount,
   ) {
     super()
   }
@@ -103,20 +106,20 @@ export class UsersController extends BaseHttpController {
       }, 401)
     }
 
-    const { 
-      name, 
-      value, 
+    const {
+      name,
+      value,
       serverEncryptionVersion = Setting.DEFAULT_ENCRYPTION_VERSION,
     } = request.body
 
     const props = {
-      name, 
+      name,
       value,
       serverEncryptionVersion,
     }
 
     const { userUuid } = request.params
-    const result = await this.doUpdateSetting.execute({ 
+    const result = await this.doUpdateSetting.execute({
       userUuid,
       props,
     })
@@ -146,5 +149,14 @@ export class UsersController extends BaseHttpController {
     })
 
     return this.json(result.keyParams)
+  }
+
+  @httpDelete('/:email')
+  async deleteAccount(request: Request): Promise<results.JsonResult> {
+    const result = await this.doDeleteAccount.execute({
+      email: request.params.email,
+    })
+
+    return this.json({ message: result.message }, result.responseCode)
   }
 }
