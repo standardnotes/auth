@@ -8,7 +8,7 @@ import {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   results,
 } from 'inversify-express-utils'
-import { DomainEventFactoryInterface, DomainEventPublisherInterface } from '@standardnotes/domain-events'
+import { DomainEventPublisherInterface } from '@standardnotes/domain-events'
 
 import TYPES from '../Bootstrap/Types'
 import { SessionServiceInterace } from '../Domain/Session/SessionServiceInterface'
@@ -21,6 +21,7 @@ import { GetUserKeyParams } from '../Domain/UseCase/GetUserKeyParams/GetUserKeyP
 import { Register } from '../Domain/UseCase/Register'
 import { ChangePassword } from '../Domain/UseCase/ChangePassword'
 import { GetAuthMethods } from '../Domain/UseCase/GetAuthMethods/GetAuthMethods'
+import { DomainEventFactoryInterface } from '../Domain/Event/DomainEventFactoryInterface'
 
 @controller('/auth')
 export class AuthController extends BaseHttpController {

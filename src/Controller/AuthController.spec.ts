@@ -2,7 +2,7 @@ import 'reflect-metadata'
 
 import * as express from 'express'
 
-import { DomainEventFactoryInterface, DomainEventInterface, DomainEventPublisherInterface } from '@standardnotes/domain-events'
+import { DomainEventInterface, DomainEventPublisherInterface } from '@standardnotes/domain-events'
 
 import { AuthController } from './AuthController'
 import { results } from 'inversify-express-utils'
@@ -18,6 +18,7 @@ import { Session } from '../Domain/Session/Session'
 import { Register } from '../Domain/UseCase/Register'
 import { ChangePassword } from '../Domain/UseCase/ChangePassword'
 import { GetAuthMethods } from '../Domain/UseCase/GetAuthMethods/GetAuthMethods'
+import { DomainEventFactoryInterface } from '../Domain/Event/DomainEventFactoryInterface'
 
 describe('AuthController', () => {
   let sessionService: SessionServiceInterace
@@ -528,7 +529,7 @@ describe('AuthController', () => {
   })
 
   it('should return 200 if get auth methods succeeds', async () => {
-    getAuthMethods.execute = jest.fn().mockReturnValue({ 
+    getAuthMethods.execute = jest.fn().mockReturnValue({
       success: true,
     })
 
@@ -540,7 +541,7 @@ describe('AuthController', () => {
   })
 
   it('should return 400 if get auth methods fails', async () => {
-    getAuthMethods.execute = jest.fn().mockReturnValue({ 
+    getAuthMethods.execute = jest.fn().mockReturnValue({
       success: false,
     })
 

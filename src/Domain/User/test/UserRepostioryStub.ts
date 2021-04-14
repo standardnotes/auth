@@ -7,6 +7,16 @@ export class UserRepostioryStub implements UserRepositoryInterface {
   ) {
   }
 
+  async remove(user: User): Promise<User> {
+    this.users.forEach((existingUser: User, index: number) => {
+      if (existingUser.uuid === user.uuid) {
+        delete this.users[index]
+      }
+    })
+
+    return user
+  }
+
   async findOneByUuid(uuid: string): Promise<User | undefined> {
     for (const user of this.users) {
       if (user.uuid === uuid) {

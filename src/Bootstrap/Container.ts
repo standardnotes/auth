@@ -72,6 +72,7 @@ import { SettingProjector } from '../Projection/SettingProjector'
 import { GetSetting } from '../Domain/UseCase/GetSetting/GetSetting'
 import { UpdateSetting } from '../Domain/UseCase/UpdateSetting/UpdateSetting'
 import { GetAuthMethods } from '../Domain/UseCase/GetAuthMethods/GetAuthMethods'
+import { AccountDeletionRequestedEventHandler } from '../Domain/Handler/AccountDeletionRequestedEventHandler'
 
 export class ContainerConfigLoader {
   async load(): Promise<Container> {
@@ -218,6 +219,7 @@ export class ContainerConfigLoader {
 
     // Handlers
     container.bind<UserRegisteredEventHandler>(TYPES.UserRegisteredEventHandler).to(UserRegisteredEventHandler)
+    container.bind<AccountDeletionRequestedEventHandler>(TYPES.AccountDeletionRequestedEventHandler).to(AccountDeletionRequestedEventHandler)
 
     // Services
     container.bind<UAParser>(TYPES.DeviceDetector).toConstantValue(new UAParser())
@@ -253,6 +255,7 @@ export class ContainerConfigLoader {
 
     const eventHandlers: Map<string, DomainEventHandlerInterface> = new Map([
       ['USER_REGISTERED', container.get(TYPES.UserRegisteredEventHandler)],
+      ['ACCOUNT_DELETION_REQUESTED', container.get(TYPES.AccountDeletionRequestedEventHandler)],
     ])
 
     if (env.get('SQS_QUEUE_URL', true)) {
