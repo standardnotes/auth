@@ -132,6 +132,7 @@ describe('UsersController', () => {
 
     const subject = UsersControllerTest.makeSubject({
       updateUser,
+      deleteAccount,
       settingRepository: repository,
       projector,
     })
@@ -178,6 +179,7 @@ describe('UsersController', () => {
     const projector = SettingProjectorTest.get()
     const subject = UsersControllerTest.makeSubject({
       updateUser,
+      deleteAccount,
       settingRepository: repository,
       projector,
     })
@@ -207,6 +209,7 @@ describe('UsersController', () => {
 
     const subject = UsersControllerTest.makeSubject({
       updateUser,
+      deleteAccount,
     })
 
     const actual = await subject.getSetting(request, response)
@@ -227,6 +230,7 @@ describe('UsersController', () => {
 
     const subject = UsersControllerTest.makeSubject({
       updateUser,
+      deleteAccount,
     })
 
     const actual = await subject.getSetting(request, response)
@@ -238,6 +242,7 @@ describe('UsersController', () => {
   it('should get user key params', async () => {
     const subject = UsersControllerTest.makeSubject({
       updateUser,
+      deleteAccount,
     })
 
     Object.assign(request, {
@@ -256,6 +261,7 @@ describe('UsersController', () => {
   it('should get user key params for authenticated user', async () => {
     const subject = UsersControllerTest.makeSubject({
       updateUser,
+      deleteAccount,
     })
 
     Object.assign(request, {
@@ -274,6 +280,7 @@ describe('UsersController', () => {
   it('should error when email parameter is not given in query when gettting user key params', async () => {
     const subject = UsersControllerTest.makeSubject({
       updateUser,
+      deleteAccount,
     })
 
     Object.assign(request, {
@@ -302,6 +309,7 @@ describe('UsersController', () => {
     const settingRepository = new SettingRepostioryStub(settings)
     const subject = UsersControllerTest.makeSubject({
       updateUser,
+      deleteAccount,
       settingRepository,
       userRepository,
     })
@@ -331,6 +339,7 @@ describe('UsersController', () => {
     const settingRepository = new SettingRepostioryStub(settings)
     const subject = UsersControllerTest.makeSubject({
       updateUser,
+      deleteAccount,
       settingRepository,
       userRepository,
     })
@@ -355,6 +364,7 @@ describe('UsersController', () => {
 
     const subject = UsersControllerTest.makeSubject({
       updateUser,
+      deleteAccount,
     })
 
     const actual = await subject.updateSetting(
@@ -378,6 +388,7 @@ describe('UsersController', () => {
 
     const subject = UsersControllerTest.makeSubject({
       updateUser,
+      deleteAccount,
     })
 
     const actual = await subject.updateSetting(request, response)

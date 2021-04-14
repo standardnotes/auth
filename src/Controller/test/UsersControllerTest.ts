@@ -1,5 +1,6 @@
 import { SettingRepositoryInterface } from '../../Domain/Setting/SettingRepositoryInterface'
 import { SettingRepostioryStub } from '../../Domain/Setting/test/SettingRepositoryStub'
+import { DeleteAccount } from '../../Domain/UseCase/DeleteAccount/DeleteAccount'
 import { GetSettingTest } from '../../Domain/UseCase/GetSetting/test/GetSettingTest'
 import { GetSettingsTest } from '../../Domain/UseCase/GetSettings/test/GetSettingsTest'
 import { GetUserKeyParamsTest } from '../../Domain/UseCase/GetUserKeyParams/test/GetUserKeyParamsTest'
@@ -16,12 +17,14 @@ import { UsersController } from '../UsersController'
 export class UsersControllerTest {
   static makeSubject({
     updateUser,
+    deleteAccount,
     settingRepository = new SettingRepostioryStub([]),
     projector = SettingProjectorTest.get(),
     userRepository = new UserRepostioryStub([]),
     keyParamsFactory = new KeyParamsFactoryStub({ version: '004', identifier: 'test@test.com' }),
   }: {
     updateUser: UpdateUser,
+    deleteAccount: DeleteAccount
     settingRepository?: SettingRepositoryInterface,
     projector?: SettingProjector,
     userRepository?: UserRepositoryInterface,
@@ -45,6 +48,7 @@ export class UsersControllerTest {
         settingRepository,
         userRepository,
       }),
+      deleteAccount,
     )
   }
 }
