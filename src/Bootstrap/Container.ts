@@ -197,7 +197,6 @@ export class ContainerConfigLoader {
     container.bind(TYPES.USER_SERVER_REGISTRATION_URL).toConstantValue(env.get('USER_SERVER_REGISTRATION_URL', true))
     container.bind(TYPES.USER_SERVER_AUTH_KEY).toConstantValue(env.get('USER_SERVER_AUTH_KEY', true))
     container.bind(TYPES.REDIS_EVENTS_CHANNEL).toConstantValue(env.get('REDIS_EVENTS_CHANNEL'))
-    container.bind(TYPES.ADMIN_KEY).toConstantValue(env.get('ADMIN_KEY'))
 
     // use cases
     container.bind<AuthenticateUser>(TYPES.AuthenticateUser).to(AuthenticateUser)
