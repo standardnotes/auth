@@ -65,6 +65,7 @@ const TYPES = {
   GetAuthMethods: Symbol.for('GetAuthMethods'),
   // Handlers
   UserRegisteredEventHandler: Symbol.for('UserRegisteredEventHandler'),
+  AccountDeletionRequestedEventHandler: Symbol.for('AccountDeletionRequestedEventHandler'),
   // Services
   DeviceDetector: Symbol.for('DeviceDetector'),
   SessionService: Symbol.for('SessionService'),

@@ -29,4 +29,17 @@ describe('MySQLRevokedSessionRepository', () => {
     expect(queryBuilder.where).toHaveBeenCalledWith('revoked_session.uuid = :uuid', { uuid: '123' })
     expect(result).toEqual(session)
   })
+
+  it('should find all revoked sessions by user id', async () => {
+    queryBuilder.where = jest.fn().mockReturnThis()
+    queryBuilder.getMany = jest.fn().mockReturnValue([session])
+
+    const result = await repository.findAllByUserUuid('123')
+
+    expect(queryBuilder.where).toHaveBeenCalledWith(
+      'revoked_session.user_uuid = :user_uuid',
+      { user_uuid: '123' }
+    )
+    expect(result).toEqual([session])
+  })
 })
