@@ -13,10 +13,9 @@ describe('GetAuthMethods', () => {
       { uuid: totpUuid, name: SETTINGS.MFA_SECRET, value: 'mfa-secret' },
     ],
   })
-  const getSettings = async () => user.settings
   const execute = async (dto: GetAuthMethodsDto) => GetAuthMethodsTest.makeSubject({
     users: [user],
-    settings: await getSettings(),
+    settings: await user.settings,
   }).execute(dto)
 
   it('should return real methods for valid user email', async () => {
@@ -25,7 +24,6 @@ describe('GetAuthMethods', () => {
     expect(actual).toEqual({
       success: true,
       methods: {
-        password: true,
         totp: {
           uuid: totpUuid,
         },
@@ -37,9 +35,7 @@ describe('GetAuthMethods', () => {
 
     expect(actual).toEqual({
       success: true,
-      methods: {
-        password: true,
-      },
+      methods: {},
     })
   })
 })

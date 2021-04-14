@@ -251,7 +251,7 @@ export class AuthController extends BaseHttpController {
   }
 
   @httpGet('/methods')
-  async methods(request: Request, _response: Response): Promise<results.JsonResult> {
+  async methods(request: Request): Promise<results.JsonResult> {
     const email = request.query.email
 
     if (typeof email !== 'string') {

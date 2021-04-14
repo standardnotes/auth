@@ -19,7 +19,7 @@ export class GetAuthMethods implements UseCaseInterface {
 
     const user = await this.userRepository.findOneByEmail(email)
 
-    if (user === undefined) return this.getPseudoMethods(email)
+    if (user === undefined) return this.getPseudoMethods()
 
     const mfaSetting = await this.settingRepository.findOneByNameAndUserUuid(
       SETTINGS.MFA_SECRET, 
@@ -33,19 +33,15 @@ export class GetAuthMethods implements UseCaseInterface {
     return {
       success: true,
       methods: {
-        password: true,
         totp,
       },
     }
   }
 
-  private getPseudoMethods(_email: string): GetAuthMethodsResponse {
+  private getPseudoMethods(): GetAuthMethodsResponse {
     return {
       success: true,
-      methods: {
-        password: true,
-        // PR note: could generate a pseudo totp uuid based on the email, but won't bother and will just default to passwords for non-existent users -- unless this is insufficient?
-      },
+      methods: {},
     }
   }
 }
