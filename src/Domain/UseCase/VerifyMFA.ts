@@ -20,10 +20,9 @@ export class VerifyMFA implements UseCaseInterface {
 
   async execute(dto: VerifyMFADTO): Promise<VerifyMFAResponse> {
     const user = await this.userRepository.findOneByEmail(dto.email)
-    if(!user) {
+    if(user === undefined) {
       return {
-        success: false,
-        errorMessage: 'Invalid email or password',
+        success: true,
       }
     }
 

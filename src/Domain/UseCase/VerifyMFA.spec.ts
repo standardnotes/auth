@@ -35,11 +35,10 @@ describe('VerifyMFA', () => {
     })
   })
 
-  it('should not pass MFA verification if user is not found', async () => {
-    userRepository.findOneByEmail = jest.fn().mockReturnValue(null)
+  it('should pass MFA verification if user is not found', async () => {
+    userRepository.findOneByEmail = jest.fn().mockReturnValue(undefined)
     expect(await createVerifyMFA().execute({ email: 'test@test.te', token: '' })).toEqual({
-      success: false,
-      errorMessage: 'Invalid email or password',
+      success: true,
     })
   })
 
