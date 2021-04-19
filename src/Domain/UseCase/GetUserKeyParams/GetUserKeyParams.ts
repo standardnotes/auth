@@ -6,6 +6,7 @@ import { GetUserKeyParamsDTO } from './GetUserKeyParamsDTO'
 import { GetUserKeyParamsResponse } from './GetUserKeyParamsResponse'
 import { UseCaseInterface } from '../UseCaseInterface'
 import { Logger } from 'winston'
+import { User } from '../../User/User'
 
 @injectable()
 export class GetUserKeyParams implements UseCaseInterface {
@@ -25,13 +26,24 @@ export class GetUserKeyParams implements UseCaseInterface {
       }
     }
 
-    const user = await this.userRepository.findOneByEmail(dto.email)
-    if (!user) {
-      this.logger.debug(`No user with email ${dto.email}. Creating pseudo key params.`)
+    let user: User | undefined
+    if (dto.email !== undefined) {
+      user = await this.userRepository.findOneByEmail(dto.email)
+      if (!user) {
+        this.logger.debug(`No user with email ${dto.email}. Creating pseudo key params.`)
 
-      return {
-        keyParams: this.keyParamsFactory.createPseudoParams(dto.email),
+        return {
+          keyParams: this.keyParamsFactory.createPseudoParams(dto.email),
+        }
       }
+    } else if (dto.userUuid) {
+      user = await this.userRepository.findOneByUuid(dto.userUuid)
+    }
+
+    if (!user) {
+      this.logger.debug('Could not find user with given parameters: %O', dto)
+
+      throw Error('Could not find user')
     }
 
     this.logger.debug(`Creating key params for user ${user.email}. Authentication: ${dto.authenticated}`)
