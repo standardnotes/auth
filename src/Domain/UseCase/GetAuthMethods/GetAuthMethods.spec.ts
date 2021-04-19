@@ -5,12 +5,12 @@ import { GetAuthMethodsDto } from './GetAuthMethodsDto'
 import { GetAuthMethodsTest } from './test/GetAuthMethodsTest'
 
 describe('GetAuthMethods', () => {
-  const totpUuid = 'totp-uuid'
+  const mfaSecretUuid = 'mfa-secret-uuid'
   const user = UserTest.makeSubject({ 
     uuid: 'user-with-settings-uuid',
   }, {
     settings: [
-      { uuid: totpUuid, name: SETTINGS.MFA_SECRET, value: 'mfa-secret' },
+      { uuid: mfaSecretUuid, name: SETTINGS.MFA_SECRET, value: 'mfa-secret' },
     ],
   })
   const execute = async (dto: GetAuthMethodsDto) => GetAuthMethodsTest.makeSubject({
@@ -25,7 +25,7 @@ describe('GetAuthMethods', () => {
       success: true,
       methods: {
         totp: {
-          uuid: totpUuid,
+          mfaSecretUuid,
         },
       },
     })

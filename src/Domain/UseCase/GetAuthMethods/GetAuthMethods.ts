@@ -27,7 +27,7 @@ export class GetAuthMethods implements UseCaseInterface {
     )
 
     const totp = mfaSetting && {
-      uuid: mfaSetting.uuid,
+      mfaSecretUuid: mfaSetting.uuid,
     }
 
     return {

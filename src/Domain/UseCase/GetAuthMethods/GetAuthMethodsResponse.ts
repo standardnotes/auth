@@ -1,12 +1,8 @@
-import { Uuid } from '../../Uuid/Uuid'
+import { AuthMethods } from '@standardnotes/auth'
 
 export type GetAuthMethodsResponse = {
   success: true,
-  methods: {
-    totp?: {
-      uuid: Uuid,
-    },
-  },
+  methods: AuthMethods,
 } | {
   success: false,
   error: string,
