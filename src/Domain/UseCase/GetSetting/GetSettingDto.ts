@@ -1,4 +1,4 @@
-import { Uuid } from '../../Uuid/Uuid'
+import { Uuid } from '@standardnotes/auth'
 
 export type GetSettingDto = {
   userUuid: Uuid,
