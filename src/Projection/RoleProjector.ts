@@ -8,7 +8,7 @@ export class RoleProjector implements ProjectorInterface<Role> {
   projectSimple(role: Role): Record<string, unknown> {
     return {
       uuid: role.uuid,
-      name: role.name
+      name: role.name,
     }
   }
 

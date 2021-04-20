@@ -5,12 +5,12 @@ import { User } from '../User/User'
 @Entity({ name: 'roles' })
 export class Role {
   @PrimaryColumn({
-    length: 36
+    length: 36,
   })
   uuid: string
 
   @Column({
-    length: 255
+    length: 255,
   })
   @Index('index_roles_on_name', { unique: true })
   name: string
@@ -20,7 +20,7 @@ export class Role {
     type: 'datetime',
     default:
       /* istanbul ignore next */
-      () => 'CURRENT_TIMESTAMP'
+      () => 'CURRENT_TIMESTAMP',
   })
   createdAt: Date
 
@@ -29,7 +29,7 @@ export class Role {
     type: 'datetime',
     default:
       /* istanbul ignore next */
-      () => 'CURRENT_TIMESTAMP'
+      () => 'CURRENT_TIMESTAMP',
   })
   updatedAt: Date
 
@@ -40,12 +40,12 @@ export class Role {
   @JoinTable({
     name: 'user_roles',
     joinColumn: {
-        name: 'role_uuid',
-        referencedColumnName: 'uuid'
+      name: 'role_uuid',
+      referencedColumnName: 'uuid',
     },
     inverseJoinColumn: {
-        name: 'user_uuid',
-        referencedColumnName: 'uuid'
+      name: 'user_uuid',
+      referencedColumnName: 'uuid',
     },
   })
   users: Promise<Array<User>>
@@ -57,12 +57,12 @@ export class Role {
   @JoinTable({
     name: 'role_permissions',
     joinColumn: {
-        name: 'role_uuid',
-        referencedColumnName: 'uuid'
+      name: 'role_uuid',
+      referencedColumnName: 'uuid',
     },
     inverseJoinColumn: {
-        name: 'permission_uuid',
-        referencedColumnName: 'uuid'
+      name: 'permission_uuid',
+      referencedColumnName: 'uuid',
     },
   })
   permissions: Promise<Array<Permission>>

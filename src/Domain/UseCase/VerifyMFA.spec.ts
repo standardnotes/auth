@@ -31,22 +31,21 @@ describe('VerifyMFA', () => {
 
   it('should pass MFA verification if user has no MFA enabled', async () => {
     expect(await createVerifyMFA().execute({ email: 'test@test.te', token: '' })).toEqual({
-      success: true
+      success: true,
     })
   })
 
-  it('should not pass MFA verification if user is not found', async () => {
-    userRepository.findOneByEmail = jest.fn().mockReturnValue(null)
+  it('should pass MFA verification if user is not found', async () => {
+    userRepository.findOneByEmail = jest.fn().mockReturnValue(undefined)
     expect(await createVerifyMFA().execute({ email: 'test@test.te', token: '' })).toEqual({
-      success: false,
-      errorMessage: 'Invalid email or password'
+      success: true,
     })
   })
 
   it('should not pass MFA verification if mfa param is not found in the request', async () => {
     settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue({
       name: SETTINGS.MFA_SECRET,
-      value: '1:shhhh:qwerty'
+      value: '1:shhhh:qwerty',
     })
 
     expect(await createVerifyMFA().execute({ email: 'test@test.te', token: '' })).toEqual({
@@ -59,7 +58,7 @@ describe('VerifyMFA', () => {
   it('should not pass MFA verification if mfa is not correct', async () => {
     settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue({
       name: SETTINGS.MFA_SECRET,
-      value: '1:zzqwrq:qwerty'
+      value: '1:zzqwrq:qwerty',
     })
 
     crypter.decryptForUser = jest.fn().mockReturnValue('shhhh')
@@ -67,14 +66,14 @@ describe('VerifyMFA', () => {
     expect(await createVerifyMFA().execute({ email: 'test@test.te', token: 'invalid-token' })).toEqual({
       success: false,
       errorTag: 'mfa-invalid',
-      errorMessage: 'The two-factor authentication code you entered is incorrect. Please try again.'
+      errorMessage: 'The two-factor authentication code you entered is incorrect. Please try again.',
     })
   })
 
   it('should pass MFA verification if mfa key is correct', async () => {
     settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue({
       name: SETTINGS.MFA_SECRET,
-      value: '1:shhhh:qwerty'
+      value: '1:shhhh:qwerty',
     })
 
     crypter.decryptForUser = jest.fn().mockReturnValue('test')

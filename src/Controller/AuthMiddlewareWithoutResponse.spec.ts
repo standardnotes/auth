@@ -19,10 +19,10 @@ describe('AuthMiddlewareWithoutResponse', () => {
     authenticateRequest.execute = jest.fn()
 
     request = {
-      headers: {}
+      headers: {},
     } as jest.Mocked<Request>
     response = {
-      locals: {}
+      locals: {},
     } as jest.Mocked<Response>
     response.status = jest.fn().mockReturnThis()
     response.send = jest.fn()
@@ -35,7 +35,7 @@ describe('AuthMiddlewareWithoutResponse', () => {
     authenticateRequest.execute = jest.fn().mockReturnValue({
       success: true,
       user,
-      session
+      session,
     })
 
     await createMiddleware().handler(request, response, next)
@@ -48,7 +48,7 @@ describe('AuthMiddlewareWithoutResponse', () => {
 
   it('should skip middleware if authentication fails', async () => {
     authenticateRequest.execute = jest.fn().mockReturnValue({
-      success: false
+      success: false,
     })
 
     await createMiddleware().handler(request, response, next)

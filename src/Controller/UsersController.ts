@@ -3,28 +3,42 @@ import { inject } from 'inversify'
 import {
   BaseHttpController,
   controller,
+  httpDelete,
+  httpGet,
   httpPatch,
+  httpPut,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  results
+  results,
 } from 'inversify-express-utils'
 import TYPES from '../Bootstrap/Types'
+import { Setting } from '../Domain/Setting/Setting'
+import { DeleteAccount } from '../Domain/UseCase/DeleteAccount/DeleteAccount'
+import { GetSetting } from '../Domain/UseCase/GetSetting/GetSetting'
+import { GetSettings } from '../Domain/UseCase/GetSettings/GetSettings'
+import { GetUserKeyParams } from '../Domain/UseCase/GetUserKeyParams/GetUserKeyParams'
+import { UpdateSetting } from '../Domain/UseCase/UpdateSetting/UpdateSetting'
 import { UpdateUser } from '../Domain/UseCase/UpdateUser'
 
-@controller('/users', TYPES.AuthMiddleware)
+@controller('/users')
 export class UsersController extends BaseHttpController {
   constructor(
     @inject(TYPES.UpdateUser) private updateUser: UpdateUser,
+    @inject(TYPES.GetSettings) private doGetSettings: GetSettings,
+    @inject(TYPES.GetSetting) private doGetSetting: GetSetting,
+    @inject(TYPES.GetUserKeyParams) private getUserKeyParams: GetUserKeyParams,
+    @inject(TYPES.UpdateSetting) private doUpdateSetting: UpdateSetting,
+    @inject(TYPES.DeleteAccount) private doDeleteAccount: DeleteAccount,
   ) {
     super()
   }
 
-  @httpPatch('/:userId')
+  @httpPatch('/:userId', TYPES.AuthMiddleware)
   async update(request: Request, response: Response): Promise<results.JsonResult> {
     if (request.params.userId !== response.locals.user.uuid) {
       return this.json({
         error: {
-          message: 'Operation not allowed.'
-        }
+          message: 'Operation not allowed.',
+        },
       }, 401)
     }
 
@@ -44,5 +58,107 @@ export class UsersController extends BaseHttpController {
     })
 
     return this.json(updateResult.authResponse)
+  }
+
+  @httpGet('/:userUuid/settings', TYPES.AuthMiddleware)
+  async getSettings(request: Request, response: Response): Promise<results.JsonResult> {
+    if (request.params.userUuid !== response.locals.user.uuid) {
+      return this.json({
+        error: {
+          message: 'Operation not allowed.',
+        },
+      }, 401)
+    }
+
+    const { userUuid } = request.params
+    const result = await this.doGetSettings.execute({ userUuid })
+
+    return this.json(result)
+  }
+
+  @httpGet('/:userUuid/settings/:settingName', TYPES.AuthMiddleware)
+  async getSetting(request: Request, response: Response): Promise<results.JsonResult> {
+    if (request.params.userUuid !== response.locals.user.uuid) {
+      return this.json({
+        error: {
+          message: 'Operation not allowed.',
+        },
+      }, 401)
+    }
+
+    const { userUuid, settingName } = request.params
+    const result = await this.doGetSetting.execute({ userUuid, settingName })
+
+    if (result.success) {
+      return this.json(result)
+    }
+
+    return this.json(result, 400)
+  }
+
+  @httpPut('/:userUuid/settings', TYPES.AuthMiddleware)
+  async updateSetting(request: Request, response: Response): Promise<results.JsonResult> {
+    if (request.params.userUuid !== response.locals.user.uuid) {
+      return this.json({
+        error: {
+          message: 'Operation not allowed.',
+        },
+      }, 401)
+    }
+
+    const {
+      name,
+      value,
+      serverEncryptionVersion = Setting.DEFAULT_ENCRYPTION_VERSION,
+    } = request.body
+
+    const props = {
+      name,
+      value,
+      serverEncryptionVersion,
+    }
+
+    const { userUuid } = request.params
+    const result = await this.doUpdateSetting.execute({
+      userUuid,
+      props,
+    })
+
+    if (result.success) {
+      return this.json({}, result.statusCode)
+    }
+
+    return this.json(result, 400)
+  }
+
+  @httpGet('/params')
+  async keyParams(request: Request): Promise<results.JsonResult> {
+    const email = 'email' in request.query ? <string> request.query.email : undefined
+    const userUuid = 'uuid' in request.query ? <string> request.query.uuid : undefined
+
+    if(!email && !userUuid) {
+      return this.json({
+        error: {
+          message: 'Missing mandatory request query parameters.',
+        },
+      }, 400)
+    }
+
+    const result = await this.getUserKeyParams.execute({
+      email,
+      userUuid,
+      authenticated: request.query.authenticated === 'true',
+    })
+
+    return this.json(result.keyParams)
+  }
+
+  @httpDelete('/:email')
+  async deleteAccount(request: Request): Promise<results.JsonResult> {
+    const result = await this.doDeleteAccount.execute({
+      email: request.params.email,
+    })
+
+    return this.json({ message: result.message }, result.responseCode)
   }
 }

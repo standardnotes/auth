@@ -22,6 +22,7 @@ const TYPES = {
   UserProjector: Symbol.for('UserProjector'),
   RoleProjector: Symbol.for('RoleProjector'),
   PermissionProjector: Symbol.for('PermissionProjector'),
+  SettingProjector: Symbol.for('SettingProjector'),
   // env vars
   JWT_SECRET: Symbol.for('JWT_SECRET'),
   LEGACY_JWT_SECRET: Symbol.for('LEGACY_JWT_SECRET'),
@@ -58,8 +59,14 @@ const TYPES = {
   DeletePreviousSessionsForUser: Symbol.for('DeletePreviousSessionsForUser'),
   DeleteSessionForUser: Symbol.for('DeleteSessionForUser'),
   ChangePassword: Symbol.for('ChangePassword'),
+  GetSettings: Symbol.for('GetSettings'),
+  GetSetting: Symbol.for('GetSetting'),
+  UpdateSetting: Symbol.for('UpdateSetting'),
+  GetAuthMethods: Symbol.for('GetAuthMethods'),
+  DeleteAccount: Symbol.for('DeleteAccount'),
   // Handlers
   UserRegisteredEventHandler: Symbol.for('UserRegisteredEventHandler'),
+  AccountDeletionRequestedEventHandler: Symbol.for('AccountDeletionRequestedEventHandler'),
   // Services
   DeviceDetector: Symbol.for('DeviceDetector'),
   SessionService: Symbol.for('SessionService'),

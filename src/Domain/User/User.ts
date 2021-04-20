@@ -7,22 +7,22 @@ import { Setting } from '../Setting/Setting'
 export class User {
   private readonly SESSIONS_PROTOCOL_VERSION = 4
   static readonly PASSWORD_HASH_COST = 11
-  static readonly ENCRYPTION_VERSION_1 = 1
+  static readonly DEFAULT_ENCRYPTION_VERSION = 1
 
   @PrimaryColumn({
-    length: 36
+    length: 36,
   })
   uuid: string
 
   @Column({
     length: 255,
-    nullable: true
+    nullable: true,
   })
   version: string
 
   @Column({
     length: 255,
-    nullable: true
+    nullable: true,
   })
   @Index('index_users_on_email')
   email: string
@@ -30,7 +30,7 @@ export class User {
   @Column({
     name: 'pw_nonce',
     length: 255,
-    nullable: true
+    nullable: true,
   })
   pwNonce: string
 
@@ -38,28 +38,28 @@ export class User {
     name: 'encrypted_server_key',
     length: 255,
     type: 'varchar',
-    nullable: true
+    nullable: true,
   })
   encryptedServerKey: string | null
 
   @Column({
     name: 'server_encryption_version',
     type: 'tinyint',
-    default: 0
+    default: 0,
   })
   serverEncryptionVersion: number
 
   @Column({
     name: 'kp_created',
     length: 255,
-    nullable: true
+    nullable: true,
   })
   kpCreated: string
 
   @Column({
     name: 'kp_origination',
     length: 255,
-    nullable: true
+    nullable: true,
   })
   kpOrigination: string
 
@@ -67,7 +67,7 @@ export class User {
     name: 'pw_cost',
     width: 11,
     type: 'int',
-    nullable: true
+    nullable: true,
   })
   pwCost: number
 
@@ -75,34 +75,34 @@ export class User {
     name: 'pw_key_size',
     width: 11,
     type: 'int',
-    nullable: true
+    nullable: true,
   })
   pwKeySize: number
 
   @Column({
     name: 'pw_salt',
     length: 255,
-    nullable: true
+    nullable: true,
   })
   pwSalt: string
 
   @Column({
     name: 'pw_alg',
     length: 255,
-    nullable: true
+    nullable: true,
   })
   pwAlg: string
 
   @Column({
     name: 'pw_func',
     length: 255,
-    nullable: true
+    nullable: true,
   })
   pwFunc: string
 
   @Column({
     name: 'encrypted_password',
-    length: 255
+    length: 255,
   })
   encryptedPassword: string
 
@@ -121,7 +121,7 @@ export class User {
   @Column({
     name: 'locked_until',
     type: 'datetime',
-    nullable: true
+    nullable: true,
   })
   lockedUntil: Date | null
 
@@ -129,14 +129,14 @@ export class User {
     name: 'num_failed_attempts',
     type: 'int',
     width: 11,
-    nullable: true
+    nullable: true,
   })
   numberOfFailedAttempts: number | null
 
   @Column({
     name: 'updated_with_user_agent',
     type: 'text',
-    nullable: true
+    nullable: true,
   })
   updatedWithUserAgent: string | null
 
@@ -163,12 +163,12 @@ export class User {
   @JoinTable({
     name: 'user_roles',
     joinColumn: {
-        name: 'user_uuid',
-        referencedColumnName: 'uuid'
+      name: 'user_uuid',
+      referencedColumnName: 'uuid',
     },
     inverseJoinColumn: {
-        name: 'role_uuid',
-        referencedColumnName: 'uuid'
+      name: 'role_uuid',
+      referencedColumnName: 'uuid',
     },
   })
   roles: Promise<Array<Role>>

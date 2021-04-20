@@ -1,6 +1,6 @@
 import * as dayjs from 'dayjs'
 import * as bcrypt from 'bcryptjs'
-import { ROLES } from '@standardnotes/auth'
+import { Role } from '@standardnotes/auth'
 
 import { v4 as uuidv4 } from 'uuid'
 import { inject, injectable } from 'inversify'
@@ -29,7 +29,7 @@ export class Register implements UseCaseInterface {
     if (this.disableUserRegistration) {
       return {
         success: false,
-        errorMessage: 'User registration is currently not allowed.'
+        errorMessage: 'User registration is currently not allowed.',
       }
     }
 
@@ -39,7 +39,7 @@ export class Register implements UseCaseInterface {
     if (existingUser) {
       return {
         success: false,
-        errorMessage: 'This email is already registered.'
+        errorMessage: 'This email is already registered.',
       }
     }
 
@@ -50,9 +50,9 @@ export class Register implements UseCaseInterface {
     user.updatedAt = dayjs.utc().toDate()
     user.encryptedPassword = await bcrypt.hash(password, User.PASSWORD_HASH_COST)
     user.encryptedServerKey = await this.crypter.generateEncryptedUserServerKey()
-    user.serverEncryptionVersion = User.ENCRYPTION_VERSION_1
+    user.serverEncryptionVersion = User.DEFAULT_ENCRYPTION_VERSION
 
-    const defaultRole = await this.roleRepository.findOneByName(ROLES.USER)
+    const defaultRole = await this.roleRepository.findOneByName(Role.User)
     if (defaultRole) {
       user.roles = Promise.resolve([ defaultRole ])
     }
@@ -70,7 +70,7 @@ export class Register implements UseCaseInterface {
         apiVersion,
         dto.updatedWithUserAgent,
         ephemeralSession
-      )
+      ),
     }
   }
 }

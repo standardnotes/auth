@@ -20,10 +20,9 @@ export class VerifyMFA implements UseCaseInterface {
 
   async execute(dto: VerifyMFADTO): Promise<VerifyMFAResponse> {
     const user = await this.userRepository.findOneByEmail(dto.email)
-    if(!user) {
+    if(user === undefined) {
       return {
-        success: false,
-        errorMessage: 'Invalid email or password'
+        success: true,
       }
     }
 
@@ -31,7 +30,7 @@ export class VerifyMFA implements UseCaseInterface {
 
     if (!mfaSecretSetting) {
       return {
-        success: true
+        success: true,
       }
     }
 
@@ -39,7 +38,7 @@ export class VerifyMFA implements UseCaseInterface {
       return {
         success: false,
         errorTag: 'mfa-required',
-        errorMessage: 'Please enter your two-factor authentication code.'
+        errorMessage: 'Please enter your two-factor authentication code.',
       }
     }
 
@@ -48,12 +47,12 @@ export class VerifyMFA implements UseCaseInterface {
       return {
         success: false,
         errorTag: 'mfa-invalid',
-        errorMessage: 'The two-factor authentication code you entered is incorrect. Please try again.'
+        errorMessage: 'The two-factor authentication code you entered is incorrect. Please try again.',
       }
     }
 
     return {
-      success: true
+      success: true,
     }
   }
 }
