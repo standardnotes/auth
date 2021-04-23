@@ -8,6 +8,7 @@ import { UseCaseInterface } from './UseCaseInterface'
 import { VerifyMFADTO } from './VerifyMFADTO'
 import { VerifyMFAResponse } from './VerifyMFAResponse'
 import { CrypterInterface } from '../Encryption/CrypterInterface'
+import { ErrorTag } from '@standardnotes/auth'
 
 @injectable()
 export class VerifyMFA implements UseCaseInterface {
@@ -37,7 +38,7 @@ export class VerifyMFA implements UseCaseInterface {
     if (!dto.token) {
       return {
         success: false,
-        errorTag: 'mfa-required',
+        errorTag: ErrorTag.MfaRequired,
         errorMessage: 'Please enter your two-factor authentication code.',
       }
     }
@@ -46,7 +47,7 @@ export class VerifyMFA implements UseCaseInterface {
     if (!decryptedValue || !authenticator.verify({ token: dto.token, secret: decryptedValue })) {
       return {
         success: false,
-        errorTag: 'mfa-invalid',
+        errorTag: ErrorTag.MfaInvalid,
         errorMessage: 'The two-factor authentication code you entered is incorrect. Please try again.',
       }
     }
