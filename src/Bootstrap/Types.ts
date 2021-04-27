@@ -62,6 +62,7 @@ const TYPES = {
   GetSettings: Symbol.for('GetSettings'),
   GetSetting: Symbol.for('GetSetting'),
   UpdateSetting: Symbol.for('UpdateSetting'),
+  DeleteSetting: Symbol.for('DeleteSetting'),
   GetAuthMethods: Symbol.for('GetAuthMethods'),
   DeleteAccount: Symbol.for('DeleteAccount'),
   // Handlers

@@ -74,6 +74,7 @@ import { UpdateSetting } from '../Domain/UseCase/UpdateSetting/UpdateSetting'
 import { GetAuthMethods } from '../Domain/UseCase/GetAuthMethods/GetAuthMethods'
 import { AccountDeletionRequestedEventHandler } from '../Domain/Handler/AccountDeletionRequestedEventHandler'
 import { DeleteAccount } from '../Domain/UseCase/DeleteAccount/DeleteAccount'
+import { DeleteSetting } from '../Domain/UseCase/DeleteSetting/DeleteSetting'
 
 export class ContainerConfigLoader {
   async load(): Promise<Container> {
@@ -216,6 +217,7 @@ export class ContainerConfigLoader {
     container.bind<GetSettings>(TYPES.GetSettings).to(GetSettings)
     container.bind<GetSetting>(TYPES.GetSetting).to(GetSetting)
     container.bind<UpdateSetting>(TYPES.UpdateSetting).to(UpdateSetting)
+    container.bind<DeleteSetting>(TYPES.DeleteSetting).to(DeleteSetting)
     container.bind<GetAuthMethods>(TYPES.GetAuthMethods).to(GetAuthMethods)
     container.bind<DeleteAccount>(TYPES.DeleteAccount).to(DeleteAccount)
 

@@ -83,4 +83,21 @@ describe('MySQLSettingRepository', () => {
 
     expect(result).toEqual('replaced')
   })
+  
+  it('should delete setting if it does exist', async () => {
+    const queryBuilder = {
+      delete: () => queryBuilder,
+      where: () => queryBuilder,
+      execute: () => undefined,
+    }
+    const repository = Object.assign(new MySQLSettingRepository(), {
+      createQueryBuilder: () => queryBuilder,
+    })
+    const result = await repository.deleteByUserUuid({
+      userUuid: 'userUuid',
+      settingName: 'settingName',
+    })
+
+    expect(result).toEqual(undefined)
+  })
 })
