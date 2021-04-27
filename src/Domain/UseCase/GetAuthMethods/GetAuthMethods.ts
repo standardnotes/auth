@@ -19,7 +19,9 @@ export class GetAuthMethods implements UseCaseInterface {
 
     const user = await this.userRepository.findOneByEmail(email)
 
-    if (user === undefined) return this.getPseudoMethods()
+    if (user === undefined) {
+      return this.getPseudoMethods()
+    }
 
     const mfaSetting = await this.settingRepository.findOneByNameAndUserUuid(
       SETTINGS.MFA_SECRET, 
