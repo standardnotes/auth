@@ -22,7 +22,9 @@ export class UpdateSetting implements UseCaseInterface {
     if (user === undefined) {
       return {
         success: false,
-        error: `User ${userUuid} not found.`,
+        error: {
+          message: `User ${userUuid} not found.`,
+        },
       }
     }
     
