@@ -21,7 +21,7 @@ export class VerifyMFA implements UseCaseInterface {
 
   async execute(dto: VerifyMFADTO): Promise<VerifyMFAResponse> {
     const user = await this.userRepository.findOneByEmail(dto.email)
-    if(user === undefined) {
+    if (user === undefined) {
       return {
         success: true,
       }
@@ -35,6 +35,8 @@ export class VerifyMFA implements UseCaseInterface {
       }
     }
 
+    // assuming mfaPayload is always set here -- this should be ensured by validation in AuthController
+
     if (!dto.token) {
       return {
         success: false,
@@ -43,6 +45,7 @@ export class VerifyMFA implements UseCaseInterface {
       }
     }
 
+    // hm: it seems that this assumes that there is only one mfa setting per user and it isn't looked up by uuid -- instead the user is the key (or more precisely [user, settingName]) 
     const decryptedValue = await this.crypter.decryptForUser(mfaSecretSetting.value, user)
     if (!decryptedValue || !authenticator.verify({ token: dto.token, secret: decryptedValue })) {
       return {

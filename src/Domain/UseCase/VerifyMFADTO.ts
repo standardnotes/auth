@@ -1,4 +1,6 @@
+import { MfaPayload } from '@standardnotes/auth'
+
 export type VerifyMFADTO = {
   email: string
-  token: string
+  mfaPayload: MfaPayload
 }

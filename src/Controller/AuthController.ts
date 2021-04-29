@@ -9,6 +9,7 @@ import {
   results,
 } from 'inversify-express-utils'
 import { DomainEventPublisherInterface } from '@standardnotes/domain-events'
+import { MfaPayload } from '@standardnotes/auth'
 
 import TYPES from '../Bootstrap/Types'
 import { SessionServiceInterace } from '../Domain/Session/SessionServiceInterface'
@@ -62,10 +63,22 @@ export class AuthController extends BaseHttpController {
       }, 400)
     }
 
+    // todo: validate request.query
+    // this has to be set if user has MFA enabled...
+    // problem: MFA is then optional
+    // but if it occurs, the entire payload is required
+    // another issue: secretuuid might be unnecessary (email+entered totp might be sufficient)
+    const mfaPayload: MfaPayload = {
+      mfaSecretUuid: request.query.mfaSecretUuid,
+      enteredTotp: request.query.enteredTotp,
+    }
+
     const verifyMFAResponse = await this.verifyMFA.execute({
       email: <string> request.query.email,
-      token: <string> request.query.mfa_key,
+      mfaPayload,
     })
+
+    // todo: this + /auth/sign_in
 
     if (!verifyMFAResponse.success) {
       return this.json({

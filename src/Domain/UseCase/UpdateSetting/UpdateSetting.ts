@@ -7,6 +7,7 @@ import { SettingRepositoryInterface } from '../../Setting/SettingRepositoryInter
 import { UserRepositoryInterface } from '../../User/UserRepositoryInterface'
 import { CreateOrReplaceSettingStatus } from '../../Setting/CreateOrReplaceSettingStatus'
 
+// todo: rename to createorreplace
 @injectable()
 export class UpdateSetting implements UseCaseInterface {
   constructor (

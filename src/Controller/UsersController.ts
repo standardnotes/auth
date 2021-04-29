@@ -96,6 +96,7 @@ export class UsersController extends BaseHttpController {
     return this.json(result, 400)
   }
 
+  // todo: rename to createorreplace
   @httpPut('/:userUuid/settings', TYPES.AuthMiddleware)
   async updateSetting(request: Request, response: Response): Promise<results.JsonResult> {
     if (request.params.userUuid !== response.locals.user.uuid) {
