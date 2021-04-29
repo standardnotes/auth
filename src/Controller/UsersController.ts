@@ -135,7 +135,6 @@ export class UsersController extends BaseHttpController {
 
   @httpDelete('/:userUuid/settings/:settingName', TYPES.AuthMiddleware)
   async deleteSetting(request: Request, response: Response): Promise<results.JsonResult> {
-    // todo: this should be in a middleware or extracted to a fn
     if (request.params.userUuid !== response.locals.user.uuid) {
       return this.json({
         error: {

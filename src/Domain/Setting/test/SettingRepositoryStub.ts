@@ -55,7 +55,6 @@ export class SettingRepostioryStub implements SettingRepositoryInterface {
   }
 }
 
-// todo: move this someplace appropriate
 async function findIndex<T>(
   list: T[], 
   predicate: (item: T) => Promise<boolean>,

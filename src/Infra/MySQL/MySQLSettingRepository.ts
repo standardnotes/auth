@@ -49,7 +49,6 @@ export class MySQLSettingRepository extends Repository<Setting> implements Setti
     settingName,
     userUuid,
   }: DeleteSettingDto): Promise<void> {
-    // assuming this always succeeds...
     await this.createQueryBuilder('setting')
       .delete()
       .where(
