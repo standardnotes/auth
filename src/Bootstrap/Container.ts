@@ -101,6 +101,7 @@ export class ContainerConfigLoader {
             database: env.get('DB_DATABASE'),
           },
         ],
+        removeNodeErrorCount: 10,
       },
       entities: [
         User,
