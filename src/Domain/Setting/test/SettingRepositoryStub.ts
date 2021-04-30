@@ -1,3 +1,4 @@
+import { DeleteSettingDto } from '../../UseCase/DeleteSetting/DeleteSettingDto'
 import { CreateOrReplaceSettingDto } from '../CreateOrReplaceSettingDto'
 import { CreateOrReplaceSettingStatus } from '../CreateOrReplaceSettingStatus'
 import { Setting } from '../Setting'
@@ -37,4 +38,32 @@ export class SettingRepostioryStub implements SettingRepositoryInterface {
 
     return existing === undefined? 'created': 'replaced'
   }
+  /**
+   * Note: this doesn't really delete anything, just pretends it did.
+   */
+  async deleteByUserUuid({
+    settingName, 
+    userUuid,
+  }: DeleteSettingDto): Promise<void> {
+    const index = await findIndex(this.settings, async (s: Setting) => {
+      return s.name === settingName && (await s.user).uuid === userUuid
+    })
+
+    if (index === -1) {
+      throw Error('Expected deleteByUserUuid to always succeed.')
+    }
+  }
+}
+
+async function findIndex<T>(
+  list: T[], 
+  predicate: (item: T) => Promise<boolean>,
+): Promise<number> {
+  for (let i = 0; i < list.length; ++i) {
+    const item = list[i]
+    if (await predicate(item)) {
+      return i
+    }
+  }
+  return -1
 }

@@ -1,6 +1,7 @@
 import { SettingRepositoryInterface } from '../../Domain/Setting/SettingRepositoryInterface'
 import { SettingRepostioryStub } from '../../Domain/Setting/test/SettingRepositoryStub'
 import { DeleteAccount } from '../../Domain/UseCase/DeleteAccount/DeleteAccount'
+import { DeleteSettingTest } from '../../Domain/UseCase/DeleteSetting/test/DeleteSettingTest'
 import { GetSettingTest } from '../../Domain/UseCase/GetSetting/test/GetSettingTest'
 import { GetSettingsTest } from '../../Domain/UseCase/GetSettings/test/GetSettingsTest'
 import { GetUserKeyParamsTest } from '../../Domain/UseCase/GetUserKeyParams/test/GetUserKeyParamsTest'
@@ -49,6 +50,9 @@ export class UsersControllerTest {
         userRepository,
       }),
       deleteAccount,
+      DeleteSettingTest.makeSubject({
+        settingRepository,
+      }),
     )
   }
 }

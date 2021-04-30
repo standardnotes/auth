@@ -3,5 +3,7 @@ export type UpdateSettingResponse = {
   statusCode: number,
 } | {
   success: false,
-  error: string,
+  error: {
+    message: string,
+  },
 }

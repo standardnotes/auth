@@ -267,7 +267,9 @@ export class AuthController extends BaseHttpController {
       email,
     })
 
-    if (result.success) return this.json(result)
+    if (result.success) {
+      return this.json(result)
+    }
 
     return this.json(result, 400)
   }
