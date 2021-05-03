@@ -63,7 +63,7 @@ export class AuthController extends BaseHttpController {
     }
 
     const { enteredTotp } = request.query
-    const token = typeof enteredTotp === 'string' || enteredTotp === undefined?
+    const token = typeof enteredTotp === 'string'?
       enteredTotp: undefined
 
     const verifyMFAResponse = await this.verifyMFA.execute({
@@ -102,7 +102,7 @@ export class AuthController extends BaseHttpController {
     }
 
     const { enteredTotp } = request.query
-    const token = typeof enteredTotp === 'string' || enteredTotp === undefined?
+    const token = typeof enteredTotp === 'string'?
       enteredTotp: undefined
 
     const verifyMFAResponse = await this.verifyMFA.execute({
