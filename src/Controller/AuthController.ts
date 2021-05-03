@@ -62,13 +62,9 @@ export class AuthController extends BaseHttpController {
       }, 400)
     }
 
-    const { enteredTotp } = request.query
-    const token = typeof enteredTotp === 'string'?
-      enteredTotp: undefined
-
     const verifyMFAResponse = await this.verifyMFA.execute({
       email: request.query.email as string,
-      token: token as string,
+      token: request.query.enteredTotp as string,
     })
 
     if (!verifyMFAResponse.success) {
@@ -101,13 +97,9 @@ export class AuthController extends BaseHttpController {
       }, 401)
     }
 
-    const { enteredTotp } = request.query
-    const token = typeof enteredTotp === 'string'?
-      enteredTotp: undefined
-
     const verifyMFAResponse = await this.verifyMFA.execute({
       email: request.body.email,
-      token: token as string,
+      token: request.query.enteredTotp as string,
     })
 
     if (!verifyMFAResponse.success) {
