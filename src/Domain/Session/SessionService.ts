@@ -26,7 +26,7 @@ export class SessionService implements SessionServiceInterace {
     @inject(TYPES.EphemeralSessionRepository) private ephemeralSessionRepository: EphemeralSessionRepositoryInterface,
     @inject(TYPES.RevokedSessionRepository) private revokedSessionRepository: RevokedSessionRepositoryInterface,
     @inject(TYPES.DeviceDetector) private deviceDetector: UAParser,
-    @inject(TYPES.Crypter) private crypter: SnCryptoNode,
+    @inject(TYPES.SnCryptoNode) private crypter: SnCryptoNode,
     @inject(TYPES.Logger) private logger: winston.Logger,
     @inject(TYPES.ACCESS_TOKEN_AGE) private accessTokenAge: number,
     @inject(TYPES.REFRESH_TOKEN_AGE) private refreshTokenAge: number
