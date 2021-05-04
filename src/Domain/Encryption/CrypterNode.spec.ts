@@ -45,6 +45,10 @@ describe('CrypterNode', () => {
     user.encryptedServerKey = version(encryptedUserKey)
   })
 
+  it('should fail to instantiate on non-32-byte key', async () => {
+    expect(() => new CrypterNode('short-key', crypto)).toThrow()
+  })
+
   it('should encrypt a value for user', async () => {
     expect(await createCrypter().encryptForUser(unencrypted, user))
       .toEqual(version(encrypted))
