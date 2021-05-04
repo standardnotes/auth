@@ -15,7 +15,7 @@ import { EphemeralSessionRepositoryInterface } from './EphemeralSessionRepositor
 import { EphemeralSession } from './EphemeralSession'
 import { RevokedSession } from './RevokedSession'
 import { RevokedSessionRepositoryInterface } from './RevokedSessionRepositoryInterface'
-import { SNPureCrypto } from '@standardnotes/sncrypto-common'
+import { SnCryptoNode } from '@standardnotes/sncrypto-node'
 
 @injectable()
 export class SessionService implements SessionServiceInterace {
@@ -26,7 +26,7 @@ export class SessionService implements SessionServiceInterace {
     @inject(TYPES.EphemeralSessionRepository) private ephemeralSessionRepository: EphemeralSessionRepositoryInterface,
     @inject(TYPES.RevokedSessionRepository) private revokedSessionRepository: RevokedSessionRepositoryInterface,
     @inject(TYPES.DeviceDetector) private deviceDetector: UAParser,
-    @inject(TYPES.Crypter) private crypter: SNPureCrypto,
+    @inject(TYPES.Crypter) private crypter: SnCryptoNode,
     @inject(TYPES.Logger) private logger: winston.Logger,
     @inject(TYPES.ACCESS_TOKEN_AGE) private accessTokenAge: number,
     @inject(TYPES.REFRESH_TOKEN_AGE) private refreshTokenAge: number
