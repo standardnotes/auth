@@ -6,7 +6,7 @@ import { CrypterNode } from './CrypterNode'
 describe('CrypterNode', () => {
   let crypto: SnCryptoNode
   let user: User
-  
+
   const iv = 'iv'
 
   const createCrypter = () => new CrypterNode(serverKey, crypto)
@@ -23,7 +23,7 @@ describe('CrypterNode', () => {
 
   const version = (encrypted: Aes256GcmEncrypted<string>, v = 1) => {
     return JSON.stringify({
-      version: v, 
+      version: v,
       encrypted,
     })
   }
@@ -31,7 +31,7 @@ describe('CrypterNode', () => {
   const unencrypted = 'unencrypted'
   const decrypted = 'decrypted'
   const encryptedUserKey = makeEncrypted('encryptedUserKey')
-  const serverKey = 'serverKey'
+  const serverKey = '7365727665724b65792e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e'
   const unsupportedVersion = 999999
   const encrypted = makeEncrypted('encrypted')
 
@@ -45,12 +45,16 @@ describe('CrypterNode', () => {
     user.encryptedServerKey = version(encryptedUserKey)
   })
 
+  it('should fail to instantiate on non-32-byte key', async () => {
+    expect(() => new CrypterNode('short-key', crypto)).toThrow()
+  })
+
   it('should encrypt a value for user', async () => {
     expect(await createCrypter().encryptForUser(unencrypted, user))
       .toEqual(version(encrypted))
 
     expect(crypto.aes256GcmDecrypt).toHaveBeenCalledWith(
-      encryptedUserKey, 
+      encryptedUserKey,
       serverKey,
     )
 
@@ -74,9 +78,9 @@ describe('CrypterNode', () => {
     expect(await createCrypter().generateEncryptedUserServerKey())
       .toEqual(version(encrypted))
 
-    expect(crypto.aes256GcmEncrypt).toHaveBeenCalledWith({ 
-      unencrypted: anotherUserKey, 
-      iv, 
+    expect(crypto.aes256GcmEncrypt).toHaveBeenCalledWith({
+      unencrypted: anotherUserKey,
+      iv,
       key: serverKey,
     })
   })

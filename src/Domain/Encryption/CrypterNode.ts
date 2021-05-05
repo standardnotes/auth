@@ -11,6 +11,12 @@ export class CrypterNode implements CrypterInterface {
     @inject(TYPES.ENCRYPTION_SERVER_KEY) private encryptionServerKey: string,
     @inject(TYPES.SnCryptoNode) private cryptoNode: SnCryptoNode,
   ) {
+    const keyBuffer = Buffer.from(encryptionServerKey, 'hex')
+    const { byteLength } = keyBuffer
+
+    if (byteLength !== 32) {
+      throw Error('ENCRYPTION_SERVER_KEY must be a hex string exactly 32 bytes long!')
+    }
   }
 
   async encryptForUser(unencrypted: string, user: User): Promise<string> {
@@ -54,7 +60,7 @@ export class CrypterNode implements CrypterInterface {
   }
 
   private stringifyVersionedEncrypted(
-    version: number, 
+    version: number,
     encrypted: Aes256GcmEncrypted<BufferEncoding>,
   ): string {
     return JSON.stringify({ version, encrypted })
