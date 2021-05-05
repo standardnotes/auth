@@ -75,6 +75,7 @@ import { GetAuthMethods } from '../Domain/UseCase/GetAuthMethods/GetAuthMethods'
 import { AccountDeletionRequestedEventHandler } from '../Domain/Handler/AccountDeletionRequestedEventHandler'
 import { DeleteAccount } from '../Domain/UseCase/DeleteAccount/DeleteAccount'
 import { DeleteSetting } from '../Domain/UseCase/DeleteSetting/DeleteSetting'
+import { SettingFactory } from '../Domain/Setting/SettingFactory'
 
 export class ContainerConfigLoader {
   async load(): Promise<Container> {
@@ -178,6 +179,9 @@ export class ContainerConfigLoader {
     container.bind<RoleProjector>(TYPES.RoleProjector).to(RoleProjector)
     container.bind<PermissionProjector>(TYPES.PermissionProjector).to(PermissionProjector)
     container.bind<SettingProjector>(TYPES.SettingProjector).to(SettingProjector)
+
+    // Factories
+    container.bind<SettingFactory>(TYPES.SettingFactory).to(SettingFactory)
 
     // env vars
     container.bind(TYPES.JWT_SECRET).toConstantValue(env.get('JWT_SECRET'))

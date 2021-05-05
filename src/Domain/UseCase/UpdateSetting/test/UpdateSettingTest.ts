@@ -1,5 +1,6 @@
 import { Setting } from '../../../Setting/Setting'
 import { SettingRepositoryInterface } from '../../../Setting/SettingRepositoryInterface'
+import { SettingFactoryTest } from '../../../Setting/test/SettingFactoryTest'
 import { SettingRepostioryStub } from '../../../Setting/test/SettingRepositoryStub'
 import { UserRepositoryInterface } from '../../../User/UserRepositoryInterface'
 import { UpdateSetting } from '../UpdateSetting'
@@ -17,6 +18,8 @@ export class UpdateSettingTest {
     return new UpdateSetting(
       settingRepository,
       userRepository,
+      // todo: from params
+      SettingFactoryTest.makeSubject(),
     )
   }
 }

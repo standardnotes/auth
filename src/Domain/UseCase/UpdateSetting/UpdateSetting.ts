@@ -6,12 +6,14 @@ import TYPES from '../../../Bootstrap/Types'
 import { SettingRepositoryInterface } from '../../Setting/SettingRepositoryInterface'
 import { UserRepositoryInterface } from '../../User/UserRepositoryInterface'
 import { CreateOrReplaceSettingStatus } from '../../Setting/CreateOrReplaceSettingStatus'
+import { SettingFactory } from '../../Setting/SettingFactory'
 
 @injectable()
 export class UpdateSetting implements UseCaseInterface {
   constructor (
     @inject(TYPES.SettingRepository) private settingRepository: SettingRepositoryInterface,
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
+    @inject(TYPES.SettingFactory) private settingFactory: SettingFactory,
   ) {}
 
   async execute(dto: UpdateSettingDto): Promise<UpdateSettingResponse> {
@@ -27,14 +29,14 @@ export class UpdateSetting implements UseCaseInterface {
         },
       }
     }
-    
+
     const status = await this.settingRepository.createOrReplace({
       user,
       props,
-    })
+    }, this.settingFactory)
 
-    return { 
-      success: true, 
+    return {
+      success: true,
       statusCode: this.statusToStatusCode(status),
     }
   }
