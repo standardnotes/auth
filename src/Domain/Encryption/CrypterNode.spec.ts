@@ -31,7 +31,7 @@ describe('CrypterNode', () => {
   const unencrypted = 'unencrypted'
   const decrypted = 'decrypted'
   const encryptedUserKey = makeEncrypted('encryptedUserKey')
-  const serverKey = 'serverKey.......................'
+  const serverKey = '7365727665724b65792e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e'
   const unsupportedVersion = 999999
   const encrypted = makeEncrypted('encrypted')
 
@@ -81,7 +81,7 @@ describe('CrypterNode', () => {
     expect(crypto.aes256GcmEncrypt).toHaveBeenCalledWith({
       unencrypted: anotherUserKey,
       iv,
-      key: expect.stringMatching(''),
+      key: serverKey,
     })
   })
 
