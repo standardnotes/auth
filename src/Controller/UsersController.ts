@@ -99,7 +99,7 @@ export class UsersController extends BaseHttpController {
   }
 
   @httpPut('/:userUuid/settings', TYPES.AuthMiddleware)
-  async updateSetting(request: Request, response: Response): Promise<results.JsonResult> {
+  async updateSetting(request: Request, response: Response): Promise<results.JsonResult | results.StatusCodeResult> {
     if (request.params.userUuid !== response.locals.user.uuid) {
       return this.json({
         error: {
@@ -127,7 +127,7 @@ export class UsersController extends BaseHttpController {
     })
 
     if (result.success) {
-      return this.json({}, result.statusCode)
+      return this.statusCode(result.statusCode)
     }
 
     return this.json(result, 400)
@@ -145,8 +145,8 @@ export class UsersController extends BaseHttpController {
 
     const { userUuid, settingName } = request.params
 
-    const result = await this.doDeleteSetting.execute({ 
-      userUuid, 
+    const result = await this.doDeleteSetting.execute({
+      userUuid,
       settingName,
     })
 

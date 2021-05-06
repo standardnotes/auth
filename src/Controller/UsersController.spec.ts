@@ -346,7 +346,7 @@ describe('UsersController', () => {
       response,
     )
 
-    expect(actual.statusCode).toEqual(201)
+    expect(actual).toMatchObject({ statusCode: 201 })
   })
 
   it('should replace user setting for vaild user uuid', async () => {
@@ -376,7 +376,7 @@ describe('UsersController', () => {
       response,
     )
 
-    expect(actual.statusCode).toEqual(204)
+    expect(actual).toMatchObject({ statusCode: 204 })
   })
 
   it('should replace user setting for nonexistent user uuid', async () => {
@@ -399,7 +399,7 @@ describe('UsersController', () => {
       response,
     )
 
-    expect(actual.statusCode).toEqual(400)
+    expect(actual).toMatchObject({ statusCode: 400 })
   })
 
   it('should error when creating/replacing user setting for invaild user uuid', async () => {
@@ -420,9 +420,9 @@ describe('UsersController', () => {
 
     const actual = await subject.updateSetting(request, response)
 
-    expect(actual.json).toHaveProperty('error')
-  }) 
-  
+    expect(actual).toMatchObject({ json: { error: expect.anything() } })
+  })
+
   it('should delete user setting if it exists', async () => {
     const user = UserTest.makeWithSettings()
     const userUuid = user.uuid
@@ -479,8 +479,8 @@ describe('UsersController', () => {
       uuid: userUuid,
     })
     const request: Partial<express.Request> = {
-      params: { 
-        userUuid: badUserUuid, 
+      params: {
+        userUuid: badUserUuid,
         settingName: 'irrelevant',
       },
     }
@@ -499,5 +499,5 @@ describe('UsersController', () => {
     )
 
     expect(actual.json).toHaveProperty('error')
-  }) 
+  })
 })
