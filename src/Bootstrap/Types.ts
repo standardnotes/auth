@@ -12,6 +12,8 @@ const TYPES = {
   SettingRepository: Symbol.for('SettingRepository'),
   LockRepository: Symbol.for('LockRepository'),
   RoleRepository: Symbol.for('RoleRepository'),
+  // Persisters
+  SettingPersister: Symbol.for('SettingPersister'),
   // Middleware
   AuthMiddleware: Symbol.for('AuthMiddleware'),
   AuthMiddlewareWithoutResponse: Symbol.for('AuthMiddlewareWithoutResponse'),

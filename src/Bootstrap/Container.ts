@@ -76,6 +76,7 @@ import { AccountDeletionRequestedEventHandler } from '../Domain/Handler/AccountD
 import { DeleteAccount } from '../Domain/UseCase/DeleteAccount/DeleteAccount'
 import { DeleteSetting } from '../Domain/UseCase/DeleteSetting/DeleteSetting'
 import { SettingFactory } from '../Domain/Setting/SettingFactory'
+import { SettingPersister } from '../Domain/Setting/SettingPersister'
 
 export class ContainerConfigLoader {
   async load(): Promise<Container> {
@@ -135,8 +136,8 @@ export class ContainerConfigLoader {
     const logger = winston.createLogger({
       level: env.get('LOG_LEVEL') || 'info',
       format: winston.format.combine(
+        winston.format.json({ space: 2 }),
         winston.format.splat(),
-        winston.format.json(),
       ),
       transports: [
         new winston.transports.Console({ level: env.get('LOG_LEVEL') || 'info' }),
@@ -166,6 +167,9 @@ export class ContainerConfigLoader {
     container.bind<MySQLRoleRepository>(TYPES.RoleRepository).toConstantValue(connection.getCustomRepository(MySQLRoleRepository))
     container.bind<RedisEphemeralSessionRepository>(TYPES.EphemeralSessionRepository).to(RedisEphemeralSessionRepository)
     container.bind<LockRepository>(TYPES.LockRepository).to(LockRepository)
+
+    // Persisters
+    container.bind<SettingPersister>(TYPES.SettingPersister).to(SettingPersister)
 
     // Middleware
     container.bind<AuthMiddleware>(TYPES.AuthMiddleware).to(AuthMiddleware)

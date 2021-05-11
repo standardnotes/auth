@@ -1,5 +1,4 @@
 import 'reflect-metadata'
-import { SettingRepostioryStub } from '../../Setting/test/SettingRepositoryStub'
 import { UserTest } from '../../User/test/UserTest'
 import { UserRepositoryInterface } from '../../User/UserRepositoryInterface'
 import { UpdateSettingTest } from './test/UpdateSettingTest'
@@ -8,9 +7,6 @@ import { UpdateSettingResponse } from './UpdateSettingResponse'
 describe('UpdateSetting', () => {
   const makeSubject = async () => UpdateSettingTest.makeSubject({
     settings: await getSettings(),
-    settingRepository: new SettingRepostioryStub(
-      await getSettings(),
-    ),
     userRepository: userRepositoryMock,
   })
 
@@ -30,7 +26,7 @@ describe('UpdateSetting', () => {
       value: 'test-setting-value',
     }
 
-    const subject = await makeSubject() 
+    const subject = await makeSubject()
     const actual: UpdateSettingResponse = await subject.execute({ props, userUuid })
 
     expect(actual).toEqual({
@@ -46,7 +42,7 @@ describe('UpdateSetting', () => {
       value: 'REPLACED',
     }
 
-    const subject = await makeSubject() 
+    const subject = await makeSubject()
     const actual: UpdateSettingResponse = await subject.execute({
       userUuid,
       props,

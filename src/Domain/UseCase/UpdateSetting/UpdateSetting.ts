@@ -3,17 +3,15 @@ import { UpdateSettingDto } from './UpdateSettingDto'
 import { UpdateSettingResponse } from './UpdateSettingResponse'
 import { UseCaseInterface } from '../UseCaseInterface'
 import TYPES from '../../../Bootstrap/Types'
-import { SettingRepositoryInterface } from '../../Setting/SettingRepositoryInterface'
 import { UserRepositoryInterface } from '../../User/UserRepositoryInterface'
 import { CreateOrReplaceSettingStatus } from '../../Setting/CreateOrReplaceSettingStatus'
-import { SettingFactory } from '../../Setting/SettingFactory'
+import { SettingPersister } from '../../Setting/SettingPersister'
 
 @injectable()
 export class UpdateSetting implements UseCaseInterface {
   constructor (
-    @inject(TYPES.SettingRepository) private settingRepository: SettingRepositoryInterface,
+    @inject(TYPES.SettingPersister) private settingPersister: SettingPersister,
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
-    @inject(TYPES.SettingFactory) private settingFactory: SettingFactory,
   ) {}
 
   async execute(dto: UpdateSettingDto): Promise<UpdateSettingResponse> {
@@ -30,10 +28,10 @@ export class UpdateSetting implements UseCaseInterface {
       }
     }
 
-    const status = await this.settingRepository.createOrReplace({
+    const status = await this.settingPersister.createOrReplace({
       user,
       props,
-    }, this.settingFactory)
+    })
 
     return {
       success: true,

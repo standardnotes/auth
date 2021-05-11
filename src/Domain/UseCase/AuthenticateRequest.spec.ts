@@ -21,6 +21,7 @@ describe('AuthenticateRequest', () => {
     logger.info = jest.fn()
     logger.warn = jest.fn()
     logger.error = jest.fn()
+    logger.debug = jest.fn()
   })
 
   it('should authorize request', async () => {
