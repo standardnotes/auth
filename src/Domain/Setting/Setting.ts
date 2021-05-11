@@ -1,4 +1,4 @@
-import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm'
+import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
 import { User } from '../User/User'
 import { v4 as uuidv4 } from 'uuid'
 import dayjs = require('dayjs')
@@ -12,10 +12,10 @@ export class Setting {
   static create(props: SettingProps, user: User): Setting {
     const uuid = uuidv4()
 
-    const { 
-      name, 
-      value, 
-      serverEncryptionVersion = Setting.DEFAULT_ENCRYPTION_VERSION, 
+    const {
+      name,
+      value,
+      serverEncryptionVersion = Setting.DEFAULT_ENCRYPTION_VERSION,
     } = props
 
     const setting: Setting = {
@@ -32,19 +32,17 @@ export class Setting {
   }
 
   static async createReplacement(
-    original: Setting, 
+    original: Setting,
     props: SettingProps,
   ): Promise<Setting> {
     const { uuid, user } = original
-    
+
     return Object.assign(Setting.create(props, await user), {
       uuid,
     })
   }
 
-  @PrimaryColumn({
-    length: 36,
-  })
+  @PrimaryGeneratedColumn('uuid')
   uuid: string
 
   @Column({
