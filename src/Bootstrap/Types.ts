@@ -23,6 +23,8 @@ const TYPES = {
   RoleProjector: Symbol.for('RoleProjector'),
   PermissionProjector: Symbol.for('PermissionProjector'),
   SettingProjector: Symbol.for('SettingProjector'),
+  // Factories
+  SettingFactory: Symbol.for('SettingFactory'),
   // env vars
   JWT_SECRET: Symbol.for('JWT_SECRET'),
   LEGACY_JWT_SECRET: Symbol.for('LEGACY_JWT_SECRET'),
@@ -71,6 +73,7 @@ const TYPES = {
   // Services
   DeviceDetector: Symbol.for('DeviceDetector'),
   SessionService: Symbol.for('SessionService'),
+  SettingService: Symbol.for('SettingService'),
   ContentDecoder: Symbol.for('ContentDecoder'),
   AuthResponseFactory20161215: Symbol.for('AuthResponseFactory20161215'),
   AuthResponseFactory20190520: Symbol.for('AuthResponseFactory20190520'),

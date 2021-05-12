@@ -3,14 +3,14 @@ import { UpdateSettingDto } from './UpdateSettingDto'
 import { UpdateSettingResponse } from './UpdateSettingResponse'
 import { UseCaseInterface } from '../UseCaseInterface'
 import TYPES from '../../../Bootstrap/Types'
-import { SettingRepositoryInterface } from '../../Setting/SettingRepositoryInterface'
 import { UserRepositoryInterface } from '../../User/UserRepositoryInterface'
 import { CreateOrReplaceSettingStatus } from '../../Setting/CreateOrReplaceSettingStatus'
+import { SettingService } from '../../Setting/SettingService'
 
 @injectable()
 export class UpdateSetting implements UseCaseInterface {
   constructor (
-    @inject(TYPES.SettingRepository) private settingRepository: SettingRepositoryInterface,
+    @inject(TYPES.SettingService) private settingService: SettingService,
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
   ) {}
 
@@ -27,14 +27,14 @@ export class UpdateSetting implements UseCaseInterface {
         },
       }
     }
-    
-    const status = await this.settingRepository.createOrReplace({
+
+    const status = await this.settingService.createOrReplace({
       user,
       props,
     })
 
-    return { 
-      success: true, 
+    return {
+      success: true,
       statusCode: this.statusToStatusCode(status),
     }
   }

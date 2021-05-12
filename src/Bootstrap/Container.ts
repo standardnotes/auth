@@ -75,6 +75,8 @@ import { GetAuthMethods } from '../Domain/UseCase/GetAuthMethods/GetAuthMethods'
 import { AccountDeletionRequestedEventHandler } from '../Domain/Handler/AccountDeletionRequestedEventHandler'
 import { DeleteAccount } from '../Domain/UseCase/DeleteAccount/DeleteAccount'
 import { DeleteSetting } from '../Domain/UseCase/DeleteSetting/DeleteSetting'
+import { SettingFactory } from '../Domain/Setting/SettingFactory'
+import { SettingService } from '../Domain/Setting/SettingService'
 
 export class ContainerConfigLoader {
   async load(): Promise<Container> {
@@ -134,8 +136,8 @@ export class ContainerConfigLoader {
     const logger = winston.createLogger({
       level: env.get('LOG_LEVEL') || 'info',
       format: winston.format.combine(
+        winston.format.json({ space: 2 }),
         winston.format.splat(),
-        winston.format.json(),
       ),
       transports: [
         new winston.transports.Console({ level: env.get('LOG_LEVEL') || 'info' }),
@@ -178,6 +180,9 @@ export class ContainerConfigLoader {
     container.bind<RoleProjector>(TYPES.RoleProjector).to(RoleProjector)
     container.bind<PermissionProjector>(TYPES.PermissionProjector).to(PermissionProjector)
     container.bind<SettingProjector>(TYPES.SettingProjector).to(SettingProjector)
+
+    // Factories
+    container.bind<SettingFactory>(TYPES.SettingFactory).to(SettingFactory)
 
     // env vars
     container.bind(TYPES.JWT_SECRET).toConstantValue(env.get('JWT_SECRET'))
@@ -239,6 +244,7 @@ export class ContainerConfigLoader {
     container.bind<DomainEventFactory>(TYPES.DomainEventFactory).to(DomainEventFactory)
     container.bind<superagent.SuperAgentStatic>(TYPES.HTTPClient).toConstantValue(superagent)
     container.bind<CrypterInterface>(TYPES.Crypter).to(CrypterNode)
+    container.bind<SettingService>(TYPES.SettingService).to(SettingService)
 
     container.bind<SnCryptoNode>(TYPES.SnCryptoNode).toConstantValue(new SnCryptoNode())
 

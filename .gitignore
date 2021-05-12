@@ -3,6 +3,7 @@ node_modules
 dist
 
 yarn-error.log
+newrelic_agent.log
 
 # Coverage
 coverage
