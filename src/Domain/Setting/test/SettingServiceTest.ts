@@ -1,11 +1,11 @@
 import { Setting } from '../Setting'
 import { SettingFactory } from '../SettingFactory'
-import { SettingPersister } from '../SettingPersister'
+import { SettingService } from '../SettingService'
 import { SettingRepositoryInterface } from '../SettingRepositoryInterface'
 import { SettingFactoryTest } from './SettingFactoryTest'
 import { SettingRepostioryStub } from './SettingRepositoryStub'
 
-export class SettingPersisterTest {
+export class SettingServiceTest {
   static makeSubject({
     settings = [],
     factory = SettingFactoryTest.makeSubject(),
@@ -14,8 +14,8 @@ export class SettingPersisterTest {
     settings?: Setting[],
     factory?: SettingFactory,
     repository?: SettingRepositoryInterface
-  } = {}): SettingPersister {
-    return new SettingPersister(
+  } = {}): SettingService {
+    return new SettingService(
       factory,
       repository,
     )

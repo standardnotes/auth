@@ -1,7 +1,7 @@
 import { Setting } from '../../Domain/Setting/Setting'
-import { SettingPersister } from '../../Domain/Setting/SettingPersister'
+import { SettingService } from '../../Domain/Setting/SettingService'
 import { SettingRepositoryInterface } from '../../Domain/Setting/SettingRepositoryInterface'
-import { SettingPersisterTest } from '../../Domain/Setting/test/SettingPersisterTest'
+import { SettingServiceTest } from '../../Domain/Setting/test/SettingServiceTest'
 import { SettingRepostioryStub } from '../../Domain/Setting/test/SettingRepositoryStub'
 import { DeleteAccount } from '../../Domain/UseCase/DeleteAccount/DeleteAccount'
 import { DeleteSettingTest } from '../../Domain/UseCase/DeleteSetting/test/DeleteSettingTest'
@@ -24,7 +24,7 @@ export class UsersControllerTest {
     updateUser,
     deleteAccount,
     settingRepository = new SettingRepostioryStub(settings),
-    settingPersister = SettingPersisterTest.makeSubject({
+    settingService = SettingServiceTest.makeSubject({
       repository: settingRepository,
     }),
     projector = SettingProjectorTest.get(),
@@ -35,7 +35,7 @@ export class UsersControllerTest {
     updateUser: UpdateUser,
     deleteAccount: DeleteAccount
     settingRepository?: SettingRepositoryInterface,
-    settingPersister?: SettingPersister,
+    settingService?: SettingService,
     projector?: SettingProjector,
     userRepository?: UserRepositoryInterface,
     keyParamsFactory?: KeyParamsFactoryInterface
@@ -55,7 +55,7 @@ export class UsersControllerTest {
         keyParamsFactory,
       }),
       UpdateSettingTest.makeSubject({
-        settingPersister,
+        settingService,
         userRepository,
       }),
       deleteAccount,

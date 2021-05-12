@@ -76,7 +76,7 @@ import { AccountDeletionRequestedEventHandler } from '../Domain/Handler/AccountD
 import { DeleteAccount } from '../Domain/UseCase/DeleteAccount/DeleteAccount'
 import { DeleteSetting } from '../Domain/UseCase/DeleteSetting/DeleteSetting'
 import { SettingFactory } from '../Domain/Setting/SettingFactory'
-import { SettingPersister } from '../Domain/Setting/SettingPersister'
+import { SettingService } from '../Domain/Setting/SettingService'
 
 export class ContainerConfigLoader {
   async load(): Promise<Container> {
@@ -168,9 +168,6 @@ export class ContainerConfigLoader {
     container.bind<RedisEphemeralSessionRepository>(TYPES.EphemeralSessionRepository).to(RedisEphemeralSessionRepository)
     container.bind<LockRepository>(TYPES.LockRepository).to(LockRepository)
 
-    // Persisters
-    container.bind<SettingPersister>(TYPES.SettingPersister).to(SettingPersister)
-
     // Middleware
     container.bind<AuthMiddleware>(TYPES.AuthMiddleware).to(AuthMiddleware)
     container.bind<SessionMiddleware>(TYPES.SessionMiddleware).to(SessionMiddleware)
@@ -247,6 +244,7 @@ export class ContainerConfigLoader {
     container.bind<DomainEventFactory>(TYPES.DomainEventFactory).to(DomainEventFactory)
     container.bind<superagent.SuperAgentStatic>(TYPES.HTTPClient).toConstantValue(superagent)
     container.bind<CrypterInterface>(TYPES.Crypter).to(CrypterNode)
+    container.bind<SettingService>(TYPES.SettingService).to(SettingService)
 
     container.bind<SnCryptoNode>(TYPES.SnCryptoNode).toConstantValue(new SnCryptoNode())
 

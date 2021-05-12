@@ -5,12 +5,12 @@ import { UseCaseInterface } from '../UseCaseInterface'
 import TYPES from '../../../Bootstrap/Types'
 import { UserRepositoryInterface } from '../../User/UserRepositoryInterface'
 import { CreateOrReplaceSettingStatus } from '../../Setting/CreateOrReplaceSettingStatus'
-import { SettingPersister } from '../../Setting/SettingPersister'
+import { SettingService } from '../../Setting/SettingService'
 
 @injectable()
 export class UpdateSetting implements UseCaseInterface {
   constructor (
-    @inject(TYPES.SettingPersister) private settingPersister: SettingPersister,
+    @inject(TYPES.SettingService) private settingService: SettingService,
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
   ) {}
 
@@ -28,7 +28,7 @@ export class UpdateSetting implements UseCaseInterface {
       }
     }
 
-    const status = await this.settingPersister.createOrReplace({
+    const status = await this.settingService.createOrReplace({
       user,
       props,
     })

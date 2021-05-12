@@ -1,11 +1,11 @@
 import 'reflect-metadata'
 import { UserTest } from '../User/test/UserTest'
-import { SettingPersisterTest } from './test/SettingPersisterTest'
+import { SettingServiceTest as SettingServiceTest } from './test/SettingServiceTest'
 import { SettingTest } from './test/SettingTest'
 
-describe('SettingPersister', () => {
+describe('SettingService', () => {
   it('should create setting if it doesn\'t exist', async () => {
-    const persister = SettingPersisterTest.makeSubject()
+    const persister = SettingServiceTest.makeSubject()
     const user = UserTest.makeSubject({})
 
     const result = await persister.createOrReplace({
@@ -22,7 +22,7 @@ describe('SettingPersister', () => {
   it('should replace setting if it does exist', async () => {
     const user = UserTest.makeSubject({})
     const setting = SettingTest.makeSubject({}, user)
-    const persister = SettingPersisterTest.makeSubject({
+    const persister = SettingServiceTest.makeSubject({
       settings: [setting],
     })
 

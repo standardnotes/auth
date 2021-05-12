@@ -6,7 +6,7 @@ import { SettingFactory } from './SettingFactory'
 import { SettingRepositoryInterface } from './SettingRepositoryInterface'
 
 @injectable()
-export class SettingPersister {
+export class SettingService {
   constructor(
     @inject(TYPES.SettingFactory) private factory: SettingFactory,
     @inject(TYPES.SettingRepository) public repository: SettingRepositoryInterface,

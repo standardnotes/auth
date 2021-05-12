@@ -12,8 +12,6 @@ const TYPES = {
   SettingRepository: Symbol.for('SettingRepository'),
   LockRepository: Symbol.for('LockRepository'),
   RoleRepository: Symbol.for('RoleRepository'),
-  // Persisters
-  SettingPersister: Symbol.for('SettingPersister'),
   // Middleware
   AuthMiddleware: Symbol.for('AuthMiddleware'),
   AuthMiddlewareWithoutResponse: Symbol.for('AuthMiddlewareWithoutResponse'),
@@ -75,6 +73,7 @@ const TYPES = {
   // Services
   DeviceDetector: Symbol.for('DeviceDetector'),
   SessionService: Symbol.for('SessionService'),
+  SettingService: Symbol.for('SettingService'),
   ContentDecoder: Symbol.for('ContentDecoder'),
   AuthResponseFactory20161215: Symbol.for('AuthResponseFactory20161215'),
   AuthResponseFactory20190520: Symbol.for('AuthResponseFactory20190520'),
