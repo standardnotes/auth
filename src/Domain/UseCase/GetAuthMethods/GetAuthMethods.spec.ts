@@ -1,16 +1,16 @@
+import { MfaSetting } from '@standardnotes/auth'
 import 'reflect-metadata'
-import { SETTINGS } from '../../Setting/Settings'
 import { UserTest } from '../../User/test/UserTest'
 import { GetAuthMethodsDto } from './GetAuthMethodsDto'
 import { GetAuthMethodsTest } from './test/GetAuthMethodsTest'
 
 describe('GetAuthMethods', () => {
   const mfaSecretUuid = 'mfa-secret-uuid'
-  const user = UserTest.makeSubject({ 
+  const user = UserTest.makeSubject({
     uuid: 'user-with-settings-uuid',
   }, {
     settings: [
-      { uuid: mfaSecretUuid, name: SETTINGS.MFA_SECRET, value: 'mfa-secret' },
+      { uuid: mfaSecretUuid, name: MfaSetting.MfaSecret, value: 'mfa-secret' },
     ],
   })
   const execute = async (dto: GetAuthMethodsDto) => GetAuthMethodsTest.makeSubject({

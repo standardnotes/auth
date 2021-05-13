@@ -2,13 +2,12 @@ import { inject, injectable } from 'inversify'
 import { authenticator } from 'otplib'
 import TYPES from '../../Bootstrap/Types'
 import { SettingRepositoryInterface } from '../Setting/SettingRepositoryInterface'
-import { SETTINGS } from '../Setting/Settings'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { UseCaseInterface } from './UseCaseInterface'
 import { VerifyMFADTO } from './VerifyMFADTO'
 import { VerifyMFAResponse } from './VerifyMFAResponse'
 import { CrypterInterface } from '../Encryption/CrypterInterface'
-import { ErrorTag } from '@standardnotes/auth'
+import { ErrorTag, MfaSetting } from '@standardnotes/auth'
 
 @injectable()
 export class VerifyMFA implements UseCaseInterface {
@@ -27,7 +26,7 @@ export class VerifyMFA implements UseCaseInterface {
       }
     }
 
-    const mfaSecretSetting = await this.settingRepository.findOneByNameAndUserUuid(SETTINGS.MFA_SECRET, user.uuid)
+    const mfaSecretSetting = await this.settingRepository.findOneByNameAndUserUuid(MfaSetting.MfaSecret, user.uuid)
 
     if (!mfaSecretSetting) {
       return {

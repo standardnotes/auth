@@ -5,7 +5,7 @@ import { UseCaseInterface } from '../UseCaseInterface'
 import TYPES from '../../../Bootstrap/Types'
 import { SettingRepositoryInterface } from '../../Setting/SettingRepositoryInterface'
 import { UserRepositoryInterface } from '../../User/UserRepositoryInterface'
-import { SETTINGS } from '../../Setting/Settings'
+import { MfaSetting } from '@standardnotes/auth'
 
 @injectable()
 export class GetAuthMethods implements UseCaseInterface {
@@ -24,18 +24,14 @@ export class GetAuthMethods implements UseCaseInterface {
     }
 
     const mfaSetting = await this.settingRepository.findOneByNameAndUserUuid(
-      SETTINGS.MFA_SECRET, 
+      MfaSetting.MfaSecret,
       user.uuid,
     )
-
-    const totp = mfaSetting && {
-      mfaSecretUuid: mfaSetting.uuid,
-    }
 
     return {
       success: true,
       methods: {
-        totp,
+        ...(mfaSetting === undefined? {}: { totp: true }),
       },
     }
   }

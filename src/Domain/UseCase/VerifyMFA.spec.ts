@@ -5,9 +5,8 @@ import { User } from '../User/User'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { VerifyMFA } from './VerifyMFA'
 import { SettingRepositoryInterface } from '../Setting/SettingRepositoryInterface'
-import { SETTINGS } from '../Setting/Settings'
 import { CrypterInterface } from '../Encryption/CrypterInterface'
-import { ErrorTag } from '@standardnotes/auth'
+import { ErrorTag, MfaSetting } from '@standardnotes/auth'
 
 describe('VerifyMFA', () => {
   let user: User
@@ -45,7 +44,7 @@ describe('VerifyMFA', () => {
 
   it('should not pass MFA verification if mfa param is not found in the request', async () => {
     settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue({
-      name: SETTINGS.MFA_SECRET,
+      name: MfaSetting.MfaSecret,
       value: '1:shhhh:qwerty',
     })
 
@@ -58,7 +57,7 @@ describe('VerifyMFA', () => {
 
   it('should not pass MFA verification if mfa is not correct', async () => {
     settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue({
-      name: SETTINGS.MFA_SECRET,
+      name: MfaSetting.MfaSecret,
       value: '1:zzqwrq:qwerty',
     })
 
@@ -73,7 +72,7 @@ describe('VerifyMFA', () => {
 
   it('should pass MFA verification if mfa key is correct', async () => {
     settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue({
-      name: SETTINGS.MFA_SECRET,
+      name: MfaSetting.MfaSecret,
       value: '1:shhhh:qwerty',
     })
 

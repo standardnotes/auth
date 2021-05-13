@@ -22,8 +22,8 @@
     "worker": "node dist/bin/worker.js"
   },
   "dependencies": {
-    "@standardnotes/auth": "2.2.0",
     "@newrelic/native-metrics": "^6.0.0",
+    "@standardnotes/auth": "3.0.0",
     "@standardnotes/domain-events": "1.1.2",
     "@standardnotes/sncrypto-common": "^1.3.0",
     "@standardnotes/sncrypto-node": "^1.3.0",
