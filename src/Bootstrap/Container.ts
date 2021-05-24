@@ -13,6 +13,7 @@ import {
   SNSDomainEventPublisher,
   SQSDomainEventSubscriberFactory,
   SQSEventMessageHandler,
+  SQSNewRelicEventMessageHandler,
 } from '@standardnotes/domain-events'
 import { UAParser } from 'ua-parser-js'
 
@@ -204,6 +205,7 @@ export class ContainerConfigLoader {
     container.bind(TYPES.USER_SERVER_REGISTRATION_URL).toConstantValue(env.get('USER_SERVER_REGISTRATION_URL', true))
     container.bind(TYPES.USER_SERVER_AUTH_KEY).toConstantValue(env.get('USER_SERVER_AUTH_KEY', true))
     container.bind(TYPES.REDIS_EVENTS_CHANNEL).toConstantValue(env.get('REDIS_EVENTS_CHANNEL'))
+    container.bind(TYPES.NEW_RELIC_ENABLED).toConstantValue(env.get('NEW_RELIC_ENABLED', true))
 
     // use cases
     container.bind<AuthenticateUser>(TYPES.AuthenticateUser).to(AuthenticateUser)
@@ -271,7 +273,9 @@ export class ContainerConfigLoader {
 
     if (env.get('SQS_QUEUE_URL', true)) {
       container.bind<DomainEventMessageHandlerInterface>(TYPES.DomainEventMessageHandler).toConstantValue(
-        new SQSEventMessageHandler(eventHandlers, container.get(TYPES.Logger))
+        env.get('NEW_RELIC_ENABLED', true) === 'true' ?
+          new SQSNewRelicEventMessageHandler(eventHandlers, container.get(TYPES.Logger)) :
+          new SQSEventMessageHandler(eventHandlers, container.get(TYPES.Logger))
       )
       container.bind<DomainEventSubscriberFactoryInterface>(TYPES.DomainEventSubscriberFactory).toConstantValue(
         new SQSDomainEventSubscriberFactory(
