@@ -7,6 +7,7 @@ import { VerifyMFA } from './VerifyMFA'
 import { SettingRepositoryInterface } from '../Setting/SettingRepositoryInterface'
 import { SETTINGS } from '../Setting/Settings'
 import { CrypterInterface } from '../Encryption/CrypterInterface'
+import { ErrorTag } from '@standardnotes/auth'
 
 describe('VerifyMFA', () => {
   let user: User
@@ -50,7 +51,7 @@ describe('VerifyMFA', () => {
 
     expect(await createVerifyMFA().execute({ email: 'test@test.te', token: '' })).toEqual({
       success: false,
-      errorTag: 'mfa-required',
+      errorTag: ErrorTag.MfaRequired,
       errorMessage: 'Please enter your two-factor authentication code.',
     })
   })
@@ -65,7 +66,7 @@ describe('VerifyMFA', () => {
 
     expect(await createVerifyMFA().execute({ email: 'test@test.te', token: 'invalid-token' })).toEqual({
       success: false,
-      errorTag: 'mfa-invalid',
+      errorTag: ErrorTag.MfaInvalid,
       errorMessage: 'The two-factor authentication code you entered is incorrect. Please try again.',
     })
   })

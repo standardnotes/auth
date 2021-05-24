@@ -5,6 +5,7 @@ import { NextFunction, Request, Response } from 'express'
 import { User } from '../Domain/User/User'
 import { AuthenticateRequest } from '../Domain/UseCase/AuthenticateRequest'
 import { Session } from '../Domain/Session/Session'
+import { Logger } from 'winston'
 
 describe('AuthMiddleware', () => {
   let authenticateRequest: AuthenticateRequest
@@ -12,7 +13,14 @@ describe('AuthMiddleware', () => {
   let response: Response
   let next: NextFunction
 
-  const createMiddleware = () => new AuthMiddleware(authenticateRequest)
+  const logger = {
+    debug: jest.fn(),
+  } as unknown as jest.Mocked<Logger>
+
+  const createMiddleware = () => new AuthMiddleware(
+    authenticateRequest,
+    logger,
+  )
 
   beforeEach(() => {
     authenticateRequest = {} as jest.Mocked<AuthenticateRequest>

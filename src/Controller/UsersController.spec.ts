@@ -16,6 +16,7 @@ import { GetUserKeyParams } from '../Domain/UseCase/GetUserKeyParams/GetUserKeyP
 import { UserRepostioryStub } from '../Domain/User/test/UserRepostioryStub'
 import { UpdateSetting } from '../Domain/UseCase/UpdateSetting/UpdateSetting'
 import { DeleteAccount } from '../Domain/UseCase/DeleteAccount/DeleteAccount'
+import { DeleteSetting } from '../Domain/UseCase/DeleteSetting/DeleteSetting'
 
 describe('UsersController', () => {
   let updateUser: UpdateUser
@@ -31,6 +32,7 @@ describe('UsersController', () => {
     {} as jest.Mocked<GetUserKeyParams>,
     {} as jest.Mocked<UpdateSetting>,
     deleteAccount,
+    {} as jest.Mocked<DeleteSetting>,
   )
 
   beforeEach(() => {
@@ -344,7 +346,7 @@ describe('UsersController', () => {
       response,
     )
 
-    expect(actual.statusCode).toEqual(201)
+    expect(actual).toMatchObject({ statusCode: 201 })
   })
 
   it('should replace user setting for vaild user uuid', async () => {
@@ -374,7 +376,7 @@ describe('UsersController', () => {
       response,
     )
 
-    expect(actual.statusCode).toEqual(204)
+    expect(actual).toMatchObject({ statusCode: 204 })
   })
 
   it('should replace user setting for nonexistent user uuid', async () => {
@@ -397,7 +399,7 @@ describe('UsersController', () => {
       response,
     )
 
-    expect(actual.statusCode).toEqual(400)
+    expect(actual).toMatchObject({ statusCode: 400 })
   })
 
   it('should error when creating/replacing user setting for invaild user uuid', async () => {
@@ -417,6 +419,84 @@ describe('UsersController', () => {
     })
 
     const actual = await subject.updateSetting(request, response)
+
+    expect(actual).toMatchObject({ json: { error: expect.anything() } })
+  })
+
+  it('should delete user setting if it exists', async () => {
+    const user = UserTest.makeWithSettings()
+    const userUuid = user.uuid
+    const settings = await user.settings
+    const setting = settings[0]
+    const request: Partial<express.Request> = {
+      params: { userUuid, settingName: setting.name },
+    }
+    const response: Partial<express.Response> = {
+      locals: { user },
+    }
+
+    const subject = UsersControllerTest.makeSubject({
+      updateUser,
+      deleteAccount,
+      settingRepository: new SettingRepostioryStub(settings),
+    })
+
+    const actual = await subject.deleteSetting(
+      request as express.Request,
+      response as express.Response,
+    )
+
+    expect(actual.statusCode).toEqual(200)
+  })
+
+  it('should fail to delete user setting if it does not exist', async () => {
+    const user = UserTest.makeSubject({})
+    const userUuid = user.uuid
+    const request: Partial<express.Request> = {
+      params: { userUuid, settingName: 'BAD' },
+    }
+    const response: Partial<express.Response> = {
+      locals: { user },
+    }
+
+    const subject = UsersControllerTest.makeSubject({
+      updateUser,
+      deleteAccount,
+    })
+
+    const actual = await subject.deleteSetting(
+      request as express.Request,
+      response as express.Response,
+    )
+
+    expect(actual.statusCode).toEqual(400)
+  })
+
+  it('should error when deleting user setting for invaild user uuid', async () => {
+    const userUuid = 'user-1'
+    const badUserUuid = 'BAD-user-uuid'
+    const user = UserTest.makeSubject({
+      uuid: userUuid,
+    })
+    const request: Partial<express.Request> = {
+      params: {
+        userUuid: badUserUuid,
+        settingName: 'irrelevant',
+      },
+    }
+    const response: Partial<express.Response> = {
+      locals: { user },
+    }
+
+    const subject = UsersControllerTest.makeSubject({
+      updateUser,
+      deleteAccount,
+    })
+
+    const actual = await subject.deleteSetting(
+      request as express.Request,
+      response as express.Response,
+    )
 
     expect(actual.json).toHaveProperty('error')
   })

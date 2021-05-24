@@ -1,4 +1,4 @@
-import { Column, Entity, Index, JoinTable, ManyToMany, OneToMany, PrimaryColumn } from 'typeorm'
+import { Column, Entity, Index, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
 import { RevokedSession } from '../Session/RevokedSession'
 import { Role } from '../Role/Role'
 import { Setting } from '../Setting/Setting'
@@ -9,9 +9,7 @@ export class User {
   static readonly PASSWORD_HASH_COST = 11
   static readonly DEFAULT_ENCRYPTION_VERSION = 1
 
-  @PrimaryColumn({
-    length: 36,
-  })
+  @PrimaryGeneratedColumn('uuid')
   uuid: string
 
   @Column({

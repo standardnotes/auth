@@ -1,11 +1,9 @@
-import { Column, Entity, Index, JoinTable, ManyToMany, PrimaryColumn } from 'typeorm'
+import { Column, Entity, Index, JoinTable, ManyToMany, PrimaryGeneratedColumn } from 'typeorm'
 import { Role } from '../Role/Role'
 
 @Entity({ name: 'permissions' })
 export class Permission {
-  @PrimaryColumn({
-    length: 36,
-  })
+  @PrimaryGeneratedColumn('uuid')
   uuid: string
 
   @Column({

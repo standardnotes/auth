@@ -13,6 +13,7 @@ import {
 import TYPES from '../Bootstrap/Types'
 import { Setting } from '../Domain/Setting/Setting'
 import { DeleteAccount } from '../Domain/UseCase/DeleteAccount/DeleteAccount'
+import { DeleteSetting } from '../Domain/UseCase/DeleteSetting/DeleteSetting'
 import { GetSetting } from '../Domain/UseCase/GetSetting/GetSetting'
 import { GetSettings } from '../Domain/UseCase/GetSettings/GetSettings'
 import { GetUserKeyParams } from '../Domain/UseCase/GetUserKeyParams/GetUserKeyParams'
@@ -28,6 +29,7 @@ export class UsersController extends BaseHttpController {
     @inject(TYPES.GetUserKeyParams) private getUserKeyParams: GetUserKeyParams,
     @inject(TYPES.UpdateSetting) private doUpdateSetting: UpdateSetting,
     @inject(TYPES.DeleteAccount) private doDeleteAccount: DeleteAccount,
+    @inject(TYPES.DeleteSetting) private doDeleteSetting: DeleteSetting,
   ) {
     super()
   }
@@ -97,7 +99,7 @@ export class UsersController extends BaseHttpController {
   }
 
   @httpPut('/:userUuid/settings', TYPES.AuthMiddleware)
-  async updateSetting(request: Request, response: Response): Promise<results.JsonResult> {
+  async updateSetting(request: Request, response: Response): Promise<results.JsonResult | results.StatusCodeResult> {
     if (request.params.userUuid !== response.locals.user.uuid) {
       return this.json({
         error: {
@@ -125,7 +127,31 @@ export class UsersController extends BaseHttpController {
     })
 
     if (result.success) {
-      return this.json({}, result.statusCode)
+      return this.statusCode(result.statusCode)
+    }
+
+    return this.json(result, 400)
+  }
+
+  @httpDelete('/:userUuid/settings/:settingName', TYPES.AuthMiddleware)
+  async deleteSetting(request: Request, response: Response): Promise<results.JsonResult> {
+    if (request.params.userUuid !== response.locals.user.uuid) {
+      return this.json({
+        error: {
+          message: 'Operation not allowed.',
+        },
+      }, 401)
+    }
+
+    const { userUuid, settingName } = request.params
+
+    const result = await this.doDeleteSetting.execute({
+      userUuid,
+      settingName,
+    })
+
+    if (result.success) {
+      return this.json(result)
     }
 
     return this.json(result, 400)

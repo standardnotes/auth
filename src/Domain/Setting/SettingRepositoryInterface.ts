@@ -1,10 +1,11 @@
-import { CreateOrReplaceSettingDto } from './CreateOrReplaceSettingDto'
-import { CreateOrReplaceSettingStatus } from './CreateOrReplaceSettingStatus'
+import { DeleteSettingDto } from '../UseCase/DeleteSetting/DeleteSettingDto'
 import { Setting } from './Setting'
 
 export interface SettingRepositoryInterface {
   findOneByNameAndUserUuid(name: string, userUuid: string): Promise<Setting | undefined>
   findAllByUserUuid(userUuid: string): Promise<Setting[]>
 
-  createOrReplace(setting: CreateOrReplaceSettingDto): Promise<CreateOrReplaceSettingStatus>
+  deleteByUserUuid(dto: DeleteSettingDto): Promise<void>
+
+  save(setting: Setting): Promise<Setting>
 }

@@ -20,7 +20,9 @@ export class GetSetting implements UseCaseInterface {
     if (setting === undefined) {
       return {
         success: false,
-        error: `Setting ${settingName} for user ${userUuid} not found!`,
+        error: {
+          message: `Setting ${settingName} for user ${userUuid} not found!`,
+        },
       }
     }
 

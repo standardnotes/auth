@@ -1,13 +1,15 @@
 import { NextFunction, Request, Response } from 'express'
 import { inject, injectable } from 'inversify'
 import { BaseMiddleware } from 'inversify-express-utils'
+import { Logger } from 'winston'
 import TYPES from '../Bootstrap/Types'
 import { AuthenticateRequest } from '../Domain/UseCase/AuthenticateRequest'
 
 @injectable()
 export class AuthMiddleware extends BaseMiddleware {
   constructor (
-    @inject(TYPES.AuthenticateRequest) private authenticateRequest: AuthenticateRequest
+    @inject(TYPES.AuthenticateRequest) private authenticateRequest: AuthenticateRequest,
+    @inject(TYPES.Logger) private logger: Logger,
   ) {
     super()
   }
@@ -16,6 +18,8 @@ export class AuthMiddleware extends BaseMiddleware {
     const authenticateRequestResponse = await this.authenticateRequest.execute({ authorizationHeader: request.headers.authorization })
 
     if (!authenticateRequestResponse.success) {
+      this.logger.debug('AuthMiddleware authentication failure.')
+
       response.status(authenticateRequestResponse.responseCode).send({
         error: {
           tag: authenticateRequestResponse.errorTag,

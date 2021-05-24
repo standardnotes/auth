@@ -1,10 +1,9 @@
-import { SimpleSetting } from '../../Setting/SimpleSetting'
 import { Uuid } from '@standardnotes/auth'
 
-export type GetSettingResponse = {
+export type DeleteSettingResponse = {
   success: true,
   userUuid: Uuid,
-  setting: SimpleSetting,
+  settingName: string,
 } | {
   success: false,
   error: {

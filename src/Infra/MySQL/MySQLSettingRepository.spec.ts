@@ -2,8 +2,6 @@ import 'reflect-metadata'
 
 import { SelectQueryBuilder } from 'typeorm'
 import { Setting } from '../../Domain/Setting/Setting'
-import { SettingTest } from '../../Domain/Setting/test/SettingTest'
-import { UserTest } from '../../Domain/User/test/UserTest'
 
 import { MySQLSettingRepository } from './MySQLSettingRepository'
 
@@ -12,12 +10,16 @@ describe('MySQLSettingRepository', () => {
   let queryBuilder: SelectQueryBuilder<Setting>
   let setting: Setting
 
+  const makeSubject = () => {
+    return new MySQLSettingRepository()
+  }
+
   beforeEach(() => {
     queryBuilder = {} as jest.Mocked<SelectQueryBuilder<Setting>>
 
     setting = {} as jest.Mocked<Setting>
 
-    repository = new MySQLSettingRepository()
+    repository = makeSubject()
     jest.spyOn(repository, 'createQueryBuilder')
     repository.createQueryBuilder = jest.fn().mockImplementation(() => queryBuilder)
   })
@@ -37,7 +39,7 @@ describe('MySQLSettingRepository', () => {
 
     const settings = [setting]
     queryBuilder.getMany = jest.fn().mockReturnValue(settings)
-    
+
     const userUuid = '123'
     const result = await repository.findAllByUserUuid(userUuid)
 
@@ -45,42 +47,20 @@ describe('MySQLSettingRepository', () => {
     expect(result).toEqual(settings)
   })
 
-  it('should create setting if it doesn\'t exist', async () => {
-    const repository = new MySQLSettingRepository()
-    const user = UserTest.makeSubject({})
-    Object.assign(repository, {
-      findOneByNameAndUserUuid: async () => undefined,
-      save: (async () => undefined),
+  it('should delete setting if it does exist', async () => {
+    const queryBuilder = {
+      delete: () => queryBuilder,
+      where: () => queryBuilder,
+      execute: () => undefined,
+    }
+    const repository = Object.assign(makeSubject(), {
+      createQueryBuilder: () => queryBuilder,
+    })
+    const result = await repository.deleteByUserUuid({
+      userUuid: 'userUuid',
+      settingName: 'settingName',
     })
 
-    const result = await repository.createOrReplace({
-      user: user,
-      props: {
-        name: 'name',
-        value: 'value',
-        serverEncryptionVersion: 999,
-      },
-    })
-
-    expect(result).toEqual('created')
-  })
-  it('should replace setting if it does exist', async () => {
-    const repository = new MySQLSettingRepository()
-    const user = UserTest.makeSubject({})
-    Object.assign(repository, {
-      findOneByNameAndUserUuid: async () => SettingTest.makeSubject({}, user),
-      save: (async () => undefined),
-    })
-
-    const result = await repository.createOrReplace({
-      user: user,
-      props: {
-        name: 'name',
-        value: 'value',
-        serverEncryptionVersion: 999,
-      },
-    })
-
-    expect(result).toEqual('replaced')
+    expect(result).toEqual(undefined)
   })
 })
