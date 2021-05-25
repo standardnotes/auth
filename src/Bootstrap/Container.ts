@@ -137,8 +137,8 @@ export class ContainerConfigLoader {
     const logger = winston.createLogger({
       level: env.get('LOG_LEVEL') || 'info',
       format: winston.format.combine(
-        winston.format.json({ space: 2 }),
         winston.format.splat(),
+        winston.format.json(),
       ),
       transports: [
         new winston.transports.Console({ level: env.get('LOG_LEVEL') || 'info' }),
