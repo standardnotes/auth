@@ -49,11 +49,12 @@ describe('AccountDeletionRequestedEventHandler', () => {
 
     ephemeralSession = {
       uuid: '2-3-4',
+      userUuid: '1-2-3',
     } as jest.Mocked<EphemeralSession>
 
     ephemeralSessionRepository = {} as jest.Mocked<EphemeralSessionRepositoryInterface>
     ephemeralSessionRepository.findAllByUserUuid = jest.fn().mockReturnValue([ ephemeralSession ])
-    ephemeralSessionRepository.deleteOneByUuid = jest.fn()
+    ephemeralSessionRepository.deleteOne = jest.fn()
 
     revokedSession = {
       uuid: '3-4-5',
@@ -88,7 +89,7 @@ describe('AccountDeletionRequestedEventHandler', () => {
     expect(userRepository.remove).not.toHaveBeenCalled()
     expect(sessionRepository.remove).not.toHaveBeenCalled()
     expect(revokedSessionRepository.remove).not.toHaveBeenCalled()
-    expect(ephemeralSessionRepository.deleteOneByUuid).not.toHaveBeenCalled()
+    expect(ephemeralSessionRepository.deleteOne).not.toHaveBeenCalled()
   })
 
   it('should remove all user sessions', async () => {
@@ -96,6 +97,6 @@ describe('AccountDeletionRequestedEventHandler', () => {
 
     expect(sessionRepository.remove).toHaveBeenCalledWith(session)
     expect(revokedSessionRepository.remove).toHaveBeenCalledWith(revokedSession)
-    expect(ephemeralSessionRepository.deleteOneByUuid).toHaveBeenCalledWith('2-3-4')
+    expect(ephemeralSessionRepository.deleteOne).toHaveBeenCalledWith('2-3-4', '1-2-3')
   })
 })

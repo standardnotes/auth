@@ -9,7 +9,7 @@ import '../src/Controller/AuthController'
 import '../src/Controller/UsersController'
 
 import * as cors from 'cors'
-import * as bodyParser from 'body-parser'
+import { urlencoded, json } from 'express'
 import * as prettyjson from 'prettyjson'
 import * as winston from 'winston'
 import * as dayjs from 'dayjs'
@@ -27,11 +27,8 @@ void container.load().then(container => {
   const server = new InversifyExpressServer(container)
 
   server.setConfig((app) => {
-    app.use(bodyParser.urlencoded({
-      extended: true,
-    }))
-    app.use(bodyParser.json())
-    app.use(bodyParser.urlencoded({ extended: true }))
+    app.use(json())
+    app.use(urlencoded({ extended: true }))
     app.use(cors())
   })
 
