@@ -50,7 +50,6 @@ export class RedisEphemeralSessionRepository implements EphemeralSessionReposito
         'MATCH',
         `${this.PREFIX}:*:${userUuid}`
       )
-      this.logger.debug('Scan result: %O', scanResult)
 
       cursor = scanResult[0]
       sessionKeys = sessionKeys.concat(scanResult[1])

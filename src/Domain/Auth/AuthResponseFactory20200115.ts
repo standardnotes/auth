@@ -35,11 +35,11 @@ export class AuthResponseFactory20200115 extends AuthResponseFactory20190520 {
 
     const session = await this.createSession(user, apiVersion, userAgent, ephemeralSession)
 
-    this.logger.debug(`Created new session for user ${user.uuid}: %O`, session)
+    this.logger.debug('Created new session for user %s: %O', user.uuid, session)
 
     const sessionPayload = await this.sessionService.createTokens(session)
 
-    this.logger.debug(`Created session payload for user ${user.uuid}: %O`, sessionPayload)
+    this.logger.debug('Created session payload for user %s: %O', user.uuid, sessionPayload)
 
     return {
       session: sessionPayload,
