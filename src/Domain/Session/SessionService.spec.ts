@@ -1,5 +1,6 @@
 import 'reflect-metadata'
 import * as winston from 'winston'
+import { TimerInterface } from '@standardnotes/time'
 
 import { Session } from './Session'
 import { SessionRepositoryInterface } from './SessionRepositoryInterface'
@@ -9,7 +10,6 @@ import { EphemeralSessionRepositoryInterface } from './EphemeralSessionRepositor
 import { EphemeralSession } from './EphemeralSession'
 import { RevokedSessionRepositoryInterface } from './RevokedSessionRepositoryInterface'
 import { RevokedSession } from './RevokedSession'
-import { SnCryptoNode } from '@standardnotes/sncrypto-node'
 
 describe('SessionService', () => {
   let sessionRepository: SessionRepositoryInterface
@@ -19,7 +19,7 @@ describe('SessionService', () => {
   let ephemeralSession: EphemeralSession
   let revokedSession: RevokedSession
   let deviceDetector: UAParser
-  let crypter: SnCryptoNode
+  let timer: TimerInterface
   let logger: winston.Logger
 
   const createService = () => new SessionService(
@@ -27,7 +27,7 @@ describe('SessionService', () => {
     ephemeralSessionRepository,
     revokedSessionRepository,
     deviceDetector,
-    crypter,
+    timer,
     logger,
     123,
     234
@@ -55,7 +55,7 @@ describe('SessionService', () => {
     ephemeralSessionRepository.save = jest.fn()
     ephemeralSessionRepository.findOneByUuid = jest.fn()
     ephemeralSessionRepository.updateTokensAndExpirationDates = jest.fn()
-    ephemeralSessionRepository.deleteOneByUuid = jest.fn()
+    ephemeralSessionRepository.deleteOne = jest.fn()
 
     revokedSessionRepository = {} as jest.Mocked<RevokedSessionRepositoryInterface>
     revokedSessionRepository.save = jest.fn()
@@ -65,6 +65,9 @@ describe('SessionService', () => {
     ephemeralSession.userAgent = 'Mozilla Firefox'
     ephemeralSession.hashedAccessToken = '4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce'
     ephemeralSession.hashedRefreshToken = '4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce'
+
+    timer = {} as jest.Mocked<TimerInterface>
+    timer.convertStringDateToMilliseconds = jest.fn().mockReturnValue(123)
 
     deviceDetector = {} as jest.Mocked<UAParser>
     deviceDetector.setUA = jest.fn().mockReturnThis()
@@ -79,9 +82,6 @@ describe('SessionService', () => {
         version: '10.13',
       },
     })
-
-    crypter = {} as jest.Mocked<SnCryptoNode>
-    crypter.generateRandomKey = jest.fn().mockReturnValue('test')
 
     logger = {} as jest.Mocked<winston.Logger>
     logger.warning = jest.fn()
@@ -98,12 +98,12 @@ describe('SessionService', () => {
     })
   })
 
-  it('should create access and refresh tokens for a session', async () => {
-    expect(await createService().createTokens(session)).toEqual({
-      access_expiration: expect.any(Number),
+  it('should refresh access and refresh tokens for a session', async () => {
+    expect(await createService().refreshTokens(session)).toEqual({
+      access_expiration: 123,
       access_token: expect.any(String),
       refresh_token: expect.any(String),
-      refresh_expiration: expect.any(Number),
+      refresh_expiration: 123,
     })
 
     expect(sessionRepository.updateHashedTokens).toHaveBeenCalled()
@@ -114,20 +114,56 @@ describe('SessionService', () => {
     const user = {} as jest.Mocked<User>
     user.uuid = '123'
 
-    const createdSession = await createService().createNewSessionForUser(user, '003', 'Google Chrome')
+    const sessionPayload = await createService().createNewSessionForUser(user, '003', 'Google Chrome')
 
-    expect(createdSession).toEqual(session)
+    expect(sessionRepository.save).toHaveBeenCalledWith(expect.any(Session))
+    expect(sessionRepository.save).toHaveBeenCalledWith({
+      accessExpiration: expect.any(Date),
+      apiVersion: '003',
+      createdAt: expect.any(Date),
+      hashedAccessToken: expect.any(String),
+      hashedRefreshToken: expect.any(String),
+      refreshExpiration: expect.any(Date),
+      updatedAt: expect.any(Date),
+      userAgent: 'Google Chrome',
+      userUuid: '123',
+      uuid: expect.any(String),
+    })
+
+    expect(sessionPayload).toEqual({
+      access_expiration: 123,
+      access_token: expect.any(String),
+      refresh_expiration: 123,
+      refresh_token: expect.any(String),
+    })
   })
 
   it('should create new ephemeral session for a user', async () => {
     const user = {} as jest.Mocked<User>
     user.uuid = '123'
 
-    const createdSession = await createService().createNewEphemeralSessionForUser(user, '003', 'Google Chrome')
+    const sessionPayload = await createService().createNewEphemeralSessionForUser(user, '003', 'Google Chrome')
 
-    expect(createdSession).toBeInstanceOf(EphemeralSession)
-    expect(createdSession.userUuid).toEqual(user.uuid)
-    expect(createdSession.userAgent).toEqual('Google Chrome')
+    expect(ephemeralSessionRepository.save).toHaveBeenCalledWith(expect.any(EphemeralSession))
+    expect(ephemeralSessionRepository.save).toHaveBeenCalledWith({
+      accessExpiration: expect.any(Date),
+      apiVersion: '003',
+      createdAt: expect.any(Date),
+      hashedAccessToken: expect.any(String),
+      hashedRefreshToken: expect.any(String),
+      refreshExpiration: expect.any(Date),
+      updatedAt: expect.any(Date),
+      userAgent: 'Google Chrome',
+      userUuid: '123',
+      uuid: expect.any(String),
+    })
+
+    expect(sessionPayload).toEqual({
+      access_expiration: 123,
+      access_token: expect.any(String),
+      refresh_expiration: 123,
+      refresh_token: expect.any(String),
+    })
   })
 
   it('should delete a session by token', async () => {
@@ -142,7 +178,7 @@ describe('SessionService', () => {
     await createService().deleteSessionByToken('1:2:3')
 
     expect(sessionRepository.deleteOneByUuid).toHaveBeenCalledWith('2e1e43')
-    expect(ephemeralSessionRepository.deleteOneByUuid).toHaveBeenCalledWith('2e1e43')
+    expect(ephemeralSessionRepository.deleteOne).toHaveBeenCalledWith('2e1e43', '1-2-3')
   })
 
   it('should not delete a session by token if session is not found', async () => {
@@ -157,7 +193,7 @@ describe('SessionService', () => {
     await createService().deleteSessionByToken('1:4:3')
 
     expect(sessionRepository.deleteOneByUuid).not.toHaveBeenCalled()
-    expect(ephemeralSessionRepository.deleteOneByUuid).not.toHaveBeenCalled()
+    expect(ephemeralSessionRepository.deleteOne).not.toHaveBeenCalled()
   })
 
   it('should determine if a refresh token is valid', async () => {

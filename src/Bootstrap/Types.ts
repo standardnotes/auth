@@ -90,6 +90,7 @@ const TYPES = {
   HTTPClient: Symbol.for('HTTPClient'),
   Crypter: Symbol.for('Crypter'),
   SnCryptoNode: Symbol.for('SnCryptoNode'),
+  Timer: Symbol.for('Timer'),
 }
 
 export default TYPES
