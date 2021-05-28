@@ -249,7 +249,7 @@ export class ContainerConfigLoader {
     container.bind<CrypterInterface>(TYPES.Crypter).to(CrypterNode)
     container.bind<SettingService>(TYPES.SettingService).to(SettingService)
     container.bind<SnCryptoNode>(TYPES.SnCryptoNode).toConstantValue(new SnCryptoNode())
-    container.bind<TimerInterface>(TYPES.Timer).to(Timer)
+    container.bind<TimerInterface>(TYPES.Timer).toConstantValue(new Timer())
 
     if (env.get('SNS_TOPIC_ARN', true)) {
       container.bind<SNSDomainEventPublisher>(TYPES.DomainEventPublisher).toConstantValue(
