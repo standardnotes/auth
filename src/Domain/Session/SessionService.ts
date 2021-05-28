@@ -1,9 +1,11 @@
 import * as crypto from 'crypto'
 import * as winston from 'winston'
 import * as dayjs from 'dayjs'
+import * as cryptoRandomString from 'crypto-random-string'
 import { UAParser } from 'ua-parser-js'
 import { inject, injectable } from 'inversify'
 import { v4 as uuidv4 } from 'uuid'
+import { TimerInterface } from '@standardnotes/time'
 
 import TYPES from '../../Bootstrap/Types'
 import { Session } from './Session'
@@ -15,7 +17,6 @@ import { EphemeralSessionRepositoryInterface } from './EphemeralSessionRepositor
 import { EphemeralSession } from './EphemeralSession'
 import { RevokedSession } from './RevokedSession'
 import { RevokedSessionRepositoryInterface } from './RevokedSessionRepositoryInterface'
-import { SnCryptoNode } from '@standardnotes/sncrypto-node'
 
 @injectable()
 export class SessionService implements SessionServiceInterace {
@@ -26,53 +27,49 @@ export class SessionService implements SessionServiceInterace {
     @inject(TYPES.EphemeralSessionRepository) private ephemeralSessionRepository: EphemeralSessionRepositoryInterface,
     @inject(TYPES.RevokedSessionRepository) private revokedSessionRepository: RevokedSessionRepositoryInterface,
     @inject(TYPES.DeviceDetector) private deviceDetector: UAParser,
-    @inject(TYPES.SnCryptoNode) private crypter: SnCryptoNode,
+    @inject(TYPES.Timer) private timer: TimerInterface,
     @inject(TYPES.Logger) private logger: winston.Logger,
     @inject(TYPES.ACCESS_TOKEN_AGE) private accessTokenAge: number,
     @inject(TYPES.REFRESH_TOKEN_AGE) private refreshTokenAge: number
   ) {
   }
 
-  async createNewSessionForUser(user: User, apiVersion: string, userAgent: string): Promise<Session> {
+  async createNewSessionForUser(user: User, apiVersion: string, userAgent: string): Promise<SessionPayload> {
     const session = this.createSession(user, apiVersion, userAgent, false)
 
-    return this.sessionRepository.save(session)
+    const sessionPayload = await this.createTokens(session)
+
+    await this.sessionRepository.save(session)
+
+    return sessionPayload
   }
 
-  async createNewEphemeralSessionForUser(user: User, apiVersion: string, userAgent: string): Promise<EphemeralSession> {
+  async createNewEphemeralSessionForUser(user: User, apiVersion: string, userAgent: string): Promise<SessionPayload> {
     const ephemeralSession = this.createSession(user, apiVersion, userAgent, true)
+
+    const sessionPayload = await this.createTokens(ephemeralSession)
 
     await this.ephemeralSessionRepository.save(ephemeralSession)
 
-    return ephemeralSession
+    return sessionPayload
   }
 
-  async createTokens(session: Session): Promise<SessionPayload> {
-    const accessToken = await this.crypter.generateRandomKey(64)
-    const refreshToken = await this.crypter.generateRandomKey(64)
+  async refreshTokens(session: Session): Promise<SessionPayload> {
+    const sessionPayload = await this.createTokens(session)
 
-    const hashedAccessToken = crypto.createHash('sha256').update(accessToken).digest('hex')
-    const hashedRefreshToken = crypto.createHash('sha256').update(refreshToken).digest('hex')
-    await this.sessionRepository.updateHashedTokens(session.uuid, hashedAccessToken, hashedRefreshToken)
+    await this.sessionRepository.updateHashedTokens(session.uuid, session.hashedAccessToken, session.hashedRefreshToken)
 
-    const accessTokenExpiration = dayjs.utc().add(this.accessTokenAge, 'second').toDate()
-    const refreshTokenExpiration = dayjs.utc().add(this.refreshTokenAge, 'second').toDate()
-    await this.sessionRepository.updatedTokenExpirationDates(session.uuid, accessTokenExpiration, refreshTokenExpiration)
+    await this.sessionRepository.updatedTokenExpirationDates(session.uuid, session.accessExpiration, session.refreshExpiration)
 
     await this.ephemeralSessionRepository.updateTokensAndExpirationDates(
       session.uuid,
-      hashedAccessToken,
-      hashedRefreshToken,
-      accessTokenExpiration,
-      refreshTokenExpiration
+      session.hashedAccessToken,
+      session.hashedRefreshToken,
+      session.accessExpiration,
+      session.refreshExpiration
     )
 
-    return {
-      access_token: `${SessionService.SESSION_TOKEN_VERSION}:${session.uuid}:${accessToken}`,
-      refresh_token: `${SessionService.SESSION_TOKEN_VERSION}:${session.uuid}:${refreshToken}`,
-      access_expiration: dayjs.utc(accessTokenExpiration).valueOf(),
-      refresh_expiration: dayjs.utc(refreshTokenExpiration).valueOf(),
-    }
+    return sessionPayload
   }
 
   isRefreshTokenValid(session: Session, token: string): boolean {
@@ -168,7 +165,7 @@ export class SessionService implements SessionServiceInterace {
 
     if (session) {
       await this.sessionRepository.deleteOneByUuid(session.uuid)
-      await this.ephemeralSessionRepository.deleteOneByUuid(session.uuid)
+      await this.ephemeralSessionRepository.deleteOne(session.uuid, session.userUuid)
     }
   }
 
@@ -206,5 +203,27 @@ export class SessionService implements SessionServiceInterace {
     }
 
     return session
+  }
+
+  private async createTokens(session: Session): Promise<SessionPayload> {
+    const accessToken = cryptoRandomString({ length: 16, type: 'url-safe' })
+    const refreshToken = cryptoRandomString({ length: 16, type: 'url-safe' })
+
+    const hashedAccessToken = crypto.createHash('sha256').update(accessToken).digest('hex')
+    const hashedRefreshToken = crypto.createHash('sha256').update(refreshToken).digest('hex')
+    session.hashedAccessToken = hashedAccessToken
+    session.hashedRefreshToken = hashedRefreshToken
+
+    const accessTokenExpiration = dayjs.utc().add(this.accessTokenAge, 'second').toDate()
+    const refreshTokenExpiration = dayjs.utc().add(this.refreshTokenAge, 'second').toDate()
+    session.accessExpiration = accessTokenExpiration
+    session.refreshExpiration = refreshTokenExpiration
+
+    return {
+      access_token: `${SessionService.SESSION_TOKEN_VERSION}:${session.uuid}:${accessToken}`,
+      refresh_token: `${SessionService.SESSION_TOKEN_VERSION}:${session.uuid}:${refreshToken}`,
+      access_expiration: this.timer.convertStringDateToMilliseconds(accessTokenExpiration.toString()),
+      refresh_expiration: this.timer.convertStringDateToMilliseconds(refreshTokenExpiration.toString()),
+    }
   }
 }

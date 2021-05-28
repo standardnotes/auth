@@ -2,7 +2,7 @@ import { inject, injectable } from 'inversify'
 import { Logger } from 'winston'
 import TYPES from '../../Bootstrap/Types'
 import { ProjectorInterface } from '../../Projection/ProjectorInterface'
-import { Session } from '../Session/Session'
+import { SessionPayload } from '../Session/SessionPayload'
 import { SessionServiceInterace } from '../Session/SessionServiceInterface'
 import { KeyParamsFactoryInterface } from '../User/KeyParamsFactoryInterface'
 import { User } from '../User/User'
@@ -33,11 +33,7 @@ export class AuthResponseFactory20200115 extends AuthResponseFactory20190520 {
       return super.createResponse(user)
     }
 
-    const session = await this.createSession(user, apiVersion, userAgent, ephemeralSession)
-
-    this.logger.debug('Created new session for user %s: %O', user.uuid, session)
-
-    const sessionPayload = await this.sessionService.createTokens(session)
+    const sessionPayload = await this.createSession(user, apiVersion, userAgent, ephemeralSession)
 
     this.logger.debug('Created session payload for user %s: %O', user.uuid, sessionPayload)
 
@@ -48,7 +44,7 @@ export class AuthResponseFactory20200115 extends AuthResponseFactory20190520 {
     }
   }
 
-  private async createSession(user: User, apiVersion: string, userAgent: string, ephemeralSession: boolean): Promise<Session> {
+  private async createSession(user: User, apiVersion: string, userAgent: string, ephemeralSession: boolean): Promise<SessionPayload> {
     if (ephemeralSession) {
       return this.sessionService.createNewEphemeralSessionForUser(user, apiVersion, userAgent)
     }

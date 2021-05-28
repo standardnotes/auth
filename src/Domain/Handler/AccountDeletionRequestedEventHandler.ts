@@ -42,7 +42,7 @@ export class AccountDeletionRequestedEventHandler implements DomainEventHandlerI
 
     const ephemeralSessions = await this.ephemeralSessionRepository.findAllByUserUuid(userUuid)
     for (const ephemeralSession of ephemeralSessions) {
-      await this.ephemeralSessionRepository.deleteOneByUuid(ephemeralSession.uuid)
+      await this.ephemeralSessionRepository.deleteOne(ephemeralSession.uuid, ephemeralSession.userUuid)
     }
 
     const revokedSessions = await this.revokedSessionRepository.findAllByUserUuid(userUuid)

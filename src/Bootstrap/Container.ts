@@ -15,6 +15,7 @@ import {
   SQSEventMessageHandler,
   SQSNewRelicEventMessageHandler,
 } from '@standardnotes/domain-events'
+import { TimerInterface, Timer } from '@standardnotes/time'
 import { UAParser } from 'ua-parser-js'
 
 import { Env } from './Env'
@@ -247,8 +248,8 @@ export class ContainerConfigLoader {
     container.bind<superagent.SuperAgentStatic>(TYPES.HTTPClient).toConstantValue(superagent)
     container.bind<CrypterInterface>(TYPES.Crypter).to(CrypterNode)
     container.bind<SettingService>(TYPES.SettingService).to(SettingService)
-
     container.bind<SnCryptoNode>(TYPES.SnCryptoNode).toConstantValue(new SnCryptoNode())
+    container.bind<TimerInterface>(TYPES.Timer).to(Timer)
 
     if (env.get('SNS_TOPIC_ARN', true)) {
       container.bind<SNSDomainEventPublisher>(TYPES.DomainEventPublisher).toConstantValue(
