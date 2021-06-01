@@ -1,85 +1,94 @@
 import 'reflect-metadata'
 import { authenticator } from 'otplib'
 
+import { ContentDecoderInterface } from '../Item/ContentDecoderInterface'
+import { Item } from '../Item/Item'
+import { ItemRepositoryInterface } from '../Item/ItemRepositoryInterface'
 import { User } from '../User/User'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { VerifyMFA } from './VerifyMFA'
-import { SettingRepositoryInterface } from '../Setting/SettingRepositoryInterface'
-import { SETTINGS } from '../Setting/Settings'
-import { CrypterInterface } from '../Encryption/CrypterInterface'
-import { ErrorTag } from '@standardnotes/auth'
 
 describe('VerifyMFA', () => {
   let user: User
+  let item: Item
   let userRepository: UserRepositoryInterface
-  let crypter: CrypterInterface
-  let settingRepository: SettingRepositoryInterface
+  let itemRepository: ItemRepositoryInterface
+  let contentDecoder: ContentDecoderInterface
 
-  const createVerifyMFA = () => new VerifyMFA(userRepository, settingRepository, crypter)
+  const createVerifyMFA = () => new VerifyMFA(userRepository, itemRepository, contentDecoder)
 
   beforeEach(() => {
     user = {} as jest.Mocked<User>
 
+    item = {} as jest.Mocked<Item>
+    item.uuid = '1-2-3'
+    item.content = 'test-data'
+
     userRepository = {} as jest.Mocked<UserRepositoryInterface>
     userRepository.findOneByEmail = jest.fn().mockReturnValue(user)
 
-    settingRepository = {} as jest.Mocked<SettingRepositoryInterface>
-    settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue(null)
+    itemRepository = {} as jest.Mocked<ItemRepositoryInterface>
+    itemRepository.findMFAExtensionByUserUuid = jest.fn().mockReturnValue(undefined)
 
-    crypter = {} as jest.Mocked<CrypterInterface>
-    crypter.decryptForUser = jest.fn()
+    contentDecoder = {} as jest.Mocked<ContentDecoderInterface>
+    contentDecoder.decode = jest.fn().mockReturnValue({})
   })
 
   it('should pass MFA verification if user has no MFA enabled', async () => {
-    expect(await createVerifyMFA().execute({ email: 'test@test.te', token: '' })).toEqual({
+    expect(await createVerifyMFA().execute({ email: 'test@test.te', requestParams: {} })).toEqual({
+      success: true,
+    })
+  })
+
+  it('should pass MFA verification if user has MFA deleted', async () => {
+    item.deleted = true
+    itemRepository.findMFAExtensionByUserUuid = jest.fn().mockReturnValue(item)
+
+    expect(await createVerifyMFA().execute({ email: 'test@test.te', requestParams: {} })).toEqual({
       success: true,
     })
   })
 
   it('should pass MFA verification if user is not found', async () => {
     userRepository.findOneByEmail = jest.fn().mockReturnValue(undefined)
-    expect(await createVerifyMFA().execute({ email: 'test@test.te', token: '' })).toEqual({
+    expect(await createVerifyMFA().execute({ email: 'test@test.te', requestParams: {} })).toEqual({
       success: true,
     })
   })
 
   it('should not pass MFA verification if mfa param is not found in the request', async () => {
-    settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue({
-      name: SETTINGS.MFA_SECRET,
-      value: '1:shhhh:qwerty',
-    })
+    itemRepository.findMFAExtensionByUserUuid = jest.fn().mockReturnValue(item)
 
-    expect(await createVerifyMFA().execute({ email: 'test@test.te', token: '' })).toEqual({
+    expect(await createVerifyMFA().execute({ email: 'test@test.te', requestParams: {} })).toEqual({
       success: false,
-      errorTag: ErrorTag.MfaRequired,
+      errorTag: 'mfa-required',
       errorMessage: 'Please enter your two-factor authentication code.',
+      errorPayload: { mfa_key: 'mfa_1-2-3' },
     })
   })
 
   it('should not pass MFA verification if mfa is not correct', async () => {
-    settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue({
-      name: SETTINGS.MFA_SECRET,
-      value: '1:zzqwrq:qwerty',
+    contentDecoder.decode = jest.fn().mockReturnValue({
+      secret: 'shhhh',
     })
+    itemRepository.findMFAExtensionByUserUuid = jest.fn().mockReturnValue(item)
 
-    crypter.decryptForUser = jest.fn().mockReturnValue('shhhh')
-
-    expect(await createVerifyMFA().execute({ email: 'test@test.te', token: 'invalid-token' })).toEqual({
+    expect(await createVerifyMFA().execute({ email: 'test@test.te', requestParams: { 'mfa_1-2-3': 'test' } })).toEqual({
       success: false,
-      errorTag: ErrorTag.MfaInvalid,
+      errorTag: 'mfa-invalid',
       errorMessage: 'The two-factor authentication code you entered is incorrect. Please try again.',
+      errorPayload: { mfa_key: 'mfa_1-2-3' },
     })
   })
 
   it('should pass MFA verification if mfa key is correct', async () => {
-    settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue({
-      name: SETTINGS.MFA_SECRET,
-      value: '1:shhhh:qwerty',
+    contentDecoder.decode = jest.fn().mockReturnValue({
+      secret: 'shhhh',
     })
 
-    crypter.decryptForUser = jest.fn().mockReturnValue('test')
+    itemRepository.findMFAExtensionByUserUuid = jest.fn().mockReturnValue(item)
 
-    expect(await createVerifyMFA().execute({ email: 'test@test.te', token: authenticator.generate('test') })).toEqual({
+    expect(await createVerifyMFA().execute({ email: 'test@test.te', requestParams: { 'mfa_1-2-3': authenticator.generate('shhhh') } })).toEqual({
       success: true,
     })
   })

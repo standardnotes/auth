@@ -64,7 +64,7 @@ export class AuthController extends BaseHttpController {
 
     const verifyMFAResponse = await this.verifyMFA.execute({
       email: <string> request.query.email,
-      token: <string> request.query.mfa_key,
+      requestParams: request.query,
     })
 
     if (!verifyMFAResponse.success) {
@@ -72,6 +72,7 @@ export class AuthController extends BaseHttpController {
         error: {
           tag: verifyMFAResponse.errorTag,
           message: verifyMFAResponse.errorMessage,
+          payload: verifyMFAResponse.errorPayload,
         },
       }, 401)
     }
@@ -99,7 +100,7 @@ export class AuthController extends BaseHttpController {
 
     const verifyMFAResponse = await this.verifyMFA.execute({
       email: request.body.email,
-      token: request.body.mfa_key,
+      requestParams: request.body,
     })
 
     if (!verifyMFAResponse.success) {
@@ -107,6 +108,7 @@ export class AuthController extends BaseHttpController {
         error: {
           tag: verifyMFAResponse.errorTag,
           message: verifyMFAResponse.errorMessage,
+          payload: verifyMFAResponse.errorPayload,
         },
       }, 401)
     }
