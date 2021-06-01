@@ -31,6 +31,12 @@ export class ChangePassword implements UseCaseInterface {
     if (dto.protocolVersion) {
       dto.user.version = dto.protocolVersion
     }
+    if (dto.kpCreated) {
+      dto.user.kpCreated = dto.kpCreated
+    }
+    if (dto.kpOrigination) {
+      dto.user.kpOrigination = dto.kpOrigination
+    }
 
     const updatedUser = await this.userRepository.save(dto.user)
 
