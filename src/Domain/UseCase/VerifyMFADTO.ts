@@ -1,4 +1,4 @@
 export type VerifyMFADTO = {
   email: string
-  token: string
+  requestParams: Record<string, unknown>
 }

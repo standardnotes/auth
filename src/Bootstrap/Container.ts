@@ -79,6 +79,11 @@ import { DeleteAccount } from '../Domain/UseCase/DeleteAccount/DeleteAccount'
 import { DeleteSetting } from '../Domain/UseCase/DeleteSetting/DeleteSetting'
 import { SettingFactory } from '../Domain/Setting/SettingFactory'
 import { SettingService } from '../Domain/Setting/SettingService'
+import { Item } from '../Domain/Item/Item'
+import { MySQLItemRepository } from '../Infra/MySQL/MySQLItemRepository'
+import { ItemRepositoryInterface } from '../Domain/Item/ItemRepositoryInterface'
+import { ContentDecoder } from '../Domain/Item/ContentDecoder'
+import { ContentDecoderInterface } from '../Domain/Item/ContentDecoderInterface'
 
 export class ContainerConfigLoader {
   async load(): Promise<Container> {
@@ -115,6 +120,7 @@ export class ContainerConfigLoader {
         Role,
         Permission,
         Setting,
+        Item,
       ],
       migrations: [
         env.get('DB_MIGRATIONS_PATH'),
@@ -167,6 +173,7 @@ export class ContainerConfigLoader {
     container.bind<MySQLUserRepository>(TYPES.UserRepository).toConstantValue(connection.getCustomRepository(MySQLUserRepository))
     container.bind<MySQLSettingRepository>(TYPES.SettingRepository).toConstantValue(connection.getCustomRepository(MySQLSettingRepository))
     container.bind<MySQLRoleRepository>(TYPES.RoleRepository).toConstantValue(connection.getCustomRepository(MySQLRoleRepository))
+    container.bind<ItemRepositoryInterface>(TYPES.ItemRepository).toConstantValue(connection.getCustomRepository(MySQLItemRepository))
     container.bind<RedisEphemeralSessionRepository>(TYPES.EphemeralSessionRepository).to(RedisEphemeralSessionRepository)
     container.bind<LockRepository>(TYPES.LockRepository).to(LockRepository)
 
@@ -237,6 +244,7 @@ export class ContainerConfigLoader {
     // Services
     container.bind<UAParser>(TYPES.DeviceDetector).toConstantValue(new UAParser())
     container.bind<SessionService>(TYPES.SessionService).to(SessionService)
+    container.bind<ContentDecoderInterface>(TYPES.ContentDecoder).to(ContentDecoder)
     container.bind<AuthResponseFactory20161215>(TYPES.AuthResponseFactory20161215).to(AuthResponseFactory20161215)
     container.bind<AuthResponseFactory20190520>(TYPES.AuthResponseFactory20190520).to(AuthResponseFactory20190520)
     container.bind<AuthResponseFactory20200115>(TYPES.AuthResponseFactory20200115).to(AuthResponseFactory20200115)
