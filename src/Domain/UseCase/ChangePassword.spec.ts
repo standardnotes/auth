@@ -37,6 +37,8 @@ describe('ChangePassword', () => {
       newPassword: 'test234',
       pwNonce: 'asdzxc',
       updatedWithUserAgent: 'Google Chrome',
+      kpCreated: '123',
+      kpOrigination: 'password-change',
     })).toEqual({
       success: true,
       authResponse: {
@@ -48,6 +50,8 @@ describe('ChangePassword', () => {
       encryptedPassword: expect.any(String),
       updatedWithUserAgent: 'Google Chrome',
       pwNonce: 'asdzxc',
+      kpCreated: '123',
+      kpOrigination: 'password-change',
     })
   })
 

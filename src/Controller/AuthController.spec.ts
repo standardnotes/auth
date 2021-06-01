@@ -144,6 +144,8 @@ describe('AuthController', () => {
     request.body.current_password = 'test123'
     request.body.new_password = 'test234'
     request.body.pw_nonce = 'asdzxc'
+    request.body.origination = 'change-password'
+    request.body.created = '123'
     request.headers['user-agent'] = 'Google Chrome'
     response.locals.user = user
 
@@ -157,6 +159,8 @@ describe('AuthController', () => {
       updatedWithUserAgent: 'Google Chrome',
       currentPassword: 'test123',
       newPassword: 'test234',
+      kpCreated: '123',
+      kpOrigination: 'change-password',
       pwNonce: 'asdzxc',
       protocolVersion: '004',
       user: {

@@ -8,4 +8,6 @@ export type ChangePasswordDTO = {
   pwNonce: string
   updatedWithUserAgent: string
   protocolVersion?: string
+  kpOrigination?: string
+  kpCreated?: string
 }

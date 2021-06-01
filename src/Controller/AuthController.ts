@@ -186,6 +186,8 @@ export class AuthController extends BaseHttpController {
       currentPassword: request.body.current_password,
       newPassword: request.body.new_password,
       pwNonce: request.body.pw_nonce,
+      kpCreated: request.body.created,
+      kpOrigination: request.body.origination,
       updatedWithUserAgent: <string> request.headers['user-agent'],
       protocolVersion: request.body.version,
     })
