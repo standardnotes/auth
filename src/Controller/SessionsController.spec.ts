@@ -12,6 +12,7 @@ import { AuthenticateRequest } from '../Domain/UseCase/AuthenticateRequest'
 import { User } from '../Domain/User/User'
 import { Role } from '../Domain/Role/Role'
 import { Permission } from '../Domain/Permission/Permission'
+import { Logger } from 'winston'
 
 describe('SessionsController', () => {
   let getActiveSessionsForUser: GetActiveSessionsForUser
@@ -28,6 +29,7 @@ describe('SessionsController', () => {
   let user: User
   let role: Role
   let permission: Permission
+  let logger: Logger
 
   const createController = () => new SessionsController(
     getActiveSessionsForUser,
@@ -37,7 +39,8 @@ describe('SessionsController', () => {
     roleProjector,
     permissionProjector,
     jwtSecret,
-    jwtTTL
+    jwtTTL,
+    logger
   )
 
   beforeEach(() => {
@@ -78,6 +81,9 @@ describe('SessionsController', () => {
     response = {
       locals: {},
     } as jest.Mocked<express.Response>
+
+    logger = {} as jest.Mocked<Logger>
+    logger.debug = jest.fn()
   })
 
   it('should get all active sessions for current user', async () => {

@@ -18,6 +18,7 @@ import { Role } from '../Domain/Role/Role'
 import { User } from '../Domain/User/User'
 import { ProjectorInterface } from '../Projection/ProjectorInterface'
 import { SessionProjector } from '../Projection/SessionProjector'
+import { Logger } from 'winston'
 
 @controller('/sessions')
 export class SessionsController extends BaseHttpController {
@@ -30,6 +31,7 @@ export class SessionsController extends BaseHttpController {
     @inject(TYPES.PermissionProjector) private permissionProjector: ProjectorInterface<Permission>,
     @inject(TYPES.AUTH_JWT_SECRET) private jwtSecret: string,
     @inject(TYPES.AUTH_JWT_TTL) private jwtTTL: number,
+    @inject(TYPES.Logger) private logger: Logger,
   ) {
     super()
   }
@@ -49,11 +51,18 @@ export class SessionsController extends BaseHttpController {
       }, authenticateRequestResponse.responseCode)
     }
 
+    this.logger.debug(`Retrieving roles and permissions for user ${authenticateRequestResponse.user?.uuid}`)
+
     const roles = await (<User> authenticateRequestResponse.user).roles
+    this.logger.debug('Roles of user %s: %O', authenticateRequestResponse.user?.uuid, roles)
+
     const permissions: Map<string, Permission> = new Map()
     await Promise.all(roles.map(async (role: Role) => {
       const rolePermissions = await role.permissions
-      rolePermissions.forEach(permission => permissions.set(permission.uuid, permission))
+      this.logger.debug('Permissions of role %s: %O', role.name, rolePermissions)
+      for(const permission of rolePermissions) {
+        permissions.set(permission.uuid, permission)
+      }
     }))
 
     const authTokenData = {
