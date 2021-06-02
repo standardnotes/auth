@@ -24,13 +24,12 @@ export class GetAuthMethods implements UseCaseInterface {
     }
 
     const mfaSetting = await this.settingRepository.findOneByNameAndUserUuid(
-      SETTINGS.MFA_SECRET, 
+      SETTINGS.MFA_SECRET,
       user.uuid,
     )
 
-    const totp = mfaSetting && {
-      mfaSecretUuid: mfaSetting.uuid,
-    }
+    const totpIsSet = mfaSetting !== undefined && mfaSetting.value.length > 0
+    const totp = totpIsSet ? true : undefined
 
     return {
       success: true,
