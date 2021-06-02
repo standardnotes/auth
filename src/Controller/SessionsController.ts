@@ -19,7 +19,7 @@ import { User } from '../Domain/User/User'
 import { ProjectorInterface } from '../Projection/ProjectorInterface'
 import { SessionProjector } from '../Projection/SessionProjector'
 
-@controller('/sessions', TYPES.AuthMiddleware, TYPES.SessionMiddleware)
+@controller('/sessions')
 export class SessionsController extends BaseHttpController {
   constructor(
     @inject(TYPES.GetActiveSessionsForUser) private getActiveSessionsForUser: GetActiveSessionsForUser,
@@ -68,7 +68,7 @@ export class SessionsController extends BaseHttpController {
     return this.json({ authToken })
   }
 
-  @httpGet('/')
+  @httpGet('/', TYPES.AuthMiddleware, TYPES.SessionMiddleware)
   async getSessions(_request: Request, response: Response): Promise<results.JsonResult> {
     const useCaseResponse = await this.getActiveSessionsForUser.execute({
       userUuid: response.locals.user.uuid,
