@@ -18,7 +18,7 @@ import { Role } from '../Domain/Role/Role'
 import { User } from '../Domain/User/User'
 import { ProjectorInterface } from '../Projection/ProjectorInterface'
 import { SessionProjector } from '../Projection/SessionProjector'
-import { Logger } from 'winston'
+import { Token } from '@standardnotes/auth'
 
 @controller('/sessions')
 export class SessionsController extends BaseHttpController {
@@ -31,7 +31,6 @@ export class SessionsController extends BaseHttpController {
     @inject(TYPES.PermissionProjector) private permissionProjector: ProjectorInterface<Permission>,
     @inject(TYPES.AUTH_JWT_SECRET) private jwtSecret: string,
     @inject(TYPES.AUTH_JWT_TTL) private jwtTTL: number,
-    @inject(TYPES.Logger) private logger: Logger,
   ) {
     super()
   }
@@ -51,25 +50,23 @@ export class SessionsController extends BaseHttpController {
       }, authenticateRequestResponse.responseCode)
     }
 
-    this.logger.debug(`Retrieving roles and permissions for user ${authenticateRequestResponse.user?.uuid}`)
-
     const roles = await (<User> authenticateRequestResponse.user).roles
-    this.logger.debug('Roles of user %s: %O', authenticateRequestResponse.user?.uuid, roles)
-
     const permissions: Map<string, Permission> = new Map()
     await Promise.all(roles.map(async (role: Role) => {
       const rolePermissions = await role.permissions
-      this.logger.debug('Permissions of role %s: %O', role.name, rolePermissions)
       for(const permission of rolePermissions) {
         permissions.set(permission.uuid, permission)
       }
     }))
 
-    const authTokenData = {
-      user: this.userProjector.projectSimple(<User> authenticateRequestResponse.user),
-      session: this.sessionProjector.projectSimple(<Session> authenticateRequestResponse.session),
-      roles: roles.map(role => this.roleProjector.projectSimple(role)),
-      permissions: [...permissions.values()].map(permission => this.permissionProjector.projectSimple(permission)),
+    const authTokenData: Token = {
+      user: this.projectUser(<User> authenticateRequestResponse.user),
+      roles: this.projectRoles(roles),
+      permissions: this.projectPermissions([...permissions.values()]),
+    }
+
+    if (authenticateRequestResponse.session !== undefined) {
+      authTokenData.session = this.projectSession(authenticateRequestResponse.session)
     }
 
     const authToken = sign(authTokenData, this.jwtSecret, { algorithm: 'HS256', expiresIn: this.jwtTTL })
@@ -92,5 +89,34 @@ export class SessionsController extends BaseHttpController {
         )
       )
     )
+  }
+
+  private projectUser(user: User): { uuid: string, email: string} {
+    return <{ uuid: string, email: string}> this.userProjector.projectSimple(user)
+  }
+
+  private projectSession(session: Session):
+  {
+    uuid: string,
+    api_version: string,
+    created_at: string,
+    updated_at: string,
+    device_info: string
+  } {
+    return <{
+      uuid: string,
+      api_version: string,
+      created_at: string,
+      updated_at: string,
+      device_info: string
+    }> this.sessionProjector.projectSimple(session)
+  }
+
+  private projectRoles(roles: Array<Role>): Array<{ uuid: string, name: string }> {
+    return roles.map(role => <{ uuid: string, name: string }> this.roleProjector.projectSimple(role))
+  }
+
+  private projectPermissions(permissions: Array<Permission>): Array<{ uuid: string, name: string }> {
+    return permissions.map(permission => <{ uuid: string, name: string }> this.permissionProjector.projectSimple(permission))
   }
 }

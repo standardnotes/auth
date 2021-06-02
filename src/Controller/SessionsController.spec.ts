@@ -12,7 +12,6 @@ import { AuthenticateRequest } from '../Domain/UseCase/AuthenticateRequest'
 import { User } from '../Domain/User/User'
 import { Role } from '../Domain/Role/Role'
 import { Permission } from '../Domain/Permission/Permission'
-import { Logger } from 'winston'
 
 describe('SessionsController', () => {
   let getActiveSessionsForUser: GetActiveSessionsForUser
@@ -29,7 +28,6 @@ describe('SessionsController', () => {
   let user: User
   let role: Role
   let permission: Permission
-  let logger: Logger
 
   const createController = () => new SessionsController(
     getActiveSessionsForUser,
@@ -39,8 +37,7 @@ describe('SessionsController', () => {
     roleProjector,
     permissionProjector,
     jwtSecret,
-    jwtTTL,
-    logger
+    jwtTTL
   )
 
   beforeEach(() => {
@@ -81,9 +78,6 @@ describe('SessionsController', () => {
     response = {
       locals: {},
     } as jest.Mocked<express.Response>
-
-    logger = {} as jest.Mocked<Logger>
-    logger.debug = jest.fn()
   })
 
   it('should get all active sessions for current user', async () => {
@@ -127,6 +121,43 @@ describe('SessionsController', () => {
       session: {
         test: 'test',
       },
+      user:  {
+        bar: 'baz',
+      },
+      roles: [
+        {
+          uuid: '1-3-4',
+          name: 'role1',
+        },
+      ],
+      permissions: [
+        {
+          uuid: '1-2-3',
+          name: 'permission1',
+        },
+      ],
+    })
+  })
+
+  it('should validate a user from an incoming request', async () => {
+    authenticateRequest.execute = jest.fn().mockReturnValue({
+      success: true,
+      user,
+    })
+
+    request.headers.authorization = 'test'
+
+    const httpResponse = await createController().validate(request)
+
+    expect(httpResponse).toBeInstanceOf(results.JsonResult)
+
+    const result = await httpResponse.executeAsync()
+    const httpResponseContent = await result.content.readAsStringAsync()
+    const httpResponseJSON = JSON.parse(httpResponseContent)
+
+    expect(decode(httpResponseJSON.authToken)).toEqual({
+      exp: expect.any(Number),
+      iat: expect.any(Number),
       user:  {
         bar: 'baz',
       },

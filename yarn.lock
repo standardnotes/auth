@@ -663,10 +663,10 @@
   resolved "https://registry.yarnpkg.com/@sqltools/formatter/-/formatter-1.2.2.tgz#9390a8127c0dcba61ebd7fdcc748655e191bdd68"
   integrity sha512-/5O7Fq6Vnv8L6ucmPjaWbVG1XkP4FO+w5glqfkIsq3Xw4oyNAdJddbnYodNDAfjVUvo/rrSCTom4kAND7T1o5Q==
 
-"@standardnotes/auth@2.2.0":
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/@standardnotes/auth/-/auth-2.2.0.tgz#fc5dbe619b1495092456f4bb3690bd5a2cc593de"
-  integrity sha512-twRg+5ZvxkOu9NIYdu73s2/YDSLpf1tcACqwNMTyoNi4vCwsTEqdqG2J8mFyFRGv9WeY+bNABU+mIPyztnzHWw==
+"@standardnotes/auth@3.1.0":
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/@standardnotes/auth/-/auth-3.1.0.tgz#1caed42e2f4d4ca869e1532f996b7708ae68422e"
+  integrity sha512-Bkh1zdMYuDTadztr4Cq+BmL4hK/UishXFQbNmH7AgMiTAWhuea+n9VBwm6dyDVfAr83hWpRG6U3TQZSc8yniqA==
 
 "@standardnotes/config@2.0.0":
   version "2.0.0"
