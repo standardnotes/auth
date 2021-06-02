@@ -131,8 +131,6 @@ export class SessionService implements SessionServiceInterace {
 
     const session = await this.getSession(sessionUuid)
     if (!session) {
-      this.logger.debug(`Could not find session with uuid: ${sessionUuid}`)
-
       return undefined
     }
 
@@ -197,8 +195,6 @@ export class SessionService implements SessionServiceInterace {
     let session = await this.ephemeralSessionRepository.findOneByUuid(uuid)
 
     if (!session) {
-      this.logger.debug(`Did not find an ephemeral session with uuid: ${uuid}`)
-
       session = await this.sessionRepository.findOneByUuid(uuid)
     }
 
