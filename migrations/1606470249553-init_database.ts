@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm'
 
-export class initDatabase1606470249552 implements MigrationInterface {
-    name = 'initDatabase1606470249552'
+export class initDatabase1606470249553 implements MigrationInterface {
+    name = 'initDatabase1606470249553'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
       await queryRunner.query('CREATE TABLE IF NOT EXISTS `sessions` (`uuid` varchar(36) NOT NULL, `user_uuid` varchar(255) NULL, `hashed_access_token` varchar(255) NOT NULL, `hashed_refresh_token` varchar(255) NOT NULL, `access_expiration` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP, `refresh_expiration` datetime NOT NULL, `api_version` varchar(255) NULL, `user_agent` text NULL, `created_at` datetime NOT NULL, `updated_at` datetime NOT NULL, INDEX `index_sessions_on_user_uuid` (`user_uuid`), INDEX `index_sessions_on_updated_at` (`updated_at`), PRIMARY KEY (`uuid`)) ENGINE=InnoDB')
