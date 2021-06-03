@@ -8,7 +8,7 @@ export class RevokedSession {
 
   @Column({
     name: 'user_uuid',
-    length: 255,
+    length: 36,
   })
   @Index('index_revoked_sessions_on_user_uuid')
   userUuid: string
