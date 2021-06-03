@@ -139,6 +139,43 @@ describe('SessionsController', () => {
     })
   })
 
+  it('should validate a user from an incoming request', async () => {
+    authenticateRequest.execute = jest.fn().mockReturnValue({
+      success: true,
+      user,
+    })
+
+    request.headers.authorization = 'test'
+
+    const httpResponse = await createController().validate(request)
+
+    expect(httpResponse).toBeInstanceOf(results.JsonResult)
+
+    const result = await httpResponse.executeAsync()
+    const httpResponseContent = await result.content.readAsStringAsync()
+    const httpResponseJSON = JSON.parse(httpResponseContent)
+
+    expect(decode(httpResponseJSON.authToken)).toEqual({
+      exp: expect.any(Number),
+      iat: expect.any(Number),
+      user:  {
+        bar: 'baz',
+      },
+      roles: [
+        {
+          uuid: '1-3-4',
+          name: 'role1',
+        },
+      ],
+      permissions: [
+        {
+          uuid: '1-2-3',
+          name: 'permission1',
+        },
+      ],
+    })
+  })
+
   it('should not validate a session from an incoming request', async () => {
     authenticateRequest.execute = jest.fn().mockReturnValue({
       success: false,
