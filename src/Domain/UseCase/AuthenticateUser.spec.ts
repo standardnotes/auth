@@ -7,16 +7,21 @@ import { User } from '../User/User'
 import { AuthenticateUser } from './AuthenticateUser'
 import { RevokedSession } from '../Session/RevokedSession'
 import { AuthenticationMethodResolverInterface } from '../Auth/AuthenticationMethodResolverInterface'
+import { Logger } from 'winston'
 
 describe('AuthenticateUser', () => {
   let user: User
   let session: Session
   let revokedSession: RevokedSession
   let authenticationMethodResolver: AuthenticationMethodResolverInterface
+  let logger: Logger
 
-  const createUseCase = () => new AuthenticateUser(authenticationMethodResolver)
+  const createUseCase = () => new AuthenticateUser(authenticationMethodResolver, logger)
 
   beforeEach(() => {
+    logger = {} as jest.Mocked<Logger>
+    logger.debug = jest.fn()
+
     user = {} as jest.Mocked<User>
     user.supportsSessions = jest.fn().mockReturnValue(false)
 
