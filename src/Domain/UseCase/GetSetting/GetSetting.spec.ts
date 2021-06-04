@@ -26,6 +26,12 @@ describe('GetSetting', () => {
     projector,
   })
 
+  it('should prevent retrieving mfa secret as a setting', async () => {
+    const actual = await makeSubject().execute({ settingName: 'MFA_SECRET', userUuid })
+
+    expect(actual.success).toEqual(false)
+  })
+
   it('should get a setting by name associated with a valid user uuid', async () => {
     const actual = await makeSubject().execute({ settingName, userUuid })
 
@@ -35,7 +41,7 @@ describe('GetSetting', () => {
       setting: simpleSettings[settingIndex],
     })
   })
-  
+
   it('should fail for invalid setting name', async () => {
     const actual = await makeSubject().execute({ settingName: 'BAD', userUuid })
 

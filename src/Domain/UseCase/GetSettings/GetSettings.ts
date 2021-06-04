@@ -5,6 +5,8 @@ import { UseCaseInterface } from '../UseCaseInterface'
 import TYPES from '../../../Bootstrap/Types'
 import { SettingRepositoryInterface } from '../../Setting/SettingRepositoryInterface'
 import { SettingProjector } from '../../../Projection/SettingProjector'
+import { Setting } from '../../Setting/Setting'
+import { SETTINGS } from '../../Setting/Settings'
 
 @injectable()
 export class GetSettings implements UseCaseInterface {
@@ -16,11 +18,12 @@ export class GetSettings implements UseCaseInterface {
   async execute(dto: GetSettingsDto): Promise<GetSettingsResponse> {
     const { userUuid } = dto
     const settings = await this.settingRepository.findAllByUserUuid(userUuid)
-    const simpleSettings = await this.settingProjector.projectManySimple(settings)
+    const filteredSettings = settings.filter((setting: Setting) => setting.name !== SETTINGS.MFA_SECRET)
+    const simpleSettings = await this.settingProjector.projectManySimple(filteredSettings)
 
     return {
       success: true,
-      userUuid, 
+      userUuid,
       settings: simpleSettings,
     }
   }
