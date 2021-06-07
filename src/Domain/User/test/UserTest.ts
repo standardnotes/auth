@@ -9,21 +9,21 @@ export class UserTest {
   /**
    * @param props user props to overwrite defaults
    * @param associated props for entites to be associated with the created user
-   * @returns 
+   * @returns
    */
   static makeSubject(
-    props: Partial<User>, 
+    props: Partial<User>,
     associated: {
       settings?: Partial<Setting>[]
     } = {}
   ): User {
     const user: User = new User()
 
-    const { 
+    const {
       settings: partialSettings = [],
     } = associated
 
-    const settings = partialSettings.map(setting => 
+    const settings = partialSettings.map(setting =>
       SettingTest.makeSubject(setting, user)
     )
 
@@ -52,14 +52,14 @@ export class UserTest {
       supportsSessions: (): boolean => true,
       updatedWithUserAgent: null,
     }
-    
+
     Object.assign(user, defaults, props)
 
     return user
   }
 
   static makeWithSettings(): User {
-    return UserTest.makeSubject({ 
+    return UserTest.makeSubject({
       uuid: 'user-with-settings-uuid',
     }, {
       settings: [

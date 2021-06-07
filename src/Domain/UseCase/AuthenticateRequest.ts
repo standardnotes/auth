@@ -17,8 +17,6 @@ export class AuthenticateRequest implements UseCaseInterface {
 
   async execute(dto: AuthenticateRequestDTO): Promise<AuthenticateRequestResponse> {
     if (!dto.authorizationHeader) {
-      this.logger.debug('invalid-auth: !dto.authorizationHeader')
-
       return {
         success: false,
         responseCode: 401,
@@ -51,8 +49,6 @@ export class AuthenticateRequest implements UseCaseInterface {
           errorMessage: 'The provided access token has expired.',
         }
       case 'INVALID_AUTH':
-        this.logger.debug('invalid-auth: INVALID_AUTH')
-
         return {
           success: false,
           responseCode: 401,
