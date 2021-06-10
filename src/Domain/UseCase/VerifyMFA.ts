@@ -29,7 +29,7 @@ export class VerifyMFA implements UseCaseInterface {
   async execute(dto: VerifyMFADTO): Promise<VerifyMFAResponse> {
     try {
       const user = await this.userRepository.findOneByEmail(dto.email)
-      if(!user) {
+      if (user == undefined) {
         return {
           success: true,
         }
@@ -83,7 +83,7 @@ export class VerifyMFA implements UseCaseInterface {
       return `mfa_${mfaExtensionUuid}`
     }
 
-    for(const key of Object.keys(requestParams)) {
+    for (const key of Object.keys(requestParams)) {
       if (key.startsWith('mfa_')) {
         return key
       }
