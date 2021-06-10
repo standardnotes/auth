@@ -79,11 +79,8 @@ import { DeleteAccount } from '../Domain/UseCase/DeleteAccount/DeleteAccount'
 import { DeleteSetting } from '../Domain/UseCase/DeleteSetting/DeleteSetting'
 import { SettingFactory } from '../Domain/Setting/SettingFactory'
 import { SettingService } from '../Domain/Setting/SettingService'
-import { Item } from '../Domain/Item/Item'
-import { MySQLItemRepository } from '../Infra/MySQL/MySQLItemRepository'
-import { ItemRepositoryInterface } from '../Domain/Item/ItemRepositoryInterface'
-import { ContentDecoder } from '../Domain/Item/ContentDecoder'
-import { ContentDecoderInterface } from '../Domain/Item/ContentDecoderInterface'
+import { ItemHttpServiceInterface } from '../Domain/Item/ItemHttpServiceInterface'
+import { SyncingServerHttpService } from '../Infra/HTTP/SyncingServerHttpService'
 
 export class ContainerConfigLoader {
   async load(): Promise<Container> {
@@ -120,7 +117,6 @@ export class ContainerConfigLoader {
         Role,
         Permission,
         Setting,
-        Item,
       ],
       migrations: [
         env.get('DB_MIGRATIONS_PATH'),
@@ -173,7 +169,6 @@ export class ContainerConfigLoader {
     container.bind<MySQLUserRepository>(TYPES.UserRepository).toConstantValue(connection.getCustomRepository(MySQLUserRepository))
     container.bind<MySQLSettingRepository>(TYPES.SettingRepository).toConstantValue(connection.getCustomRepository(MySQLSettingRepository))
     container.bind<MySQLRoleRepository>(TYPES.RoleRepository).toConstantValue(connection.getCustomRepository(MySQLRoleRepository))
-    container.bind<ItemRepositoryInterface>(TYPES.ItemRepository).toConstantValue(connection.getCustomRepository(MySQLItemRepository))
     container.bind<RedisEphemeralSessionRepository>(TYPES.EphemeralSessionRepository).to(RedisEphemeralSessionRepository)
     container.bind<LockRepository>(TYPES.LockRepository).to(LockRepository)
 
@@ -214,6 +209,7 @@ export class ContainerConfigLoader {
     container.bind(TYPES.USER_SERVER_AUTH_KEY).toConstantValue(env.get('USER_SERVER_AUTH_KEY', true))
     container.bind(TYPES.REDIS_EVENTS_CHANNEL).toConstantValue(env.get('REDIS_EVENTS_CHANNEL'))
     container.bind(TYPES.NEW_RELIC_ENABLED).toConstantValue(env.get('NEW_RELIC_ENABLED', true))
+    container.bind(TYPES.SYNCING_SERVER_URL).toConstantValue(env.get('SYNCING_SERVER_URL'))
 
     // use cases
     container.bind<AuthenticateUser>(TYPES.AuthenticateUser).to(AuthenticateUser)
@@ -244,7 +240,6 @@ export class ContainerConfigLoader {
     // Services
     container.bind<UAParser>(TYPES.DeviceDetector).toConstantValue(new UAParser())
     container.bind<SessionService>(TYPES.SessionService).to(SessionService)
-    container.bind<ContentDecoderInterface>(TYPES.ContentDecoder).to(ContentDecoder)
     container.bind<AuthResponseFactory20161215>(TYPES.AuthResponseFactory20161215).to(AuthResponseFactory20161215)
     container.bind<AuthResponseFactory20190520>(TYPES.AuthResponseFactory20190520).to(AuthResponseFactory20190520)
     container.bind<AuthResponseFactory20200115>(TYPES.AuthResponseFactory20200115).to(AuthResponseFactory20200115)
@@ -258,6 +253,7 @@ export class ContainerConfigLoader {
     container.bind<SettingService>(TYPES.SettingService).to(SettingService)
     container.bind<SnCryptoNode>(TYPES.SnCryptoNode).toConstantValue(new SnCryptoNode())
     container.bind<TimerInterface>(TYPES.Timer).toConstantValue(new Timer())
+    container.bind<ItemHttpServiceInterface>(TYPES.ItemHttpService).to(SyncingServerHttpService)
 
     if (env.get('SNS_TOPIC_ARN', true)) {
       container.bind<SNSDomainEventPublisher>(TYPES.DomainEventPublisher).toConstantValue(

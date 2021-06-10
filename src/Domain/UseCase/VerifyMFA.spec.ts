@@ -1,48 +1,36 @@
 import 'reflect-metadata'
 import { authenticator } from 'otplib'
 
-import { ContentDecoderInterface } from '../Item/ContentDecoderInterface'
-import { Item } from '../Item/Item'
-import { ItemRepositoryInterface } from '../Item/ItemRepositoryInterface'
 import { User } from '../User/User'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { VerifyMFA } from './VerifyMFA'
 import { SettingRepositoryInterface } from '../Setting/SettingRepositoryInterface'
 import { CrypterInterface } from '../Encryption/CrypterInterface'
 import { Setting } from '../Setting/Setting'
+import { ItemHttpServiceInterface } from '../Item/ItemHttpServiceInterface'
 
 describe('VerifyMFA', () => {
   let user: User
-  let item: Item
   let userRepository: UserRepositoryInterface
-  let itemRepository: ItemRepositoryInterface
-  let contentDecoder: ContentDecoderInterface
   let settingRepository: SettingRepositoryInterface
+  let itemHttpService: ItemHttpServiceInterface
   let crypter: CrypterInterface
 
   const createVerifyMFA = () => new VerifyMFA(
     userRepository,
-    itemRepository,
+    itemHttpService,
     settingRepository,
     crypter,
-    contentDecoder
   )
 
   beforeEach(() => {
     user = {} as jest.Mocked<User>
 
-    item = {} as jest.Mocked<Item>
-    item.uuid = '1-2-3'
-    item.content = 'test-data'
-
     userRepository = {} as jest.Mocked<UserRepositoryInterface>
     userRepository.findOneByEmail = jest.fn().mockReturnValue(user)
 
-    itemRepository = {} as jest.Mocked<ItemRepositoryInterface>
-    itemRepository.findMFAExtensionByUserUuid = jest.fn().mockReturnValue(undefined)
-
-    contentDecoder = {} as jest.Mocked<ContentDecoderInterface>
-    contentDecoder.decode = jest.fn().mockReturnValue({})
+    itemHttpService = {} as jest.Mocked<ItemHttpServiceInterface>
+    itemHttpService.getUserMFASecret = jest.fn().mockReturnValue(undefined)
 
     settingRepository = {} as jest.Mocked<SettingRepositoryInterface>
     settingRepository.findOneByNameAndUserUuid = jest.fn()
@@ -51,16 +39,7 @@ describe('VerifyMFA', () => {
     crypter.decryptForUser = jest.fn()
   })
 
-  it('should pass MFA verification if user has no MFA enabled', async () => {
-    expect(await createVerifyMFA().execute({ email: 'test@test.te', requestParams: {} })).toEqual({
-      success: true,
-    })
-  })
-
-  it('should pass MFA verification if user has MFA deleted', async () => {
-    item.deleted = true
-    itemRepository.findMFAExtensionByUserUuid = jest.fn().mockReturnValue(item)
-
+  it('should pass MFA verification if user has no MFA enabled or MFA deleted', async () => {
     expect(await createVerifyMFA().execute({ email: 'test@test.te', requestParams: {} })).toEqual({
       success: true,
     })
@@ -74,7 +53,10 @@ describe('VerifyMFA', () => {
   })
 
   it('should not pass MFA verification if mfa param is not found in the request', async () => {
-    itemRepository.findMFAExtensionByUserUuid = jest.fn().mockReturnValue(item)
+    itemHttpService.getUserMFASecret = jest.fn().mockReturnValue({
+      secret: 'shhhh',
+      extensionUuid: '1-2-3',
+    })
 
     expect(await createVerifyMFA().execute({ email: 'test@test.te', requestParams: {} })).toEqual({
       success: false,
@@ -85,10 +67,10 @@ describe('VerifyMFA', () => {
   })
 
   it('should not pass MFA verification if mfa is not correct', async () => {
-    contentDecoder.decode = jest.fn().mockReturnValue({
+    itemHttpService.getUserMFASecret = jest.fn().mockReturnValue({
       secret: 'shhhh',
+      extensionUuid: '1-2-3',
     })
-    itemRepository.findMFAExtensionByUserUuid = jest.fn().mockReturnValue(item)
 
     expect(await createVerifyMFA().execute({ email: 'test@test.te', requestParams: { 'mfa_1-2-3': 'test' } })).toEqual({
       success: false,
@@ -99,11 +81,10 @@ describe('VerifyMFA', () => {
   })
 
   it('should pass MFA verification if mfa key is correct', async () => {
-    contentDecoder.decode = jest.fn().mockReturnValue({
+    itemHttpService.getUserMFASecret = jest.fn().mockReturnValue({
       secret: 'shhhh',
+      extensionUuid: '1-2-3',
     })
-
-    itemRepository.findMFAExtensionByUserUuid = jest.fn().mockReturnValue(item)
 
     expect(await createVerifyMFA().execute({ email: 'test@test.te', requestParams: { 'mfa_1-2-3': authenticator.generate('shhhh') } })).toEqual({
       success: true,

@@ -4,9 +4,7 @@ import { authenticator } from 'otplib'
 import TYPES from '../../Bootstrap/Types'
 import { CrypterInterface } from '../Encryption/CrypterInterface'
 import { MFAValidationError } from '../Error/MFAValidationError'
-import { ContentDecoderInterface } from '../Item/ContentDecoderInterface'
-import { Item } from '../Item/Item'
-import { ItemRepositoryInterface } from '../Item/ItemRepositoryInterface'
+import { ItemHttpServiceInterface } from '../Item/ItemHttpServiceInterface'
 import { SettingRepositoryInterface } from '../Setting/SettingRepositoryInterface'
 import { SETTINGS } from '../Setting/Settings'
 import { User } from '../User/User'
@@ -19,10 +17,9 @@ import { VerifyMFAResponse } from './VerifyMFAResponse'
 export class VerifyMFA implements UseCaseInterface {
   constructor(
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
-    @inject(TYPES.ItemRepository) private itemsRepository: ItemRepositoryInterface,
+    @inject(TYPES.ItemHttpService) private itemHttpService: ItemHttpServiceInterface,
     @inject(TYPES.SettingRepository) private settingRepository: SettingRepositoryInterface,
     @inject(TYPES.Crypter) private crypter: CrypterInterface,
-    @inject(TYPES.ContentDecoder) private contentDecoder: ContentDecoderInterface,
   ) {
   }
 
@@ -40,16 +37,14 @@ export class VerifyMFA implements UseCaseInterface {
         return this.verifyMFASecret(mfaSecretFromSettings, dto.requestParams)
       }
 
-      const mfaExtension = await this.itemsRepository.findMFAExtensionByUserUuid(user.uuid)
-      if (!mfaExtension || mfaExtension.deleted) {
+      const mfaSecretExtension = await this.itemHttpService.getUserMFASecret(user.uuid)
+      if (mfaSecretExtension === undefined) {
         return {
           success: true,
         }
       }
 
-      const mfaSecretFromExtension = this.getMFASecretFromExtension(mfaExtension)
-
-      return this.verifyMFASecret(mfaSecretFromExtension, dto.requestParams, mfaExtension.uuid)
+      return this.verifyMFASecret(mfaSecretExtension.secret, dto.requestParams, mfaSecretExtension.extensionUuid)
     } catch (error) {
       if (error instanceof MFAValidationError) {
         return {
@@ -102,12 +97,6 @@ export class VerifyMFA implements UseCaseInterface {
     }
 
     return this.crypter.decryptForUser(mfaSetting.value, user)
-  }
-
-  private getMFASecretFromExtension(mfaExtension: Item): string {
-    const mfaContent = this.contentDecoder.decode(<string> mfaExtension.content)
-
-    return mfaContent.secret as string
   }
 
   private verifyMFASecret(secret: string, requestParams: Record<string, unknown>, mfaExtensionUuid?: string): VerifyMFAResponse {
