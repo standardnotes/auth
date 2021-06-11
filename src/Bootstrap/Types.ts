@@ -12,7 +12,6 @@ const TYPES = {
   SettingRepository: Symbol.for('SettingRepository'),
   LockRepository: Symbol.for('LockRepository'),
   RoleRepository: Symbol.for('RoleRepository'),
-  ItemRepository: Symbol.for('ItemRepository'),
   // Middleware
   AuthMiddleware: Symbol.for('AuthMiddleware'),
   AuthMiddlewareWithoutResponse: Symbol.for('AuthMiddlewareWithoutResponse'),
@@ -48,6 +47,7 @@ const TYPES = {
   USER_SERVER_AUTH_KEY: Symbol.for('USER_SERVER_AUTH_KEY'),
   REDIS_EVENTS_CHANNEL: Symbol.for('REDIS_EVENTS_CHANNEL'),
   NEW_RELIC_ENABLED: Symbol.for('NEW_RELIC_ENABLED'),
+  SYNCING_SERVER_URL: Symbol.for('SYNCING_SERVER_URL'),
   // use cases
   AuthenticateUser: Symbol.for('AuthenticateUser'),
   AuthenticateRequest: Symbol.for('AuthenticateRequest'),
@@ -76,7 +76,6 @@ const TYPES = {
   DeviceDetector: Symbol.for('DeviceDetector'),
   SessionService: Symbol.for('SessionService'),
   SettingService: Symbol.for('SettingService'),
-  ContentDecoder: Symbol.for('ContentDecoder'),
   AuthResponseFactory20161215: Symbol.for('AuthResponseFactory20161215'),
   AuthResponseFactory20190520: Symbol.for('AuthResponseFactory20190520'),
   AuthResponseFactory20200115: Symbol.for('AuthResponseFactory20200115'),
@@ -92,6 +91,7 @@ const TYPES = {
   Crypter: Symbol.for('Crypter'),
   SnCryptoNode: Symbol.for('SnCryptoNode'),
   Timer: Symbol.for('Timer'),
+  ItemHttpService: Symbol.for('ItemHttpService'),
 }
 
 export default TYPES

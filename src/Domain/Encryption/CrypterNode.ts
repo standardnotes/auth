@@ -32,7 +32,7 @@ export class CrypterNode implements CrypterInterface {
     return this.stringifyVersionedEncrypted(User.DEFAULT_ENCRYPTION_VERSION, encrypted)
   }
 
-  async decryptForUser(formattedEncryptedValue: string, user: User): Promise<string | null> {
+  async decryptForUser(formattedEncryptedValue: string, user: User): Promise<string> {
     const decryptedUserServerKey = await this.decryptUserServerKey(user)
 
     const encrypted = this.parseVersionedEncrypted(formattedEncryptedValue)
