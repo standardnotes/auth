@@ -8,6 +8,7 @@ import { SettingRepositoryInterface } from '../Setting/SettingRepositoryInterfac
 import { CrypterInterface } from '../Encryption/CrypterInterface'
 import { Setting } from '../Setting/Setting'
 import { ItemHttpServiceInterface } from '../Item/ItemHttpServiceInterface'
+import { Logger } from 'winston'
 
 describe('VerifyMFA', () => {
   let user: User
@@ -15,12 +16,14 @@ describe('VerifyMFA', () => {
   let settingRepository: SettingRepositoryInterface
   let itemHttpService: ItemHttpServiceInterface
   let crypter: CrypterInterface
+  let logger: Logger
 
   const createVerifyMFA = () => new VerifyMFA(
     userRepository,
     itemHttpService,
     settingRepository,
     crypter,
+    logger
   )
 
   beforeEach(() => {
@@ -37,6 +40,9 @@ describe('VerifyMFA', () => {
 
     crypter = {} as jest.Mocked<CrypterInterface>
     crypter.decryptForUser = jest.fn()
+
+    logger = {} as jest.Mocked<Logger>
+    logger.debug = jest.fn()
   })
 
   it('should pass MFA verification if user has no MFA enabled or MFA deleted', async () => {

@@ -1,6 +1,7 @@
 import { ErrorTag } from '@standardnotes/auth'
 import { inject, injectable } from 'inversify'
 import { authenticator } from 'otplib'
+import { Logger } from 'winston'
 import TYPES from '../../Bootstrap/Types'
 import { CrypterInterface } from '../Encryption/CrypterInterface'
 import { MFAValidationError } from '../Error/MFAValidationError'
@@ -20,6 +21,7 @@ export class VerifyMFA implements UseCaseInterface {
     @inject(TYPES.ItemHttpService) private itemHttpService: ItemHttpServiceInterface,
     @inject(TYPES.SettingRepository) private settingRepository: SettingRepositoryInterface,
     @inject(TYPES.Crypter) private crypter: CrypterInterface,
+    @inject(TYPES.Logger) private logger: Logger
   ) {
   }
 
@@ -34,6 +36,8 @@ export class VerifyMFA implements UseCaseInterface {
 
       const mfaSecretFromSettings = await this.getMFASecretFromUserSettings(user)
       if (mfaSecretFromSettings !== undefined) {
+        this.logger.debug('Verifying secret from user settings')
+
         return this.verifyMFASecret(mfaSecretFromSettings, dto.requestParams)
       }
 
@@ -43,6 +47,8 @@ export class VerifyMFA implements UseCaseInterface {
           success: true,
         }
       }
+
+      this.logger.debug('Verifying secret from MFA Extension')
 
       return this.verifyMFASecret(mfaSecretExtension.secret, dto.requestParams, mfaSecretExtension.extensionUuid)
     } catch (error) {
