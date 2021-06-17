@@ -12,6 +12,7 @@ const TYPES = {
   SettingRepository: Symbol.for('SettingRepository'),
   LockRepository: Symbol.for('LockRepository'),
   RoleRepository: Symbol.for('RoleRepository'),
+  WebSocketsConnectionRepository: Symbol.for('WebSocketsConnectionRepository'),
   // Middleware
   AuthMiddleware: Symbol.for('AuthMiddleware'),
   AuthMiddlewareWithoutResponse: Symbol.for('AuthMiddlewareWithoutResponse'),
@@ -69,6 +70,7 @@ const TYPES = {
   DeleteSetting: Symbol.for('DeleteSetting'),
   GetAuthMethods: Symbol.for('GetAuthMethods'),
   DeleteAccount: Symbol.for('DeleteAccount'),
+  AddWebSocketsConnection: Symbol.for('AddWebSocketsConnection'),
   // Handlers
   UserRegisteredEventHandler: Symbol.for('UserRegisteredEventHandler'),
   AccountDeletionRequestedEventHandler: Symbol.for('AccountDeletionRequestedEventHandler'),

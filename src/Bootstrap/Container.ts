@@ -81,6 +81,9 @@ import { SettingFactory } from '../Domain/Setting/SettingFactory'
 import { SettingService } from '../Domain/Setting/SettingService'
 import { ItemHttpServiceInterface } from '../Domain/Item/ItemHttpServiceInterface'
 import { SyncingServerHttpService } from '../Infra/HTTP/SyncingServerHttpService'
+import { WebSocketsConnectionRepositoryInterface } from '../Domain/WebSockets/WebSocketsConnectionRepositoryInterface'
+import { RedisWebSocketsConnectionRepository } from '../Infra/Redis/RedisWebSocketsConnectionRepository'
+import { AddWebSocketsConnection } from '../Domain/UseCase/AddWebSocketsConnection/AddWebSocketsConnection'
 
 export class ContainerConfigLoader {
   async load(): Promise<Container> {
@@ -171,6 +174,7 @@ export class ContainerConfigLoader {
     container.bind<MySQLRoleRepository>(TYPES.RoleRepository).toConstantValue(connection.getCustomRepository(MySQLRoleRepository))
     container.bind<RedisEphemeralSessionRepository>(TYPES.EphemeralSessionRepository).to(RedisEphemeralSessionRepository)
     container.bind<LockRepository>(TYPES.LockRepository).to(LockRepository)
+    container.bind<WebSocketsConnectionRepositoryInterface>(TYPES.WebSocketsConnectionRepository).to(RedisWebSocketsConnectionRepository)
 
     // Middleware
     container.bind<AuthMiddleware>(TYPES.AuthMiddleware).to(AuthMiddleware)
@@ -232,6 +236,7 @@ export class ContainerConfigLoader {
     container.bind<DeleteSetting>(TYPES.DeleteSetting).to(DeleteSetting)
     container.bind<GetAuthMethods>(TYPES.GetAuthMethods).to(GetAuthMethods)
     container.bind<DeleteAccount>(TYPES.DeleteAccount).to(DeleteAccount)
+    container.bind<AddWebSocketsConnection>(TYPES.AddWebSocketsConnection).to(AddWebSocketsConnection)
 
     // Handlers
     container.bind<UserRegisteredEventHandler>(TYPES.UserRegisteredEventHandler).to(UserRegisteredEventHandler)
