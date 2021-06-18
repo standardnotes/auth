@@ -12,11 +12,13 @@ describe('RedisWebSocketsConnectionRepository', () => {
   beforeEach(() => {
     redisClient = {} as jest.Mocked<IORedis.Redis>
     redisClient.sadd = jest.fn()
+    redisClient.set = jest.fn()
   })
 
   it('should save a connection to set of user connections', async () => {
     await createRepository().saveConnection('1-2-3', '2-3-4')
 
-    expect(redisClient.sadd).toHaveBeenLastCalledWith('ws:1-2-3', '2-3-4')
+    expect(redisClient.sadd).toHaveBeenLastCalledWith('ws_user_connections:1-2-3', '2-3-4')
+    expect(redisClient.set).toHaveBeenLastCalledWith('ws_connection:2-3-4', '1-2-3')
   })
 })

@@ -5,7 +5,8 @@ import { WebSocketsConnectionRepositoryInterface } from '../../Domain/WebSockets
 
 @injectable()
 export class RedisWebSocketsConnectionRepository implements WebSocketsConnectionRepositoryInterface {
-  private readonly PREFIX = 'ws'
+  private readonly WEB_SOCKETS_USER_CONNECTIONS_PREFIX = 'ws_user_connections'
+  private readonly WEB_SOCKETS_CONNETION_PREFIX = 'ws_connection'
 
   constructor(
     @inject(TYPES.Redis) private redisClient: IORedis.Redis
@@ -13,6 +14,7 @@ export class RedisWebSocketsConnectionRepository implements WebSocketsConnection
   }
 
   async saveConnection (userUuid: string, connectionId: string): Promise<void> {
-    await this.redisClient.sadd(`${this.PREFIX}:${userUuid}`, connectionId)
+    await this.redisClient.set(`${this.WEB_SOCKETS_CONNETION_PREFIX}:${connectionId}`, userUuid)
+    await this.redisClient.sadd(`${this.WEB_SOCKETS_USER_CONNECTIONS_PREFIX}:${userUuid}`, connectionId)
   }
 }
