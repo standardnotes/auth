@@ -13,6 +13,13 @@ export class RedisWebSocketsConnectionRepository implements WebSocketsConnection
   ) {
   }
 
+  async removeConnection(connectionId: string): Promise<void> {
+    const userUuid = await this.redisClient.get(`${this.WEB_SOCKETS_CONNETION_PREFIX}:${connectionId}`)
+
+    await this.redisClient.srem(`${this.WEB_SOCKETS_USER_CONNECTIONS_PREFIX}:${userUuid}`, connectionId)
+    await this.redisClient.del(`${this.WEB_SOCKETS_CONNETION_PREFIX}:${connectionId}`)
+  }
+
   async saveConnection (userUuid: string, connectionId: string): Promise<void> {
     await this.redisClient.set(`${this.WEB_SOCKETS_CONNETION_PREFIX}:${connectionId}`, userUuid)
     await this.redisClient.sadd(`${this.WEB_SOCKETS_USER_CONNECTIONS_PREFIX}:${userUuid}`, connectionId)

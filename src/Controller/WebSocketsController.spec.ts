@@ -7,17 +7,22 @@ import { AddWebSocketsConnection } from '../Domain/UseCase/AddWebSocketsConnecti
 
 import { WebSocketsController } from './WebSocketsController'
 import { Logger } from 'winston'
+import { RemoveWebSocketsConnection } from '../Domain/UseCase/RemoveWebSocketsConnection/RemoveWebSocketsConnection'
 
 describe('WebSocketsController', () => {
   let addWebSocketsConnection: AddWebSocketsConnection
+  let removeWebSocketsConnection: RemoveWebSocketsConnection
   let request: express.Request
   let logger: Logger
 
-  const createController = () => new WebSocketsController(addWebSocketsConnection, logger)
+  const createController = () => new WebSocketsController(addWebSocketsConnection, removeWebSocketsConnection, logger)
 
   beforeEach(() => {
     addWebSocketsConnection = {} as jest.Mocked<AddWebSocketsConnection>
     addWebSocketsConnection.execute = jest.fn()
+
+    removeWebSocketsConnection = {} as jest.Mocked<RemoveWebSocketsConnection>
+    removeWebSocketsConnection.execute = jest.fn()
 
     request = {
       body: {
@@ -61,5 +66,26 @@ describe('WebSocketsController', () => {
     expect(httpResponse).toBeInstanceOf(results.BadRequestErrorMessageResult)
 
     expect(addWebSocketsConnection.execute).not.toHaveBeenCalled()
+  })
+
+  it('should remove a disconnected web sockets connection', async () => {
+    const httpResponse = await createController().deleteWebSocketsConnection(request)
+
+    expect(httpResponse).toBeInstanceOf(results.JsonResult)
+    expect((<results.JsonResult> httpResponse).statusCode).toEqual(200)
+
+    expect(removeWebSocketsConnection.execute).toHaveBeenCalledWith({
+      connectionId: '2-3-4',
+    })
+  })
+
+  it('should not remove a disconnected web sockets connection if connection id is missing', async () => {
+    delete request.body.connectionId
+
+    const httpResponse = await createController().deleteWebSocketsConnection(request)
+
+    expect(httpResponse).toBeInstanceOf(results.BadRequestErrorMessageResult)
+
+    expect(removeWebSocketsConnection.execute).not.toHaveBeenCalled()
   })
 })
