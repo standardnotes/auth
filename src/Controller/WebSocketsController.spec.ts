@@ -6,12 +6,14 @@ import { results } from 'inversify-express-utils'
 import { AddWebSocketsConnection } from '../Domain/UseCase/AddWebSocketsConnection/AddWebSocketsConnection'
 
 import { WebSocketsController } from './WebSocketsController'
+import { Logger } from 'winston'
 
 describe('WebSocketsController', () => {
   let addWebSocketsConnection: AddWebSocketsConnection
   let request: express.Request
+  let logger: Logger
 
-  const createController = () => new WebSocketsController(addWebSocketsConnection)
+  const createController = () => new WebSocketsController(addWebSocketsConnection, logger)
 
   beforeEach(() => {
     addWebSocketsConnection = {} as jest.Mocked<AddWebSocketsConnection>
@@ -24,6 +26,9 @@ describe('WebSocketsController', () => {
       },
       headers: {},
     } as jest.Mocked<express.Request>
+
+    logger = {} as jest.Mocked<Logger>
+    logger.debug = jest.fn()
   })
 
   it('should persist an established web sockets connection', async () => {

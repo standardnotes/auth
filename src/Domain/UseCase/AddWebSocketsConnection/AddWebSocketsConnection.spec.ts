@@ -1,16 +1,21 @@
 import 'reflect-metadata'
+import { Logger } from 'winston'
 import { WebSocketsConnectionRepositoryInterface } from '../../WebSockets/WebSocketsConnectionRepositoryInterface'
 
 import { AddWebSocketsConnection } from './AddWebSocketsConnection'
 
 describe('AddWebSocketsConnection', () => {
   let webSocketsConnectionRepository: WebSocketsConnectionRepositoryInterface
+  let logger: Logger
 
-  const createUseCase = () => new AddWebSocketsConnection(webSocketsConnectionRepository)
+  const createUseCase = () => new AddWebSocketsConnection(webSocketsConnectionRepository, logger)
 
   beforeEach(() => {
     webSocketsConnectionRepository = {} as jest.Mocked<WebSocketsConnectionRepositoryInterface>
     webSocketsConnectionRepository.saveConnection = jest.fn()
+
+    logger = {} as jest.Mocked<Logger>
+    logger.debug = jest.fn()
   })
 
   it('should save a web sockets connection for a user for further communication', async () => {
