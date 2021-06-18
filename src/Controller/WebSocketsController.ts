@@ -19,9 +19,9 @@ export class WebSocketsController extends BaseHttpController {
   }
 
   @httpPost('/')
-  async storeWebSocketsConnection(request: Request): Promise<results.JsonResult | results.BadRequestResult> {
+  async storeWebSocketsConnection(request: Request): Promise<results.JsonResult | results.BadRequestErrorMessageResult> {
     if (!request.body.userUuid || !request.body.connectionId) {
-      return this.badRequest()
+      return this.badRequest('Missing user uuid and or connection id')
     }
 
     await this.addWebSocketsConnection.execute({

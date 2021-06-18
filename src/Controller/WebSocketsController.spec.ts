@@ -43,7 +43,7 @@ describe('WebSocketsController', () => {
 
     const httpResponse = await createController().storeWebSocketsConnection(request)
 
-    expect(httpResponse).toBeInstanceOf(results.BadRequestResult)
+    expect(httpResponse).toBeInstanceOf(results.BadRequestErrorMessageResult)
 
     expect(addWebSocketsConnection.execute).not.toHaveBeenCalled()
   })
@@ -53,7 +53,7 @@ describe('WebSocketsController', () => {
 
     const httpResponse = await createController().storeWebSocketsConnection(request)
 
-    expect(httpResponse).toBeInstanceOf(results.BadRequestResult)
+    expect(httpResponse).toBeInstanceOf(results.BadRequestErrorMessageResult)
 
     expect(addWebSocketsConnection.execute).not.toHaveBeenCalled()
   })
