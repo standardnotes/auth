@@ -27,10 +27,12 @@ describe('WebSocketsController', () => {
     request = {
       body: {
         userUuid: '1-2-3',
-        connectionId: '2-3-4',
+      },
+      params: {
       },
       headers: {},
     } as jest.Mocked<express.Request>
+    request.params.connectionId = '2-3-4'
 
     logger = {} as jest.Mocked<Logger>
     logger.debug = jest.fn()
@@ -58,16 +60,6 @@ describe('WebSocketsController', () => {
     expect(addWebSocketsConnection.execute).not.toHaveBeenCalled()
   })
 
-  it('should not persist an established web sockets connection if connection id is missing', async () => {
-    delete request.body.connectionId
-
-    const httpResponse = await createController().storeWebSocketsConnection(request)
-
-    expect(httpResponse).toBeInstanceOf(results.BadRequestErrorMessageResult)
-
-    expect(addWebSocketsConnection.execute).not.toHaveBeenCalled()
-  })
-
   it('should remove a disconnected web sockets connection', async () => {
     const httpResponse = await createController().deleteWebSocketsConnection(request)
 
@@ -77,15 +69,5 @@ describe('WebSocketsController', () => {
     expect(removeWebSocketsConnection.execute).toHaveBeenCalledWith({
       connectionId: '2-3-4',
     })
-  })
-
-  it('should not remove a disconnected web sockets connection if connection id is missing', async () => {
-    delete request.body.connectionId
-
-    const httpResponse = await createController().deleteWebSocketsConnection(request)
-
-    expect(httpResponse).toBeInstanceOf(results.BadRequestErrorMessageResult)
-
-    expect(removeWebSocketsConnection.execute).not.toHaveBeenCalled()
   })
 })

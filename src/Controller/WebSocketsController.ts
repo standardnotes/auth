@@ -23,31 +23,25 @@ export class WebSocketsController extends BaseHttpController {
     super()
   }
 
-  @httpPost('/')
+  @httpPost('/:connectionId')
   async storeWebSocketsConnection(request: Request): Promise<results.JsonResult | results.BadRequestErrorMessageResult> {
-    if (!request.body.userUuid || !request.body.connectionId) {
-      this.logger.debug('Missing required parameters from the request: %O', request.body)
+    if (!request.body.userUuid) {
+      this.logger.debug('Missing required user uuid from the request: %O', request.body)
 
-      return this.badRequest('Missing user uuid and or connection id')
+      return this.badRequest('Missing user uuid')
     }
 
     await this.addWebSocketsConnection.execute({
       userUuid: request.body.userUuid,
-      connectionId: request.body.connectionId,
+      connectionId: request.params.connectionId,
     })
 
     return this.json({ success: true })
   }
 
-  @httpDelete('/')
+  @httpDelete('/:connectionId')
   async deleteWebSocketsConnection(request: Request): Promise<results.JsonResult | results.BadRequestErrorMessageResult> {
-    if (!request.body.connectionId) {
-      this.logger.debug('Missing required parameters from the request: %O', request.body)
-
-      return this.badRequest('Missing connection id')
-    }
-
-    await this.removeWebSocketsConnection.execute({ connectionId: request.body.connectionId })
+    await this.removeWebSocketsConnection.execute({ connectionId: request.params.connectionId })
 
     return this.json({ success: true })
   }
