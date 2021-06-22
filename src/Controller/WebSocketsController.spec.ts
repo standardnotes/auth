@@ -6,16 +6,15 @@ import { results } from 'inversify-express-utils'
 import { AddWebSocketsConnection } from '../Domain/UseCase/AddWebSocketsConnection/AddWebSocketsConnection'
 
 import { WebSocketsController } from './WebSocketsController'
-import { Logger } from 'winston'
 import { RemoveWebSocketsConnection } from '../Domain/UseCase/RemoveWebSocketsConnection/RemoveWebSocketsConnection'
 
 describe('WebSocketsController', () => {
   let addWebSocketsConnection: AddWebSocketsConnection
   let removeWebSocketsConnection: RemoveWebSocketsConnection
   let request: express.Request
-  let logger: Logger
+  let response: express.Response
 
-  const createController = () => new WebSocketsController(addWebSocketsConnection, removeWebSocketsConnection, logger)
+  const createController = () => new WebSocketsController(addWebSocketsConnection, removeWebSocketsConnection)
 
   beforeEach(() => {
     addWebSocketsConnection = {} as jest.Mocked<AddWebSocketsConnection>
@@ -34,12 +33,16 @@ describe('WebSocketsController', () => {
     } as jest.Mocked<express.Request>
     request.params.connectionId = '2-3-4'
 
-    logger = {} as jest.Mocked<Logger>
-    logger.debug = jest.fn()
+    response = {
+      locals: {},
+    } as jest.Mocked<express.Response>
+    response.locals.user = {
+      uuid: '1-2-3',
+    }
   })
 
   it('should persist an established web sockets connection', async () => {
-    const httpResponse = await createController().storeWebSocketsConnection(request)
+    const httpResponse = await createController().storeWebSocketsConnection(request, response)
 
     expect(httpResponse).toBeInstanceOf(results.JsonResult)
     expect((<results.JsonResult> httpResponse).statusCode).toEqual(200)
@@ -48,16 +51,6 @@ describe('WebSocketsController', () => {
       userUuid: '1-2-3',
       connectionId: '2-3-4',
     })
-  })
-
-  it('should not persist an established web sockets connection if user uuid is missing', async () => {
-    delete request.body.userUuid
-
-    const httpResponse = await createController().storeWebSocketsConnection(request)
-
-    expect(httpResponse).toBeInstanceOf(results.BadRequestErrorMessageResult)
-
-    expect(addWebSocketsConnection.execute).not.toHaveBeenCalled()
   })
 
   it('should remove a disconnected web sockets connection', async () => {

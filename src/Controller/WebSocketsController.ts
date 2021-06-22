@@ -1,4 +1,4 @@
-import { Request } from 'express'
+import { Request, Response } from 'express'
 import { inject } from 'inversify'
 import {
   BaseHttpController,
@@ -8,7 +8,6 @@ import {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   results,
 } from 'inversify-express-utils'
-import { Logger } from 'winston'
 import TYPES from '../Bootstrap/Types'
 import { AddWebSocketsConnection } from '../Domain/UseCase/AddWebSocketsConnection/AddWebSocketsConnection'
 import { RemoveWebSocketsConnection } from '../Domain/UseCase/RemoveWebSocketsConnection/RemoveWebSocketsConnection'
@@ -18,21 +17,14 @@ export class WebSocketsController extends BaseHttpController {
   constructor(
     @inject(TYPES.AddWebSocketsConnection) private addWebSocketsConnection: AddWebSocketsConnection,
     @inject(TYPES.RemoveWebSocketsConnection) private removeWebSocketsConnection: RemoveWebSocketsConnection,
-    @inject(TYPES.Logger) private logger: Logger
   ) {
     super()
   }
 
-  @httpPost('/:connectionId')
-  async storeWebSocketsConnection(request: Request): Promise<results.JsonResult | results.BadRequestErrorMessageResult> {
-    if (!request.body.userUuid) {
-      this.logger.debug('Missing required user uuid from the request: %O', request.body)
-
-      return this.badRequest('Missing user uuid')
-    }
-
+  @httpPost('/:connectionId', TYPES.AuthMiddleware)
+  async storeWebSocketsConnection(request: Request, response: Response): Promise<results.JsonResult | results.BadRequestErrorMessageResult> {
     await this.addWebSocketsConnection.execute({
-      userUuid: request.body.userUuid,
+      userUuid: response.locals.user.uuid,
       connectionId: request.params.connectionId,
     })
 
