@@ -1,4 +1,5 @@
 import 'reflect-metadata'
+import { Setting } from '../../Setting/Setting'
 import { UserTest } from '../../User/test/UserTest'
 import { UserRepositoryInterface } from '../../User/UserRepositoryInterface'
 import { UpdateSettingTest } from './test/UpdateSettingTest'
@@ -31,6 +32,7 @@ describe('UpdateSetting', () => {
 
     expect(actual).toEqual({
       success: true,
+      setting: expect.any(Setting),
       statusCode: 201,
     })
   })
@@ -50,6 +52,7 @@ describe('UpdateSetting', () => {
 
     expect(actual).toEqual({
       success: true,
+      setting: expect.any(Setting),
       statusCode: 204,
     })
   })

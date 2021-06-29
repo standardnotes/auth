@@ -28,14 +28,15 @@ export class UpdateSetting implements UseCaseInterface {
       }
     }
 
-    const status = await this.settingService.createOrReplace({
+    const response = await this.settingService.createOrReplace({
       user,
       props,
     })
 
     return {
       success: true,
-      statusCode: this.statusToStatusCode(status),
+      setting: response.setting,
+      statusCode: this.statusToStatusCode(response),
     }
   }
 
