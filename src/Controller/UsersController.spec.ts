@@ -17,6 +17,7 @@ import { UserRepostioryStub } from '../Domain/User/test/UserRepostioryStub'
 import { UpdateSetting } from '../Domain/UseCase/UpdateSetting/UpdateSetting'
 import { DeleteAccount } from '../Domain/UseCase/DeleteAccount/DeleteAccount'
 import { DeleteSetting } from '../Domain/UseCase/DeleteSetting/DeleteSetting'
+import { GetMFASetting } from '../Domain/UseCase/GetMFASetting/GetMFASetting'
 
 describe('UsersController', () => {
   let updateUser: UpdateUser
@@ -29,6 +30,7 @@ describe('UsersController', () => {
     updateUser,
     {} as jest.Mocked<GetSettings>,
     {} as jest.Mocked<GetSetting>,
+    {} as jest.Mocked<GetMFASetting>,
     {} as jest.Mocked<GetUserKeyParams>,
     {} as jest.Mocked<UpdateSetting>,
     deleteAccount,
@@ -196,6 +198,90 @@ describe('UsersController', () => {
       userUuid,
       setting: expectedSetting,
     })
+  })
+
+  it('should get user mfa secret for vaild user uuid', async () => {
+    const user = UserTest.makeSubject({
+      uuid: 'user-with-settings-uuid',
+    }, {
+      settings: [
+        { uuid: 'setting-2-uuid', name: 'MFA_SECRET' },
+        { uuid: 'setting-2-uuid', name: 'setting-2-name' },
+        { uuid: 'setting-3-uuid', name: 'setting-3-name' },
+      ],
+    })
+    const userUuid = user.uuid
+    response.locals.user = user
+
+    const settings = await user.settings
+    const settingIndex = 0
+
+    Object.assign(request, {
+      params: { userUuid },
+    })
+
+    const repository = new SettingRepostioryStub(settings)
+    const projector = SettingProjectorTest.get()
+    const subject = UsersControllerTest.makeSubject({
+      updateUser,
+      deleteAccount,
+      settingRepository: repository,
+      projector,
+    })
+
+    const expectedSetting = await projector.projectSimple(settings[settingIndex])
+
+    const actual = await subject.getMFASetting(request, response)
+
+    expect(actual.statusCode).toEqual(200)
+    expect(actual.json).toEqual({
+      success: true,
+      userUuid,
+      setting: expectedSetting,
+    })
+  })
+
+  it('should error when geting user mfa for invaild user uuid', async () => {
+    const userUuid = 'user-1'
+    const badUserUuid = 'BAD-user-uuid'
+    const user = UserTest.makeSubject({
+      uuid: userUuid,
+    })
+    Object.assign(request, {
+      params: { userUuid: badUserUuid },
+    })
+    response.locals.user = user
+
+    const subject = UsersControllerTest.makeSubject({
+      updateUser,
+      deleteAccount,
+    })
+
+    const actual = await subject.getMFASetting(request, response)
+
+    expect(actual.statusCode).toEqual(401)
+    expect(actual.json).toHaveProperty('error')
+  })
+
+  it('should error when geting non existing mfa for vaild user uuid', async () => {
+    const userUuid = 'user-1'
+    const user = UserTest.makeSubject({
+      uuid: userUuid,
+    })
+    Object.assign(request, {
+      params: { userUuid },
+    })
+    response.locals.user = user
+
+    const subject = UsersControllerTest.makeSubject({
+      updateUser,
+      deleteAccount,
+    })
+
+    const actual = await subject.getMFASetting(request, response)
+
+    expect(actual.statusCode).toEqual(400)
+    expect(actual.json).toHaveProperty('error')
   })
 
   it('should error when geting user setting by name for invaild user uuid', async () => {

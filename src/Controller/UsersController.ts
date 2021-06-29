@@ -14,6 +14,7 @@ import TYPES from '../Bootstrap/Types'
 import { Setting } from '../Domain/Setting/Setting'
 import { DeleteAccount } from '../Domain/UseCase/DeleteAccount/DeleteAccount'
 import { DeleteSetting } from '../Domain/UseCase/DeleteSetting/DeleteSetting'
+import { GetMFASetting } from '../Domain/UseCase/GetMFASetting/GetMFASetting'
 import { GetSetting } from '../Domain/UseCase/GetSetting/GetSetting'
 import { GetSettings } from '../Domain/UseCase/GetSettings/GetSettings'
 import { GetUserKeyParams } from '../Domain/UseCase/GetUserKeyParams/GetUserKeyParams'
@@ -26,6 +27,7 @@ export class UsersController extends BaseHttpController {
     @inject(TYPES.UpdateUser) private updateUser: UpdateUser,
     @inject(TYPES.GetSettings) private doGetSettings: GetSettings,
     @inject(TYPES.GetSetting) private doGetSetting: GetSetting,
+    @inject(TYPES.GetMFASetting) private doGetMFASetting: GetMFASetting,
     @inject(TYPES.GetUserKeyParams) private getUserKeyParams: GetUserKeyParams,
     @inject(TYPES.UpdateSetting) private doUpdateSetting: UpdateSetting,
     @inject(TYPES.DeleteAccount) private doDeleteAccount: DeleteAccount,
@@ -76,6 +78,25 @@ export class UsersController extends BaseHttpController {
     const result = await this.doGetSettings.execute({ userUuid })
 
     return this.json(result)
+  }
+
+  @httpGet('/:userUuid/mfa', TYPES.AuthMiddleware)
+  async getMFASetting(request: Request, response: Response): Promise<results.JsonResult> {
+    if (request.params.userUuid !== response.locals.user.uuid) {
+      return this.json({
+        error: {
+          message: 'Operation not allowed.',
+        },
+      }, 401)
+    }
+
+    const result = await this.doGetMFASetting.execute({ userUuid: request.params.userUuid })
+
+    if (result.success) {
+      return this.json(result)
+    }
+
+    return this.json(result, 400)
   }
 
   @httpGet('/:userUuid/settings/:settingName', TYPES.AuthMiddleware)
