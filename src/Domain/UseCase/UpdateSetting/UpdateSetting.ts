@@ -6,11 +6,13 @@ import TYPES from '../../../Bootstrap/Types'
 import { UserRepositoryInterface } from '../../User/UserRepositoryInterface'
 import { CreateOrReplaceSettingResponse } from '../../Setting/CreateOrReplaceSettingResponse'
 import { SettingService } from '../../Setting/SettingService'
+import { SettingProjector } from '../../../Projection/SettingProjector'
 
 @injectable()
 export class UpdateSetting implements UseCaseInterface {
   constructor (
     @inject(TYPES.SettingService) private settingService: SettingService,
+    @inject(TYPES.SettingProjector) private settingProjector: SettingProjector,
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
   ) {}
 
@@ -35,7 +37,7 @@ export class UpdateSetting implements UseCaseInterface {
 
     return {
       success: true,
-      setting: response.setting,
+      setting: await this.settingProjector.projectSimple(response.setting),
       statusCode: this.statusToStatusCode(response),
     }
   }

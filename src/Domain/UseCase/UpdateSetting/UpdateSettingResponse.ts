@@ -1,8 +1,8 @@
-import { Setting } from '../../Setting/Setting'
+import { SimpleSetting } from '../../Setting/SimpleSetting'
 
 export type UpdateSettingResponse = {
   success: true,
-  setting: Setting,
+  setting: SimpleSetting,
   statusCode: number,
 } | {
   success: false,
