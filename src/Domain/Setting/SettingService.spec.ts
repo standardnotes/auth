@@ -4,7 +4,7 @@ import { SettingServiceTest as SettingServiceTest } from './test/SettingServiceT
 import { SettingTest } from './test/SettingTest'
 
 describe('SettingService', () => {
-  it('should create setting if it doesn\'t exist', async () => {
+  it ('should create setting if it doesn\'t exist', async () => {
     const persister = SettingServiceTest.makeSubject()
     const user = UserTest.makeSubject({})
 
@@ -17,9 +17,10 @@ describe('SettingService', () => {
       },
     })
 
-    expect(result).toEqual('created')
+    expect(result.status).toEqual('created')
   })
-  it('should replace setting if it does exist', async () => {
+
+  it ('should replace setting if it does exist', async () => {
     const user = UserTest.makeSubject({})
     const setting = SettingTest.makeSubject({}, user)
     const persister = SettingServiceTest.makeSubject({
@@ -35,6 +36,6 @@ describe('SettingService', () => {
       },
     })
 
-    expect(result).toEqual('replaced')
+    expect(result.status).toEqual('replaced')
   })
 })

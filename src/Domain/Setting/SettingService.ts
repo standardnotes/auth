@@ -1,7 +1,7 @@
 import { inject, injectable } from 'inversify'
 import TYPES from '../../Bootstrap/Types'
 import { CreateOrReplaceSettingDto } from './CreateOrReplaceSettingDto'
-import { CreateOrReplaceSettingStatus } from './CreateOrReplaceSettingStatus'
+import { CreateOrReplaceSettingResponse } from './CreateOrReplaceSettingResponse'
 import { SettingFactory } from './SettingFactory'
 import { SettingRepositoryInterface } from './SettingRepositoryInterface'
 
@@ -13,19 +13,25 @@ export class SettingService {
   ) {}
 
   async createOrReplace(dto: CreateOrReplaceSettingDto):
-  Promise<CreateOrReplaceSettingStatus> {
+  Promise<CreateOrReplaceSettingResponse> {
     const { user, props } = dto
 
     const existing = await this.repository.findOneByNameAndUserUuid(props.name, user.uuid)
 
     if (existing === undefined) {
-      await this.repository.save(await this.factory.create(props, user))
+      const setting = await this.repository.save(await this.factory.create(props, user))
 
-      return 'created'
+      return {
+        status: 'created',
+        setting,
+      }
     }
 
-    await this.repository.save(await this.factory.createReplacement(existing, props))
+    const setting = await this.repository.save(await this.factory.createReplacement(existing, props))
 
-    return 'replaced'
+    return {
+      status: 'replaced',
+      setting,
+    }
   }
 }

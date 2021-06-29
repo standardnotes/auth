@@ -31,6 +31,11 @@ describe('UpdateSetting', () => {
 
     expect(actual).toEqual({
       success: true,
+      setting: {
+        name: 'test-setting-name',
+        uuid: expect.any(String),
+        value: 'test-setting-value',
+      },
       statusCode: 201,
     })
   })
@@ -50,6 +55,11 @@ describe('UpdateSetting', () => {
 
     expect(actual).toEqual({
       success: true,
+      setting: {
+        name: 'setting-1-name',
+        uuid: expect.any(String),
+        value: 'REPLACED',
+      },
       statusCode: 204,
     })
   })

@@ -1,9 +1,10 @@
 import { SimpleSetting } from '../../Setting/SimpleSetting'
+import { Uuid } from '@standardnotes/auth'
 
-export type UpdateSettingResponse = {
+export type GetMFASettingResponse = {
   success: true,
+  userUuid: Uuid,
   setting: SimpleSetting,
-  statusCode: number,
 } | {
   success: false,
   error: {

@@ -17,6 +17,7 @@ import { UserRepositoryInterface } from '../../Domain/User/UserRepositoryInterfa
 import { SettingProjector } from '../../Projection/SettingProjector'
 import { SettingProjectorTest } from '../../Projection/test/SettingProjectorTest'
 import { UsersController } from '../UsersController'
+import { GetMFASettingTest } from '../../Domain/UseCase/GetMFASetting/test/GetMFASettingTest'
 
 export class UsersControllerTest {
   static makeSubject({
@@ -47,6 +48,10 @@ export class UsersControllerTest {
         projector,
       }),
       GetSettingTest.makeSubject({
+        repository: settingRepository,
+        projector,
+      }),
+      GetMFASettingTest.makeSubject({
         repository: settingRepository,
         projector,
       }),
