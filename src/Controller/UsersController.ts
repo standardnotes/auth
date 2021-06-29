@@ -127,7 +127,7 @@ export class UsersController extends BaseHttpController {
     })
 
     if (result.success) {
-      return this.statusCode(result.statusCode)
+      return this.json({ setting: result.setting }, result.statusCode)
     }
 
     return this.json(result, 400)
