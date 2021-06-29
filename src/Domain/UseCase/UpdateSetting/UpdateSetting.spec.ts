@@ -1,5 +1,4 @@
 import 'reflect-metadata'
-import { Setting } from '../../Setting/Setting'
 import { UserTest } from '../../User/test/UserTest'
 import { UserRepositoryInterface } from '../../User/UserRepositoryInterface'
 import { UpdateSettingTest } from './test/UpdateSettingTest'
@@ -32,7 +31,11 @@ describe('UpdateSetting', () => {
 
     expect(actual).toEqual({
       success: true,
-      setting: expect.any(Setting),
+      setting: {
+        name: 'test-setting-name',
+        uuid: expect.any(String),
+        value: 'test-setting-value',
+      },
       statusCode: 201,
     })
   })
@@ -52,7 +55,11 @@ describe('UpdateSetting', () => {
 
     expect(actual).toEqual({
       success: true,
-      setting: expect.any(Setting),
+      setting: {
+        name: 'setting-1-name',
+        uuid: expect.any(String),
+        value: 'REPLACED',
+      },
       statusCode: 204,
     })
   })
