@@ -1,9 +1,12 @@
 import { Setting } from './Setting'
 
-export type SettingProps = Omit<Setting, 
-  'uuid' | 
-  'user' | 
-  'createdAt' | 
+export type SettingProps = Omit<Setting,
+  'uuid' |
+  'user' |
+  'createdAt' |
   'updatedAt' |
   'serverEncryptionVersion'
-> & { serverEncryptionVersion?: number }
+> & {
+  uuid?: string,
+  serverEncryptionVersion?: number
+}

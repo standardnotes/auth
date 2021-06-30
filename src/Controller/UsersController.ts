@@ -103,11 +103,13 @@ export class UsersController extends BaseHttpController {
   @httpPut('/:userUuid/mfa')
   async updateMFASetting(request: Request): Promise<results.JsonResult | results.StatusCodeResult> {
     const {
+      uuid,
       value,
       serverEncryptionVersion = Setting.DEFAULT_ENCRYPTION_VERSION,
     } = request.body
 
     const props = {
+      uuid,
       value,
       serverEncryptionVersion,
       name: SETTINGS.MFA_SECRET,

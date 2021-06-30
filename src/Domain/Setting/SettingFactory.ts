@@ -14,7 +14,7 @@ export class SettingFactory {
   ) {}
 
   async create(props: SettingProps, user: User): Promise<Setting> {
-    const uuid = uuidv4()
+    const uuid = props.uuid ?? uuidv4()
 
     const {
       name,
