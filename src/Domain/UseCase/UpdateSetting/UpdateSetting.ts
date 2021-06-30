@@ -7,6 +7,7 @@ import { UserRepositoryInterface } from '../../User/UserRepositoryInterface'
 import { CreateOrReplaceSettingResponse } from '../../Setting/CreateOrReplaceSettingResponse'
 import { SettingService } from '../../Setting/SettingService'
 import { SettingProjector } from '../../../Projection/SettingProjector'
+import { Logger } from 'winston'
 
 @injectable()
 export class UpdateSetting implements UseCaseInterface {
@@ -14,9 +15,12 @@ export class UpdateSetting implements UseCaseInterface {
     @inject(TYPES.SettingService) private settingService: SettingService,
     @inject(TYPES.SettingProjector) private settingProjector: SettingProjector,
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
+    @inject(TYPES.Logger) private logger: Logger,
   ) {}
 
   async execute(dto: UpdateSettingDto): Promise<UpdateSettingResponse> {
+    this.logger.debug('Updating setting: %O', dto)
+
     const { userUuid, props } = dto
 
     const user = await this.userRepository.findOneByUuid(userUuid)

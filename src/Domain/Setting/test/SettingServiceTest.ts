@@ -4,6 +4,7 @@ import { SettingService } from '../SettingService'
 import { SettingRepositoryInterface } from '../SettingRepositoryInterface'
 import { SettingFactoryTest } from './SettingFactoryTest'
 import { SettingRepostioryStub } from './SettingRepositoryStub'
+import { Logger } from 'winston'
 
 export class SettingServiceTest {
   static makeSubject({
@@ -15,9 +16,13 @@ export class SettingServiceTest {
     factory?: SettingFactory,
     repository?: SettingRepositoryInterface
   } = {}): SettingService {
+    const logger = {} as jest.Mocked<Logger>
+    logger.debug = jest.fn()
+
     return new SettingService(
       factory,
       repository,
+      logger,
     )
   }
 }
