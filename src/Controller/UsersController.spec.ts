@@ -435,6 +435,33 @@ describe('UsersController', () => {
     expect(actual).toMatchObject({ statusCode: 201 })
   })
 
+  it('should create user mfa setting', async () => {
+    const user = UserTest.makeWithSettings()
+    const userUuid = user.uuid
+
+    const settings = await user.settings
+
+    Object.assign(request, {
+      params: { userUuid },
+      body: { value: 'value' },
+    })
+
+    const userRepository = new UserRepostioryStub([user])
+    const settingRepository = new SettingRepostioryStub(settings)
+    const subject = UsersControllerTest.makeSubject({
+      updateUser,
+      deleteAccount,
+      settingRepository,
+      userRepository,
+    })
+
+    const actual = await subject.updateMFASetting(
+      request,
+    )
+
+    expect(actual).toMatchObject({ statusCode: 201 })
+  })
+
   it('should replace user setting for vaild user uuid', async () => {
     const user = UserTest.makeWithSettings()
     const userUuid = user.uuid
@@ -460,6 +487,41 @@ describe('UsersController', () => {
     const actual = await subject.updateSetting(
       request,
       response,
+    )
+
+    expect(actual).toMatchObject({ statusCode: 204 })
+  })
+
+  it('should replace user mfa setting', async () => {
+    const user = UserTest.makeSubject({
+      uuid: 'user-with-settings-uuid',
+    }, {
+      settings: [
+        { uuid: 'setting-2-uuid', name: 'MFA_SECRET' },
+        { uuid: 'setting-2-uuid', name: 'setting-2-name' },
+        { uuid: 'setting-3-uuid', name: 'setting-3-name' },
+      ],
+    })
+    const userUuid = user.uuid
+
+    const settings = await user.settings
+
+    Object.assign(request, {
+      params: { userUuid },
+      body: { value: 'NEW-value' },
+    })
+
+    const userRepository = new UserRepostioryStub([user])
+    const settingRepository = new SettingRepostioryStub(settings)
+    const subject = UsersControllerTest.makeSubject({
+      updateUser,
+      deleteAccount,
+      settingRepository,
+      userRepository,
+    })
+
+    const actual = await subject.updateMFASetting(
+      request,
     )
 
     expect(actual).toMatchObject({ statusCode: 204 })
@@ -505,6 +567,22 @@ describe('UsersController', () => {
     })
 
     const actual = await subject.updateSetting(request, response)
+
+    expect(actual).toMatchObject({ json: { error: expect.anything() } })
+  })
+
+  it('should error when creating/replacing user mfa setting for invaild user uuid', async () => {
+    const badUserUuid = 'BAD-user-uuid'
+    Object.assign(request, {
+      params: { userUuid: badUserUuid, settingName: 'irrelevant' },
+    })
+
+    const subject = UsersControllerTest.makeSubject({
+      updateUser,
+      deleteAccount,
+    })
+
+    const actual = await subject.updateMFASetting(request)
 
     expect(actual).toMatchObject({ json: { error: expect.anything() } })
   })

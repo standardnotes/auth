@@ -12,6 +12,7 @@ import {
 } from 'inversify-express-utils'
 import TYPES from '../Bootstrap/Types'
 import { Setting } from '../Domain/Setting/Setting'
+import { SETTINGS } from '../Domain/Setting/Settings'
 import { DeleteAccount } from '../Domain/UseCase/DeleteAccount/DeleteAccount'
 import { DeleteSetting } from '../Domain/UseCase/DeleteSetting/DeleteSetting'
 import { GetMFASetting } from '../Domain/UseCase/GetMFASetting/GetMFASetting'
@@ -94,6 +95,32 @@ export class UsersController extends BaseHttpController {
 
     if (result.success) {
       return this.json(result)
+    }
+
+    return this.json(result, 400)
+  }
+
+  @httpPut('/:userUuid/mfa')
+  async updateMFASetting(request: Request): Promise<results.JsonResult | results.StatusCodeResult> {
+    const {
+      value,
+      serverEncryptionVersion = Setting.DEFAULT_ENCRYPTION_VERSION,
+    } = request.body
+
+    const props = {
+      value,
+      serverEncryptionVersion,
+      name: SETTINGS.MFA_SECRET,
+    }
+
+    const { userUuid } = request.params
+    const result = await this.doUpdateSetting.execute({
+      userUuid,
+      props,
+    })
+
+    if (result.success) {
+      return this.json({ setting: result.setting }, result.statusCode)
     }
 
     return this.json(result, 400)
