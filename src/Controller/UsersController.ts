@@ -80,7 +80,7 @@ export class UsersController extends BaseHttpController {
     return this.json(result)
   }
 
-  @httpGet('/:userUuid/mfa', TYPES.AuthMiddleware)
+  @httpGet('/:userUuid/mfa')
   async getMFASetting(request: Request, response: Response): Promise<results.JsonResult> {
     if (request.params.userUuid !== response.locals.user.uuid) {
       return this.json({
