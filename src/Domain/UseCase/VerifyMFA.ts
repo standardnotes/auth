@@ -1,4 +1,5 @@
 import { ErrorTag } from '@standardnotes/auth'
+import { v4 as uuidv4 } from 'uuid'
 import { inject, injectable } from 'inversify'
 import { authenticator } from 'otplib'
 import { Logger } from 'winston'
@@ -94,6 +95,7 @@ export class VerifyMFA implements UseCaseInterface {
     throw new MFAValidationError(
       'Please enter your two-factor authentication code.',
       ErrorTag.MfaRequired,
+      { mfa_key: `mfa_${uuidv4()}` }
     )
   }
 

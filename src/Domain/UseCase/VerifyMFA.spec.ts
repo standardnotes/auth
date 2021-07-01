@@ -143,6 +143,7 @@ describe('VerifyMFA', () => {
       success: false,
       errorTag: 'mfa-required',
       errorMessage: 'Please enter your two-factor authentication code.',
+      errorPayload: { mfa_key: expect.stringMatching(/^mfa_/) },
     })
   })
 
