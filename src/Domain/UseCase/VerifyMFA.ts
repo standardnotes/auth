@@ -6,6 +6,7 @@ import TYPES from '../../Bootstrap/Types'
 import { CrypterInterface } from '../Encryption/CrypterInterface'
 import { MFAValidationError } from '../Error/MFAValidationError'
 import { ItemHttpServiceInterface } from '../Item/ItemHttpServiceInterface'
+import { Setting } from '../Setting/Setting'
 import { SettingRepositoryInterface } from '../Setting/SettingRepositoryInterface'
 import { SETTINGS } from '../Setting/Settings'
 import { User } from '../User/User'
@@ -100,6 +101,10 @@ export class VerifyMFA implements UseCaseInterface {
     const mfaSetting = await this.settingRepository.findOneByNameAndUserUuid(SETTINGS.MFA_SECRET, user.uuid)
     if (mfaSetting === undefined) {
       return undefined
+    }
+
+    if (mfaSetting.serverEncryptionVersion === Setting.DEFAULT_ENCRYPTION_VERSION) {
+      return mfaSetting.value
     }
 
     return this.crypter.decryptForUser(mfaSetting.value, user)

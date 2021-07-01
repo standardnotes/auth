@@ -97,10 +97,23 @@ describe('VerifyMFA', () => {
     })
   })
 
-  it('should pass MFA verification from user settings if mfa key is correct', async () => {
-    settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue({} as jest.Mocked<Setting>)
+  it('should pass MFA verification from user settings if mfa key is correctly encrypted', async () => {
+    settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue({
+      serverEncryptionVersion: 1,
+    } as jest.Mocked<Setting>)
 
     crypter.decryptForUser = jest.fn().mockReturnValue('shhhh')
+
+    expect(await createVerifyMFA().execute({ email: 'test@test.te', requestParams: { 'mfa_1-2-3': authenticator.generate('shhhh') } })).toEqual({
+      success: true,
+    })
+  })
+
+  it('should pass MFA verification from user settings if mfa key is correctly unencrypted', async () => {
+    settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue({
+      serverEncryptionVersion: 0,
+      value: 'shhhh',
+    } as jest.Mocked<Setting>)
 
     expect(await createVerifyMFA().execute({ email: 'test@test.te', requestParams: { 'mfa_1-2-3': authenticator.generate('shhhh') } })).toEqual({
       success: true,
