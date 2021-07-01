@@ -8,8 +8,6 @@ import { CreateOrReplaceSettingResponse } from '../../Setting/CreateOrReplaceSet
 import { SettingService } from '../../Setting/SettingService'
 import { SettingProjector } from '../../../Projection/SettingProjector'
 import { Logger } from 'winston'
-import { CrypterInterface } from '../../Encryption/CrypterInterface'
-import { Setting } from '../../Setting/Setting'
 
 @injectable()
 export class UpdateSetting implements UseCaseInterface {
@@ -17,7 +15,6 @@ export class UpdateSetting implements UseCaseInterface {
     @inject(TYPES.SettingService) private settingService: SettingService,
     @inject(TYPES.SettingProjector) private settingProjector: SettingProjector,
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
-    @inject(TYPES.Crypter) private crypter: CrypterInterface,
     @inject(TYPES.Logger) private logger: Logger,
   ) {}
 
@@ -35,10 +32,6 @@ export class UpdateSetting implements UseCaseInterface {
           message: `User ${userUuid} not found.`,
         },
       }
-    }
-
-    if (props.serverEncryptionVersion !== Setting.ENCRYPTION_VERSION_UNENCRYPTED) {
-      props.value = await this.crypter.encryptForUser(props.value, user)
     }
 
     const response = await this.settingService.createOrReplace({

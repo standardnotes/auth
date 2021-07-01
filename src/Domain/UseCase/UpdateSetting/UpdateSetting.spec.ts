@@ -94,7 +94,7 @@ describe('UpdateSetting', () => {
     })
   })
 
-  it('should replace am encrypted setting for a valid user uuid if it does exist', async () => {
+  it('should replace an encrypted setting for a valid user uuid if it does exist', async () => {
     const setting = await getSetting()
     const props = {
       name: setting.name,
