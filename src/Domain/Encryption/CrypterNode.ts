@@ -3,6 +3,7 @@ import { SnCryptoNode } from '@standardnotes/sncrypto-node'
 import { inject, injectable } from 'inversify'
 import TYPES from '../../Bootstrap/Types'
 import { User } from '../User/User'
+import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { CrypterInterface } from './CrypterInterface'
 
 @injectable()
@@ -10,6 +11,7 @@ export class CrypterNode implements CrypterInterface {
   constructor (
     @inject(TYPES.ENCRYPTION_SERVER_KEY) private encryptionServerKey: string,
     @inject(TYPES.SnCryptoNode) private cryptoNode: SnCryptoNode,
+    @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
   ) {
     const keyBuffer = Buffer.from(encryptionServerKey, 'hex')
     const { byteLength } = keyBuffer
@@ -54,6 +56,12 @@ export class CrypterNode implements CrypterInterface {
   }
 
   async decryptUserServerKey(user: User): Promise<string> {
+    if (!user.encryptedServerKey) {
+      user.encryptedServerKey = await this.generateEncryptedUserServerKey()
+      user.serverEncryptionVersion = User.DEFAULT_ENCRYPTION_VERSION
+      await this.userRepository.save(user)
+    }
+
     const encrypted = this.parseVersionedEncrypted(user.encryptedServerKey as string)
 
     return this.cryptoNode.aes256GcmDecrypt(encrypted, this.encryptionServerKey)

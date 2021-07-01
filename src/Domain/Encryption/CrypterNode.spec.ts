@@ -1,15 +1,17 @@
 import { Aes256GcmEncrypted } from '@standardnotes/sncrypto-common'
 import { SnCryptoNode } from '@standardnotes/sncrypto-node'
 import { User } from '../User/User'
+import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { CrypterNode } from './CrypterNode'
 
 describe('CrypterNode', () => {
   let crypto: SnCryptoNode
   let user: User
+  let userRepository: UserRepositoryInterface
 
   const iv = 'iv'
 
-  const createCrypter = () => new CrypterNode(serverKey, crypto)
+  const createCrypter = () => new CrypterNode(serverKey, crypto, userRepository)
 
   const makeEncrypted = (ciphertext: string): Aes256GcmEncrypted<string> => {
     return {
@@ -43,10 +45,13 @@ describe('CrypterNode', () => {
 
     user = {} as jest.Mocked<User>
     user.encryptedServerKey = version(encryptedUserKey)
+
+    userRepository = {} as jest.Mocked<UserRepositoryInterface>
+    userRepository.save = jest.fn()
   })
 
   it('should fail to instantiate on non-32-byte key', async () => {
-    expect(() => new CrypterNode('short-key', crypto)).toThrow()
+    expect(() => new CrypterNode('short-key', crypto, userRepository)).toThrow()
   })
 
   it('should encrypt a value for user', async () => {
@@ -67,6 +72,17 @@ describe('CrypterNode', () => {
     expect(crypto.aes256GcmDecrypt).toHaveBeenNthCalledWith(1, encryptedUserKey, serverKey)
 
     expect(crypto.aes256GcmDecrypt).toHaveBeenNthCalledWith(2, encrypted, decrypted)
+  })
+
+  it('should generate an encrypted server key for user during decryption if one does not exist', async () => {
+    user.encryptedServerKey = null
+    user.serverEncryptionVersion = 0
+
+    expect(await createCrypter().decryptForUser(version(encrypted), user)).toEqual(decrypted)
+
+    expect(crypto.aes256GcmDecrypt).toHaveBeenCalledTimes(2)
+
+    expect(userRepository.save).toHaveBeenCalled()
   })
 
   it('should generate an encrypted user server key', async () => {
