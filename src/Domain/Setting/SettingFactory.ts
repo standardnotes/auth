@@ -1,4 +1,3 @@
-import dayjs = require('dayjs')
 import { inject, injectable } from 'inversify'
 import TYPES from '../../Bootstrap/Types'
 import { User } from '../User/User'
@@ -6,15 +5,20 @@ import { Setting } from './Setting'
 import { SettingProps } from './SettingProps'
 import { v4 as uuidv4 } from 'uuid'
 import { CrypterInterface } from '../Encryption/CrypterInterface'
+import { TimerInterface } from '@standardnotes/time'
 
 @injectable()
 export class SettingFactory {
   constructor(
     @inject(TYPES.Crypter) private crypter: CrypterInterface,
+    @inject(TYPES.Timer) private timer: TimerInterface,
   ) {}
 
   async create(props: SettingProps, user: User): Promise<Setting> {
     const uuid = props.uuid ?? uuidv4()
+    const now = this.timer.getTimestampInMicroseconds()
+    const createdAt = props.createdAt ?? now
+    const updatedAt = props.updatedAt ?? now
 
     const {
       name,
@@ -32,8 +36,8 @@ export class SettingFactory {
         user,
       }),
       serverEncryptionVersion,
-      createdAt: dayjs.utc().toDate(),
-      updatedAt: dayjs.utc().toDate(),
+      createdAt,
+      updatedAt,
     }
 
     return Object.assign(new Setting(), setting)

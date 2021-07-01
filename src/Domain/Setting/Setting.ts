@@ -29,21 +29,15 @@ export class Setting {
 
   @Column({
     name: 'created_at',
-    type: 'datetime',
-    default:
-      /* istanbul ignore next */
-      () => 'CURRENT_TIMESTAMP',
+    type: 'bigint',
   })
-  createdAt: Date
+  createdAt: number
 
   @Column({
     name: 'updated_at',
-    type: 'datetime',
-    default:
-      /* istanbul ignore next */
-      () => 'CURRENT_TIMESTAMP',
+    type: 'bigint',
   })
-  updatedAt: Date
+  updatedAt: number
 
   @ManyToOne(
     /* istanbul ignore next */

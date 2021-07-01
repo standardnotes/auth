@@ -106,6 +106,8 @@ export class UsersController extends BaseHttpController {
       uuid,
       value,
       serverEncryptionVersion = Setting.ENCRYPTION_VERSION_DEFAULT,
+      createdAt,
+      updatedAt,
     } = request.body
 
     const props = {
@@ -113,6 +115,8 @@ export class UsersController extends BaseHttpController {
       value,
       serverEncryptionVersion,
       name: SETTINGS.MFA_SECRET,
+      createdAt,
+      updatedAt,
     }
 
     const { userUuid } = request.params

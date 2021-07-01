@@ -8,5 +8,7 @@ export type SettingProps = Omit<Setting,
   'serverEncryptionVersion'
 > & {
   uuid?: string,
+  createdAt?: number,
+  updatedAt?: number,
   serverEncryptionVersion?: number
 }

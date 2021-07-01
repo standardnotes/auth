@@ -3,8 +3,8 @@ import { Setting } from '../Setting'
 
 export class SettingTest {
   static defaultStringPrefix = 'default-test-setting-'
-  static defaultDate = new Date(0)
-  
+  static defaultDate = 1
+
   static makeSubject(
     props: Partial<Setting>,
     associatedUser: User,
