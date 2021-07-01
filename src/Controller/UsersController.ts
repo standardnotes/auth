@@ -105,7 +105,7 @@ export class UsersController extends BaseHttpController {
     const {
       uuid,
       value,
-      serverEncryptionVersion = Setting.DEFAULT_ENCRYPTION_VERSION,
+      serverEncryptionVersion = Setting.ENCRYPTION_VERSION_DEFAULT,
     } = request.body
 
     const props = {
@@ -161,7 +161,7 @@ export class UsersController extends BaseHttpController {
     const {
       name,
       value,
-      serverEncryptionVersion = Setting.DEFAULT_ENCRYPTION_VERSION,
+      serverEncryptionVersion = Setting.ENCRYPTION_VERSION_DEFAULT,
     } = request.body
 
     const props = {

@@ -19,7 +19,7 @@ export class SettingFactory {
     const {
       name,
       value,
-      serverEncryptionVersion = Setting.DEFAULT_ENCRYPTION_VERSION,
+      serverEncryptionVersion = Setting.ENCRYPTION_VERSION_DEFAULT,
     } = props
 
     const setting: Setting = {

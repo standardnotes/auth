@@ -1,5 +1,6 @@
 import 'reflect-metadata'
 import { UserTest } from '../User/test/UserTest'
+import { Setting } from './Setting'
 import { SettingProps } from './SettingProps'
 import { SettingFactoryTest } from './test/SettingFactoryTest'
 
@@ -8,18 +9,19 @@ describe('SettingFactory', () => {
     const props: SettingProps = {
       name: 'name',
       value: 'value',
+      serverEncryptionVersion: Setting.ENCRYPTION_VERSION_UNENCRYPTED,
     }
     const actual = await SettingFactoryTest.makeSubject()
       .create(props, UserTest.makeSubject({}))
 
     expect(actual).toMatchObject(props)
   })
+
   it('should create an encrypted Setting', async () => {
     const value = 'value'
     const props: SettingProps = {
       name: 'name',
       value,
-      serverEncryptionVersion: 1,
     }
     const { value: _, ...propsExceptValue } = props
     const actual = await SettingFactoryTest.makeSubject()
@@ -28,6 +30,7 @@ describe('SettingFactory', () => {
     expect(actual).toMatchObject(propsExceptValue)
     expect(actual.value).not.toBe(value)
   })
+
   it('should throw for unrecognized encryption version', async () => {
     const value = 'value'
     const props: SettingProps = {

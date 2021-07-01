@@ -105,7 +105,7 @@ export class VerifyMFA implements UseCaseInterface {
       return undefined
     }
 
-    if (mfaSetting.serverEncryptionVersion === Setting.DEFAULT_ENCRYPTION_VERSION) {
+    if (mfaSetting.serverEncryptionVersion === Setting.ENCRYPTION_VERSION_UNENCRYPTED) {
       return mfaSetting.value
     }
 
