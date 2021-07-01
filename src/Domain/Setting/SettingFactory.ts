@@ -59,10 +59,10 @@ export class SettingFactory {
     serverEncryptionVersion: number,
     user: User
   }): Promise<string> {
-    if (serverEncryptionVersion === 0) {
+    if (serverEncryptionVersion === Setting.ENCRYPTION_VERSION_UNENCRYPTED) {
       return value
     }
-    if (serverEncryptionVersion === 1) {
+    if (serverEncryptionVersion === Setting.ENCRYPTION_VERSION_DEFAULT) {
       return this.crypter.encryptForUser(value, user)
     }
     throw Error(`Unrecognized encryption version: ${serverEncryptionVersion}!`)
