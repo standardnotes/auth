@@ -18,6 +18,7 @@ import { UpdateSetting } from '../Domain/UseCase/UpdateSetting/UpdateSetting'
 import { DeleteAccount } from '../Domain/UseCase/DeleteAccount/DeleteAccount'
 import { DeleteSetting } from '../Domain/UseCase/DeleteSetting/DeleteSetting'
 import { GetMFASetting } from '../Domain/UseCase/GetMFASetting/GetMFASetting'
+import { Setting } from '../Domain/Setting/Setting'
 
 describe('UsersController', () => {
   let updateUser: UpdateUser
@@ -205,7 +206,7 @@ describe('UsersController', () => {
       uuid: 'user-with-settings-uuid',
     }, {
       settings: [
-        { uuid: 'setting-2-uuid', name: 'MFA_SECRET' },
+        { uuid: 'setting-2-uuid', name: 'MFA_SECRET', serverEncryptionVersion: Setting.ENCRYPTION_VERSION_UNENCRYPTED },
         { uuid: 'setting-2-uuid', name: 'setting-2-name' },
         { uuid: 'setting-3-uuid', name: 'setting-3-name' },
       ],
