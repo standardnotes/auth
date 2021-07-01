@@ -489,7 +489,7 @@ describe('UsersController', () => {
       response,
     )
 
-    expect(actual).toMatchObject({ statusCode: 204 })
+    expect(actual).toMatchObject({ statusCode: 200 })
   })
 
   it('should replace user mfa setting', async () => {
@@ -524,7 +524,7 @@ describe('UsersController', () => {
       request,
     )
 
-    expect(actual).toMatchObject({ statusCode: 204 })
+    expect(actual).toMatchObject({ statusCode: 200 })
   })
 
   it('should replace user setting for nonexistent user uuid', async () => {

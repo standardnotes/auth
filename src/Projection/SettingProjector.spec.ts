@@ -11,9 +11,11 @@ describe('SettingProjector', () => {
     uuid: 'setting-uuid',
     name: 'setting-name',
     value: 'setting-value',
+    createdAt: new Date(1),
+    updatedAt: new Date(2),
   }
   const setting = SettingTest.makeSubject(
-    settingProps, 
+    settingProps,
     UserTest.makeSubject(userProps),
   )
 

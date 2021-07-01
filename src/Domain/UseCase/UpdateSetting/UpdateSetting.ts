@@ -52,7 +52,7 @@ export class UpdateSetting implements UseCaseInterface {
       return 201
     }
     if (response.status === 'replaced') {
-      return 204
+      return 200
     }
 
     const exhaustiveCheck: never = response.status

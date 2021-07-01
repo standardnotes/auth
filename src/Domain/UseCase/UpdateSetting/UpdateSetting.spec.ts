@@ -35,6 +35,8 @@ describe('UpdateSetting', () => {
         name: 'test-setting-name',
         uuid: expect.any(String),
         value: 'test-setting-value',
+        createdAt: expect.any(Date),
+        updatedAt: expect.any(Date),
       },
       statusCode: 201,
     })
@@ -59,8 +61,10 @@ describe('UpdateSetting', () => {
         name: 'setting-1-name',
         uuid: expect.any(String),
         value: 'REPLACED',
+        createdAt: expect.any(Date),
+        updatedAt: expect.any(Date),
       },
-      statusCode: 204,
+      statusCode: 200,
     })
   })
 })
