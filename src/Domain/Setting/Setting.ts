@@ -17,7 +17,7 @@ export class Setting {
   name: string
 
   @Column({
-    length: 255,
+    type: 'text',
   })
   value: string
 
