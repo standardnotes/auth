@@ -1,8 +1,6 @@
 import { Setting } from './Setting'
 
-export type SimpleSetting = Omit<Setting, 
-  'user' | 
-  'createdAt' | 
-  'updatedAt' | 
+export type SimpleSetting = Omit<Setting,
+  'user' |
   'serverEncryptionVersion'
 >
