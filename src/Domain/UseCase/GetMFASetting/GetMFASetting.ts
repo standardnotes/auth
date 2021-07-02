@@ -33,7 +33,8 @@ export class GetMFASetting implements UseCaseInterface {
       }
     }
 
-    if (setting.serverEncryptionVersion === Setting.ENCRYPTION_VERSION_DEFAULT) {
+    if (setting.serverEncryptionVersion === Setting.ENCRYPTION_VERSION_DEFAULT ||
+      setting.serverEncryptionVersion === Setting.ENCRYPTION_VERSION_CLIENT_ENCODED_AND_SERVER_ENCRYPTED) {
       const user = await this.userRepository.findOneByUuid(userUuid)
 
       if (user === undefined) {
