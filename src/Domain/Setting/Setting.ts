@@ -6,6 +6,7 @@ import { User } from '../User/User'
 export class Setting {
   static readonly ENCRYPTION_VERSION_UNENCRYPTED = 0
   static readonly ENCRYPTION_VERSION_DEFAULT = 1
+  static readonly ENCRYPTION_VERSION_CLIENT_ENCODED_AND_SERVER_ENCRYPTED = 2
 
   @PrimaryGeneratedColumn('uuid')
   uuid: string

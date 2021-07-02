@@ -86,6 +86,8 @@ import { RedisWebSocketsConnectionRepository } from '../Infra/Redis/RedisWebSock
 import { AddWebSocketsConnection } from '../Domain/UseCase/AddWebSocketsConnection/AddWebSocketsConnection'
 import { RemoveWebSocketsConnection } from '../Domain/UseCase/RemoveWebSocketsConnection/RemoveWebSocketsConnection'
 import { GetMFASetting } from '../Domain/UseCase/GetMFASetting/GetMFASetting'
+import { ContentDecoderInterface } from '../Domain/Encryption/ContentDecoderInterface'
+import { ContentDecoder } from '../Domain/Encryption/ContentDecoder'
 
 export class ContainerConfigLoader {
   async load(): Promise<Container> {
@@ -263,6 +265,7 @@ export class ContainerConfigLoader {
     container.bind<SnCryptoNode>(TYPES.SnCryptoNode).toConstantValue(new SnCryptoNode())
     container.bind<TimerInterface>(TYPES.Timer).toConstantValue(new Timer())
     container.bind<ItemHttpServiceInterface>(TYPES.ItemHttpService).to(SyncingServerHttpService)
+    container.bind<ContentDecoderInterface>(TYPES.ContenDecoder).to(ContentDecoder)
 
     if (env.get('SNS_TOPIC_ARN', true)) {
       container.bind<SNSDomainEventPublisher>(TYPES.DomainEventPublisher).toConstantValue(

@@ -97,7 +97,7 @@ export class UsersController extends BaseHttpController {
     const {
       uuid,
       value,
-      serverEncryptionVersion = Setting.ENCRYPTION_VERSION_DEFAULT,
+      serverEncryptionVersion = Setting.ENCRYPTION_VERSION_CLIENT_ENCODED_AND_SERVER_ENCRYPTED,
       createdAt,
       updatedAt,
     } = request.body

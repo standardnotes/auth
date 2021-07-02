@@ -9,6 +9,7 @@ import { CrypterInterface } from '../Encryption/CrypterInterface'
 import { Setting } from '../Setting/Setting'
 import { ItemHttpServiceInterface } from '../Item/ItemHttpServiceInterface'
 import { Logger } from 'winston'
+import { ContentDecoderInterface } from '../Encryption/ContentDecoderInterface'
 
 describe('VerifyMFA', () => {
   let user: User
@@ -16,6 +17,7 @@ describe('VerifyMFA', () => {
   let settingRepository: SettingRepositoryInterface
   let itemHttpService: ItemHttpServiceInterface
   let crypter: CrypterInterface
+  let contentDecoder: ContentDecoderInterface
   let logger: Logger
 
   const createVerifyMFA = () => new VerifyMFA(
@@ -23,6 +25,7 @@ describe('VerifyMFA', () => {
     itemHttpService,
     settingRepository,
     crypter,
+    contentDecoder,
     logger
   )
 
@@ -37,6 +40,9 @@ describe('VerifyMFA', () => {
 
     settingRepository = {} as jest.Mocked<SettingRepositoryInterface>
     settingRepository.findOneByNameAndUserUuid = jest.fn()
+
+    contentDecoder = {} as jest.Mocked<ContentDecoderInterface>
+    contentDecoder.decode = jest.fn().mockReturnValue('decoded')
 
     crypter = {} as jest.Mocked<CrypterInterface>
     crypter.decryptForUser = jest.fn()
@@ -99,7 +105,7 @@ describe('VerifyMFA', () => {
 
   it('should pass MFA verification from user settings if mfa key is correctly encrypted', async () => {
     settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue({
-      serverEncryptionVersion: 1,
+      serverEncryptionVersion: Setting.ENCRYPTION_VERSION_DEFAULT,
     } as jest.Mocked<Setting>)
 
     crypter.decryptForUser = jest.fn().mockReturnValue('shhhh')
@@ -109,9 +115,23 @@ describe('VerifyMFA', () => {
     })
   })
 
+  it('should pass MFA verification from user settings if mfa key is correctly encoded and encrypted', async () => {
+    settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue({
+      serverEncryptionVersion: Setting.ENCRYPTION_VERSION_CLIENT_ENCODED_AND_SERVER_ENCRYPTED,
+    } as jest.Mocked<Setting>)
+
+    crypter.decryptForUser = jest.fn().mockReturnValue('decrypted')
+
+    contentDecoder.decode = jest.fn().mockReturnValue({ secret: 'shhhh' })
+
+    expect(await createVerifyMFA().execute({ email: 'test@test.te', requestParams: { 'mfa_1-2-3': authenticator.generate('shhhh') } })).toEqual({
+      success: true,
+    })
+  })
+
   it('should pass MFA verification from user settings if mfa key is correctly unencrypted', async () => {
     settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue({
-      serverEncryptionVersion: 0,
+      serverEncryptionVersion: Setting.ENCRYPTION_VERSION_UNENCRYPTED,
       value: 'shhhh',
     } as jest.Mocked<Setting>)
 

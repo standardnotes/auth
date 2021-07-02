@@ -15,6 +15,7 @@ import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { UseCaseInterface } from './UseCaseInterface'
 import { VerifyMFADTO } from './VerifyMFADTO'
 import { VerifyMFAResponse } from './VerifyMFAResponse'
+import { ContentDecoderInterface } from '../Encryption/ContentDecoderInterface'
 
 @injectable()
 export class VerifyMFA implements UseCaseInterface {
@@ -23,6 +24,7 @@ export class VerifyMFA implements UseCaseInterface {
     @inject(TYPES.ItemHttpService) private itemHttpService: ItemHttpServiceInterface,
     @inject(TYPES.SettingRepository) private settingRepository: SettingRepositoryInterface,
     @inject(TYPES.Crypter) private crypter: CrypterInterface,
+    @inject(TYPES.ContenDecoder) private contentDecoder: ContentDecoderInterface,
     @inject(TYPES.Logger) private logger: Logger
   ) {
   }
@@ -109,7 +111,14 @@ export class VerifyMFA implements UseCaseInterface {
       return mfaSetting.value
     }
 
-    return this.crypter.decryptForUser(mfaSetting.value, user)
+    const decrypted = await this.crypter.decryptForUser(mfaSetting.value, user)
+    if (mfaSetting.serverEncryptionVersion !== Setting.ENCRYPTION_VERSION_CLIENT_ENCODED_AND_SERVER_ENCRYPTED) {
+      return decrypted
+    }
+
+    const decoded = this.contentDecoder.decode(decrypted)
+
+    return decoded.secret as string
   }
 
   private verifyMFASecret(secret: string, requestParams: Record<string, unknown>, mfaExtensionUuid?: string): VerifyMFAResponse {
