@@ -1,5 +1,6 @@
 import { Aes256GcmEncrypted } from '@standardnotes/sncrypto-common'
 import { SnCryptoNode } from '@standardnotes/sncrypto-node'
+import { Logger } from 'winston'
 import { User } from '../User/User'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { CrypterNode } from './CrypterNode'
@@ -8,10 +9,11 @@ describe('CrypterNode', () => {
   let crypto: SnCryptoNode
   let user: User
   let userRepository: UserRepositoryInterface
+  let logger: Logger
 
   const iv = 'iv'
 
-  const createCrypter = () => new CrypterNode(serverKey, crypto, userRepository)
+  const createCrypter = () => new CrypterNode(serverKey, crypto, userRepository, logger)
 
   const makeEncrypted = (ciphertext: string): Aes256GcmEncrypted<string> => {
     return {
@@ -48,10 +50,13 @@ describe('CrypterNode', () => {
 
     userRepository = {} as jest.Mocked<UserRepositoryInterface>
     userRepository.save = jest.fn()
+
+    logger = {} as jest.Mocked<Logger>
+    logger.debug = jest.fn()
   })
 
   it('should fail to instantiate on non-32-byte key', async () => {
-    expect(() => new CrypterNode('short-key', crypto, userRepository)).toThrow()
+    expect(() => new CrypterNode('short-key', crypto, userRepository, logger)).toThrow()
   })
 
   it('should encrypt a value for user', async () => {

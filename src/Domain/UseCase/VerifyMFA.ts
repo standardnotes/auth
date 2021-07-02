@@ -107,6 +107,8 @@ export class VerifyMFA implements UseCaseInterface {
       return undefined
     }
 
+    this.logger.debug('Found MFA Setting %O', mfaSetting)
+
     if (mfaSetting.serverEncryptionVersion === Setting.ENCRYPTION_VERSION_UNENCRYPTED) {
       return mfaSetting.value
     }
