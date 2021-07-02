@@ -82,15 +82,7 @@ export class UsersController extends BaseHttpController {
   }
 
   @httpGet('/:userUuid/mfa')
-  async getMFASetting(request: Request, response: Response): Promise<results.JsonResult> {
-    if (request.params.userUuid !== response.locals.user.uuid) {
-      return this.json({
-        error: {
-          message: 'Operation not allowed.',
-        },
-      }, 401)
-    }
-
+  async getMFASetting(request: Request): Promise<results.JsonResult> {
     const result = await this.doGetMFASetting.execute({ userUuid: request.params.userUuid })
 
     if (result.success) {

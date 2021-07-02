@@ -232,7 +232,7 @@ describe('UsersController', () => {
 
     const expectedSetting = await projector.projectSimple(settings[settingIndex])
 
-    const actual = await subject.getMFASetting(request, response)
+    const actual = await subject.getMFASetting(request)
 
     expect(actual.statusCode).toEqual(200)
     expect(actual.json).toEqual({
@@ -240,28 +240,6 @@ describe('UsersController', () => {
       userUuid,
       setting: expectedSetting,
     })
-  })
-
-  it('should error when geting user mfa for invaild user uuid', async () => {
-    const userUuid = 'user-1'
-    const badUserUuid = 'BAD-user-uuid'
-    const user = UserTest.makeSubject({
-      uuid: userUuid,
-    })
-    Object.assign(request, {
-      params: { userUuid: badUserUuid },
-    })
-    response.locals.user = user
-
-    const subject = UsersControllerTest.makeSubject({
-      updateUser,
-      deleteAccount,
-    })
-
-    const actual = await subject.getMFASetting(request, response)
-
-    expect(actual.statusCode).toEqual(401)
-    expect(actual.json).toHaveProperty('error')
   })
 
   it('should error when geting non existing mfa for vaild user uuid', async () => {
@@ -279,7 +257,7 @@ describe('UsersController', () => {
       deleteAccount,
     })
 
-    const actual = await subject.getMFASetting(request, response)
+    const actual = await subject.getMFASetting(request)
 
     expect(actual.statusCode).toEqual(400)
     expect(actual.json).toHaveProperty('error')
