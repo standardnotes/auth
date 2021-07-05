@@ -643,4 +643,53 @@ describe('UsersController', () => {
 
     expect(actual.json).toHaveProperty('error')
   })
+
+  it('should delete user mfa setting if it exists', async () => {
+    const user = UserTest.makeSubject({
+      uuid: 'user-with-settings-uuid',
+    }, {
+      settings: [
+        { uuid: 'setting-2-uuid', name: 'MFA_SECRET' },
+        { uuid: 'setting-2-uuid', name: 'setting-2-name' },
+        { uuid: 'setting-3-uuid', name: 'setting-3-name' },
+      ],
+    })
+    const userUuid = user.uuid
+    const settings = await user.settings
+    const setting = settings[0]
+    const request: Partial<express.Request> = {
+      params: { userUuid, settingName: setting.name },
+    }
+
+    const subject = UsersControllerTest.makeSubject({
+      updateUser,
+      deleteAccount,
+      settingRepository: new SettingRepostioryStub(settings),
+    })
+
+    const actual = await subject.deleteMFASetting(
+      request as express.Request
+    )
+
+    expect(actual.statusCode).toEqual(200)
+  })
+
+  it('should fail to delete mfa user setting if it does not exist', async () => {
+    const user = UserTest.makeSubject({})
+    const userUuid = user.uuid
+    const request: Partial<express.Request> = {
+      params: { userUuid, settingName: 'BAD' },
+    }
+
+    const subject = UsersControllerTest.makeSubject({
+      updateUser,
+      deleteAccount,
+    })
+
+    const actual = await subject.deleteMFASetting(
+      request as express.Request,
+    )
+
+    expect(actual.statusCode).toEqual(400)
+  })
 })

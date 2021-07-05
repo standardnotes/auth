@@ -92,6 +92,22 @@ export class UsersController extends BaseHttpController {
     return this.json(result, 400)
   }
 
+  @httpDelete('/:userUuid/mfa',)
+  async deleteMFASetting(request: Request): Promise<results.JsonResult> {
+    const { userUuid } = request.params
+
+    const result = await this.doDeleteSetting.execute({
+      userUuid,
+      settingName: SETTINGS.MFA_SECRET,
+    })
+
+    if (result.success) {
+      return this.json(result)
+    }
+
+    return this.json(result, 400)
+  }
+
   @httpPut('/:userUuid/mfa')
   async updateMFASetting(request: Request): Promise<results.JsonResult | results.StatusCodeResult> {
     const {
