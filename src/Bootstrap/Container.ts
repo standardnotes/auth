@@ -1,7 +1,6 @@
 import * as winston from 'winston'
 import * as IORedis from 'ioredis'
 import * as AWS from 'aws-sdk'
-import * as superagent from 'superagent'
 import { Container } from 'inversify'
 import {
   DomainEventHandlerInterface,
@@ -88,6 +87,7 @@ import { RemoveWebSocketsConnection } from '../Domain/UseCase/RemoveWebSocketsCo
 import { GetMFASetting } from '../Domain/UseCase/GetMFASetting/GetMFASetting'
 import { ContentDecoderInterface } from '../Domain/Encryption/ContentDecoderInterface'
 import { ContentDecoder } from '../Domain/Encryption/ContentDecoder'
+import axios, { AxiosInstance } from 'axios'
 
 export class ContainerConfigLoader {
   async load(): Promise<Container> {
@@ -259,7 +259,7 @@ export class ContainerConfigLoader {
     container.bind<TokenDecoder>(TYPES.TokenDecoder).to(TokenDecoder)
     container.bind<AuthenticationMethodResolver>(TYPES.AuthenticationMethodResolver).to(AuthenticationMethodResolver)
     container.bind<DomainEventFactory>(TYPES.DomainEventFactory).to(DomainEventFactory)
-    container.bind<superagent.SuperAgentStatic>(TYPES.HTTPClient).toConstantValue(superagent)
+    container.bind<AxiosInstance>(TYPES.HTTPClient).toConstantValue(axios.create())
     container.bind<CrypterInterface>(TYPES.Crypter).to(CrypterNode)
     container.bind<SettingService>(TYPES.SettingService).to(SettingService)
     container.bind<SnCryptoNode>(TYPES.SnCryptoNode).toConstantValue(new SnCryptoNode())

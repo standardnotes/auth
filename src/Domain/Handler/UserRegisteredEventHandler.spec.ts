@@ -1,13 +1,12 @@
 import 'reflect-metadata'
 import { UserRegisteredEvent } from '@standardnotes/domain-events'
-import { SuperAgentRequest, SuperAgentStatic } from 'superagent'
 import { Logger } from 'winston'
 
 import { UserRegisteredEventHandler } from './UserRegisteredEventHandler'
+import { AxiosInstance } from 'axios'
 
 describe('UserRegisteredEventHandler', () => {
-  let httpClient: SuperAgentStatic
-  let request: SuperAgentRequest
+  let httpClient: AxiosInstance
   const userServerRegistrationUrl = 'https://user-server/registration'
   const userServerAuthKey = 'auth-key'
   let event: UserRegisteredEvent
@@ -21,12 +20,8 @@ describe('UserRegisteredEventHandler', () => {
   )
 
   beforeEach(() => {
-    request = {} as jest.Mocked<SuperAgentRequest>
-    request.set = jest.fn().mockReturnThis()
-    request.send = jest.fn().mockReturnThis()
-
-    httpClient = {} as jest.Mocked<SuperAgentStatic>
-    httpClient.post = jest.fn().mockReturnValue(request)
+    httpClient = {} as jest.Mocked<AxiosInstance>
+    httpClient.request = jest.fn()
 
     event = {} as jest.Mocked<UserRegisteredEvent>
     event.createdAt = new Date(1)
@@ -42,13 +37,21 @@ describe('UserRegisteredEventHandler', () => {
   it('should send a request to the user management server about a registration', async () => {
     await createHandler().handle(event)
 
-    expect(httpClient.post).toHaveBeenCalledWith('https://user-server/registration')
-    expect(request.send).toHaveBeenCalledWith({
-      key: 'auth-key',
-      user: {
-        created_at: new Date(1),
-        email: 'test@test.te',
+    expect(httpClient.request).toHaveBeenCalledWith({
+      method: 'POST',
+      url: 'https://user-server/registration',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
       },
+      data: {
+        key: 'auth-key',
+        user: {
+          created_at: new Date(1),
+          email: 'test@test.te',
+        },
+      },
+      validateStatus: expect.any(Function),
     })
   })
 
@@ -61,7 +64,6 @@ describe('UserRegisteredEventHandler', () => {
     )
     await handler.handle(event)
 
-    expect(httpClient.post).not.toHaveBeenCalled()
-    expect(request.send).not.toHaveBeenCalled()
+    expect(httpClient.request).not.toHaveBeenCalled()
   })
 })
