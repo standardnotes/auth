@@ -33,8 +33,12 @@ export class GetMFASetting implements UseCaseInterface {
       }
     }
 
-    if (setting.serverEncryptionVersion === Setting.ENCRYPTION_VERSION_DEFAULT ||
-      setting.serverEncryptionVersion === Setting.ENCRYPTION_VERSION_CLIENT_ENCODED_AND_SERVER_ENCRYPTED) {
+    if (setting.value !== null &&
+      (
+        setting.serverEncryptionVersion === Setting.ENCRYPTION_VERSION_DEFAULT ||
+        setting.serverEncryptionVersion === Setting.ENCRYPTION_VERSION_CLIENT_ENCODED_AND_SERVER_ENCRYPTED
+      )
+    ) {
       const user = await this.userRepository.findOneByUuid(userUuid)
 
       if (user === undefined) {
@@ -46,7 +50,7 @@ export class GetMFASetting implements UseCaseInterface {
         }
       }
 
-      setting.value = await this.crypter.decryptForUser(setting.value as string, user)
+      setting.value = await this.crypter.decryptForUser(setting.value, user)
     }
 
     const simpleSetting = await this.settingProjector.projectSimple(setting)
