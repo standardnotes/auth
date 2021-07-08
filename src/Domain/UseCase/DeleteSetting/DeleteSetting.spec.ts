@@ -1,42 +1,61 @@
 import 'reflect-metadata'
-import { UserTest } from '../../User/test/UserTest'
-import { DeleteSettingDto } from './DeleteSettingDto'
-import { DeleteSettingTest } from './test/DeleteSettingTest'
+
+import { TimerInterface } from '@standardnotes/time'
+
+import { Setting } from '../../Setting/Setting'
+import { SettingRepositoryInterface } from '../../Setting/SettingRepositoryInterface'
+
+import { DeleteSetting } from './DeleteSetting'
 
 describe('DeleteSetting', () => {
-  const user = UserTest.makeWithSettings()
-  const userUuid = user.uuid
-  const getSettings = async () => user.settings
-  const execute = async (dto: DeleteSettingDto) => await DeleteSettingTest
-    .makeSubject({
-      settings: await getSettings(),
-    }).execute(dto)
+  let setting: Setting
+  let settingRepository: SettingRepositoryInterface
+  let timer: TimerInterface
 
-  it('should delete a setting if it exists', async () => {
-    const settings = await getSettings()
-    const setting = settings[0]
-    const settingName = setting.name
-    const actual = await execute({
-      userUuid,
-      settingName,
-    })
+  const createUseCase = () => new DeleteSetting(settingRepository, timer)
 
-    expect(actual).toEqual({
-      success: true,
-      userUuid,
-      settingName,
-    })
+  beforeEach(() => {
+    setting = {} as jest.Mocked<Setting>
+
+    settingRepository = {} as jest.Mocked<SettingRepositoryInterface>
+    settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue(setting)
+    settingRepository.deleteByUserUuid = jest.fn()
+    settingRepository.save = jest.fn()
+
+    timer = {} as jest.Mocked<TimerInterface>
+    timer.getTimestampInMicroseconds = jest.fn().mockReturnValue(1)
   })
 
-  it('should fail to delete a setting if it does not exist', async () => {
-    const settingName = 'BAD'
-    const actual = await execute({
-      userUuid,
-      settingName,
+  it('should delete a setting by name and user uuid', async () => {
+    await createUseCase().execute({
+      settingName: 'test',
+      userUuid: '1-2-3',
     })
 
-    expect(actual).toMatchObject({
-      success: false,
+    expect(settingRepository.deleteByUserUuid).toHaveBeenCalledWith({ 'settingName': 'test', 'userUuid': '1-2-3' })
+  })
+
+  it('should not delete a setting by name and user uuid if not found', async () => {
+    settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue(undefined)
+
+    await createUseCase().execute({
+      settingName: 'test',
+      userUuid: '1-2-3',
+    })
+
+    expect(settingRepository.deleteByUserUuid).not.toHaveBeenCalled()
+  })
+
+  it('should soft delete a setting by name and user uuid', async () => {
+    await createUseCase().execute({
+      settingName: 'test',
+      userUuid: '1-2-3',
+      softDelete: true,
+    })
+
+    expect(settingRepository.save).toHaveBeenCalledWith({
+      'updatedAt': 1,
+      'value': null,
     })
   })
 })

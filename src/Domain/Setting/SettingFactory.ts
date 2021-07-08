@@ -59,16 +59,16 @@ export class SettingFactory {
     serverEncryptionVersion,
     user,
   }: {
-    value: string,
+    value: string | null,
     serverEncryptionVersion: number,
     user: User
-  }): Promise<string> {
+  }): Promise<string | null> {
     switch(serverEncryptionVersion) {
     case Setting.ENCRYPTION_VERSION_UNENCRYPTED:
       return value
     case Setting.ENCRYPTION_VERSION_DEFAULT:
     case Setting.ENCRYPTION_VERSION_CLIENT_ENCODED_AND_SERVER_ENCRYPTED:
-      return this.crypter.encryptForUser(value, user)
+      return this.crypter.encryptForUser(value as string, user)
     default:
       throw Error(`Unrecognized encryption version: ${serverEncryptionVersion}!`)
     }

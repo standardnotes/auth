@@ -46,7 +46,7 @@ export class GetMFASetting implements UseCaseInterface {
         }
       }
 
-      setting.value = await this.crypter.decryptForUser(setting.value, user)
+      setting.value = await this.crypter.decryptForUser(setting.value as string, user)
     }
 
     const simpleSetting = await this.settingProjector.projectSimple(setting)

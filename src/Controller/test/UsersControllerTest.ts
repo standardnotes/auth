@@ -4,7 +4,6 @@ import { SettingRepositoryInterface } from '../../Domain/Setting/SettingReposito
 import { SettingServiceTest } from '../../Domain/Setting/test/SettingServiceTest'
 import { SettingRepostioryStub } from '../../Domain/Setting/test/SettingRepositoryStub'
 import { DeleteAccount } from '../../Domain/UseCase/DeleteAccount/DeleteAccount'
-import { DeleteSettingTest } from '../../Domain/UseCase/DeleteSetting/test/DeleteSettingTest'
 import { GetSettingTest } from '../../Domain/UseCase/GetSetting/test/GetSettingTest'
 import { GetSettingsTest } from '../../Domain/UseCase/GetSettings/test/GetSettingsTest'
 import { GetUserKeyParamsTest } from '../../Domain/UseCase/GetUserKeyParams/test/GetUserKeyParamsTest'
@@ -18,12 +17,14 @@ import { SettingProjector } from '../../Projection/SettingProjector'
 import { SettingProjectorTest } from '../../Projection/test/SettingProjectorTest'
 import { UsersController } from '../UsersController'
 import { GetMFASettingTest } from '../../Domain/UseCase/GetMFASetting/test/GetMFASettingTest'
+import { DeleteSetting } from '../../Domain/UseCase/DeleteSetting/DeleteSetting'
 
 export class UsersControllerTest {
   static makeSubject({
     settings = [],
     updateUser,
     deleteAccount,
+    deleteSetting,
     settingRepository = new SettingRepostioryStub(settings),
     settingService = SettingServiceTest.makeSubject({
       repository: settingRepository,
@@ -34,7 +35,8 @@ export class UsersControllerTest {
   }: {
     settings?: Setting[],
     updateUser: UpdateUser,
-    deleteAccount: DeleteAccount
+    deleteAccount: DeleteAccount,
+    deleteSetting: DeleteSetting,
     settingRepository?: SettingRepositoryInterface,
     settingService?: SettingService,
     projector?: SettingProjector,
@@ -64,9 +66,7 @@ export class UsersControllerTest {
         userRepository,
       }),
       deleteAccount,
-      DeleteSettingTest.makeSubject({
-        settingRepository,
-      }),
+      deleteSetting,
     )
   }
 }

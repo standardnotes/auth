@@ -23,6 +23,7 @@ import { Setting } from '../Domain/Setting/Setting'
 describe('UsersController', () => {
   let updateUser: UpdateUser
   let deleteAccount: DeleteAccount
+  let deleteSetting: DeleteSetting
   let request: express.Request
   let response: express.Response
   let user: User
@@ -35,7 +36,7 @@ describe('UsersController', () => {
     {} as jest.Mocked<GetUserKeyParams>,
     {} as jest.Mocked<UpdateSetting>,
     deleteAccount,
-    {} as jest.Mocked<DeleteSetting>,
+    deleteSetting,
   )
 
   beforeEach(() => {
@@ -44,6 +45,9 @@ describe('UsersController', () => {
 
     deleteAccount = {} as jest.Mocked<DeleteAccount>
     deleteAccount.execute = jest.fn().mockReturnValue({ success: true, message: 'A OK', responseCode: 200 })
+
+    deleteSetting = {} as jest.Mocked<DeleteSetting>
+    deleteSetting.execute = jest.fn().mockReturnValue({ success: true })
 
     user = {} as jest.Mocked<User>
     user.uuid = '123'
@@ -138,6 +142,7 @@ describe('UsersController', () => {
     const subject = UsersControllerTest.makeSubject({
       updateUser,
       deleteAccount,
+      deleteSetting,
       settingRepository: repository,
       projector,
     })
@@ -185,6 +190,7 @@ describe('UsersController', () => {
     const subject = UsersControllerTest.makeSubject({
       updateUser,
       deleteAccount,
+      deleteSetting,
       settingRepository: repository,
       projector,
     })
@@ -226,6 +232,7 @@ describe('UsersController', () => {
     const subject = UsersControllerTest.makeSubject({
       updateUser,
       deleteAccount,
+      deleteSetting,
       settingRepository: repository,
       projector,
     })
@@ -255,6 +262,7 @@ describe('UsersController', () => {
     const subject = UsersControllerTest.makeSubject({
       updateUser,
       deleteAccount,
+      deleteSetting,
     })
 
     const actual = await subject.getMFASetting(request)
@@ -277,6 +285,7 @@ describe('UsersController', () => {
     const subject = UsersControllerTest.makeSubject({
       updateUser,
       deleteAccount,
+      deleteSetting,
     })
 
     const actual = await subject.getSetting(request, response)
@@ -298,6 +307,7 @@ describe('UsersController', () => {
     const subject = UsersControllerTest.makeSubject({
       updateUser,
       deleteAccount,
+      deleteSetting,
     })
 
     const actual = await subject.getSetting(request, response)
@@ -310,6 +320,7 @@ describe('UsersController', () => {
     const subject = UsersControllerTest.makeSubject({
       updateUser,
       deleteAccount,
+      deleteSetting,
     })
 
     Object.assign(request, {
@@ -335,6 +346,7 @@ describe('UsersController', () => {
       updateUser,
       deleteAccount,
       userRepository,
+      deleteSetting,
     })
 
     Object.assign(request, {
@@ -354,6 +366,7 @@ describe('UsersController', () => {
     const subject = UsersControllerTest.makeSubject({
       updateUser,
       deleteAccount,
+      deleteSetting,
     })
 
     Object.assign(request, {
@@ -373,6 +386,7 @@ describe('UsersController', () => {
     const subject = UsersControllerTest.makeSubject({
       updateUser,
       deleteAccount,
+      deleteSetting,
     })
 
     Object.assign(request, {
@@ -404,6 +418,7 @@ describe('UsersController', () => {
       deleteAccount,
       settingRepository,
       userRepository,
+      deleteSetting,
     })
 
     const actual = await subject.updateSetting(
@@ -432,6 +447,7 @@ describe('UsersController', () => {
       deleteAccount,
       settingRepository,
       userRepository,
+      deleteSetting,
     })
 
     const actual = await subject.updateMFASetting(
@@ -461,6 +477,7 @@ describe('UsersController', () => {
       deleteAccount,
       settingRepository,
       userRepository,
+      deleteSetting,
     })
 
     const actual = await subject.updateSetting(
@@ -497,6 +514,7 @@ describe('UsersController', () => {
       deleteAccount,
       settingRepository,
       userRepository,
+      deleteSetting,
     })
 
     const actual = await subject.updateMFASetting(
@@ -519,6 +537,7 @@ describe('UsersController', () => {
     const subject = UsersControllerTest.makeSubject({
       updateUser,
       deleteAccount,
+      deleteSetting,
     })
 
     const actual = await subject.updateSetting(
@@ -543,6 +562,7 @@ describe('UsersController', () => {
     const subject = UsersControllerTest.makeSubject({
       updateUser,
       deleteAccount,
+      deleteSetting,
     })
 
     const actual = await subject.updateSetting(request, response)
@@ -559,6 +579,7 @@ describe('UsersController', () => {
     const subject = UsersControllerTest.makeSubject({
       updateUser,
       deleteAccount,
+      deleteSetting,
     })
 
     const actual = await subject.updateMFASetting(request)
@@ -582,6 +603,7 @@ describe('UsersController', () => {
       updateUser,
       deleteAccount,
       settingRepository: new SettingRepostioryStub(settings),
+      deleteSetting,
     })
 
     const actual = await subject.deleteSetting(
@@ -592,7 +614,7 @@ describe('UsersController', () => {
     expect(actual.statusCode).toEqual(200)
   })
 
-  it('should fail to delete user setting if it does not exist', async () => {
+  it('should fail to delete user setting if the use case fails to succeed', async () => {
     const user = UserTest.makeSubject({})
     const userUuid = user.uuid
     const request: Partial<express.Request> = {
@@ -602,9 +624,12 @@ describe('UsersController', () => {
       locals: { user },
     }
 
+    deleteSetting.execute = jest.fn().mockReturnValue({ success: false })
+
     const subject = UsersControllerTest.makeSubject({
       updateUser,
       deleteAccount,
+      deleteSetting,
     })
 
     const actual = await subject.deleteSetting(
@@ -634,6 +659,7 @@ describe('UsersController', () => {
     const subject = UsersControllerTest.makeSubject({
       updateUser,
       deleteAccount,
+      deleteSetting,
     })
 
     const actual = await subject.deleteSetting(
@@ -665,6 +691,7 @@ describe('UsersController', () => {
       updateUser,
       deleteAccount,
       settingRepository: new SettingRepostioryStub(settings),
+      deleteSetting,
     })
 
     const actual = await subject.deleteMFASetting(
@@ -681,9 +708,12 @@ describe('UsersController', () => {
       params: { userUuid, settingName: 'BAD' },
     }
 
+    deleteSetting.execute = jest.fn().mockReturnValue({ success: false })
+
     const subject = UsersControllerTest.makeSubject({
       updateUser,
       deleteAccount,
+      deleteSetting,
     })
 
     const actual = await subject.deleteMFASetting(

@@ -28,7 +28,7 @@ export class GetAuthMethods implements UseCaseInterface {
       user.uuid,
     )
 
-    const totpIsSet = mfaSetting !== undefined && mfaSetting.value.length > 0
+    const totpIsSet = mfaSetting !== undefined && mfaSetting.value !== null && mfaSetting.value.length > 0
     const totp = totpIsSet ? true : undefined
 
     return {

@@ -18,8 +18,9 @@ export class Setting {
 
   @Column({
     type: 'text',
+    nullable: true,
   })
-  value: string
+  value: string | null
 
   @Column({
     name: 'server_encryption_version',

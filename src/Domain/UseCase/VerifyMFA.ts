@@ -103,7 +103,7 @@ export class VerifyMFA implements UseCaseInterface {
 
   private async getMFASecretFromUserSettings(user: User): Promise<string | undefined> {
     const mfaSetting = await this.settingRepository.findOneByNameAndUserUuid(SETTINGS.MFA_SECRET, user.uuid)
-    if (mfaSetting === undefined) {
+    if (mfaSetting === undefined || mfaSetting.value === null) {
       return undefined
     }
 

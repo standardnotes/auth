@@ -99,6 +99,7 @@ export class UsersController extends BaseHttpController {
     const result = await this.doDeleteSetting.execute({
       userUuid,
       settingName: SETTINGS.MFA_SECRET,
+      softDelete: true,
     })
 
     if (result.success) {
