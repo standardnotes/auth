@@ -34,12 +34,12 @@ export class DeleteSetting implements UseCaseInterface {
       setting.updatedAt = this.timer.getTimestampInMicroseconds()
 
       await this.settingRepository.save(setting)
+    } else {
+      await this.settingRepository.deleteByUserUuid({
+        userUuid,
+        settingName,
+      })
     }
-
-    await this.settingRepository.deleteByUserUuid({
-      userUuid,
-      settingName,
-    })
 
     return {
       success: true,
