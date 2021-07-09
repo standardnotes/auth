@@ -2,7 +2,7 @@ import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } 
 import { User } from '../User/User'
 
 @Entity({ name: 'settings' })
-@Index('index_settings_on_name_and_user_uuid', ['name', 'user'])
+@Index('index_settings_on_name_and_user_uuid', ['name', 'user'], { unique: true })
 export class Setting {
   static readonly ENCRYPTION_VERSION_UNENCRYPTED = 0
   static readonly ENCRYPTION_VERSION_DEFAULT = 1
