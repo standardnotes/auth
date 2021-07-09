@@ -49,7 +49,7 @@ export class SettingFactory {
   ): Promise<Setting> {
     const { uuid, user } = original
 
-    return Object.assign(this.create(props, await user), {
+    return Object.assign(await this.create(props, await user), {
       uuid,
     })
   }

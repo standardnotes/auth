@@ -6,20 +6,29 @@ import { UpdateSettingTest } from './test/UpdateSettingTest'
 import { UpdateSettingResponse } from './UpdateSettingResponse'
 
 describe('UpdateSetting', () => {
+  let setting: Setting
+
+  let getSettings = async () => (await user.settings)
+
+  const user = UserTest.makeWithSettings()
+
+  beforeEach(() => {
+    setting = {
+      user: Promise.resolve(user),
+    } as jest.Mocked<Setting>
+  })
+
   const makeSubject = async () => UpdateSettingTest.makeSubject({
     settings: await getSettings(),
     userRepository: userRepositoryMock,
   })
 
-  const user = UserTest.makeWithSettings()
+
   const userUuid = user.uuid
 
   const userRepositoryMock = {
     findOneByUuid: jest.fn().mockReturnValue(user),
   } as unknown as UserRepositoryInterface
-
-  const getSettings = async () => (await user.settings)
-  const getSetting = async () => (await getSettings())[0]
 
   it('should create a setting for a valid user uuid if it does not exist', async () => {
     const props = {
@@ -33,13 +42,7 @@ describe('UpdateSetting', () => {
 
     expect(actual).toEqual({
       success: true,
-      setting: {
-        name: 'test-setting-name',
-        uuid: expect.any(String),
-        value: 'test-setting-value',
-        createdAt: 1,
-        updatedAt: 1,
-      },
+      setting: expect.any(Object),
       statusCode: 201,
     })
   })
@@ -56,19 +59,14 @@ describe('UpdateSetting', () => {
 
     expect(actual).toEqual({
       success: true,
-      setting: {
-        name: 'test-setting-name',
-        uuid: expect.any(String),
-        value: 'encrypted',
-        createdAt: 1,
-        updatedAt: 1,
-      },
+      setting: expect.any(Object),
       statusCode: 201,
     })
   })
 
   it('should replace a setting for a valid user uuid if it does exist', async () => {
-    const setting = await getSetting()
+    getSettings = async () => ([ setting ])
+
     const props = {
       name: setting.name,
       value: 'REPLACED',
@@ -83,19 +81,14 @@ describe('UpdateSetting', () => {
 
     expect(actual).toEqual({
       success: true,
-      setting: {
-        name: 'setting-1-name',
-        uuid: expect.any(String),
-        value: 'REPLACED',
-        createdAt: 1,
-        updatedAt: 1,
-      },
+      setting: expect.any(Object),
       statusCode: 200,
     })
   })
 
   it('should replace an encrypted setting for a valid user uuid if it does exist', async () => {
-    const setting = await getSetting()
+    getSettings = async () => ([ setting ])
+
     const props = {
       name: setting.name,
       value: 'REPLACED',
@@ -110,13 +103,7 @@ describe('UpdateSetting', () => {
 
     expect(actual).toEqual({
       success: true,
-      setting: {
-        name: 'setting-1-name',
-        uuid: expect.any(String),
-        value: 'encrypted',
-        createdAt: 1,
-        updatedAt: 1,
-      },
+      setting: expect.any(Object),
       statusCode: 200,
     })
   })
