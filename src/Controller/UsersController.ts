@@ -1,3 +1,4 @@
+import { MfaSetting } from '@standardnotes/auth'
 import { Request, Response } from 'express'
 import { inject } from 'inversify'
 import {
@@ -12,10 +13,8 @@ import {
 } from 'inversify-express-utils'
 import TYPES from '../Bootstrap/Types'
 import { Setting } from '../Domain/Setting/Setting'
-import { SETTINGS } from '../Domain/Setting/Settings'
 import { DeleteAccount } from '../Domain/UseCase/DeleteAccount/DeleteAccount'
 import { DeleteSetting } from '../Domain/UseCase/DeleteSetting/DeleteSetting'
-import { GetMFASetting } from '../Domain/UseCase/GetMFASetting/GetMFASetting'
 import { GetSetting } from '../Domain/UseCase/GetSetting/GetSetting'
 import { GetSettings } from '../Domain/UseCase/GetSettings/GetSettings'
 import { GetUserKeyParams } from '../Domain/UseCase/GetUserKeyParams/GetUserKeyParams'
@@ -28,7 +27,6 @@ export class UsersController extends BaseHttpController {
     @inject(TYPES.UpdateUser) private updateUser: UpdateUser,
     @inject(TYPES.GetSettings) private doGetSettings: GetSettings,
     @inject(TYPES.GetSetting) private doGetSetting: GetSetting,
-    @inject(TYPES.GetMFASetting) private doGetMFASetting: GetMFASetting,
     @inject(TYPES.GetUserKeyParams) private getUserKeyParams: GetUserKeyParams,
     @inject(TYPES.UpdateSetting) private doUpdateSetting: UpdateSetting,
     @inject(TYPES.DeleteAccount) private doDeleteAccount: DeleteAccount,
@@ -83,7 +81,11 @@ export class UsersController extends BaseHttpController {
 
   @httpGet('/:userUuid/mfa')
   async getMFASetting(request: Request): Promise<results.JsonResult> {
-    const result = await this.doGetMFASetting.execute({ userUuid: request.params.userUuid })
+    const result = await this.doGetSetting.execute({
+      userUuid: request.params.userUuid,
+      settingName: MfaSetting.MfaSecret,
+      allowMFARetrieval: true,
+    })
 
     if (result.success) {
       return this.json(result)
@@ -98,7 +100,7 @@ export class UsersController extends BaseHttpController {
 
     const result = await this.doDeleteSetting.execute({
       userUuid,
-      settingName: SETTINGS.MFA_SECRET,
+      settingName: MfaSetting.MfaSecret,
       softDelete: true,
     })
 
@@ -123,7 +125,7 @@ export class UsersController extends BaseHttpController {
       uuid,
       value,
       serverEncryptionVersion,
-      name: SETTINGS.MFA_SECRET,
+      name: MfaSetting.MfaSecret,
       createdAt,
       updatedAt,
     }

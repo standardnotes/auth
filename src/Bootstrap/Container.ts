@@ -84,7 +84,6 @@ import { WebSocketsConnectionRepositoryInterface } from '../Domain/WebSockets/We
 import { RedisWebSocketsConnectionRepository } from '../Infra/Redis/RedisWebSocketsConnectionRepository'
 import { AddWebSocketsConnection } from '../Domain/UseCase/AddWebSocketsConnection/AddWebSocketsConnection'
 import { RemoveWebSocketsConnection } from '../Domain/UseCase/RemoveWebSocketsConnection/RemoveWebSocketsConnection'
-import { GetMFASetting } from '../Domain/UseCase/GetMFASetting/GetMFASetting'
 import { ContentDecoderInterface } from '../Domain/Encryption/ContentDecoderInterface'
 import { ContentDecoder } from '../Domain/Encryption/ContentDecoder'
 import axios, { AxiosInstance } from 'axios'
@@ -236,7 +235,6 @@ export class ContainerConfigLoader {
     container.bind<ChangePassword>(TYPES.ChangePassword).to(ChangePassword)
     container.bind<GetSettings>(TYPES.GetSettings).to(GetSettings)
     container.bind<GetSetting>(TYPES.GetSetting).to(GetSetting)
-    container.bind<GetMFASetting>(TYPES.GetMFASetting).to(GetMFASetting)
     container.bind<UpdateSetting>(TYPES.UpdateSetting).to(UpdateSetting)
     container.bind<DeleteSetting>(TYPES.DeleteSetting).to(DeleteSetting)
     container.bind<GetAuthMethods>(TYPES.GetAuthMethods).to(GetAuthMethods)

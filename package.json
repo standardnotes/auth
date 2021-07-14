@@ -77,7 +77,6 @@
     "coveragePathIgnorePatterns": [
       "/node_modules/",
       "/Bootstrap/",
-      "/test/",
       "HealthCheckController"
     ],
     "setupFilesAfterEnv": [

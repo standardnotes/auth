@@ -6,35 +6,33 @@ import { UsersController } from './UsersController'
 import { results } from 'inversify-express-utils'
 import { User } from '../Domain/User/User'
 import { UpdateUser } from '../Domain/UseCase/UpdateUser'
-import { UserTest } from '../Domain/User/test/UserTest'
-import { SettingProjectorTest } from '../Projection/test/SettingProjectorTest'
-import { SettingRepostioryStub } from '../Domain/Setting/test/SettingRepositoryStub'
-import { UsersControllerTest } from './test/UsersControllerTest'
 import { GetSettings } from '../Domain/UseCase/GetSettings/GetSettings'
 import { GetSetting } from '../Domain/UseCase/GetSetting/GetSetting'
 import { GetUserKeyParams } from '../Domain/UseCase/GetUserKeyParams/GetUserKeyParams'
-import { UserRepostioryStub } from '../Domain/User/test/UserRepostioryStub'
 import { UpdateSetting } from '../Domain/UseCase/UpdateSetting/UpdateSetting'
 import { DeleteAccount } from '../Domain/UseCase/DeleteAccount/DeleteAccount'
 import { DeleteSetting } from '../Domain/UseCase/DeleteSetting/DeleteSetting'
-import { GetMFASetting } from '../Domain/UseCase/GetMFASetting/GetMFASetting'
 import { Setting } from '../Domain/Setting/Setting'
 
 describe('UsersController', () => {
   let updateUser: UpdateUser
   let deleteAccount: DeleteAccount
   let deleteSetting: DeleteSetting
+  let getSettings: GetSettings
+  let getSetting: GetSetting
+  let getUserKeyParams: GetUserKeyParams
+  let updateSetting: UpdateSetting
+
   let request: express.Request
   let response: express.Response
   let user: User
 
-  const createControllerWithMocks = () => new UsersController(
+  const createController = () => new UsersController(
     updateUser,
-    {} as jest.Mocked<GetSettings>,
-    {} as jest.Mocked<GetSetting>,
-    {} as jest.Mocked<GetMFASetting>,
-    {} as jest.Mocked<GetUserKeyParams>,
-    {} as jest.Mocked<UpdateSetting>,
+    getSettings,
+    getSetting,
+    getUserKeyParams,
+    updateSetting,
     deleteAccount,
     deleteSetting,
   )
@@ -51,6 +49,18 @@ describe('UsersController', () => {
 
     user = {} as jest.Mocked<User>
     user.uuid = '123'
+
+    getSettings = {} as jest.Mocked<GetSettings>
+    getSettings.execute = jest.fn()
+
+    getSetting = {} as jest.Mocked<GetSetting>
+    getSetting.execute = jest.fn()
+
+    getUserKeyParams = {} as jest.Mocked<GetUserKeyParams>
+    getUserKeyParams.execute = jest.fn()
+
+    updateSetting = {} as jest.Mocked<UpdateSetting>
+    updateSetting.execute = jest.fn()
 
     request = {
       headers: {},
@@ -73,7 +83,7 @@ describe('UsersController', () => {
 
     updateUser.execute = jest.fn().mockReturnValue({ authResponse: { foo: 'bar' } })
 
-    const httpResponse = <results.JsonResult> await createControllerWithMocks().update(request, response)
+    const httpResponse = <results.JsonResult> await createController().update(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(updateUser.execute).toHaveBeenCalledWith({
@@ -98,7 +108,7 @@ describe('UsersController', () => {
     request.headers['user-agent'] = 'Google Chrome'
     response.locals.user = user
 
-    const httpResponse = <results.JsonResult> await createControllerWithMocks().update(request, response)
+    const httpResponse = <results.JsonResult> await createController().update(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(updateUser.execute).not.toHaveBeenCalled()
@@ -110,7 +120,7 @@ describe('UsersController', () => {
   it('should delete user', async () => {
     request.params.email = 'test@test.te'
 
-    const httpResponse = <results.JsonResult> await createControllerWithMocks().deleteAccount(request)
+    const httpResponse = <results.JsonResult> await createController().deleteAccount(request)
     const result = await httpResponse.executeAsync()
 
     expect(deleteAccount.execute).toHaveBeenCalledWith({ email: 'test@test.te' })
@@ -119,607 +129,437 @@ describe('UsersController', () => {
     expect(await result.content.readAsStringAsync()).toEqual('{"message":"A OK"}')
   })
 
-  it('should get user settings for vaild user uuid', async () => {
-    const userUuid = 'user-1'
-    const user = UserTest.makeSubject({
-      uuid: userUuid,
-    }, {
-      settings: [
-        { uuid: 'setting-1' },
-      ],
-    })
-    Object.assign(request, {
-      params: { userUuid },
-    })
-    response.locals.user = user
-
-    const settings = await user.settings
-
-    const projector = SettingProjectorTest.get()
-    const simpleSettings = await projector.projectManySimple(settings)
-    const repository = new SettingRepostioryStub(settings)
-
-    const subject = UsersControllerTest.makeSubject({
-      updateUser,
-      deleteAccount,
-      deleteSetting,
-      settingRepository: repository,
-      projector,
-    })
-    const actual = await subject.getSettings(request, response)
-
-    expect(actual.statusCode).toEqual(200)
-    expect(actual.json).toEqual({
-      success: true,
-      userUuid,
-      settings: simpleSettings,
-    })
-  })
-
-  it('should error when geting user settings for invaild user uuid', async () => {
-    const userUuid = 'user-1'
-    const badUserUuid = 'BAD-user-uuid'
-    const user = UserTest.makeSubject({
-      uuid: userUuid,
-    })
-    Object.assign(request, {
-      params: { userUuid: badUserUuid },
-    })
-    response.locals.user = user
-
-    const actual = await createControllerWithMocks().getSettings(request, response)
-
-    expect(actual.statusCode).toEqual(401)
-    expect(actual.json).toHaveProperty('error')
-  })
-
-  it('should get user setting by name for vaild user uuid', async () => {
-    const user = UserTest.makeWithSettings()
-    const userUuid = user.uuid
-    response.locals.user = user
-
-    const settings = await user.settings
-    const settingIndex = 0
-
-    Object.assign(request, {
-      params: { userUuid, settingName: settings[settingIndex].name },
-    })
-
-    const repository = new SettingRepostioryStub(settings)
-    const projector = SettingProjectorTest.get()
-    const subject = UsersControllerTest.makeSubject({
-      updateUser,
-      deleteAccount,
-      deleteSetting,
-      settingRepository: repository,
-      projector,
-    })
-
-    const expectedSetting = await projector.projectSimple(settings[settingIndex])
-
-    const actual = await subject.getSetting(request, response)
-
-    expect(actual.statusCode).toEqual(200)
-    expect(actual.json).toEqual({
-      success: true,
-      userUuid,
-      setting: expectedSetting,
-    })
-  })
-
-  it('should get user mfa secret for vaild user uuid', async () => {
-    const user = UserTest.makeSubject({
-      uuid: 'user-with-settings-uuid',
-    }, {
-      settings: [
-        { uuid: 'setting-2-uuid', name: 'MFA_SECRET', serverEncryptionVersion: Setting.ENCRYPTION_VERSION_UNENCRYPTED },
-        { uuid: 'setting-2-uuid', name: 'setting-2-name' },
-        { uuid: 'setting-3-uuid', name: 'setting-3-name' },
-      ],
-    })
-    const userUuid = user.uuid
-    response.locals.user = user
-
-    const settings = await user.settings
-    const settingIndex = 0
-
-    Object.assign(request, {
-      params: { userUuid },
-    })
-
-    const repository = new SettingRepostioryStub(settings)
-    const projector = SettingProjectorTest.get()
-    const subject = UsersControllerTest.makeSubject({
-      updateUser,
-      deleteAccount,
-      deleteSetting,
-      settingRepository: repository,
-      projector,
-    })
-
-    const expectedSetting = await projector.projectSimple(settings[settingIndex])
-
-    const actual = await subject.getMFASetting(request)
-
-    expect(actual.statusCode).toEqual(200)
-    expect(actual.json).toEqual({
-      success: true,
-      userUuid,
-      setting: expectedSetting,
-    })
-  })
-
-  it('should error when geting non existing mfa for vaild user uuid', async () => {
-    const userUuid = 'user-1'
-    const user = UserTest.makeSubject({
-      uuid: userUuid,
-    })
-    Object.assign(request, {
-      params: { userUuid },
-    })
-    response.locals.user = user
-
-    const subject = UsersControllerTest.makeSubject({
-      updateUser,
-      deleteAccount,
-      deleteSetting,
-    })
-
-    const actual = await subject.getMFASetting(request)
-
-    expect(actual.statusCode).toEqual(400)
-    expect(actual.json).toHaveProperty('error')
-  })
-
-  it('should error when geting user setting by name for invaild user uuid', async () => {
-    const userUuid = 'user-1'
-    const badUserUuid = 'BAD-user-uuid'
-    const user = UserTest.makeSubject({
-      uuid: userUuid,
-    })
-    Object.assign(request, {
-      params: { userUuid: badUserUuid, settingName: 'irrelevant' },
-    })
-    response.locals.user = user
-
-    const subject = UsersControllerTest.makeSubject({
-      updateUser,
-      deleteAccount,
-      deleteSetting,
-    })
-
-    const actual = await subject.getSetting(request, response)
-
-    expect(actual.statusCode).toEqual(401)
-    expect(actual.json).toHaveProperty('error')
-  })
-
-  it('should error when geting user setting by invalid name for vaild user uuid', async () => {
-    const userUuid = 'user-1'
-    const user = UserTest.makeSubject({
-      uuid: userUuid,
-    })
-    Object.assign(request, {
-      params: { userUuid, settingName: 'BAD' },
-    })
-    response.locals.user = user
-
-    const subject = UsersControllerTest.makeSubject({
-      updateUser,
-      deleteAccount,
-      deleteSetting,
-    })
-
-    const actual = await subject.getSetting(request, response)
-
-    expect(actual.statusCode).toEqual(400)
-    expect(actual.json).toHaveProperty('error')
-  })
-
-  it('should get user key params by email', async () => {
-    const subject = UsersControllerTest.makeSubject({
-      updateUser,
-      deleteAccount,
-      deleteSetting,
-    })
-
-    Object.assign(request, {
-      query: { email: 'test@test.com' },
-    })
-
-    const actual = await subject.keyParams(request)
-
-    expect(actual.statusCode).toEqual(200)
-    expect(actual.json).toEqual({
-      identifier: 'test@test.com',
-      version: '004',
-    })
-  })
-
-  it('should get user key params by uuid', async () => {
-    const user = UserTest.makeWithSettings()
-    const userUuid = user.uuid
-
-    const userRepository = new UserRepostioryStub([user])
-
-    const subject = UsersControllerTest.makeSubject({
-      updateUser,
-      deleteAccount,
-      userRepository,
-      deleteSetting,
-    })
-
-    Object.assign(request, {
-      query: { uuid: userUuid },
-    })
-
-    const actual = await subject.keyParams(request)
-
-    expect(actual.statusCode).toEqual(200)
-    expect(actual.json).toEqual({
-      identifier: 'test@test.com',
-      version: '004',
-    })
-  })
-
-  it('should get user key params for authenticated user', async () => {
-    const subject = UsersControllerTest.makeSubject({
-      updateUser,
-      deleteAccount,
-      deleteSetting,
-    })
-
-    Object.assign(request, {
-      query: { email: 'test@test.com', authenticated: 'true' },
-    })
-
-    const actual = await subject.keyParams(request)
-
-    expect(actual.statusCode).toEqual(200)
-    expect(actual.json).toEqual({
-      identifier: 'test@test.com',
-      version: '004',
-    })
-  })
-
-  it('should error when email and uuid parameters are not given in query when gettting user key params', async () => {
-    const subject = UsersControllerTest.makeSubject({
-      updateUser,
-      deleteAccount,
-      deleteSetting,
-    })
-
-    Object.assign(request, {
-      query: {},
-    })
-
-    const actual = await subject.keyParams(request)
-
-    expect(actual.statusCode).toEqual(400)
-    expect(actual.json).toHaveProperty('error')
-  })
-
-  it('should create user setting for vaild user uuid', async () => {
-    const user = UserTest.makeWithSettings()
-    const userUuid = user.uuid
-    response.locals.user = user
-
-    const settings = await user.settings
-
-    Object.assign(request, {
-      params: { userUuid },
-      body: { name: 'NEW-setting', value: 'value' },
-    })
-
-    const userRepository = new UserRepostioryStub([user])
-    const settingRepository = new SettingRepostioryStub(settings)
-    const subject = UsersControllerTest.makeSubject({
-      updateUser,
-      deleteAccount,
-      settingRepository,
-      userRepository,
-      deleteSetting,
-    })
-
-    const actual = await subject.updateSetting(
-      request,
-      response,
-    )
-
-    expect(actual).toMatchObject({ statusCode: 201 })
-  })
-
-  it('should create user mfa setting', async () => {
-    const user = UserTest.makeWithSettings()
-    const userUuid = user.uuid
-
-    const settings = await user.settings
-
-    Object.assign(request, {
-      params: { userUuid },
-      body: { value: 'value' },
-    })
-
-    const userRepository = new UserRepostioryStub([user])
-    const settingRepository = new SettingRepostioryStub(settings)
-    const subject = UsersControllerTest.makeSubject({
-      updateUser,
-      deleteAccount,
-      settingRepository,
-      userRepository,
-      deleteSetting,
-    })
-
-    const actual = await subject.updateMFASetting(
-      request,
-    )
-
-    expect(actual).toMatchObject({ statusCode: 201 })
-  })
-
-  it('should replace user setting for vaild user uuid', async () => {
-    const user = UserTest.makeWithSettings()
-    const userUuid = user.uuid
-    response.locals.user = user
-
-    const settings = await user.settings
-    const setting = settings[0]
-
-    Object.assign(request, {
-      params: { userUuid },
-      body: { name: setting.name, value: 'NEW-value' },
-    })
-
-    const userRepository = new UserRepostioryStub([user])
-    const settingRepository = new SettingRepostioryStub(settings)
-    const subject = UsersControllerTest.makeSubject({
-      updateUser,
-      deleteAccount,
-      settingRepository,
-      userRepository,
-      deleteSetting,
-    })
-
-    const actual = await subject.updateSetting(
-      request,
-      response,
-    )
-
-    expect(actual).toMatchObject({ statusCode: 200 })
-  })
-
-  it('should replace user mfa setting', async () => {
-    const user = UserTest.makeSubject({
-      uuid: 'user-with-settings-uuid',
-    }, {
-      settings: [
-        { uuid: 'setting-2-uuid', name: 'MFA_SECRET' },
-        { uuid: 'setting-2-uuid', name: 'setting-2-name' },
-        { uuid: 'setting-3-uuid', name: 'setting-3-name' },
-      ],
-    })
-    const userUuid = user.uuid
-
-    const settings = await user.settings
-
-    Object.assign(request, {
-      params: { userUuid },
-      body: { value: 'NEW-value' },
-    })
-
-    const userRepository = new UserRepostioryStub([user])
-    const settingRepository = new SettingRepostioryStub(settings)
-    const subject = UsersControllerTest.makeSubject({
-      updateUser,
-      deleteAccount,
-      settingRepository,
-      userRepository,
-      deleteSetting,
-    })
-
-    const actual = await subject.updateMFASetting(
-      request,
-    )
-
-    expect(actual).toMatchObject({ statusCode: 200 })
-  })
-
-  it('should replace user setting for nonexistent user uuid', async () => {
-    const user = UserTest.makeWithSettings()
-    const userUuid = user.uuid
-    response.locals.user = user
-
-    Object.assign(request, {
-      params: { userUuid },
-      body: { name: 'NEW-name', value: 'NEW-value' },
-    })
-
-    const subject = UsersControllerTest.makeSubject({
-      updateUser,
-      deleteAccount,
-      deleteSetting,
-    })
-
-    const actual = await subject.updateSetting(
-      request,
-      response,
-    )
-
-    expect(actual).toMatchObject({ statusCode: 400 })
-  })
-
-  it('should error when creating/replacing user setting for invaild user uuid', async () => {
-    const userUuid = 'user-1'
-    const badUserUuid = 'BAD-user-uuid'
-    const user = UserTest.makeSubject({
-      uuid: userUuid,
-    })
-    Object.assign(request, {
-      params: { userUuid: badUserUuid, settingName: 'irrelevant' },
-    })
-    response.locals.user = user
-
-    const subject = UsersControllerTest.makeSubject({
-      updateUser,
-      deleteAccount,
-      deleteSetting,
-    })
-
-    const actual = await subject.updateSetting(request, response)
-
-    expect(actual).toMatchObject({ json: { error: expect.anything() } })
-  })
-
-  it('should error when creating/replacing user mfa setting for invaild user uuid', async () => {
-    const badUserUuid = 'BAD-user-uuid'
-    Object.assign(request, {
-      params: { userUuid: badUserUuid, settingName: 'irrelevant' },
-    })
-
-    const subject = UsersControllerTest.makeSubject({
-      updateUser,
-      deleteAccount,
-      deleteSetting,
-    })
-
-    const actual = await subject.updateMFASetting(request)
-
-    expect(actual).toMatchObject({ json: { error: expect.anything() } })
-  })
-
-  it('should delete user setting if it exists', async () => {
-    const user = UserTest.makeWithSettings()
-    const userUuid = user.uuid
-    const settings = await user.settings
-    const setting = settings[0]
-    const request: Partial<express.Request> = {
-      params: { userUuid, settingName: setting.name },
-    }
-    const response: Partial<express.Response> = {
-      locals: { user },
+  it('should get user settings', async () => {
+    request.params.userUuid = '1-2-3'
+    response.locals.user = {
+      uuid: '1-2-3',
     }
 
-    const subject = UsersControllerTest.makeSubject({
-      updateUser,
-      deleteAccount,
-      settingRepository: new SettingRepostioryStub(settings),
-      deleteSetting,
-    })
+    const httpResponse = <results.JsonResult> await createController().getSettings(request, response)
+    const result = await httpResponse.executeAsync()
 
-    const actual = await subject.deleteSetting(
-      request as express.Request,
-      response as express.Response,
-    )
+    expect(getSettings.execute).toHaveBeenCalledWith({ userUuid: '1-2-3' })
 
-    expect(actual.statusCode).toEqual(200)
+    expect(result.statusCode).toEqual(200)
   })
 
-  it('should fail to delete user setting if the use case fails to succeed', async () => {
-    const user = UserTest.makeSubject({})
-    const userUuid = user.uuid
-    const request: Partial<express.Request> = {
-      params: { userUuid, settingName: 'BAD' },
+  it('should not get user settings if not allowed', async () => {
+    request.params.userUuid = '1-2-3'
+    response.locals.user = {
+      uuid: '2-3-4',
     }
-    const response: Partial<express.Response> = {
-      locals: { user },
-    }
+
+    const httpResponse = <results.JsonResult> await createController().getSettings(request, response)
+    const result = await httpResponse.executeAsync()
+
+    expect(getSettings.execute).not.toHaveBeenCalled()
+
+    expect(result.statusCode).toEqual(401)
+  })
+
+  it('should get user mfa setting', async () => {
+    request.params.userUuid = '1-2-3'
+
+    getSetting.execute = jest.fn().mockReturnValue({ success: true })
+
+    const httpResponse = <results.JsonResult> await createController().getMFASetting(request)
+    const result = await httpResponse.executeAsync()
+
+    expect(getSetting.execute).toHaveBeenCalledWith({ userUuid: '1-2-3', settingName: 'MFA_SECRET', allowMFARetrieval: true })
+
+    expect(result.statusCode).toEqual(200)
+  })
+
+  it('should fail if could not get user mfa setting', async () => {
+    request.params.userUuid = '1-2-3'
+
+    getSetting.execute = jest.fn().mockReturnValue({ success: false })
+
+    const httpResponse = <results.JsonResult> await createController().getMFASetting(request)
+    const result = await httpResponse.executeAsync()
+
+    expect(getSetting.execute).toHaveBeenCalledWith({ userUuid: '1-2-3', settingName: 'MFA_SECRET', allowMFARetrieval: true })
+
+    expect(result.statusCode).toEqual(400)
+  })
+
+  it('should delete user mfa setting', async () => {
+    request.params.userUuid = '1-2-3'
+
+    deleteSetting.execute = jest.fn().mockReturnValue({ success: true })
+
+    const httpResponse = <results.JsonResult> await createController().deleteMFASetting(request)
+    const result = await httpResponse.executeAsync()
+
+    expect(deleteSetting.execute).toHaveBeenCalledWith({ userUuid: '1-2-3', settingName: 'MFA_SECRET', softDelete: true })
+
+    expect(result.statusCode).toEqual(200)
+  })
+
+  it('should fail if could not delete user mfa setting', async () => {
+    request.params.userUuid = '1-2-3'
 
     deleteSetting.execute = jest.fn().mockReturnValue({ success: false })
 
-    const subject = UsersControllerTest.makeSubject({
-      updateUser,
-      deleteAccount,
-      deleteSetting,
-    })
+    const httpResponse = <results.JsonResult> await createController().deleteMFASetting(request)
+    const result = await httpResponse.executeAsync()
 
-    const actual = await subject.deleteSetting(
-      request as express.Request,
-      response as express.Response,
-    )
+    expect(deleteSetting.execute).toHaveBeenCalledWith({ userUuid: '1-2-3', settingName: 'MFA_SECRET', softDelete: true })
 
-    expect(actual.statusCode).toEqual(400)
+    expect(result.statusCode).toEqual(400)
   })
 
-  it('should error when deleting user setting for invaild user uuid', async () => {
-    const userUuid = 'user-1'
-    const badUserUuid = 'BAD-user-uuid'
-    const user = UserTest.makeSubject({
-      uuid: userUuid,
-    })
-    const request: Partial<express.Request> = {
-      params: {
-        userUuid: badUserUuid,
-        settingName: 'irrelevant',
+  it('should update user mfa setting with default encoded and encrypted setting', async () => {
+    request.params.userUuid = '1-2-3'
+    request.body = {
+      uuid: '2-3-4',
+      value: 'test',
+      createdAt: 123,
+      updatedAt: 234,
+    }
+
+    updateSetting.execute = jest.fn().mockReturnValue({ success: true, statusCode: 200 })
+
+    const httpResponse = <results.JsonResult> await createController().updateMFASetting(request)
+    const result = await httpResponse.executeAsync()
+
+    expect(updateSetting.execute).toHaveBeenCalledWith({
+      props: {
+        createdAt: 123,
+        name: 'MFA_SECRET',
+        serverEncryptionVersion: Setting.ENCRYPTION_VERSION_CLIENT_ENCODED_AND_SERVER_ENCRYPTED,
+        updatedAt: 234,
+        uuid: '2-3-4',
+        value: 'test',
       },
-    }
-    const response: Partial<express.Response> = {
-      locals: { user },
-    }
-
-    const subject = UsersControllerTest.makeSubject({
-      updateUser,
-      deleteAccount,
-      deleteSetting,
+      userUuid: '1-2-3',
     })
 
-    const actual = await subject.deleteSetting(
-      request as express.Request,
-      response as express.Response,
-    )
-
-    expect(actual.json).toHaveProperty('error')
+    expect(result.statusCode).toEqual(200)
   })
 
-  it('should delete user mfa setting if it exists', async () => {
-    const user = UserTest.makeSubject({
-      uuid: 'user-with-settings-uuid',
-    }, {
-      settings: [
-        { uuid: 'setting-2-uuid', name: 'MFA_SECRET' },
-        { uuid: 'setting-2-uuid', name: 'setting-2-name' },
-        { uuid: 'setting-3-uuid', name: 'setting-3-name' },
-      ],
-    })
-    const userUuid = user.uuid
-    const settings = await user.settings
-    const setting = settings[0]
-    const request: Partial<express.Request> = {
-      params: { userUuid, settingName: setting.name },
+  it('should update user mfa setting with different encryption', async () => {
+    request.params.userUuid = '1-2-3'
+    request.body = {
+      uuid: '2-3-4',
+      value: 'test',
+      serverEncryptionVersion: Setting.ENCRYPTION_VERSION_DEFAULT,
+      createdAt: 123,
+      updatedAt: 234,
     }
 
-    const subject = UsersControllerTest.makeSubject({
-      updateUser,
-      deleteAccount,
-      settingRepository: new SettingRepostioryStub(settings),
-      deleteSetting,
+    updateSetting.execute = jest.fn().mockReturnValue({ success: true, statusCode: 200 })
+
+    const httpResponse = <results.JsonResult> await createController().updateMFASetting(request)
+    const result = await httpResponse.executeAsync()
+
+    expect(updateSetting.execute).toHaveBeenCalledWith({
+      props: {
+        createdAt: 123,
+        name: 'MFA_SECRET',
+        serverEncryptionVersion: 1,
+        updatedAt: 234,
+        uuid: '2-3-4',
+        value: 'test',
+      },
+      userUuid: '1-2-3',
     })
 
-    const actual = await subject.deleteMFASetting(
-      request as express.Request
-    )
-
-    expect(actual.statusCode).toEqual(200)
+    expect(result.statusCode).toEqual(200)
   })
 
-  it('should fail to delete mfa user setting if it does not exist', async () => {
-    const user = UserTest.makeSubject({})
-    const userUuid = user.uuid
-    const request: Partial<express.Request> = {
-      params: { userUuid, settingName: 'BAD' },
+  it('should fail if could not update user mfa setting', async () => {
+    request.params.userUuid = '1-2-3'
+    request.body = {
+      uuid: '2-3-4',
+      value: 'test',
+      serverEncryptionVersion: Setting.ENCRYPTION_VERSION_CLIENT_ENCODED_AND_SERVER_ENCRYPTED,
+      createdAt: 123,
+      updatedAt: 234,
+    }
+
+    updateSetting.execute = jest.fn().mockReturnValue({ success: false })
+
+    const httpResponse = <results.JsonResult> await createController().updateMFASetting(request)
+    const result = await httpResponse.executeAsync()
+
+    expect(updateSetting.execute).toHaveBeenCalledWith({
+      props: {
+        createdAt: 123,
+        name: 'MFA_SECRET',
+        serverEncryptionVersion: 2,
+        updatedAt: 234,
+        uuid: '2-3-4',
+        value: 'test',
+      },
+      userUuid: '1-2-3',
+    })
+
+    expect(result.statusCode).toEqual(400)
+  })
+
+  it('should get user setting', async () => {
+    request.params.userUuid = '1-2-3'
+    request.params.settingName = 'test'
+    response.locals.user = {
+      uuid: '1-2-3',
+    }
+
+    getSetting.execute = jest.fn().mockReturnValue({ success: true })
+
+    const httpResponse = <results.JsonResult> await createController().getSetting(request, response)
+    const result = await httpResponse.executeAsync()
+
+    expect(getSetting.execute).toHaveBeenCalledWith({ userUuid: '1-2-3', settingName: 'test' })
+
+    expect(result.statusCode).toEqual(200)
+  })
+
+  it('should not get user setting if not allowed', async () => {
+    request.params.userUuid = '1-2-3'
+    request.params.settingName = 'test'
+    response.locals.user = {
+      uuid: '2-3-4',
+    }
+
+    getSetting.execute = jest.fn()
+
+    const httpResponse = <results.JsonResult> await createController().getSetting(request, response)
+    const result = await httpResponse.executeAsync()
+
+    expect(getSetting.execute).not.toHaveBeenCalled()
+
+    expect(result.statusCode).toEqual(401)
+  })
+
+  it('should fail if could not get user setting', async () => {
+    request.params.userUuid = '1-2-3'
+    request.params.settingName = 'test'
+    response.locals.user = {
+      uuid: '1-2-3',
+    }
+
+    getSetting.execute = jest.fn().mockReturnValue({ success: false })
+
+    const httpResponse = <results.JsonResult> await createController().getSetting(request, response)
+    const result = await httpResponse.executeAsync()
+
+    expect(getSetting.execute).toHaveBeenCalledWith({ userUuid: '1-2-3', settingName: 'test' })
+
+    expect(result.statusCode).toEqual(400)
+  })
+
+  it('should update user setting with default encryption', async () => {
+    request.params.userUuid = '1-2-3'
+    response.locals.user = {
+      uuid: '1-2-3',
+    }
+
+    request.body = {
+      name: 'foo',
+      value: 'bar',
+    }
+
+    updateSetting.execute = jest.fn().mockReturnValue({ success: true, statusCode: 200 })
+
+    const httpResponse = <results.JsonResult> await createController().updateSetting(request, response)
+    const result = await httpResponse.executeAsync()
+
+    expect(updateSetting.execute).toHaveBeenCalledWith({
+      props: {
+        name: 'foo',
+        serverEncryptionVersion: 1,
+        value: 'bar',
+      },
+      userUuid: '1-2-3',
+    })
+
+    expect(result.statusCode).toEqual(200)
+  })
+
+  it('should update user setting with different encryption setting', async () => {
+    request.params.userUuid = '1-2-3'
+    response.locals.user = {
+      uuid: '1-2-3',
+    }
+
+    request.body = {
+      name: 'foo',
+      value: 'bar',
+      serverEncryptionVersion: Setting.ENCRYPTION_VERSION_UNENCRYPTED,
+    }
+
+    updateSetting.execute = jest.fn().mockReturnValue({ success: true, statusCode: 200 })
+
+    const httpResponse = <results.JsonResult> await createController().updateSetting(request, response)
+    const result = await httpResponse.executeAsync()
+
+    expect(updateSetting.execute).toHaveBeenCalledWith({
+      props: {
+        name: 'foo',
+        serverEncryptionVersion: 0,
+        value: 'bar',
+      },
+      userUuid: '1-2-3',
+    })
+
+    expect(result.statusCode).toEqual(200)
+  })
+
+  it('should not update user setting if not allowed', async () => {
+    request.params.userUuid = '1-2-3'
+    response.locals.user = {
+      uuid: '2-3-4',
+    }
+
+    request.body = {
+      name: 'foo',
+      value: 'bar',
+      serverEncryptionVersion: Setting.ENCRYPTION_VERSION_DEFAULT,
+    }
+
+    updateSetting.execute = jest.fn()
+
+    const httpResponse = <results.JsonResult> await createController().updateSetting(request, response)
+    const result = await httpResponse.executeAsync()
+
+    expect(updateSetting.execute).not.toHaveBeenCalled()
+
+    expect(result.statusCode).toEqual(401)
+  })
+
+  it('should fail if could not update user setting', async () => {
+    request.params.userUuid = '1-2-3'
+    response.locals.user = {
+      uuid: '1-2-3',
+    }
+
+    request.body = {
+      name: 'foo',
+      value: 'bar',
+      serverEncryptionVersion: Setting.ENCRYPTION_VERSION_DEFAULT,
+    }
+
+    updateSetting.execute = jest.fn().mockReturnValue({ success: false })
+
+    const httpResponse = <results.JsonResult> await createController().updateSetting(request, response)
+    const result = await httpResponse.executeAsync()
+
+    expect(updateSetting.execute).toHaveBeenCalledWith({
+      props: {
+        name: 'foo',
+        serverEncryptionVersion: 1,
+        value: 'bar',
+      },
+      userUuid: '1-2-3',
+    })
+
+    expect(result.statusCode).toEqual(400)
+  })
+
+  it('should delete user setting', async () => {
+    request.params.userUuid = '1-2-3'
+    request.params.settingName = 'foo'
+    response.locals.user = {
+      uuid: '1-2-3',
+    }
+
+    deleteSetting.execute = jest.fn().mockReturnValue({ success: true })
+
+    const httpResponse = <results.JsonResult> await createController().deleteSetting(request, response)
+    const result = await httpResponse.executeAsync()
+
+    expect(deleteSetting.execute).toHaveBeenCalledWith({ userUuid: '1-2-3', settingName: 'foo' })
+
+    expect(result.statusCode).toEqual(200)
+  })
+
+  it('should not delete user setting if user is not allowed', async () => {
+    request.params.userUuid = '1-2-3'
+    request.params.settingName = 'foo'
+    response.locals.user = {
+      uuid: '2-3-4',
+    }
+
+    deleteSetting.execute = jest.fn()
+
+    const httpResponse = <results.JsonResult> await createController().deleteSetting(request, response)
+    const result = await httpResponse.executeAsync()
+
+    expect(deleteSetting.execute).not.toHaveBeenCalled()
+
+    expect(result.statusCode).toEqual(401)
+  })
+
+  it('should fail if could not delete user setting', async () => {
+    request.params.userUuid = '1-2-3'
+    request.params.settingName = 'foo'
+    response.locals.user = {
+      uuid: '1-2-3',
     }
 
     deleteSetting.execute = jest.fn().mockReturnValue({ success: false })
 
-    const subject = UsersControllerTest.makeSubject({
-      updateUser,
-      deleteAccount,
-      deleteSetting,
+    const httpResponse = <results.JsonResult> await createController().deleteSetting(request, response)
+    const result = await httpResponse.executeAsync()
+
+    expect(deleteSetting.execute).toHaveBeenCalledWith({ userUuid: '1-2-3', settingName: 'foo' })
+
+    expect(result.statusCode).toEqual(400)
+  })
+
+  it('should get user key params', async () => {
+    request.query = {
+      email: 'test@test.te',
+      uuid: '1-2-3',
+    }
+
+    getUserKeyParams.execute = jest.fn().mockReturnValue({ foo: 'bar' })
+
+    const httpResponse = <results.JsonResult> await createController().keyParams(request)
+    const result = await httpResponse.executeAsync()
+
+    expect(getUserKeyParams.execute).toHaveBeenCalledWith({
+      email: 'test@test.te',
+      userUuid: '1-2-3',
+      authenticated: false,
     })
 
-    const actual = await subject.deleteMFASetting(
-      request as express.Request,
-    )
+    expect(result.statusCode).toEqual(200)
+  })
 
-    expect(actual.statusCode).toEqual(400)
+  it('should get authenticated user key params', async () => {
+    request.query = {
+      email: 'test@test.te',
+      uuid: '1-2-3',
+      authenticated: 'true',
+    }
+
+    getUserKeyParams.execute = jest.fn().mockReturnValue({ foo: 'bar' })
+
+    const httpResponse = <results.JsonResult> await createController().keyParams(request)
+    const result = await httpResponse.executeAsync()
+
+    expect(getUserKeyParams.execute).toHaveBeenCalledWith({
+      email: 'test@test.te',
+      userUuid: '1-2-3',
+      authenticated: true,
+    })
+
+    expect(result.statusCode).toEqual(200)
+  })
+
+  it('should not get user key params if email and user uuid is missing', async () => {
+    request.query = {
+    }
+
+    getUserKeyParams.execute = jest.fn().mockReturnValue({ foo: 'bar' })
+
+    const httpResponse = <results.JsonResult> await createController().keyParams(request)
+    const result = await httpResponse.executeAsync()
+
+    expect(getUserKeyParams.execute).not.toHaveBeenCalled()
+
+    expect(result.statusCode).toEqual(400)
   })
 })

@@ -12,10 +12,10 @@ export class SettingService {
     @inject(TYPES.SettingFactory) private factory: SettingFactory,
     @inject(TYPES.SettingRepository) private repository: SettingRepositoryInterface,
     @inject(TYPES.Logger) private logger: Logger,
-  ) {}
+  ) {
+  }
 
-  async createOrReplace(dto: CreateOrReplaceSettingDto):
-  Promise<CreateOrReplaceSettingResponse> {
+  async createOrReplace(dto: CreateOrReplaceSettingDto): Promise<CreateOrReplaceSettingResponse> {
     const { user, props } = dto
 
     const existing = await this.repository.findOneByNameAndUserUuid(props.name, user.uuid)

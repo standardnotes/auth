@@ -1,15 +1,41 @@
 import 'reflect-metadata'
-import { UserTest } from '../User/test/UserTest'
-import { SettingServiceTest as SettingServiceTest } from './test/SettingServiceTest'
-import { SettingTest } from './test/SettingTest'
+import { Logger } from 'winston'
+import { User } from '../User/User'
+import { Setting } from './Setting'
+import { SettingFactory } from './SettingFactory'
+import { SettingRepositoryInterface } from './SettingRepositoryInterface'
+
+import { SettingService } from './SettingService'
 
 describe('SettingService', () => {
-  it ('should create setting if it doesn\'t exist', async () => {
-    const persister = SettingServiceTest.makeSubject()
-    const user = UserTest.makeSubject({})
+  let setting: Setting
+  let user: User
+  let factory: SettingFactory
+  let repository: SettingRepositoryInterface
+  let logger: Logger
 
-    const result = await persister.createOrReplace({
-      user: user,
+  const createService = () => new SettingService(factory, repository, logger)
+
+  beforeEach(() => {
+    user = {} as jest.Mocked<User>
+
+    setting = {} as jest.Mocked<Setting>
+
+    factory = {} as jest.Mocked<SettingFactory>
+    factory.create = jest.fn().mockReturnValue(setting)
+    factory.createReplacement = jest.fn().mockReturnValue(setting)
+
+    repository = {} as jest.Mocked<SettingRepositoryInterface>
+    repository.findOneByNameAndUserUuid = jest.fn().mockReturnValue(undefined)
+    repository.save = jest.fn()
+
+    logger = {} as jest.Mocked<Logger>
+    logger.debug = jest.fn()
+  })
+
+  it ('should create setting if it doesn\'t exist', async () => {
+    const result = await createService().createOrReplace({
+      user,
       props: {
         name: 'name',
         value: 'value',
@@ -21,13 +47,9 @@ describe('SettingService', () => {
   })
 
   it ('should replace setting if it does exist', async () => {
-    const user = UserTest.makeSubject({})
-    const setting = SettingTest.makeSubject({}, user)
-    const persister = SettingServiceTest.makeSubject({
-      settings: [setting],
-    })
+    repository.findOneByNameAndUserUuid = jest.fn().mockReturnValue(setting)
 
-    const result = await persister.createOrReplace({
+    const result = await createService().createOrReplace({
       user: user,
       props: {
         ...setting,
