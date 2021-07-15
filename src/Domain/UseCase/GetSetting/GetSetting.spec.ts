@@ -22,7 +22,7 @@ describe('GetSetting', () => {
     setting = {} as jest.Mocked<Setting>
 
     settingRepository = {} as jest.Mocked<SettingRepositoryInterface>
-    settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue(setting)
+    settingRepository.findLastByNameAndUserUuid = jest.fn().mockReturnValue(setting)
 
     settingProjector = {} as jest.Mocked<SettingProjector>
     settingProjector.projectSimple = jest.fn().mockReturnValue({ foo: 'bar' })
@@ -49,7 +49,7 @@ describe('GetSetting', () => {
       serverEncryptionVersion: Setting.ENCRYPTION_VERSION_DEFAULT,
     } as jest.Mocked<Setting>
 
-    settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue(setting)
+    settingRepository.findLastByNameAndUserUuid = jest.fn().mockReturnValue(setting)
 
     crypter.decryptForUser = jest.fn().mockReturnValue('decrypted')
 
@@ -71,7 +71,7 @@ describe('GetSetting', () => {
       serverEncryptionVersion: Setting.ENCRYPTION_VERSION_DEFAULT,
     } as jest.Mocked<Setting>
 
-    settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue(setting)
+    settingRepository.findLastByNameAndUserUuid = jest.fn().mockReturnValue(setting)
 
     crypter.decryptForUser = jest.fn().mockReturnValue('decrypted')
 
@@ -91,7 +91,7 @@ describe('GetSetting', () => {
       serverEncryptionVersion: Setting.ENCRYPTION_VERSION_CLIENT_ENCODED_AND_SERVER_ENCRYPTED,
     } as jest.Mocked<Setting>
 
-    settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue(setting)
+    settingRepository.findLastByNameAndUserUuid = jest.fn().mockReturnValue(setting)
 
     crypter.decryptForUser = jest.fn().mockReturnValue('encoded_and_decrypted')
 
@@ -108,7 +108,7 @@ describe('GetSetting', () => {
   })
 
   it('should not find a setting for user if it does not exist', async () => {
-    settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue(undefined)
+    settingRepository.findLastByNameAndUserUuid = jest.fn().mockReturnValue(undefined)
 
     expect(await createUseCase().execute({ userUuid: '1-2-3', settingName: 'test' })).toEqual({
       success: false,

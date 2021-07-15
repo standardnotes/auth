@@ -7,6 +7,17 @@ import { DeleteSettingDto } from '../../Domain/UseCase/DeleteSetting/DeleteSetti
 @injectable()
 @EntityRepository(Setting)
 export class MySQLSettingRepository extends Repository<Setting> implements SettingRepositoryInterface {
+  async findOneByUuid(uuid: string): Promise<Setting | undefined> {
+    return this.createQueryBuilder('setting')
+      .where(
+        'setting.uuid = :uuid',
+        {
+          uuid,
+        }
+      )
+      .getOne()
+  }
+
   async findOneByNameAndUserUuid(name: string, userUuid: string): Promise<Setting | undefined> {
     return this.createQueryBuilder('setting')
       .where(
@@ -18,6 +29,23 @@ export class MySQLSettingRepository extends Repository<Setting> implements Setti
       )
       .getOne()
   }
+
+  async findLastByNameAndUserUuid(name: string, userUuid: string): Promise<Setting | undefined> {
+    const settings = await this.createQueryBuilder('setting')
+      .where(
+        'setting.name = :name AND setting.user_uuid = :user_uuid',
+        {
+          name,
+          user_uuid: userUuid,
+        }
+      )
+      .orderBy('updated_at', 'DESC')
+      .limit(1)
+      .getMany()
+
+    return settings.pop()
+  }
+
   async findAllByUserUuid(userUuid: string): Promise<Setting[]> {
     return this.createQueryBuilder('setting')
       .where(
@@ -28,6 +56,7 @@ export class MySQLSettingRepository extends Repository<Setting> implements Setti
       )
       .getMany()
   }
+
   async deleteByUserUuid({
     settingName,
     userUuid,
