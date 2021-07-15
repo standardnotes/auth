@@ -159,13 +159,14 @@ describe('UsersController', () => {
 
   it('should get user mfa setting', async () => {
     request.params.userUuid = '1-2-3'
+    request.body.lastSyncTime = 123
 
-    getSetting.execute = jest.fn().mockReturnValue({ success: true })
+    getSettings.execute = jest.fn().mockReturnValue({ success: true })
 
-    const httpResponse = <results.JsonResult> await createController().getMFASetting(request)
+    const httpResponse = <results.JsonResult> await createController().getMFASettings(request)
     const result = await httpResponse.executeAsync()
 
-    expect(getSetting.execute).toHaveBeenCalledWith({ userUuid: '1-2-3', settingName: 'MFA_SECRET', allowMFARetrieval: true })
+    expect(getSettings.execute).toHaveBeenCalledWith({ userUuid: '1-2-3', settingName: 'MFA_SECRET', allowMFARetrieval: true, updatedAfter: 123 })
 
     expect(result.statusCode).toEqual(200)
   })
@@ -173,12 +174,12 @@ describe('UsersController', () => {
   it('should fail if could not get user mfa setting', async () => {
     request.params.userUuid = '1-2-3'
 
-    getSetting.execute = jest.fn().mockReturnValue({ success: false })
+    getSettings.execute = jest.fn().mockReturnValue({ success: false })
 
-    const httpResponse = <results.JsonResult> await createController().getMFASetting(request)
+    const httpResponse = <results.JsonResult> await createController().getMFASettings(request)
     const result = await httpResponse.executeAsync()
 
-    expect(getSetting.execute).toHaveBeenCalledWith({ userUuid: '1-2-3', settingName: 'MFA_SECRET', allowMFARetrieval: true })
+    expect(getSettings.execute).toHaveBeenCalledWith({ userUuid: '1-2-3', settingName: 'MFA_SECRET', allowMFARetrieval: true })
 
     expect(result.statusCode).toEqual(400)
   })

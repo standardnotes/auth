@@ -13,13 +13,26 @@ export class GetSettings implements UseCaseInterface {
   constructor (
     @inject(TYPES.SettingRepository) private settingRepository: SettingRepositoryInterface,
     @inject(TYPES.SettingProjector) private settingProjector: SettingProjector,
-  ) {}
+  ) {
+  }
 
   async execute(dto: GetSettingsDto): Promise<GetSettingsResponse> {
     const { userUuid } = dto
-    const settings = await this.settingRepository.findAllByUserUuid(userUuid)
-    const filteredSettings = settings.filter((setting: Setting) => setting.name !== MfaSetting.MfaSecret)
-    const simpleSettings = await this.settingProjector.projectManySimple(filteredSettings)
+    let settings = await this.settingRepository.findAllByUserUuid(userUuid)
+
+    if (dto.settingName !== undefined) {
+      settings = settings.filter((setting: Setting) => setting.name === dto.settingName)
+    }
+
+    if (dto.updatedAfter !== undefined) {
+      settings = settings.filter((setting: Setting) => setting.updatedAt > (dto.updatedAfter as number))
+    }
+
+    if (!dto.allowMFARetrieval) {
+      settings = settings.filter((setting: Setting) => setting.name !== MfaSetting.MfaSecret)
+    }
+
+    const simpleSettings = await this.settingProjector.projectManySimple(settings)
 
     return {
       success: true,

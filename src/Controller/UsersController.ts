@@ -80,11 +80,12 @@ export class UsersController extends BaseHttpController {
   }
 
   @httpGet('/:userUuid/mfa')
-  async getMFASetting(request: Request): Promise<results.JsonResult> {
-    const result = await this.doGetSetting.execute({
+  async getMFASettings(request: Request): Promise<results.JsonResult> {
+    const result = await this.doGetSettings.execute({
       userUuid: request.params.userUuid,
       settingName: MfaSetting.MfaSecret,
       allowMFARetrieval: true,
+      updatedAfter: request.body.lastSyncTime,
     })
 
     if (result.success) {

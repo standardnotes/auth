@@ -16,8 +16,11 @@ describe('GetSettings', () => {
   const createUseCase = () => new GetSettings(settingRepository, settingProjector)
 
   beforeEach(() => {
-    setting = {} as jest.Mocked<Setting>
-    mfaSetting = { name: MfaSetting.MfaSecret } as jest.Mocked<Setting>
+    setting = {
+      name: 'test',
+      updatedAt: 345,
+    } as jest.Mocked<Setting>
+    mfaSetting = { name: MfaSetting.MfaSecret, updatedAt: 122 } as jest.Mocked<Setting>
 
     settingRepository = {} as jest.Mocked<SettingRepositoryInterface>
     settingRepository.findAllByUserUuid = jest.fn().mockReturnValue([ setting, mfaSetting ])
@@ -34,5 +37,35 @@ describe('GetSettings', () => {
     })
 
     expect(settingProjector.projectManySimple).toHaveBeenCalledWith([ setting ])
+  })
+
+  it('should return all user settings of certain name', async () => {
+    expect(await createUseCase().execute({ userUuid: '1-2-3', settingName: 'test', allowMFARetrieval: true })).toEqual({
+      success: true,
+      userUuid: '1-2-3',
+      settings: [{ foo: 'bar' }],
+    })
+
+    expect(settingProjector.projectManySimple).toHaveBeenCalledWith([ setting ])
+  })
+
+  it('should return all user settings updated after', async () => {
+    expect(await createUseCase().execute({ userUuid: '1-2-3', allowMFARetrieval: true, updatedAfter: 123 })).toEqual({
+      success: true,
+      userUuid: '1-2-3',
+      settings: [{ foo: 'bar' }],
+    })
+
+    expect(settingProjector.projectManySimple).toHaveBeenCalledWith([ setting ])
+  })
+
+  it('should return all user settings with mfa if explicit', async () => {
+    expect(await createUseCase().execute({ userUuid: '1-2-3', allowMFARetrieval: true })).toEqual({
+      success: true,
+      userUuid: '1-2-3',
+      settings: [{ foo: 'bar' }],
+    })
+
+    expect(settingProjector.projectManySimple).toHaveBeenCalledWith([ setting, mfaSetting ])
   })
 })
