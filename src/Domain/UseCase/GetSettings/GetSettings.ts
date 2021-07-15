@@ -6,7 +6,7 @@ import TYPES from '../../../Bootstrap/Types'
 import { SettingRepositoryInterface } from '../../Setting/SettingRepositoryInterface'
 import { SettingProjector } from '../../../Projection/SettingProjector'
 import { Setting } from '../../Setting/Setting'
-import { SETTINGS } from '../../Setting/Settings'
+import { MfaSetting } from '@standardnotes/auth'
 
 @injectable()
 export class GetSettings implements UseCaseInterface {
@@ -18,7 +18,7 @@ export class GetSettings implements UseCaseInterface {
   async execute(dto: GetSettingsDto): Promise<GetSettingsResponse> {
     const { userUuid } = dto
     const settings = await this.settingRepository.findAllByUserUuid(userUuid)
-    const filteredSettings = settings.filter((setting: Setting) => setting.name !== SETTINGS.MFA_SECRET)
+    const filteredSettings = settings.filter((setting: Setting) => setting.name !== MfaSetting.MfaSecret)
     const simpleSettings = await this.settingProjector.projectManySimple(filteredSettings)
 
     return {

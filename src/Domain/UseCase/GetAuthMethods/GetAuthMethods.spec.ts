@@ -1,33 +1,37 @@
 import 'reflect-metadata'
-import { SETTINGS } from '../../Setting/Settings'
-import { UserTest } from '../../User/test/UserTest'
+
 import { User } from '../../User/User'
-import { GetAuthMethodsDto } from './GetAuthMethodsDto'
-import { GetAuthMethodsTest } from './test/GetAuthMethodsTest'
+import { SettingRepositoryInterface } from '../../Setting/SettingRepositoryInterface'
+import { UserRepositoryInterface } from '../../User/UserRepositoryInterface'
+import { GetAuthMethods } from './GetAuthMethods'
+import { Setting } from '../../Setting/Setting'
 
 describe('GetAuthMethods', () => {
-  const mfaSecretUuid = 'mfa-secret-uuid'
   let user: User
+  let setting: Setting
+  let settingRepository: SettingRepositoryInterface
+  let userRepository: UserRepositoryInterface
 
-  const execute = async (dto: GetAuthMethodsDto) => GetAuthMethodsTest.makeSubject({
-    users: [user],
-    settings: await user.settings,
-  }).execute(dto)
+  const createUseCase = () => new GetAuthMethods(settingRepository, userRepository)
 
   beforeEach(() => {
-    user = UserTest.makeSubject({
-      uuid: 'user-with-settings-uuid',
-    }, {
-      settings: [
-        { uuid: mfaSecretUuid, name: SETTINGS.MFA_SECRET, value: 'mfa-secret' },
-      ],
-    })
+    user = {} as jest.Mocked<User>
+
+    setting = {
+      value: 'test',
+    } as jest.Mocked<Setting>
+
+    settingRepository = {} as jest.Mocked<SettingRepositoryInterface>
+    settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue(setting)
+
+    userRepository = {} as jest.Mocked<UserRepositoryInterface>
+    userRepository.findOneByEmail = jest.fn().mockReturnValue(user)
   })
 
   it('should return real methods for valid user email', async () => {
-    const actual = await execute({ email: user.email })
+    const response = await createUseCase().execute({ email: 'test@test.te' })
 
-    expect(actual).toEqual({
+    expect(response).toEqual({
       success: true,
       methods: {
         totp: true,
@@ -36,26 +40,25 @@ describe('GetAuthMethods', () => {
   })
 
   it('should not return totp methods if setting is reset', async () => {
-    user = UserTest.makeSubject({
-      uuid: 'user-with-settings-uuid',
-    }, {
-      settings: [
-        { uuid: mfaSecretUuid, name: SETTINGS.MFA_SECRET, value: '' },
-      ],
-    })
+    setting = {
+      value: null,
+    } as jest.Mocked<Setting>
+    settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue(setting)
 
-    const actual = await execute({ email: user.email })
+    const response = await createUseCase().execute({ email: 'test@test.te' })
 
-    expect(actual).toEqual({
+    expect(response).toEqual({
       success: true,
       methods: {},
     })
   })
 
   it('should return fake methods for invalid user email', async () => {
-    const actual = await execute({ email: 'INVALID' })
+    userRepository.findOneByEmail = jest.fn().mockReturnValue(undefined)
 
-    expect(actual).toEqual({
+    const response = await createUseCase().execute({ email: 'test@test.te' })
+
+    expect(response).toEqual({
       success: true,
       methods: {},
     })
