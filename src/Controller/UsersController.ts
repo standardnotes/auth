@@ -97,10 +97,13 @@ export class UsersController extends BaseHttpController {
   @httpDelete('/:userUuid/mfa',)
   async deleteMFASetting(request: Request): Promise<results.JsonResult> {
     const { userUuid } = request.params
+    const { uuid, updatedAt } = request.body
 
     const result = await this.doDeleteSetting.execute({
+      uuid,
       userUuid,
       settingName: MfaSetting.MfaSecret,
+      timestamp: updatedAt,
       softDelete: true,
     })
 

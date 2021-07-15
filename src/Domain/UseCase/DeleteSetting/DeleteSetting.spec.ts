@@ -18,7 +18,8 @@ describe('DeleteSetting', () => {
     setting = {} as jest.Mocked<Setting>
 
     settingRepository = {} as jest.Mocked<SettingRepositoryInterface>
-    settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue(setting)
+    settingRepository.findLastByNameAndUserUuid = jest.fn().mockReturnValue(setting)
+    settingRepository.findOneByUuid = jest.fn().mockReturnValue(setting)
     settingRepository.deleteByUserUuid = jest.fn()
     settingRepository.save = jest.fn()
 
@@ -35,12 +36,34 @@ describe('DeleteSetting', () => {
     expect(settingRepository.deleteByUserUuid).toHaveBeenCalledWith({ 'settingName': 'test', 'userUuid': '1-2-3' })
   })
 
+  it('should delete a setting by uuid', async () => {
+    await createUseCase().execute({
+      settingName: 'test',
+      userUuid: '1-2-3',
+      uuid: '3-4-5',
+    })
+
+    expect(settingRepository.deleteByUserUuid).toHaveBeenCalledWith({ 'settingName': 'test', 'userUuid': '1-2-3' })
+  })
+
   it('should not delete a setting by name and user uuid if not found', async () => {
-    settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue(undefined)
+    settingRepository.findLastByNameAndUserUuid = jest.fn().mockReturnValue(undefined)
 
     await createUseCase().execute({
       settingName: 'test',
       userUuid: '1-2-3',
+    })
+
+    expect(settingRepository.deleteByUserUuid).not.toHaveBeenCalled()
+  })
+
+  it('should not delete a setting by uuid if not found', async () => {
+    settingRepository.findOneByUuid = jest.fn().mockReturnValue(undefined)
+
+    await createUseCase().execute({
+      settingName: 'test',
+      userUuid: '1-2-3',
+      uuid: '2-3-4',
     })
 
     expect(settingRepository.deleteByUserUuid).not.toHaveBeenCalled()
@@ -55,6 +78,20 @@ describe('DeleteSetting', () => {
 
     expect(settingRepository.save).toHaveBeenCalledWith({
       'updatedAt': 1,
+      'value': null,
+    })
+  })
+
+  it('should soft delete a setting with timestamp', async () => {
+    await createUseCase().execute({
+      settingName: 'test',
+      userUuid: '1-2-3',
+      softDelete: true,
+      timestamp: 123,
+    })
+
+    expect(settingRepository.save).toHaveBeenCalledWith({
+      'updatedAt': 123,
       'value': null,
     })
   })
