@@ -24,7 +24,7 @@ export class GetAuthMethods implements UseCaseInterface {
       return this.getPseudoMethods()
     }
 
-    const mfaSetting = await this.settingRepository.findOneByNameAndUserUuid(
+    const mfaSetting = await this.settingRepository.findLastByNameAndUserUuid(
       MfaSetting.MfaSecret,
       user.uuid,
     )

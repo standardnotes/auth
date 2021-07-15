@@ -22,7 +22,7 @@ describe('GetAuthMethods', () => {
     } as jest.Mocked<Setting>
 
     settingRepository = {} as jest.Mocked<SettingRepositoryInterface>
-    settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue(setting)
+    settingRepository.findLastByNameAndUserUuid = jest.fn().mockReturnValue(setting)
 
     userRepository = {} as jest.Mocked<UserRepositoryInterface>
     userRepository.findOneByEmail = jest.fn().mockReturnValue(user)
@@ -43,7 +43,7 @@ describe('GetAuthMethods', () => {
     setting = {
       value: null,
     } as jest.Mocked<Setting>
-    settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue(setting)
+    settingRepository.findLastByNameAndUserUuid = jest.fn().mockReturnValue(setting)
 
     const response = await createUseCase().execute({ email: 'test@test.te' })
 

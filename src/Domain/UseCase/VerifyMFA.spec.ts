@@ -39,7 +39,7 @@ describe('VerifyMFA', () => {
     itemHttpService.getUserMFASecret = jest.fn().mockReturnValue(undefined)
 
     settingRepository = {} as jest.Mocked<SettingRepositoryInterface>
-    settingRepository.findOneByNameAndUserUuid = jest.fn()
+    settingRepository.findLastByNameAndUserUuid = jest.fn()
 
     contentDecoder = {} as jest.Mocked<ContentDecoderInterface>
     contentDecoder.decode = jest.fn().mockReturnValue('decoded')
@@ -104,7 +104,7 @@ describe('VerifyMFA', () => {
   })
 
   it('should pass MFA verification from user settings if mfa key is correctly encrypted', async () => {
-    settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue({
+    settingRepository.findLastByNameAndUserUuid = jest.fn().mockReturnValue({
       serverEncryptionVersion: Setting.ENCRYPTION_VERSION_DEFAULT,
     } as jest.Mocked<Setting>)
 
@@ -116,7 +116,7 @@ describe('VerifyMFA', () => {
   })
 
   it('should pass MFA verification from user settings if mfa key is correctly encoded and encrypted', async () => {
-    settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue({
+    settingRepository.findLastByNameAndUserUuid = jest.fn().mockReturnValue({
       serverEncryptionVersion: Setting.ENCRYPTION_VERSION_CLIENT_ENCODED_AND_SERVER_ENCRYPTED,
     } as jest.Mocked<Setting>)
 
@@ -130,7 +130,7 @@ describe('VerifyMFA', () => {
   })
 
   it('should pass MFA verification from user settings if mfa key is correctly unencrypted', async () => {
-    settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue({
+    settingRepository.findLastByNameAndUserUuid = jest.fn().mockReturnValue({
       serverEncryptionVersion: Setting.ENCRYPTION_VERSION_UNENCRYPTED,
       value: 'shhhh',
     } as jest.Mocked<Setting>)
@@ -141,7 +141,7 @@ describe('VerifyMFA', () => {
   })
 
   it('should not pass MFA verification from user settings if mfa is not correct', async () => {
-    settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue({} as jest.Mocked<Setting>)
+    settingRepository.findLastByNameAndUserUuid = jest.fn().mockReturnValue({} as jest.Mocked<Setting>)
 
     crypter.decryptForUser = jest.fn().mockReturnValue('shhhh')
 
@@ -155,7 +155,7 @@ describe('VerifyMFA', () => {
 
 
   it('should not pass MFA verification from user settings if no mfa param is found in the request', async () => {
-    settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue({} as jest.Mocked<Setting>)
+    settingRepository.findLastByNameAndUserUuid = jest.fn().mockReturnValue({} as jest.Mocked<Setting>)
 
     crypter.decryptForUser = jest.fn().mockReturnValue('shhhh')
 
@@ -168,7 +168,7 @@ describe('VerifyMFA', () => {
   })
 
   it('should throw an error if the error is not handled mfa validation error', async () => {
-    settingRepository.findOneByNameAndUserUuid = jest.fn().mockImplementation(() => {
+    settingRepository.findLastByNameAndUserUuid = jest.fn().mockImplementation(() => {
       throw new Error('oops!')
     })
 
