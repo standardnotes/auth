@@ -32,7 +32,7 @@ export class GetSetting implements UseCaseInterface {
       }
     }
 
-    const setting = await this.settingRepository.findOneByNameAndUserUuid(settingName, userUuid)
+    const setting = await this.settingRepository.findLastByNameAndUserUuid(settingName, userUuid)
 
     if (setting === undefined) {
       return {

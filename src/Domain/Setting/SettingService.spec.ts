@@ -26,7 +26,7 @@ describe('SettingService', () => {
     factory.createReplacement = jest.fn().mockReturnValue(setting)
 
     repository = {} as jest.Mocked<SettingRepositoryInterface>
-    repository.findOneByNameAndUserUuid = jest.fn().mockReturnValue(undefined)
+    repository.findLastByNameAndUserUuid = jest.fn().mockReturnValue(undefined)
     repository.save = jest.fn()
 
     logger = {} as jest.Mocked<Logger>
@@ -46,13 +46,45 @@ describe('SettingService', () => {
     expect(result.status).toEqual('created')
   })
 
+  it ('should create setting with a given uuid if it does not exist', async () => {
+    repository.findOneByUuid = jest.fn().mockReturnValue(undefined)
+
+    const result = await createService().createOrReplace({
+      user,
+      props: {
+        uuid: '1-2-3',
+        name: 'name',
+        value: 'value',
+        serverEncryptionVersion: 1,
+      },
+    })
+
+    expect(result.status).toEqual('created')
+  })
+
   it ('should replace setting if it does exist', async () => {
-    repository.findOneByNameAndUserUuid = jest.fn().mockReturnValue(setting)
+    repository.findLastByNameAndUserUuid = jest.fn().mockReturnValue(setting)
 
     const result = await createService().createOrReplace({
       user: user,
       props: {
         ...setting,
+        value: 'value',
+        serverEncryptionVersion: 1,
+      },
+    })
+
+    expect(result.status).toEqual('replaced')
+  })
+
+  it ('should replace setting with a given uuid if it does exist', async () => {
+    repository.findOneByUuid = jest.fn().mockReturnValue(setting)
+
+    const result = await createService().createOrReplace({
+      user: user,
+      props: {
+        ...setting,
+        uuid: '1-2-3',
         value: 'value',
         serverEncryptionVersion: 1,
       },
