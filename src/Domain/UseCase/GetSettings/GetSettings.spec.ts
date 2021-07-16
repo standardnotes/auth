@@ -6,14 +6,20 @@ import { Setting } from '../../Setting/Setting'
 import { SettingRepositoryInterface } from '../../Setting/SettingRepositoryInterface'
 
 import { GetSettings } from './GetSettings'
+import { UserRepositoryInterface } from '../../User/UserRepositoryInterface'
+import { User } from '../../User/User'
+import { CrypterInterface } from '../../Encryption/CrypterInterface'
 
 describe('GetSettings', () => {
   let settingRepository: SettingRepositoryInterface
   let settingProjector: SettingProjector
   let setting: Setting
   let mfaSetting: Setting
+  let userRepository: UserRepositoryInterface
+  let user: User
+  let crypter: CrypterInterface
 
-  const createUseCase = () => new GetSettings(settingRepository, settingProjector)
+  const createUseCase = () => new GetSettings(settingRepository, settingProjector, userRepository, crypter)
 
   beforeEach(() => {
     setting = {
@@ -27,6 +33,25 @@ describe('GetSettings', () => {
 
     settingProjector = {} as jest.Mocked<SettingProjector>
     settingProjector.projectManySimple = jest.fn().mockReturnValue([{ foo: 'bar' }])
+
+    user = {} as jest.Mocked<User>
+
+    userRepository = {} as jest.Mocked<UserRepositoryInterface>
+    userRepository.findOneByUuid = jest.fn().mockReturnValue(user)
+
+    crypter = {} as jest.Mocked<CrypterInterface>
+    crypter.decryptForUser = jest.fn().mockReturnValue('decrypted')
+  })
+
+  it('should fail if a user is not found', async () => {
+    userRepository.findOneByUuid = jest.fn().mockReturnValue(undefined)
+
+    expect(await createUseCase().execute({ userUuid: '1-2-3' })).toEqual({
+      success: false,
+      error: {
+        message: 'User 1-2-3 not found.',
+      },
+    })
   })
 
   it('should return all user settings except mfa', async () => {
@@ -37,6 +62,29 @@ describe('GetSettings', () => {
     })
 
     expect(settingProjector.projectManySimple).toHaveBeenCalledWith([ setting ])
+  })
+
+  it('should return all setting with decrypted values', async () => {
+    setting = {
+      name: 'test',
+      updatedAt: 345,
+      value: 'encrypted',
+      serverEncryptionVersion: Setting.ENCRYPTION_VERSION_DEFAULT,
+    } as jest.Mocked<Setting>
+    settingRepository.findAllByUserUuid = jest.fn().mockReturnValue([ setting ])
+
+    expect(await createUseCase().execute({ userUuid: '1-2-3' })).toEqual({
+      success: true,
+      userUuid: '1-2-3',
+      settings: [{ foo: 'bar' }],
+    })
+
+    expect(settingProjector.projectManySimple).toHaveBeenCalledWith([{
+      name: 'test',
+      updatedAt: 345,
+      value: 'decrypted',
+      serverEncryptionVersion: 1,
+    }])
   })
 
   it('should return all user settings of certain name', async () => {
