@@ -41,7 +41,7 @@ export class GetSettings implements UseCaseInterface {
     }
 
     if (dto.updatedAfter !== undefined) {
-      settings = settings.filter((setting: Setting) => setting.updatedAt > (dto.updatedAfter as number))
+      settings = settings.filter((setting: Setting) => setting.updatedAt >= (dto.updatedAfter as number))
     }
 
     if (!dto.allowMFARetrieval) {
