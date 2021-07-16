@@ -19,7 +19,7 @@ export class UpdateSetting implements UseCaseInterface {
   ) {}
 
   async execute(dto: UpdateSettingDto): Promise<UpdateSettingResponse> {
-    this.logger.debug('Updating setting: %O', dto)
+    this.logger.debug('[%s] Updating setting: %O', dto.userUuid, dto)
 
     const { userUuid, props } = dto
 

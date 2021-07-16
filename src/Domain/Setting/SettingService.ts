@@ -24,7 +24,7 @@ export class SettingService {
     if (existing === undefined) {
       const setting = await this.repository.save(await this.factory.create(props, user))
 
-      this.logger.debug('Created setting %s: %O', props.name, setting)
+      this.logger.debug('[%s] Created setting %s: %O', user.uuid, props.name, setting)
 
       return {
         status: 'created',
@@ -34,7 +34,7 @@ export class SettingService {
 
     const setting = await this.repository.save(await this.factory.createReplacement(existing, props))
 
-    this.logger.debug('Replaced existing setting %s with: %O', props.name, setting)
+    this.logger.debug('[%s] Replaced existing setting %s with: %O', user.uuid, props.name, setting)
 
     return {
       status: 'replaced',
