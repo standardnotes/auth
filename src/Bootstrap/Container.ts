@@ -87,6 +87,7 @@ import { RemoveWebSocketsConnection } from '../Domain/UseCase/RemoveWebSocketsCo
 import { ContentDecoderInterface } from '../Domain/Encryption/ContentDecoderInterface'
 import { ContentDecoder } from '../Domain/Encryption/ContentDecoder'
 import axios, { AxiosInstance } from 'axios'
+import { UserSubscription } from '../Domain/User/UserSubscription'
 
 export class ContainerConfigLoader {
   async load(): Promise<Container> {
@@ -118,6 +119,7 @@ export class ContainerConfigLoader {
       },
       entities: [
         User,
+        UserSubscription,
         Session,
         RevokedSession,
         Role,

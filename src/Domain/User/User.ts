@@ -2,6 +2,7 @@ import { Column, Entity, Index, JoinTable, ManyToMany, OneToMany, PrimaryGenerat
 import { RevokedSession } from '../Session/RevokedSession'
 import { Role } from '../Role/Role'
 import { Setting } from '../Setting/Setting'
+import { UserSubscription } from './UserSubscription'
 
 @Entity({ name: 'users' })
 export class User {
@@ -170,6 +171,14 @@ export class User {
     },
   })
   roles: Promise<Array<Role>>
+
+  @OneToMany(
+    /* istanbul ignore next */
+    () => UserSubscription,
+    /* istanbul ignore next */
+    subscription => subscription.user
+  )
+  subscriptions: Promise<UserSubscription[]>
 
   supportsSessions(): boolean {
     return parseInt(this.version) >= this.SESSIONS_PROTOCOL_VERSION
