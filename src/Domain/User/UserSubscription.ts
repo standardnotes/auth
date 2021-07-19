@@ -38,7 +38,7 @@ export class UserSubscription {
     /* istanbul ignore next */
     user => user.subscriptions,
     /* istanbul ignore next */
-    { nullable: false }
+    { onDelete: 'CASCADE', nullable: false }
   )
   @JoinColumn({ name: 'user_uuid', referencedColumnName: 'uuid' })
   user: Promise<User>
