@@ -90,4 +90,29 @@ describe('SubscriptionPurchasedEventHandler', () => {
       userSubscriptionRepository.save
     ).toHaveBeenCalledWith(subscription)
   })
+
+  it('should not do anything if no user is found for specified email', async () => {
+    userRepository.findOneByEmail = jest.fn().mockReturnValue(undefined)
+
+    await createHandler().handle(event)
+
+    expect(userRepository.save).not.toHaveBeenCalled()
+    expect(userSubscriptionRepository.save).not.toHaveBeenCalled()
+  })
+
+  it('should not update role if no role name exists for subscription name', async () => {
+    event.payload.subscriptionName = '' as SubscriptionName
+
+    await createHandler().handle(event)
+
+    expect(userRepository.save).not.toHaveBeenCalled()
+  })
+
+  it ('should not update role if no role exists for role name', async () => {
+    roleRepository.findOneByName = jest.fn().mockReturnValue(undefined)
+
+    await createHandler().handle(event)
+
+    expect(userRepository.save).not.toHaveBeenCalled()
+  })
 })

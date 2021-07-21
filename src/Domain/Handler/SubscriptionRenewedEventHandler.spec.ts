@@ -65,4 +65,12 @@ describe('SubscriptionRenewedEventHandler', () => {
       timestamp
     )
   })
+
+  it('should not do anything if no user is found for specified email', async () => {
+    userRepository.findOneByEmail = jest.fn().mockReturnValue(undefined)
+
+    await createHandler().handle(event)
+
+    expect(userSubscriptionRepository.updateEndsAtByNameAndUserUuid).not.toHaveBeenCalled()
+  })
 })
