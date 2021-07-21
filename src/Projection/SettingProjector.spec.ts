@@ -1,32 +1,45 @@
 import 'reflect-metadata'
-import { SettingTest } from '../Domain/Setting/test/SettingTest'
-import { UserTest } from '../Domain/User/test/UserTest'
+
+import { Setting } from '../Domain/Setting/Setting'
+
 import { SettingProjector } from './SettingProjector'
 
 describe('SettingProjector', () => {
-  const userProps = {
-    uuid: 'user-uuid',
-  }
-  const settingProps = {
-    uuid: 'setting-uuid',
-    name: 'setting-name',
-    value: 'setting-value',
-  }
-  const setting = SettingTest.makeSubject(
-    settingProps, 
-    UserTest.makeSubject(userProps),
-  )
-
-  const expectedProjection = settingProps
+  let setting: Setting
 
   const createProjector = () => new SettingProjector()
 
+  beforeEach(() => {
+    setting = {
+      uuid: 'setting-uuid',
+      name: 'setting-name',
+      value: 'setting-value',
+      serverEncryptionVersion: 1,
+      createdAt: 1,
+      updatedAt: 2,
+    } as jest.Mocked<Setting>
+  })
+
   it('should create a simple projection of a setting', async () => {
     const projection = await createProjector().projectSimple(setting)
-    expect(projection).toEqual(expectedProjection)
+    expect(projection).toEqual({
+      uuid: 'setting-uuid',
+      name: 'setting-name',
+      value: 'setting-value',
+      createdAt: 1,
+      updatedAt: 2,
+    })
   })
   it('should create a simple projection of list of settings', async () => {
     const projection = await createProjector().projectManySimple([setting])
-    expect(projection).toEqual([expectedProjection])
+    expect(projection).toEqual([
+      {
+        uuid: 'setting-uuid',
+        name: 'setting-name',
+        value: 'setting-value',
+        createdAt: 1,
+        updatedAt: 2,
+      },
+    ])
   })
 })

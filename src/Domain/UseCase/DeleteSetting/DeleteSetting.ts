@@ -4,18 +4,21 @@ import { DeleteSettingResponse } from './DeleteSettingResponse'
 import { UseCaseInterface } from '../UseCaseInterface'
 import TYPES from '../../../Bootstrap/Types'
 import { SettingRepositoryInterface } from '../../Setting/SettingRepositoryInterface'
+import { TimerInterface } from '@standardnotes/time'
+import { Setting } from '../../Setting/Setting'
 
 @injectable()
 export class DeleteSetting implements UseCaseInterface {
   constructor (
     @inject(TYPES.SettingRepository) private settingRepository: SettingRepositoryInterface,
-  ) {}
+    @inject(TYPES.Timer) private timer: TimerInterface,
+  ) {
+  }
 
   async execute(dto: DeleteSettingDto): Promise<DeleteSettingResponse> {
     const { userUuid, settingName } = dto
 
-    const setting = await this.settingRepository
-      .findOneByNameAndUserUuid(settingName, userUuid)
+    const setting = await this.getSetting(dto)
 
     if (setting === undefined) {
       return {
@@ -25,16 +28,31 @@ export class DeleteSetting implements UseCaseInterface {
         },
       }
     }
-    
-    await this.settingRepository.deleteByUserUuid({
-      userUuid,
-      settingName,
-    })
 
-    return { 
+    if (dto.softDelete) {
+      setting.value = null
+      setting.updatedAt = dto.timestamp ?? this.timer.getTimestampInMicroseconds()
+
+      await this.settingRepository.save(setting)
+    } else {
+      await this.settingRepository.deleteByUserUuid({
+        userUuid,
+        settingName,
+      })
+    }
+
+    return {
       success: true,
       settingName,
       userUuid,
     }
+  }
+
+  private async getSetting(dto: DeleteSettingDto): Promise<Setting | undefined> {
+    if (dto.uuid !== undefined) {
+      return this.settingRepository.findOneByUuid(dto.uuid)
+    }
+
+    return this.settingRepository.findLastByNameAndUserUuid(dto.settingName, dto.userUuid)
   }
 }

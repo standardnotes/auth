@@ -1,33 +1,23 @@
 import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
 import { User } from '../User/User'
 
-@Entity({ name: 'settings' })
-@Index('index_settings_on_name_and_user_uuid', ['name', 'user'])
-export class Setting {
-  static readonly ENCRYPTION_VERSION_UNENCRYPTED = 0
-  static readonly ENCRYPTION_VERSION_DEFAULT = 1
-  static readonly ENCRYPTION_VERSION_CLIENT_ENCODED_AND_SERVER_ENCRYPTED = 2
-
+@Entity({ name: 'user_subscriptions' })
+export class UserSubscription {
   @PrimaryGeneratedColumn('uuid')
   uuid: string
 
   @Column({
+    name: 'plan_name',
     length: 255,
+    nullable: false,
   })
-  name: string
+  planName: string
 
   @Column({
-    type: 'text',
-    nullable: true,
+    name: 'ends_at',
+    type: 'bigint',
   })
-  value: string | null
-
-  @Column({
-    name: 'server_encryption_version',
-    type: 'tinyint',
-    default: Setting.ENCRYPTION_VERSION_UNENCRYPTED,
-  })
-  serverEncryptionVersion: number
+  endsAt: number
 
   @Column({
     name: 'created_at',
@@ -39,14 +29,14 @@ export class Setting {
     name: 'updated_at',
     type: 'bigint',
   })
-  @Index('index_settings_on_updated_at')
+  @Index('updated_at')
   updatedAt: number
 
   @ManyToOne(
     /* istanbul ignore next */
     () => User,
     /* istanbul ignore next */
-    user => user.settings,
+    user => user.subscriptions,
     /* istanbul ignore next */
     { onDelete: 'CASCADE', nullable: false }
   )

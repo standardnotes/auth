@@ -5,14 +5,15 @@ import { UseCaseInterface } from '../UseCaseInterface'
 import TYPES from '../../../Bootstrap/Types'
 import { SettingRepositoryInterface } from '../../Setting/SettingRepositoryInterface'
 import { UserRepositoryInterface } from '../../User/UserRepositoryInterface'
-import { SETTINGS } from '../../Setting/Settings'
+import { MfaSetting } from '@standardnotes/auth'
 
 @injectable()
 export class GetAuthMethods implements UseCaseInterface {
   constructor (
     @inject(TYPES.SettingRepository) private settingRepository: SettingRepositoryInterface,
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
-  ) {}
+  ) {
+  }
 
   async execute(dto: GetAuthMethodsDto): Promise<GetAuthMethodsResponse> {
     const { email } = dto
@@ -23,12 +24,12 @@ export class GetAuthMethods implements UseCaseInterface {
       return this.getPseudoMethods()
     }
 
-    const mfaSetting = await this.settingRepository.findOneByNameAndUserUuid(
-      SETTINGS.MFA_SECRET,
+    const mfaSetting = await this.settingRepository.findLastByNameAndUserUuid(
+      MfaSetting.MfaSecret,
       user.uuid,
     )
 
-    const totpIsSet = mfaSetting !== undefined && mfaSetting.value.length > 0
+    const totpIsSet = mfaSetting !== undefined && mfaSetting.value !== null && mfaSetting.value.length > 0
     const totp = totpIsSet ? true : undefined
 
     return {

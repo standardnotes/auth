@@ -24,6 +24,16 @@ describe('MySQLSettingRepository', () => {
     repository.createQueryBuilder = jest.fn().mockImplementation(() => queryBuilder)
   })
 
+  it('should find one setting by uuid', async () => {
+    queryBuilder.where = jest.fn().mockReturnThis()
+    queryBuilder.getOne = jest.fn().mockReturnValue(setting)
+
+    const result = await repository.findOneByUuid('1-2-3')
+
+    expect(queryBuilder.where).toHaveBeenCalledWith('setting.uuid = :uuid', { uuid: '1-2-3' })
+    expect(result).toEqual(setting)
+  })
+
   it('should find one setting by name and user uuid', async () => {
     queryBuilder.where = jest.fn().mockReturnThis()
     queryBuilder.getOne = jest.fn().mockReturnValue(setting)
@@ -31,6 +41,20 @@ describe('MySQLSettingRepository', () => {
     const result = await repository.findOneByNameAndUserUuid('test', '1-2-3')
 
     expect(queryBuilder.where).toHaveBeenCalledWith('setting.name = :name AND setting.user_uuid = :user_uuid', { name: 'test', user_uuid: '1-2-3' })
+    expect(result).toEqual(setting)
+  })
+
+  it('should find last setting by name and user uuid', async () => {
+    queryBuilder.where = jest.fn().mockReturnThis()
+    queryBuilder.orderBy = jest.fn().mockReturnThis()
+    queryBuilder.limit = jest.fn().mockReturnThis()
+    queryBuilder.getMany = jest.fn().mockReturnValue([ setting ])
+
+    const result = await repository.findLastByNameAndUserUuid('test', '1-2-3')
+
+    expect(queryBuilder.where).toHaveBeenCalledWith('setting.name = :name AND setting.user_uuid = :user_uuid', { name: 'test', user_uuid: '1-2-3' })
+    expect(queryBuilder.orderBy).toHaveBeenCalledWith('updated_at', 'DESC')
+    expect(queryBuilder.limit).toHaveBeenCalledWith(1)
     expect(result).toEqual(setting)
   })
 

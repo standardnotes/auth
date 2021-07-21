@@ -4,17 +4,23 @@ import { UpdateSettingResponse } from './UpdateSettingResponse'
 import { UseCaseInterface } from '../UseCaseInterface'
 import TYPES from '../../../Bootstrap/Types'
 import { UserRepositoryInterface } from '../../User/UserRepositoryInterface'
-import { CreateOrReplaceSettingStatus } from '../../Setting/CreateOrReplaceSettingStatus'
+import { CreateOrReplaceSettingResponse } from '../../Setting/CreateOrReplaceSettingResponse'
 import { SettingService } from '../../Setting/SettingService'
+import { SettingProjector } from '../../../Projection/SettingProjector'
+import { Logger } from 'winston'
 
 @injectable()
 export class UpdateSetting implements UseCaseInterface {
   constructor (
     @inject(TYPES.SettingService) private settingService: SettingService,
+    @inject(TYPES.SettingProjector) private settingProjector: SettingProjector,
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
+    @inject(TYPES.Logger) private logger: Logger,
   ) {}
 
   async execute(dto: UpdateSettingDto): Promise<UpdateSettingResponse> {
+    this.logger.debug('[%s] Updating setting: %O', dto.userUuid, dto)
+
     const { userUuid, props } = dto
 
     const user = await this.userRepository.findOneByUuid(userUuid)
@@ -28,27 +34,28 @@ export class UpdateSetting implements UseCaseInterface {
       }
     }
 
-    const status = await this.settingService.createOrReplace({
+    const response = await this.settingService.createOrReplace({
       user,
       props,
     })
 
     return {
       success: true,
-      statusCode: this.statusToStatusCode(status),
+      setting: await this.settingProjector.projectSimple(response.setting),
+      statusCode: this.statusToStatusCode(response),
     }
   }
 
   /* istanbul ignore next */
-  private statusToStatusCode(status: CreateOrReplaceSettingStatus): number {
-    if (status === 'created') {
+  private statusToStatusCode(response: CreateOrReplaceSettingResponse): number {
+    if (response.status === 'created') {
       return 201
     }
-    if (status === 'replaced') {
-      return 204
+    if (response.status === 'replaced') {
+      return 200
     }
 
-    const exhaustiveCheck: never = status
+    const exhaustiveCheck: never = response.status
     throw new Error(`Unrecognized status: ${exhaustiveCheck}!`)
   }
 }

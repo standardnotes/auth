@@ -1,4 +1,5 @@
-import { ErrorTag } from '@standardnotes/auth'
+import { ErrorTag, MfaSetting } from '@standardnotes/auth'
+import { v4 as uuidv4 } from 'uuid'
 import { inject, injectable } from 'inversify'
 import { authenticator } from 'otplib'
 import { Logger } from 'winston'
@@ -6,13 +7,14 @@ import TYPES from '../../Bootstrap/Types'
 import { CrypterInterface } from '../Encryption/CrypterInterface'
 import { MFAValidationError } from '../Error/MFAValidationError'
 import { ItemHttpServiceInterface } from '../Item/ItemHttpServiceInterface'
+import { Setting } from '../Setting/Setting'
 import { SettingRepositoryInterface } from '../Setting/SettingRepositoryInterface'
-import { SETTINGS } from '../Setting/Settings'
 import { User } from '../User/User'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { UseCaseInterface } from './UseCaseInterface'
 import { VerifyMFADTO } from './VerifyMFADTO'
 import { VerifyMFAResponse } from './VerifyMFAResponse'
+import { ContentDecoderInterface } from '../Encryption/ContentDecoderInterface'
 
 @injectable()
 export class VerifyMFA implements UseCaseInterface {
@@ -21,6 +23,7 @@ export class VerifyMFA implements UseCaseInterface {
     @inject(TYPES.ItemHttpService) private itemHttpService: ItemHttpServiceInterface,
     @inject(TYPES.SettingRepository) private settingRepository: SettingRepositoryInterface,
     @inject(TYPES.Crypter) private crypter: CrypterInterface,
+    @inject(TYPES.ContenDecoder) private contentDecoder: ContentDecoderInterface,
     @inject(TYPES.Logger) private logger: Logger
   ) {
   }
@@ -93,16 +96,30 @@ export class VerifyMFA implements UseCaseInterface {
     throw new MFAValidationError(
       'Please enter your two-factor authentication code.',
       ErrorTag.MfaRequired,
+      { mfa_key: `mfa_${uuidv4()}` }
     )
   }
 
   private async getMFASecretFromUserSettings(user: User): Promise<string | undefined> {
-    const mfaSetting = await this.settingRepository.findOneByNameAndUserUuid(SETTINGS.MFA_SECRET, user.uuid)
-    if (mfaSetting === undefined) {
+    const mfaSetting = await this.settingRepository.findLastByNameAndUserUuid(MfaSetting.MfaSecret, user.uuid)
+    if (mfaSetting === undefined || mfaSetting.value === null) {
       return undefined
     }
 
-    return this.crypter.decryptForUser(mfaSetting.value, user)
+    this.logger.debug('Found MFA Setting %O', mfaSetting)
+
+    if (mfaSetting.serverEncryptionVersion === Setting.ENCRYPTION_VERSION_UNENCRYPTED) {
+      return mfaSetting.value
+    }
+
+    const decrypted = await this.crypter.decryptForUser(mfaSetting.value, user)
+    if (mfaSetting.serverEncryptionVersion !== Setting.ENCRYPTION_VERSION_CLIENT_ENCODED_AND_SERVER_ENCRYPTED) {
+      return decrypted
+    }
+
+    const decoded = this.contentDecoder.decode(decrypted)
+
+    return decoded.secret as string
   }
 
   private verifyMFASecret(secret: string, requestParams: Record<string, unknown>, mfaExtensionUuid?: string): VerifyMFAResponse {

@@ -1,3 +1,4 @@
+import { MfaSetting } from '@standardnotes/auth'
 import { Request, Response } from 'express'
 import { inject } from 'inversify'
 import {
@@ -78,6 +79,74 @@ export class UsersController extends BaseHttpController {
     return this.json(result)
   }
 
+  @httpGet('/:userUuid/mfa')
+  async getMFASettings(request: Request): Promise<results.JsonResult> {
+    const result = await this.doGetSettings.execute({
+      userUuid: request.params.userUuid,
+      settingName: MfaSetting.MfaSecret,
+      allowMFARetrieval: true,
+      updatedAfter: request.body.lastSyncTime,
+    })
+
+    if (result.success) {
+      return this.json(result)
+    }
+
+    return this.json(result, 400)
+  }
+
+  @httpDelete('/:userUuid/mfa',)
+  async deleteMFASetting(request: Request): Promise<results.JsonResult> {
+    const { userUuid } = request.params
+    const { uuid, updatedAt } = request.body
+
+    const result = await this.doDeleteSetting.execute({
+      uuid,
+      userUuid,
+      settingName: MfaSetting.MfaSecret,
+      timestamp: updatedAt,
+      softDelete: true,
+    })
+
+    if (result.success) {
+      return this.json(result)
+    }
+
+    return this.json(result, 400)
+  }
+
+  @httpPut('/:userUuid/mfa')
+  async updateMFASetting(request: Request): Promise<results.JsonResult | results.StatusCodeResult> {
+    const {
+      uuid,
+      value,
+      serverEncryptionVersion = Setting.ENCRYPTION_VERSION_CLIENT_ENCODED_AND_SERVER_ENCRYPTED,
+      createdAt,
+      updatedAt,
+    } = request.body
+
+    const props = {
+      uuid,
+      value,
+      serverEncryptionVersion,
+      name: MfaSetting.MfaSecret,
+      createdAt,
+      updatedAt,
+    }
+
+    const { userUuid } = request.params
+    const result = await this.doUpdateSetting.execute({
+      userUuid,
+      props,
+    })
+
+    if (result.success) {
+      return this.json({ setting: result.setting }, result.statusCode)
+    }
+
+    return this.json(result, 400)
+  }
+
   @httpGet('/:userUuid/settings/:settingName', TYPES.AuthMiddleware)
   async getSetting(request: Request, response: Response): Promise<results.JsonResult> {
     if (request.params.userUuid !== response.locals.user.uuid) {
@@ -111,7 +180,7 @@ export class UsersController extends BaseHttpController {
     const {
       name,
       value,
-      serverEncryptionVersion = Setting.DEFAULT_ENCRYPTION_VERSION,
+      serverEncryptionVersion = Setting.ENCRYPTION_VERSION_DEFAULT,
     } = request.body
 
     const props = {
@@ -127,7 +196,7 @@ export class UsersController extends BaseHttpController {
     })
 
     if (result.success) {
-      return this.statusCode(result.statusCode)
+      return this.json({ setting: result.setting }, result.statusCode)
     }
 
     return this.json(result, 400)

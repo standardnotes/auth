@@ -84,7 +84,10 @@ import { WebSocketsConnectionRepositoryInterface } from '../Domain/WebSockets/We
 import { RedisWebSocketsConnectionRepository } from '../Infra/Redis/RedisWebSocketsConnectionRepository'
 import { AddWebSocketsConnection } from '../Domain/UseCase/AddWebSocketsConnection/AddWebSocketsConnection'
 import { RemoveWebSocketsConnection } from '../Domain/UseCase/RemoveWebSocketsConnection/RemoveWebSocketsConnection'
+import { ContentDecoderInterface } from '../Domain/Encryption/ContentDecoderInterface'
+import { ContentDecoder } from '../Domain/Encryption/ContentDecoder'
 import axios, { AxiosInstance } from 'axios'
+import { UserSubscription } from '../Domain/User/UserSubscription'
 
 export class ContainerConfigLoader {
   async load(): Promise<Container> {
@@ -116,6 +119,7 @@ export class ContainerConfigLoader {
       },
       entities: [
         User,
+        UserSubscription,
         Session,
         RevokedSession,
         Role,
@@ -261,6 +265,7 @@ export class ContainerConfigLoader {
     container.bind<SnCryptoNode>(TYPES.SnCryptoNode).toConstantValue(new SnCryptoNode())
     container.bind<TimerInterface>(TYPES.Timer).toConstantValue(new Timer())
     container.bind<ItemHttpServiceInterface>(TYPES.ItemHttpService).to(SyncingServerHttpService)
+    container.bind<ContentDecoderInterface>(TYPES.ContenDecoder).to(ContentDecoder)
 
     if (env.get('SNS_TOPIC_ARN', true)) {
       container.bind<SNSDomainEventPublisher>(TYPES.DomainEventPublisher).toConstantValue(

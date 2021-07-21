@@ -1,63 +1,119 @@
 import 'reflect-metadata'
 
-import { SettingProjectorTest } from '../../../Projection/test/SettingProjectorTest'
+import { MfaSetting } from '@standardnotes/auth'
+import { SettingProjector } from '../../../Projection/SettingProjector'
 import { Setting } from '../../Setting/Setting'
-import { SETTINGS } from '../../Setting/Settings'
-import { SimpleSetting } from '../../Setting/SimpleSetting'
-import { UserTest } from '../../User/test/UserTest'
-import { GetSettingsTest } from './test/GetSettingsTest'
+import { SettingRepositoryInterface } from '../../Setting/SettingRepositoryInterface'
+
+import { GetSettings } from './GetSettings'
+import { UserRepositoryInterface } from '../../User/UserRepositoryInterface'
+import { User } from '../../User/User'
+import { CrypterInterface } from '../../Encryption/CrypterInterface'
 
 describe('GetSettings', () => {
-  let user = UserTest.makeWithSettings()
-  const userUuid = user.uuid
+  let settingRepository: SettingRepositoryInterface
+  let settingProjector: SettingProjector
+  let setting: Setting
+  let mfaSetting: Setting
+  let userRepository: UserRepositoryInterface
+  let user: User
+  let crypter: CrypterInterface
 
-  const projector = SettingProjectorTest.get()
+  const createUseCase = () => new GetSettings(settingRepository, settingProjector, userRepository, crypter)
 
-  let settings: Setting[]
-  let simpleSettings: SimpleSetting[]
+  beforeEach(() => {
+    setting = {
+      name: 'test',
+      updatedAt: 345,
+    } as jest.Mocked<Setting>
+    mfaSetting = { name: MfaSetting.MfaSecret, updatedAt: 122 } as jest.Mocked<Setting>
 
-  beforeAll(async () => {
-    settings = await user.settings
-    simpleSettings = await projector.projectManySimple(settings)
+    settingRepository = {} as jest.Mocked<SettingRepositoryInterface>
+    settingRepository.findAllByUserUuid = jest.fn().mockReturnValue([ setting, mfaSetting ])
+
+    settingProjector = {} as jest.Mocked<SettingProjector>
+    settingProjector.projectManySimple = jest.fn().mockReturnValue([{ foo: 'bar' }])
+
+    user = {} as jest.Mocked<User>
+
+    userRepository = {} as jest.Mocked<UserRepositoryInterface>
+    userRepository.findOneByUuid = jest.fn().mockReturnValue(user)
+
+    crypter = {} as jest.Mocked<CrypterInterface>
+    crypter.decryptForUser = jest.fn().mockReturnValue('decrypted')
   })
 
-  const makeSubject = () => GetSettingsTest.makeSubject({
-    settings,
-    projector,
-  })
+  it('should fail if a user is not found', async () => {
+    userRepository.findOneByUuid = jest.fn().mockReturnValue(undefined)
 
-  it('should get associated settings for a valid user uuid', async () => {
-    const actual = await makeSubject().execute({ userUuid })
-
-    expect(actual.userUuid).toEqual(userUuid)
-    expect(actual.settings).toEqual(simpleSettings)
-  })
-
-  it('should prevent mfa secret from being retrieved with all settings', async () => {
-    user = UserTest.makeSubject({
-      uuid: 'user-with-settings-uuid',
-    }, {
-      settings: [
-        { uuid: 'setting-1-uuid', name: 'setting-1-name' },
-        { uuid: 'setting-2-uuid', name: 'setting-2-name' },
-        { uuid: 'setting-3-uuid', name: SETTINGS.MFA_SECRET },
-      ],
+    expect(await createUseCase().execute({ userUuid: '1-2-3' })).toEqual({
+      success: false,
+      error: {
+        message: 'User 1-2-3 not found.',
+      },
     })
-    settings = await user.settings
-    settings.pop()
-    simpleSettings = await projector.projectManySimple(settings)
-
-    const actual = await makeSubject().execute({ userUuid })
-
-    expect(actual.userUuid).toEqual(userUuid)
-    expect(actual.settings).toEqual(simpleSettings)
   })
 
-  it('should get empty settings for an invalid user uuid', async () => {
-    const badUserUuid = 'BAD-user-uuid'
-    const actual = await makeSubject().execute({ userUuid: badUserUuid })
+  it('should return all user settings except mfa', async () => {
+    expect(await createUseCase().execute({ userUuid: '1-2-3' })).toEqual({
+      success: true,
+      userUuid: '1-2-3',
+      settings: [{ foo: 'bar' }],
+    })
 
-    expect(actual.userUuid).toEqual(badUserUuid)
-    expect(actual.settings).toEqual([])
+    expect(settingProjector.projectManySimple).toHaveBeenCalledWith([ setting ])
+  })
+
+  it('should return all setting with decrypted values', async () => {
+    setting = {
+      name: 'test',
+      updatedAt: 345,
+      value: 'encrypted',
+      serverEncryptionVersion: Setting.ENCRYPTION_VERSION_DEFAULT,
+    } as jest.Mocked<Setting>
+    settingRepository.findAllByUserUuid = jest.fn().mockReturnValue([ setting ])
+
+    expect(await createUseCase().execute({ userUuid: '1-2-3' })).toEqual({
+      success: true,
+      userUuid: '1-2-3',
+      settings: [{ foo: 'bar' }],
+    })
+
+    expect(settingProjector.projectManySimple).toHaveBeenCalledWith([{
+      name: 'test',
+      updatedAt: 345,
+      value: 'decrypted',
+      serverEncryptionVersion: 1,
+    }])
+  })
+
+  it('should return all user settings of certain name', async () => {
+    expect(await createUseCase().execute({ userUuid: '1-2-3', settingName: 'test', allowMFARetrieval: true })).toEqual({
+      success: true,
+      userUuid: '1-2-3',
+      settings: [{ foo: 'bar' }],
+    })
+
+    expect(settingProjector.projectManySimple).toHaveBeenCalledWith([ setting ])
+  })
+
+  it('should return all user settings updated after', async () => {
+    expect(await createUseCase().execute({ userUuid: '1-2-3', allowMFARetrieval: true, updatedAfter: 123 })).toEqual({
+      success: true,
+      userUuid: '1-2-3',
+      settings: [{ foo: 'bar' }],
+    })
+
+    expect(settingProjector.projectManySimple).toHaveBeenCalledWith([ setting ])
+  })
+
+  it('should return all user settings with mfa if explicit', async () => {
+    expect(await createUseCase().execute({ userUuid: '1-2-3', allowMFARetrieval: true })).toEqual({
+      success: true,
+      userUuid: '1-2-3',
+      settings: [{ foo: 'bar' }],
+    })
+
+    expect(settingProjector.projectManySimple).toHaveBeenCalledWith([ setting, mfaSetting ])
   })
 })

@@ -6,16 +6,12 @@ import { SimpleSetting } from '../Domain/Setting/SimpleSetting'
 @injectable()
 export class SettingProjector {
   async projectSimple(setting: Setting): Promise<SimpleSetting> {
-    const { 
+    const {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       user,
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      createdAt,
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      updatedAt,
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       serverEncryptionVersion,
-      ...rest 
+      ...rest
     } = setting
 
     return rest
