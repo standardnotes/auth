@@ -13,6 +13,7 @@ const TYPES = {
   LockRepository: Symbol.for('LockRepository'),
   RoleRepository: Symbol.for('RoleRepository'),
   WebSocketsConnectionRepository: Symbol.for('WebSocketsConnectionRepository'),
+  UserSubscriptionRepository: Symbol.for('UserSubscriptionRepository'),
   // Middleware
   AuthMiddleware: Symbol.for('AuthMiddleware'),
   AuthMiddlewareWithoutResponse: Symbol.for('AuthMiddlewareWithoutResponse'),
@@ -75,6 +76,10 @@ const TYPES = {
   // Handlers
   UserRegisteredEventHandler: Symbol.for('UserRegisteredEventHandler'),
   AccountDeletionRequestedEventHandler: Symbol.for('AccountDeletionRequestedEventHandler'),
+  SubscriptionPurchasedEventHandler: Symbol.for('SubscriptionPurchasedEventHandler'),
+  SubscriptionRenewedEventHandler: Symbol.for('SubscriptionRenewedEventHandler'),
+  SubscriptionRefundedEventHandler: Symbol.for('SubscriptionRefundedEventHandler'),
+
   // Services
   DeviceDetector: Symbol.for('DeviceDetector'),
   SessionService: Symbol.for('SessionService'),

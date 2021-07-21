@@ -74,6 +74,9 @@ import { GetSetting } from '../Domain/UseCase/GetSetting/GetSetting'
 import { UpdateSetting } from '../Domain/UseCase/UpdateSetting/UpdateSetting'
 import { GetAuthMethods } from '../Domain/UseCase/GetAuthMethods/GetAuthMethods'
 import { AccountDeletionRequestedEventHandler } from '../Domain/Handler/AccountDeletionRequestedEventHandler'
+import { SubscriptionPurchasedEventHandler } from '../Domain/Handler/SubscriptionPurchasedEventHandler'
+import { SubscriptionRenewedEventHandler } from '../Domain/Handler/SubscriptionRenewedEventHandler'
+import { SubscriptionRefundedEventHandler } from '../Domain/Handler/SubscriptionRefundedEventHandler'
 import { DeleteAccount } from '../Domain/UseCase/DeleteAccount/DeleteAccount'
 import { DeleteSetting } from '../Domain/UseCase/DeleteSetting/DeleteSetting'
 import { SettingFactory } from '../Domain/Setting/SettingFactory'
@@ -88,6 +91,7 @@ import { ContentDecoderInterface } from '../Domain/Encryption/ContentDecoderInte
 import { ContentDecoder } from '../Domain/Encryption/ContentDecoder'
 import axios, { AxiosInstance } from 'axios'
 import { UserSubscription } from '../Domain/User/UserSubscription'
+import { MySQLUserSubscriptionRepository } from '../Infra/MySQL/MySQLUserSubscriptionRepository'
 
 export class ContainerConfigLoader {
   async load(): Promise<Container> {
@@ -177,6 +181,7 @@ export class ContainerConfigLoader {
     container.bind<MySQLUserRepository>(TYPES.UserRepository).toConstantValue(connection.getCustomRepository(MySQLUserRepository))
     container.bind<MySQLSettingRepository>(TYPES.SettingRepository).toConstantValue(connection.getCustomRepository(MySQLSettingRepository))
     container.bind<MySQLRoleRepository>(TYPES.RoleRepository).toConstantValue(connection.getCustomRepository(MySQLRoleRepository))
+    container.bind<MySQLUserSubscriptionRepository>(TYPES.UserSubscriptionRepository).toConstantValue(connection.getCustomRepository(MySQLUserSubscriptionRepository))
     container.bind<RedisEphemeralSessionRepository>(TYPES.EphemeralSessionRepository).to(RedisEphemeralSessionRepository)
     container.bind<LockRepository>(TYPES.LockRepository).to(LockRepository)
     container.bind<WebSocketsConnectionRepositoryInterface>(TYPES.WebSocketsConnectionRepository).to(RedisWebSocketsConnectionRepository)
@@ -247,6 +252,9 @@ export class ContainerConfigLoader {
     // Handlers
     container.bind<UserRegisteredEventHandler>(TYPES.UserRegisteredEventHandler).to(UserRegisteredEventHandler)
     container.bind<AccountDeletionRequestedEventHandler>(TYPES.AccountDeletionRequestedEventHandler).to(AccountDeletionRequestedEventHandler)
+    container.bind<SubscriptionPurchasedEventHandler>(TYPES.SubscriptionPurchasedEventHandler).to(SubscriptionPurchasedEventHandler)
+    container.bind<SubscriptionRenewedEventHandler>(TYPES.SubscriptionRenewedEventHandler).to(SubscriptionRenewedEventHandler)
+    container.bind<SubscriptionRefundedEventHandler>(TYPES.SubscriptionRefundedEventHandler).to(SubscriptionRefundedEventHandler)
 
     // Services
     container.bind<UAParser>(TYPES.DeviceDetector).toConstantValue(new UAParser())
@@ -286,6 +294,9 @@ export class ContainerConfigLoader {
     const eventHandlers: Map<string, DomainEventHandlerInterface> = new Map([
       ['USER_REGISTERED', container.get(TYPES.UserRegisteredEventHandler)],
       ['ACCOUNT_DELETION_REQUESTED', container.get(TYPES.AccountDeletionRequestedEventHandler)],
+      ['SUBSCRIPTION_PURCHASED', container.get(TYPES.SubscriptionPurchasedEventHandler)],
+      ['SUBSCRIPTION_RENEWED', container.get(TYPES.SubscriptionRenewedEventHandler)],
+      ['SUBSCRIPTION_REFUNDED', container.get(TYPES.SubscriptionRefundedEventHandler)],
     ])
 
     if (env.get('SQS_QUEUE_URL', true)) {
