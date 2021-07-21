@@ -277,25 +277,4 @@ export class AuthController extends BaseHttpController {
 
     return this.json(result, 400)
   }
-
-  @httpGet('/test_purchase')
-  async testPurchaseEvent(): Promise<void> {
-    await this.domainEventPublisher.publish(
-      this.domainEventFactory.createSubscriptionPurchasedEvent()
-    )
-  }
-
-  @httpGet('/test_renew')
-  async testRenewEvent(): Promise<void> {
-    await this.domainEventPublisher.publish(
-      this.domainEventFactory.createSubscriptionRenewedEvent()
-    )
-  }
-
-  @httpGet('/test_refund')
-  async testRefundEvent(): Promise<void> {
-    await this.domainEventPublisher.publish(
-      this.domainEventFactory.createSubscriptionRefundedEvent()
-    )
-  }
 }
