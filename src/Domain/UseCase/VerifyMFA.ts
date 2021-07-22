@@ -108,13 +108,15 @@ export class VerifyMFA implements UseCaseInterface {
 
     this.logger.debug('Found MFA Setting %O', mfaSetting)
 
-    if (mfaSetting.serverEncryptionVersion === Setting.ENCRYPTION_VERSION_UNENCRYPTED) {
-      return mfaSetting.value
-    }
+    let decrypted = mfaSetting.value
 
-    const decrypted = await this.crypter.decryptForUser(mfaSetting.value, user)
-    if (mfaSetting.serverEncryptionVersion !== Setting.ENCRYPTION_VERSION_CLIENT_ENCODED_AND_SERVER_ENCRYPTED) {
-      return decrypted
+    const encryptedVersions = [
+      Setting.ENCRYPTION_VERSION_DEFAULT,
+      Setting.ENCRYPTION_VERSION_CLIENT_ENCODED_AND_SERVER_ENCRYPTED,
+    ]
+
+    if (encryptedVersions.includes(mfaSetting.serverEncryptionVersion)) {
+      decrypted = await this.crypter.decryptForUser(mfaSetting.value, user)
     }
 
     const decoded = this.contentDecoder.decode(decrypted)
