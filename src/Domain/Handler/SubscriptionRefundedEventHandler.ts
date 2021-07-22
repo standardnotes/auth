@@ -23,6 +23,28 @@ implements DomainEventHandlerInterface
     @inject(TYPES.Logger) private logger: Logger
   ) {}
 
+  async handle(
+    event: SubscriptionRefundedEvent
+  ): Promise<void> {
+    const user = await this.userRepository.findOneByEmail(
+      event.payload.userEmail
+    )
+
+    if (user === undefined) {
+      this.logger.warn(
+        `Could not find user with email: ${event.payload.userEmail}`
+      )
+      return
+    }
+
+    await this.updateUserRole(user)
+    await this.updateSubscriptionEndsAt(
+      event.payload.subscriptionName,
+      user.uuid,
+      event.payload.timestamp,
+    )
+  }
+
   private async updateUserRole(user: User): Promise<void> {
     const role = await this.roleRepository.findOneByName(RoleName.CoreUser)
 
@@ -45,29 +67,6 @@ implements DomainEventHandlerInterface
       userUuid,
       timestamp,
       timestamp,
-    )
-  }
-
-
-  async handle(
-    event: SubscriptionRefundedEvent
-  ): Promise<void> {
-    const user = await this.userRepository.findOneByEmail(
-      event.payload.userEmail
-    )
-
-    if (user === undefined) {
-      this.logger.warn(
-        `Could not find user with email: ${event.payload.userEmail}`
-      )
-      return
-    }
-
-    await this.updateUserRole(user)
-    await this.updateSubscriptionEndsAt(
-      event.payload.subscriptionName,
-      user.uuid,
-      event.payload.timestamp,
     )
   }
 }

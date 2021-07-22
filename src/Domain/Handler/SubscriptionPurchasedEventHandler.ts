@@ -25,6 +25,29 @@ implements DomainEventHandlerInterface
     @inject(TYPES.Logger) private logger: Logger
   ) {}
 
+  async handle(
+    event: SubscriptionPurchasedEvent | SubscriptionRenewedEvent
+  ): Promise<void> {
+    const user = await this.userRepository.findOneByEmail(
+      event.payload.userEmail
+    )
+
+    if (user === undefined) {
+      this.logger.warn(
+        `Could not find user with email: ${event.payload.userEmail}`
+      )
+      return
+    }
+
+    await this.createSubscription(
+      event.payload.subscriptionName,
+      user,
+      event.payload.subscriptionExpiresAt,
+      event.payload.timestamp,
+    )
+    await this.updateUserRole(user, event.payload.subscriptionName)
+  }
+
   private subscriptionNameToRoleNameMap = new Map<SubscriptionName, RoleName>([
     [SubscriptionName.CorePlan, RoleName.CoreUser],
     [SubscriptionName.PlusPlan, RoleName.PlusUser],
@@ -69,28 +92,5 @@ implements DomainEventHandlerInterface
     subscription.endsAt = subscriptionExpiresAt
 
     await this.userSubscriptionRepository.save(subscription)
-  }
-
-  async handle(
-    event: SubscriptionPurchasedEvent | SubscriptionRenewedEvent
-  ): Promise<void> {
-    const user = await this.userRepository.findOneByEmail(
-      event.payload.userEmail
-    )
-
-    if (user === undefined) {
-      this.logger.warn(
-        `Could not find user with email: ${event.payload.userEmail}`
-      )
-      return
-    }
-
-    await this.createSubscription(
-      event.payload.subscriptionName,
-      user,
-      event.payload.subscriptionExpiresAt,
-      event.payload.timestamp,
-    )
-    await this.updateUserRole(user, event.payload.subscriptionName)
   }
 }

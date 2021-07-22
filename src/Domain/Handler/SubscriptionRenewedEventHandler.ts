@@ -19,21 +19,6 @@ implements DomainEventHandlerInterface
     @inject(TYPES.UserSubscriptionRepository) private userSubscriptionRepository: UserSubscriptionRepositoryInterface,
     @inject(TYPES.Logger) private logger: Logger
   ) {}
-
-  private async updateSubscriptionEndsAt(
-    subscriptionName: string,
-    userUuid: string,
-    subscriptionExpiresAt: number,
-    timestamp: number,
-  ): Promise<void> {
-    await this.userSubscriptionRepository.updateEndsAtByNameAndUserUuid(
-      subscriptionName,
-      userUuid,
-      subscriptionExpiresAt,
-      timestamp,
-    )
-  }
-
   async handle(
     event: SubscriptionPurchasedEvent | SubscriptionRenewedEvent
   ): Promise<void> {
@@ -53,6 +38,20 @@ implements DomainEventHandlerInterface
       user.uuid,
       event.payload.subscriptionExpiresAt,
       event.payload.timestamp,
+    )
+  }
+
+  private async updateSubscriptionEndsAt(
+    subscriptionName: string,
+    userUuid: string,
+    subscriptionExpiresAt: number,
+    timestamp: number,
+  ): Promise<void> {
+    await this.userSubscriptionRepository.updateEndsAtByNameAndUserUuid(
+      subscriptionName,
+      userUuid,
+      subscriptionExpiresAt,
+      timestamp,
     )
   }
 }
