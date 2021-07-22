@@ -141,9 +141,13 @@ describe('VerifyMFA', () => {
   })
 
   it('should not pass MFA verification from user settings if mfa is not correct', async () => {
-    settingRepository.findLastByNameAndUserUuid = jest.fn().mockReturnValue({} as jest.Mocked<Setting>)
+    settingRepository.findLastByNameAndUserUuid = jest.fn().mockReturnValue({
+      serverEncryptionVersion: Setting.ENCRYPTION_VERSION_DEFAULT,
+    } as jest.Mocked<Setting>)
 
-    crypter.decryptForUser = jest.fn().mockReturnValue('shhhh')
+    crypter.decryptForUser = jest.fn().mockReturnValue('decrypted')
+
+    contentDecoder.decode = jest.fn().mockReturnValue({ secret: 'shhhh' })
 
     expect(await createVerifyMFA().execute({ email: 'test@test.te', requestParams: { 'mfa_1-2-3': 'test' } })).toEqual({
       success: false,
@@ -155,9 +159,13 @@ describe('VerifyMFA', () => {
 
 
   it('should not pass MFA verification from user settings if no mfa param is found in the request', async () => {
-    settingRepository.findLastByNameAndUserUuid = jest.fn().mockReturnValue({} as jest.Mocked<Setting>)
+    settingRepository.findLastByNameAndUserUuid = jest.fn().mockReturnValue({
+      serverEncryptionVersion: Setting.ENCRYPTION_VERSION_DEFAULT,
+    } as jest.Mocked<Setting>)
 
-    crypter.decryptForUser = jest.fn().mockReturnValue('shhhh')
+    crypter.decryptForUser = jest.fn().mockReturnValue('decrypted')
+
+    contentDecoder.decode = jest.fn().mockReturnValue({ secret: 'shhhh' })
 
     expect(await createVerifyMFA().execute({ email: 'test@test.te', requestParams: { 'foo': 'bar' } })).toEqual({
       success: false,
