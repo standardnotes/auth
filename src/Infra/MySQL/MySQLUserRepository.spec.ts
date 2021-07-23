@@ -12,6 +12,7 @@ describe('MySQLUserRepository', () => {
 
   beforeEach(() => {
     queryBuilder = {} as jest.Mocked<SelectQueryBuilder<User>>
+    queryBuilder.cache = jest.fn().mockReturnThis()
 
     user = {} as jest.Mocked<User>
 

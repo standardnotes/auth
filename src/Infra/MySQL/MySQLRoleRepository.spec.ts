@@ -12,6 +12,7 @@ describe('MySQLRoleRepository', () => {
 
   beforeEach(() => {
     queryBuilder = {} as jest.Mocked<SelectQueryBuilder<Role>>
+    queryBuilder.cache = jest.fn().mockReturnThis()
 
     role = {} as jest.Mocked<Role>
 
