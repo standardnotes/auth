@@ -50,6 +50,7 @@ const TYPES = {
   REDIS_EVENTS_CHANNEL: Symbol.for('REDIS_EVENTS_CHANNEL'),
   NEW_RELIC_ENABLED: Symbol.for('NEW_RELIC_ENABLED'),
   SYNCING_SERVER_URL: Symbol.for('SYNCING_SERVER_URL'),
+  VERSION: Symbol.for('VERSION'),
   // use cases
   AuthenticateUser: Symbol.for('AuthenticateUser'),
   AuthenticateRequest: Symbol.for('AuthenticateRequest'),
