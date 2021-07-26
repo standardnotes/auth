@@ -81,6 +81,9 @@ jobs:
     - name: Download task definition
       run: |
         aws ecs describe-task-definition --task-definition auth-dev --query taskDefinition > task-definition.json
+    - name: Fill in the new version in the Amazon ECS task definition
+      run: |
+        jq '(.containerDefinitions[] | select(.name=="auth-dev") | .environment[] | select(.name=="VERSION")).value = "${{ github.sha }}"' task-definition.json > tmp.json && mv tmp.json task-definition.json
     - name: Fill in the new image ID in the Amazon ECS task definition
       id: task-def
       uses: aws-actions/amazon-ecs-render-task-definition@v1
@@ -111,6 +114,9 @@ jobs:
     - name: Download task definition
       run: |
         aws ecs describe-task-definition --task-definition auth-worker-dev --query taskDefinition > task-definition.json
+    - name: Fill in the new version in the Amazon ECS task definition
+      run: |
+        jq '(.containerDefinitions[] | select(.name=="auth-worker-dev") | .environment[] | select(.name=="VERSION")).value = "${{ github.sha }}"' task-definition.json > tmp.json && mv tmp.json task-definition.json
     - name: Fill in the new image ID in the Amazon ECS task definition
       id: task-def
       uses: aws-actions/amazon-ecs-render-task-definition@v1

@@ -10,7 +10,7 @@ import '../src/Controller/UsersController'
 import '../src/Controller/WebSocketsController'
 
 import * as cors from 'cors'
-import { urlencoded, json } from 'express'
+import { urlencoded, json, Request, Response, NextFunction } from 'express'
 import * as winston from 'winston'
 import * as dayjs from 'dayjs'
 import * as utc from 'dayjs/plugin/utc'
@@ -27,6 +27,10 @@ void container.load().then(container => {
   const server = new InversifyExpressServer(container)
 
   server.setConfig((app) => {
+    app.use((_request: Request, response: Response, next: NextFunction) => {
+      response.setHeader('X-Auth-Version', container.get(TYPES.VERSION))
+      next()
+    })
     app.use(json())
     app.use(urlencoded({ extended: true }))
     app.use(cors())
