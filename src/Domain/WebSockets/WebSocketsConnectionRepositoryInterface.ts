@@ -1,4 +1,5 @@
 export interface WebSocketsConnectionRepositoryInterface {
-  saveConnection (userUuid: string, connectionId: string): Promise<void>
-  removeConnection (connectionId: string): Promise<void>
+  findAllByUserUuid(userUuid: string): Promise<string[]>
+  saveConnection(userUuid: string, connectionId: string): Promise<void>
+  removeConnection(connectionId: string): Promise<void>
 }

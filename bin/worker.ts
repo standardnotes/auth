@@ -2,6 +2,9 @@ import 'reflect-metadata'
 
 import 'newrelic'
 
+import * as dayjs from 'dayjs'
+import * as utc from 'dayjs/plugin/utc'
+
 import { Logger } from 'winston'
 
 import { ContainerConfigLoader } from '../src/Bootstrap/Container'
@@ -11,6 +14,8 @@ import { DomainEventSubscriberFactoryInterface } from '@standardnotes/domain-eve
 
 const container = new ContainerConfigLoader
 void container.load().then(container => {
+  dayjs.extend(utc)
+
   const env: Env = new Env()
   env.load()
 
