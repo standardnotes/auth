@@ -11,6 +11,7 @@ import { RoleRepositoryInterface } from '../Role/RoleRepositoryInterface'
 import { User } from '../User/User'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { UserSubscriptionRepositoryInterface } from '../User/UserSubscriptionRepositoryInterface'
+import { WebSocketServiceInterface } from '../WebSockets/WebSocketsServiceInterface'
 
 @injectable()
 export class SubscriptionRefundedEventHandler
@@ -20,6 +21,7 @@ implements DomainEventHandlerInterface
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
     @inject(TYPES.RoleRepository) private roleRepository: RoleRepositoryInterface,
     @inject(TYPES.UserSubscriptionRepository) private userSubscriptionRepository: UserSubscriptionRepositoryInterface,
+    @inject(TYPES.WebSocketsService) private webSocketsService: WebSocketServiceInterface,
     @inject(TYPES.Logger) private logger: Logger
   ) {}
 
@@ -46,15 +48,22 @@ implements DomainEventHandlerInterface
   }
 
   private async updateUserRole(user: User): Promise<void> {
-    const role = await this.roleRepository.findOneByName(RoleName.CoreUser)
+    const currentRoleName = (await user.roles)[0].name as RoleName
+    const newRoleName = RoleName.CoreUser
+    const newRole = await this.roleRepository.findOneByName(newRoleName)
 
-    if (role === undefined) {
+    if (newRole === undefined) {
       this.logger.warn(`Could not find role for role name: ${RoleName.CoreUser}`)
       return
     }
 
-    user.roles = Promise.resolve([role])
+    user.roles = Promise.resolve([newRole])
     await this.userRepository.save(user)
+    await this.webSocketsService.sendUserRoleChangedEvent(
+      user,
+      currentRoleName,
+      newRoleName
+    )
   }
 
   private async updateSubscriptionEndsAt(
@@ -65,7 +74,6 @@ implements DomainEventHandlerInterface
     await this.userSubscriptionRepository.updateEndsAtByNameAndUserUuid(
       subscriptionName,
       userUuid,
-      timestamp,
       timestamp,
     )
   }
