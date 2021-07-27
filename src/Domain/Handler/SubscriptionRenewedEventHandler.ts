@@ -37,7 +37,6 @@ implements DomainEventHandlerInterface
       event.payload.subscriptionName,
       user.uuid,
       event.payload.subscriptionExpiresAt,
-      event.payload.timestamp,
     )
   }
 
@@ -45,13 +44,11 @@ implements DomainEventHandlerInterface
     subscriptionName: string,
     userUuid: string,
     subscriptionExpiresAt: number,
-    timestamp: number,
   ): Promise<void> {
     await this.userSubscriptionRepository.updateEndsAtByNameAndUserUuid(
       subscriptionName,
       userUuid,
       subscriptionExpiresAt,
-      timestamp,
     )
   }
 }

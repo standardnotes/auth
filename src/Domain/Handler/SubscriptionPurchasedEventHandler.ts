@@ -43,7 +43,6 @@ implements DomainEventHandlerInterface
       event.payload.subscriptionName,
       user,
       event.payload.subscriptionExpiresAt,
-      event.payload.timestamp,
     )
     await this.updateUserRole(user, event.payload.subscriptionName)
   }
@@ -82,13 +81,12 @@ implements DomainEventHandlerInterface
     subscriptionName: string,
     user: User,
     subscriptionExpiresAt: number,
-    timestamp: number,
   ): Promise<void> {
     const subscription = new UserSubscription()
     subscription.planName = subscriptionName
     subscription.user = Promise.resolve(user)
-    subscription.createdAt = timestamp
-    subscription.updatedAt = timestamp
+    subscription.createdAt = dayjs.utc().valueOf()
+    subscription.updatedAt = dayjs.utc().valueOf()
     subscription.endsAt = subscriptionExpiresAt
 
     await this.userSubscriptionRepository.save(subscription)
