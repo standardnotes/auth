@@ -33,7 +33,7 @@ export class WebSocketsService implements WebSocketsServiceInterface {
     )
 
     await Promise.all(
-      userConnections.map(async (connectionUuid) => {
+      userConnections.map(async (connectionUuid) => (
         await this.httpClient.request({
           method: 'POST',
           url: `${this.webSocketsApiUrl}/${connectionUuid}`,
@@ -46,7 +46,7 @@ export class WebSocketsService implements WebSocketsServiceInterface {
             /* istanbul ignore next */
             (status: number) => status >= 200 && status < 500,
         })
-      })
+      ))
     )
   }
 }
