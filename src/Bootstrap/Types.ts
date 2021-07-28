@@ -51,6 +51,7 @@ const TYPES = {
   NEW_RELIC_ENABLED: Symbol.for('NEW_RELIC_ENABLED'),
   SYNCING_SERVER_URL: Symbol.for('SYNCING_SERVER_URL'),
   WEBSOCKETS_API_URL: Symbol.for('WEBSOCKETS_API_URL'),
+  VERSION: Symbol.for('VERSION'),
   // use cases
   AuthenticateUser: Symbol.for('AuthenticateUser'),
   AuthenticateRequest: Symbol.for('AuthenticateRequest'),
