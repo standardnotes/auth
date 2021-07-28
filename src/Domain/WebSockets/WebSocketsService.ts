@@ -6,10 +6,10 @@ import TYPES from '../../Bootstrap/Types'
 import { DomainEventFactoryInterface } from '../Event/DomainEventFactoryInterface'
 import { User } from '../User/User'
 import { WebSocketsConnectionRepositoryInterface } from './WebSocketsConnectionRepositoryInterface'
-import { WebSocketServiceInterface } from './WebSocketsServiceInterface'
+import { WebSocketsServiceInterface } from './WebSocketsServiceInterface'
 
 @injectable()
-export class WebSocketsService implements WebSocketServiceInterface {
+export class WebSocketsService implements WebSocketsServiceInterface {
   constructor(
     @inject(TYPES.WebSocketsConnectionRepository) private webSocketsConnectionRepository: WebSocketsConnectionRepositoryInterface,
     @inject(TYPES.DomainEventFactory) private domainEventFactory: DomainEventFactoryInterface,

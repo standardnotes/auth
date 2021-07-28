@@ -15,7 +15,7 @@ import { User } from '../User/User'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { UserSubscription } from '../User/UserSubscription'
 import { UserSubscriptionRepositoryInterface } from '../User/UserSubscriptionRepositoryInterface'
-import { WebSocketServiceInterface } from '../WebSockets/WebSocketsServiceInterface'
+import { WebSocketsServiceInterface } from '../WebSockets/WebSocketsServiceInterface'
 
 @injectable()
 export class SubscriptionPurchasedEventHandler
@@ -25,7 +25,7 @@ implements DomainEventHandlerInterface
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
     @inject(TYPES.RoleRepository) private roleRepository: RoleRepositoryInterface,
     @inject(TYPES.UserSubscriptionRepository) private userSubscriptionRepository: UserSubscriptionRepositoryInterface,
-    @inject(TYPES.WebSocketsService) private webSocketsService: WebSocketServiceInterface,
+    @inject(TYPES.WebSocketsService) private webSocketsService: WebSocketsServiceInterface,
     @inject(TYPES.Logger) private logger: Logger
   ) {}
 
