@@ -29,9 +29,10 @@ describe('MySQLUserSubscriptionRepository', () => {
 
     expect(queryBuilder.update).toHaveBeenCalled()
     expect(queryBuilder.set).toHaveBeenCalledWith(
-      expect.objectContaining({
+      {
+        updatedAt: expect.any(Number),
         endsAt: 1000,
-      })
+      }
     )
     expect(queryBuilder.where).toHaveBeenCalledWith(
       'plan_name = :plan_name AND user_uuid = :user_uuid',

@@ -95,7 +95,11 @@ describe('SubscriptionPurchasedEventHandler', () => {
     expect(userRepository.findOneByEmail).toHaveBeenCalledWith('test@test.com')
     expect(
       userSubscriptionRepository.save
-    ).toHaveBeenCalledWith(expect.objectContaining(subscription))
+    ).toHaveBeenCalledWith({
+      ...subscription,
+      createdAt: expect.any(Number),
+      updatedAt: expect.any(Number),
+    })
   })
 
   it('should send websockets event', async () => {
