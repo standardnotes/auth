@@ -12,11 +12,13 @@ import { SubscriptionPurchasedEventHandler } from './SubscriptionPurchasedEventH
 import { UserSubscription } from '../User/UserSubscription'
 
 import * as dayjs from 'dayjs'
+import { WebSocketsServiceInterface } from '../WebSockets/WebSocketsServiceInterface'
 
 describe('SubscriptionPurchasedEventHandler', () => {
   let userRepository: UserRepositoryInterface
   let roleRepository: RoleRepositoryInterface
   let userSubscriptionRepository: UserSubscriptionRepositoryInterface
+  let webSocketsService: WebSocketsServiceInterface
   let logger: Logger
   let user: User
   let role: Role
@@ -29,12 +31,17 @@ describe('SubscriptionPurchasedEventHandler', () => {
     userRepository,
     roleRepository,
     userSubscriptionRepository,
+    webSocketsService,
     logger
   )
 
   beforeEach(() => {
     user = {
       uuid: '123',
+      email: 'test@test.com',
+      roles: Promise.resolve([{
+        name: RoleName.CoreUser,
+      }]),
     } as jest.Mocked<User>
     role = {} as jest.Mocked<Role>
     subscription = {} as jest.Mocked<UserSubscription>
@@ -48,8 +55,10 @@ describe('SubscriptionPurchasedEventHandler', () => {
 
     userSubscriptionRepository = {} as jest.Mocked<UserSubscriptionRepositoryInterface>
     userSubscriptionRepository.save = jest.fn().mockReturnValue(subscription)
+    
+    webSocketsService = {} as jest.Mocked<WebSocketsServiceInterface>
+    webSocketsService.sendUserRoleChangedEvent = jest.fn() 
 
-    timestamp = dayjs.utc().valueOf()
     subscriptionExpiresAt = timestamp + 365*1000
 
     event = {} as jest.Mocked<SubscriptionPurchasedEvent>
@@ -58,7 +67,7 @@ describe('SubscriptionPurchasedEventHandler', () => {
       userEmail: 'test@test.com',
       subscriptionName: SubscriptionName.ProPlan,
       subscriptionExpiresAt,
-      timestamp,
+      timestamp: dayjs.utc().valueOf(),
     }
 
     logger = {} as jest.Mocked<Logger>
@@ -80,15 +89,23 @@ describe('SubscriptionPurchasedEventHandler', () => {
     await createHandler().handle(event)
 
     subscription.planName = SubscriptionName.ProPlan
-    subscription.createdAt = timestamp
-    subscription.updatedAt = timestamp
     subscription.endsAt = subscriptionExpiresAt
     subscription.user = Promise.resolve(user)
 
     expect(userRepository.findOneByEmail).toHaveBeenCalledWith('test@test.com')
     expect(
       userSubscriptionRepository.save
-    ).toHaveBeenCalledWith(subscription)
+    ).toHaveBeenCalledWith(expect.objectContaining(subscription))
+  })
+
+  it('should send websockets event', async () => {
+    await createHandler().handle(event)
+
+    expect(webSocketsService.sendUserRoleChangedEvent).toHaveBeenCalledWith(
+      user,
+      RoleName.CoreUser,
+      RoleName.ProUser
+    )
   })
 
   it('should not do anything if no user is found for specified email', async () => {

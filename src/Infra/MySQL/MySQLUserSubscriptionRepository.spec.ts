@@ -25,14 +25,13 @@ describe('MySQLUserSubscriptionRepository', () => {
     queryBuilder.where = jest.fn().mockReturnThis()
     queryBuilder.execute = jest.fn()
 
-    await repository.updateEndsAtByNameAndUserUuid('test', '123', 1000, 1000)
+    await repository.updateEndsAtByNameAndUserUuid('test', '123', 1000)
 
     expect(queryBuilder.update).toHaveBeenCalled()
     expect(queryBuilder.set).toHaveBeenCalledWith(
-      {
+      expect.objectContaining({
         endsAt: 1000,
-        updatedAt: 1000,
-      }
+      })
     )
     expect(queryBuilder.where).toHaveBeenCalledWith(
       'plan_name = :plan_name AND user_uuid = :user_uuid',

@@ -62,7 +62,6 @@ describe('SubscriptionRenewedEventHandler', () => {
       SubscriptionName.ProPlan,
       '123',
       subscriptionExpirationDate,
-      timestamp
     )
   })
 

@@ -10,11 +10,13 @@ import { UserSubscriptionRepositoryInterface } from '../User/UserSubscriptionRep
 import { RoleName, SubscriptionName } from '@standardnotes/auth'
 import * as dayjs from 'dayjs'
 import { Role } from '../Role/Role'
+import { WebSocketsServiceInterface } from '../WebSockets/WebSocketsServiceInterface'
 
 describe('SubscriptionRefundedEventHandler', () => {
   let userRepository: UserRepositoryInterface
   let roleRepository: RoleRepositoryInterface
   let userSubscriptionRepository: UserSubscriptionRepositoryInterface
+  let webSocketsService: WebSocketsServiceInterface
   let logger: Logger
   let user: User
   let role: Role
@@ -25,12 +27,17 @@ describe('SubscriptionRefundedEventHandler', () => {
     userRepository,
     roleRepository,
     userSubscriptionRepository,
+    webSocketsService,
     logger
   )
 
   beforeEach(() => {
     user = {
       uuid: '123',
+      email: 'test@test.com',
+      roles: Promise.resolve([{
+        name: RoleName.ProUser,
+      }]),
     } as jest.Mocked<User>
     role = {} as jest.Mocked<Role>
 
@@ -43,6 +50,9 @@ describe('SubscriptionRefundedEventHandler', () => {
 
     userSubscriptionRepository = {} as jest.Mocked<UserSubscriptionRepositoryInterface>
     userSubscriptionRepository.updateEndsAtByNameAndUserUuid = jest.fn()  
+
+    webSocketsService = {} as jest.Mocked<WebSocketsServiceInterface>
+    webSocketsService.sendUserRoleChangedEvent = jest.fn() 
 
     timestamp = dayjs.utc().valueOf()
 
@@ -79,7 +89,16 @@ describe('SubscriptionRefundedEventHandler', () => {
       SubscriptionName.ProPlan,
       '123',
       timestamp,
-      timestamp
+    )
+  })
+
+  it('should send websockets event', async () => {
+    await createHandler().handle(event)
+
+    expect(webSocketsService.sendUserRoleChangedEvent).toHaveBeenCalledWith(
+      user,
+      RoleName.ProUser,
+      RoleName.CoreUser,
     )
   })
 
