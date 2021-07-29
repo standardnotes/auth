@@ -1,10 +1,20 @@
 import { RoleName } from '@standardnotes/auth'
+import { TimerInterface } from '@standardnotes/time'
 import 'reflect-metadata'
 
 import { DomainEventFactory } from './DomainEventFactory'
 
 describe('DomainEventFactory', () => {
-  const createFactory = () => new DomainEventFactory()
+  let timer: TimerInterface
+
+  const createFactory = () => new DomainEventFactory(
+    timer,
+  )
+
+  beforeEach(() => {
+    timer = {} as jest.Mocked<TimerInterface>
+    timer.getTimestampInMicroseconds = jest.fn().mockReturnValue(1)
+  })
 
   it('should create a USER_REGISTERED event', () => {
     expect(createFactory().createUserRegisteredEvent('1-2-3', 'test@test.te'))
