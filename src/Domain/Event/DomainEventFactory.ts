@@ -1,11 +1,18 @@
 import { RoleName } from '@standardnotes/auth'
 import { AccountDeletionRequestedEvent, UserRegisteredEvent, UserRoleChangedEvent } from '@standardnotes/domain-events'
+import { TimerInterface } from '@standardnotes/time'
 import * as dayjs from 'dayjs'
-import { injectable } from 'inversify'
+import { inject, injectable } from 'inversify'
+import TYPES from '../../Bootstrap/Types'
 import { DomainEventFactoryInterface } from './DomainEventFactoryInterface'
 
 @injectable()
 export class DomainEventFactory implements DomainEventFactoryInterface {
+  constructor (
+    @inject(TYPES.Timer) private timer: TimerInterface,
+  ) {
+  }
+
   createAccountDeletionRequestedEvent(userUuid: string): AccountDeletionRequestedEvent {
     return {
       type: 'ACCOUNT_DELETION_REQUESTED',
@@ -36,7 +43,7 @@ export class DomainEventFactory implements DomainEventFactoryInterface {
         email,
         fromRole,
         toRole,
-        timestamp: dayjs.utc().valueOf(),
+        timestamp: this.timer.getTimestampInMicroseconds(),
       },
     }
   }
