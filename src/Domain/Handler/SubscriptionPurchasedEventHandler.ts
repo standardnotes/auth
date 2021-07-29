@@ -7,8 +7,6 @@ import {
 import { inject, injectable } from 'inversify'
 import { Logger } from 'winston'
 
-import * as dayjs from 'dayjs'
-
 import TYPES from '../../Bootstrap/Types'
 import { RoleRepositoryInterface } from '../Role/RoleRepositoryInterface'
 import { User } from '../User/User'
@@ -47,6 +45,7 @@ implements DomainEventHandlerInterface
       event.payload.subscriptionName,
       user,
       event.payload.subscriptionExpiresAt,
+      event.payload.timestamp,
     )
     await this.updateUserRole(user, event.payload.subscriptionName)
   }
@@ -91,12 +90,13 @@ implements DomainEventHandlerInterface
     subscriptionName: string,
     user: User,
     subscriptionExpiresAt: number,
+    timestamp: number,
   ): Promise<void> {
     const subscription = new UserSubscription()
     subscription.planName = subscriptionName
     subscription.user = Promise.resolve(user)
-    subscription.createdAt = dayjs.utc().valueOf()
-    subscription.updatedAt = dayjs.utc().valueOf()
+    subscription.createdAt = timestamp
+    subscription.updatedAt = timestamp
     subscription.endsAt = subscriptionExpiresAt
 
     await this.userSubscriptionRepository.save(subscription)
