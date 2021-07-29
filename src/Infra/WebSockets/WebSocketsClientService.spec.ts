@@ -1,15 +1,15 @@
 import 'reflect-metadata'
 
 import { UserRoleChangedEvent } from '@standardnotes/domain-events'
-import { User } from '../User/User'
+import { User } from '../../Domain/User/User'
 import { RoleName } from '@standardnotes/auth'
 
-import { WebSocketsService } from './WebSocketsService'
-import { WebSocketsConnectionRepositoryInterface } from './WebSocketsConnectionRepositoryInterface'
-import { DomainEventFactoryInterface } from '../Event/DomainEventFactoryInterface'
+import { WebSocketsClientService } from './WebSocketsClientService'
+import { WebSocketsConnectionRepositoryInterface } from '../../Domain/WebSockets/WebSocketsConnectionRepositoryInterface'
+import { DomainEventFactoryInterface } from '../../Domain/Event/DomainEventFactoryInterface'
 import { AxiosInstance } from 'axios'
 
-describe('WebSocketsService', () => {
+describe('WebSocketsClientService', () => {
   let connectionIds: string[]
   let user: User
   let fromRole: RoleName
@@ -21,7 +21,7 @@ describe('WebSocketsService', () => {
   
   const webSocketsApiUrl = 'http://test-websockets'
 
-  const createService = () => new WebSocketsService(
+  const createService = () => new WebSocketsClientService(
     webSocketsConnectionRepository,
     domainEventFactory,
     httpClient,

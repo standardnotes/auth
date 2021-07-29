@@ -92,7 +92,7 @@ import { ContentDecoder } from '../Domain/Encryption/ContentDecoder'
 import axios, { AxiosInstance } from 'axios'
 import { UserSubscription } from '../Domain/User/UserSubscription'
 import { MySQLUserSubscriptionRepository } from '../Infra/MySQL/MySQLUserSubscriptionRepository'
-import { WebSocketsService } from '../Domain/WebSockets/WebSocketsService'
+import { WebSocketsClientService } from '../Infra/WebSockets/WebSocketsClientService'
 import { RoleService } from '../Domain/Role/RoleService'
 
 export class ContainerConfigLoader {
@@ -278,7 +278,7 @@ export class ContainerConfigLoader {
     container.bind<TimerInterface>(TYPES.Timer).toConstantValue(new Timer())
     container.bind<ItemHttpServiceInterface>(TYPES.ItemHttpService).to(SyncingServerHttpService)
     container.bind<ContentDecoderInterface>(TYPES.ContenDecoder).to(ContentDecoder)
-    container.bind<WebSocketsService>(TYPES.WebSocketsService).to(WebSocketsService)
+    container.bind<WebSocketsClientService>(TYPES.WebSocketsClientService).to(WebSocketsClientService)
     container.bind<RoleService>(TYPES.RoleService).to(RoleService)
 
     if (env.get('SNS_TOPIC_ARN', true)) {

@@ -3,13 +3,13 @@ import { AxiosInstance } from 'axios'
 import { inject, injectable } from 'inversify'
 
 import TYPES from '../../Bootstrap/Types'
-import { DomainEventFactoryInterface } from '../Event/DomainEventFactoryInterface'
-import { User } from '../User/User'
-import { WebSocketsConnectionRepositoryInterface } from './WebSocketsConnectionRepositoryInterface'
-import { WebSocketsServiceInterface } from './WebSocketsServiceInterface'
+import { DomainEventFactoryInterface } from '../../Domain/Event/DomainEventFactoryInterface'
+import { User } from '../../Domain/User/User'
+import { WebSocketsConnectionRepositoryInterface } from '../../Domain/WebSockets/WebSocketsConnectionRepositoryInterface'
+import { ClientServiceInterface } from '../../Domain/Client/ClientServiceInterface'
 
 @injectable()
-export class WebSocketsService implements WebSocketsServiceInterface {
+export class WebSocketsClientService implements ClientServiceInterface {
   constructor(
     @inject(TYPES.WebSocketsConnectionRepository) private webSocketsConnectionRepository: WebSocketsConnectionRepositoryInterface,
     @inject(TYPES.DomainEventFactory) private domainEventFactory: DomainEventFactoryInterface,

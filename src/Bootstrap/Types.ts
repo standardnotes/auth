@@ -103,7 +103,7 @@ const TYPES = {
   Timer: Symbol.for('Timer'),
   ItemHttpService: Symbol.for('ItemHttpService'),
   ContenDecoder: Symbol.for('ContenDecoder'),
-  WebSocketsService: Symbol.for('WebSocketService'),
+  WebSocketsClientService: Symbol.for('WebSocketClientService'),
   RoleService: Symbol.for('RoleService'),
 }
 

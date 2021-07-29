@@ -7,13 +7,13 @@ import { RoleRepositoryInterface } from '../Role/RoleRepositoryInterface'
 import { RoleName, SubscriptionName } from '@standardnotes/auth'
 import { Role } from '../Role/Role'
 
-import { WebSocketsServiceInterface } from '../WebSockets/WebSocketsServiceInterface'
+import { ClientServiceInterface } from '../Client/ClientServiceInterface'
 import { RoleService } from './RoleService'
 
 describe('RoleService', () => {
   let userRepository: UserRepositoryInterface
   let roleRepository: RoleRepositoryInterface
-  let webSocketsService: WebSocketsServiceInterface
+  let webSocketsClientService: ClientServiceInterface
   let logger: Logger
   let user: User
   let role: Role
@@ -21,7 +21,7 @@ describe('RoleService', () => {
   const createService = () => new RoleService(
     userRepository,
     roleRepository,
-    webSocketsService,
+    webSocketsClientService,
     logger
   )
 
@@ -42,8 +42,8 @@ describe('RoleService', () => {
     roleRepository = {} as jest.Mocked<RoleRepositoryInterface>
     roleRepository.findOneByName = jest.fn().mockReturnValue(role)
     
-    webSocketsService = {} as jest.Mocked<WebSocketsServiceInterface>
-    webSocketsService.sendUserRoleChangedEvent = jest.fn() 
+    webSocketsClientService = {} as jest.Mocked<ClientServiceInterface>
+    webSocketsClientService.sendUserRoleChangedEvent = jest.fn() 
 
     logger = {} as jest.Mocked<Logger>
     logger.info = jest.fn()
@@ -65,7 +65,7 @@ describe('RoleService', () => {
   it('should send websockets event', async () => {
     await createService().updateUserRole(user, SubscriptionName.ProPlan)
 
-    expect(webSocketsService.sendUserRoleChangedEvent).toHaveBeenCalledWith(
+    expect(webSocketsClientService.sendUserRoleChangedEvent).toHaveBeenCalledWith(
       user,
       RoleName.CoreUser,
       RoleName.ProUser

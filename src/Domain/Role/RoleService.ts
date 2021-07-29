@@ -5,7 +5,7 @@ import { Logger } from 'winston'
 import TYPES from '../../Bootstrap/Types'
 import { User } from '../User/User'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
-import { WebSocketsServiceInterface } from '../WebSockets/WebSocketsServiceInterface'
+import { ClientServiceInterface } from '../Client/ClientServiceInterface'
 import { RoleRepositoryInterface } from './RoleRepositoryInterface'
 import { RoleServiceInterface } from './RoleServiceInterface'
 
@@ -14,7 +14,7 @@ export class RoleService implements RoleServiceInterface {
   constructor(
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
     @inject(TYPES.RoleRepository) private roleRepository: RoleRepositoryInterface,
-    @inject(TYPES.WebSocketsService) private webSocketsService: WebSocketsServiceInterface,
+    @inject(TYPES.WebSocketsClientService) private webSocketsClientService: ClientServiceInterface,
     @inject(TYPES.Logger) private logger: Logger
   ) {}
 
@@ -45,7 +45,7 @@ export class RoleService implements RoleServiceInterface {
       role,
     ])
     await this.userRepository.save(user)
-    await this.webSocketsService.sendUserRoleChangedEvent(
+    await this.webSocketsClientService.sendUserRoleChangedEvent(
       user,
       currentRoleName,
       newRoleName
