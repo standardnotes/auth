@@ -32,21 +32,19 @@ export class WebSocketsClientService implements ClientServiceInterface {
       toRole
     )
 
-    await Promise.all(
-      userConnections.map(async (connectionUuid) => (
-        await this.httpClient.request({
-          method: 'POST',
-          url: `${this.webSocketsApiUrl}/${connectionUuid}`,
-          headers: {
-            Accept: 'text/plain',
-            'Content-Type': 'text/plain',
-          },
-          data: JSON.stringify(event),
-          validateStatus:
-            /* istanbul ignore next */
-            (status: number) => status >= 200 && status < 500,
-        })
-      ))
-    )
+    for (const connectionUuid of userConnections) {
+      await this.httpClient.request({
+        method: 'POST',
+        url: `${this.webSocketsApiUrl}/${connectionUuid}`,
+        headers: {
+          Accept: 'text/plain',
+          'Content-Type': 'text/plain',
+        },
+        data: JSON.stringify(event),
+        validateStatus:
+          /* istanbul ignore next */
+          (status: number) => status >= 200 && status < 500,
+      })
+    }
   }
 }
