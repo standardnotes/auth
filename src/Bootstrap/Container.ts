@@ -93,6 +93,7 @@ import axios, { AxiosInstance } from 'axios'
 import { UserSubscription } from '../Domain/User/UserSubscription'
 import { MySQLUserSubscriptionRepository } from '../Infra/MySQL/MySQLUserSubscriptionRepository'
 import { WebSocketsService } from '../Domain/WebSockets/WebSocketsService'
+import { RoleService } from '../Domain/Role/RoleService'
 
 export class ContainerConfigLoader {
   async load(): Promise<Container> {
@@ -278,6 +279,7 @@ export class ContainerConfigLoader {
     container.bind<ItemHttpServiceInterface>(TYPES.ItemHttpService).to(SyncingServerHttpService)
     container.bind<ContentDecoderInterface>(TYPES.ContenDecoder).to(ContentDecoder)
     container.bind<WebSocketsService>(TYPES.WebSocketsService).to(WebSocketsService)
+    container.bind<RoleService>(TYPES.RoleService).to(RoleService)
 
     if (env.get('SNS_TOPIC_ARN', true)) {
       container.bind<SNSDomainEventPublisher>(TYPES.DomainEventPublisher).toConstantValue(
