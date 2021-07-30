@@ -279,7 +279,7 @@ export class ContainerConfigLoader {
     container.bind<ItemHttpServiceInterface>(TYPES.ItemHttpService).to(SyncingServerHttpService)
     container.bind<ContentDecoderInterface>(TYPES.ContenDecoder).to(ContentDecoder)
     container.bind<WebSocketsClientService>(TYPES.WebSocketsClientService).to(WebSocketsClientService)
-    container.bind<RoleService>(TYPES.RoleService).to(RoleService)
+    container.bind<RoleServiceInterface>(TYPES.RoleService).to(RoleService)
 
     if (env.get('SNS_TOPIC_ARN', true)) {
       container.bind<SNSDomainEventPublisher>(TYPES.DomainEventPublisher).toConstantValue(
