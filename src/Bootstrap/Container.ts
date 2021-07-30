@@ -94,6 +94,8 @@ import { UserSubscription } from '../Domain/User/UserSubscription'
 import { MySQLUserSubscriptionRepository } from '../Infra/MySQL/MySQLUserSubscriptionRepository'
 import { WebSocketsClientService } from '../Infra/WebSockets/WebSocketsClientService'
 import { RoleService } from '../Domain/Role/RoleService'
+import { ClientServiceInterface } from '../Domain/Client/ClientServiceInterface'
+import { RoleServiceInterface } from '../Domain/Role/RoleServiceInterface'
 
 export class ContainerConfigLoader {
   async load(): Promise<Container> {
