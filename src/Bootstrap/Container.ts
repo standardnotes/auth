@@ -278,7 +278,7 @@ export class ContainerConfigLoader {
     container.bind<TimerInterface>(TYPES.Timer).toConstantValue(new Timer())
     container.bind<ItemHttpServiceInterface>(TYPES.ItemHttpService).to(SyncingServerHttpService)
     container.bind<ContentDecoderInterface>(TYPES.ContenDecoder).to(ContentDecoder)
-    container.bind<WebSocketsClientService>(TYPES.WebSocketsClientService).to(WebSocketsClientService)
+    container.bind<ClientServiceInterface>(TYPES.WebSocketsClientService).to(WebSocketsClientService)
     container.bind<RoleServiceInterface>(TYPES.RoleService).to(RoleService)
 
     if (env.get('SNS_TOPIC_ARN', true)) {
