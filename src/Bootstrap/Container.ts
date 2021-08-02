@@ -81,8 +81,6 @@ import { DeleteAccount } from '../Domain/UseCase/DeleteAccount/DeleteAccount'
 import { DeleteSetting } from '../Domain/UseCase/DeleteSetting/DeleteSetting'
 import { SettingFactory } from '../Domain/Setting/SettingFactory'
 import { SettingService } from '../Domain/Setting/SettingService'
-import { ItemHttpServiceInterface } from '../Domain/Item/ItemHttpServiceInterface'
-import { SyncingServerHttpService } from '../Infra/HTTP/SyncingServerHttpService'
 import { WebSocketsConnectionRepositoryInterface } from '../Domain/WebSockets/WebSocketsConnectionRepositoryInterface'
 import { RedisWebSocketsConnectionRepository } from '../Infra/Redis/RedisWebSocketsConnectionRepository'
 import { AddWebSocketsConnection } from '../Domain/UseCase/AddWebSocketsConnection/AddWebSocketsConnection'
@@ -273,7 +271,6 @@ export class ContainerConfigLoader {
     container.bind<SettingService>(TYPES.SettingService).to(SettingService)
     container.bind<SnCryptoNode>(TYPES.SnCryptoNode).toConstantValue(new SnCryptoNode())
     container.bind<TimerInterface>(TYPES.Timer).toConstantValue(new Timer())
-    container.bind<ItemHttpServiceInterface>(TYPES.ItemHttpService).to(SyncingServerHttpService)
     container.bind<ContentDecoderInterface>(TYPES.ContenDecoder).to(ContentDecoder)
 
     if (env.get('SNS_TOPIC_ARN', true)) {

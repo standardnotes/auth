@@ -6,7 +6,6 @@ import { Logger } from 'winston'
 import TYPES from '../../Bootstrap/Types'
 import { CrypterInterface } from '../Encryption/CrypterInterface'
 import { MFAValidationError } from '../Error/MFAValidationError'
-import { ItemHttpServiceInterface } from '../Item/ItemHttpServiceInterface'
 import { Setting } from '../Setting/Setting'
 import { SettingRepositoryInterface } from '../Setting/SettingRepositoryInterface'
 import { User } from '../User/User'
@@ -20,7 +19,6 @@ import { ContentDecoderInterface } from '../Encryption/ContentDecoderInterface'
 export class VerifyMFA implements UseCaseInterface {
   constructor(
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
-    @inject(TYPES.ItemHttpService) private itemHttpService: ItemHttpServiceInterface,
     @inject(TYPES.SettingRepository) private settingRepository: SettingRepositoryInterface,
     @inject(TYPES.Crypter) private crypter: CrypterInterface,
     @inject(TYPES.ContenDecoder) private contentDecoder: ContentDecoderInterface,
@@ -37,23 +35,14 @@ export class VerifyMFA implements UseCaseInterface {
         }
       }
 
-      const mfaSecretFromSettings = await this.getMFASecretFromUserSettings(user)
-      if (mfaSecretFromSettings !== undefined) {
-        this.logger.debug('Verifying secret from user settings')
-
-        return this.verifyMFASecret(mfaSecretFromSettings, dto.requestParams)
-      }
-
-      const mfaSecretExtension = await this.itemHttpService.getUserMFASecret(user.uuid)
-      if (mfaSecretExtension === undefined) {
+      const mfaSecret = await this.getMFASecret(user)
+      if (mfaSecret === undefined) {
         return {
           success: true,
         }
       }
 
-      this.logger.debug('Verifying secret from MFA Extension')
-
-      return this.verifyMFASecret(mfaSecretExtension.secret, dto.requestParams, mfaSecretExtension.extensionUuid)
+      return this.verifyMFASecret(mfaSecret, dto.requestParams)
     } catch (error) {
       if (error instanceof MFAValidationError) {
         return {
@@ -68,39 +57,30 @@ export class VerifyMFA implements UseCaseInterface {
     }
   }
 
-  private getMFATokenFromRequestParams(requestParams: Record<string, unknown>, mfaExtensionUuid?: string): string {
-    const mfaParamKey = this.getMFAParameterNameFromRequest(requestParams, mfaExtensionUuid)
-
-    if (requestParams[mfaParamKey] === undefined) {
-      throw new MFAValidationError(
-        'Please enter your two-factor authentication code.',
-        ErrorTag.MfaRequired,
-        { mfa_key: mfaParamKey }
-      )
-    }
-
-    return requestParams[mfaParamKey] as string
-  }
-
-  private getMFAParameterNameFromRequest(requestParams: Record<string, unknown>, mfaExtensionUuid?: string): string {
-    if (mfaExtensionUuid !== undefined) {
-      return `mfa_${mfaExtensionUuid}`
-    }
-
+  private getMFATokenAndParamKeyFromRequestParams(requestParams: Record<string, unknown>): { key: string, token: string } {
+    let mfaParamKey = null
     for (const key of Object.keys(requestParams)) {
       if (key.startsWith('mfa_')) {
-        return key
+        mfaParamKey = key
+        break
       }
     }
 
-    throw new MFAValidationError(
-      'Please enter your two-factor authentication code.',
-      ErrorTag.MfaRequired,
-      { mfa_key: `mfa_${uuidv4()}` }
-    )
+    if (mfaParamKey === null) {
+      throw new MFAValidationError(
+        'Please enter your two-factor authentication code.',
+        ErrorTag.MfaRequired,
+        { mfa_key: `mfa_${uuidv4()}` }
+      )
+    }
+
+    return {
+      token: requestParams[mfaParamKey] as string,
+      key: mfaParamKey,
+    }
   }
 
-  private async getMFASecretFromUserSettings(user: User): Promise<string | undefined> {
+  private async getMFASecret(user: User): Promise<string | undefined> {
     const mfaSetting = await this.settingRepository.findLastByNameAndUserUuid(MfaSetting.MfaSecret, user.uuid)
     if (mfaSetting === undefined || mfaSetting.value === null) {
       return undefined
@@ -124,16 +104,14 @@ export class VerifyMFA implements UseCaseInterface {
     return decoded.secret as string
   }
 
-  private verifyMFASecret(secret: string, requestParams: Record<string, unknown>, mfaExtensionUuid?: string): VerifyMFAResponse {
-    const token = this.getMFATokenFromRequestParams(requestParams, mfaExtensionUuid)
+  private verifyMFASecret(secret: string, requestParams: Record<string, unknown>): VerifyMFAResponse {
+    const tokenAndParamKey = this.getMFATokenAndParamKeyFromRequestParams(requestParams)
 
-    if (!authenticator.verify({ token, secret })) {
-      const mfaParamKey = this.getMFAParameterNameFromRequest(requestParams, mfaExtensionUuid)
-
+    if (!authenticator.verify({ token: tokenAndParamKey.token, secret })) {
       throw new MFAValidationError(
         'The two-factor authentication code you entered is incorrect. Please try again.',
         ErrorTag.MfaInvalid,
-        { mfa_key: mfaParamKey }
+        { mfa_key: tokenAndParamKey.key }
       )
     }
 

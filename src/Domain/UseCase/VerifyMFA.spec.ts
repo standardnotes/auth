@@ -7,7 +7,6 @@ import { VerifyMFA } from './VerifyMFA'
 import { SettingRepositoryInterface } from '../Setting/SettingRepositoryInterface'
 import { CrypterInterface } from '../Encryption/CrypterInterface'
 import { Setting } from '../Setting/Setting'
-import { ItemHttpServiceInterface } from '../Item/ItemHttpServiceInterface'
 import { Logger } from 'winston'
 import { ContentDecoderInterface } from '../Encryption/ContentDecoderInterface'
 
@@ -15,14 +14,12 @@ describe('VerifyMFA', () => {
   let user: User
   let userRepository: UserRepositoryInterface
   let settingRepository: SettingRepositoryInterface
-  let itemHttpService: ItemHttpServiceInterface
   let crypter: CrypterInterface
   let contentDecoder: ContentDecoderInterface
   let logger: Logger
 
   const createVerifyMFA = () => new VerifyMFA(
     userRepository,
-    itemHttpService,
     settingRepository,
     crypter,
     contentDecoder,
@@ -34,9 +31,6 @@ describe('VerifyMFA', () => {
 
     userRepository = {} as jest.Mocked<UserRepositoryInterface>
     userRepository.findOneByEmail = jest.fn().mockReturnValue(user)
-
-    itemHttpService = {} as jest.Mocked<ItemHttpServiceInterface>
-    itemHttpService.getUserMFASecret = jest.fn().mockReturnValue(undefined)
 
     settingRepository = {} as jest.Mocked<SettingRepositoryInterface>
     settingRepository.findLastByNameAndUserUuid = jest.fn()
@@ -64,46 +58,7 @@ describe('VerifyMFA', () => {
     })
   })
 
-  it('should not pass MFA verification if mfa param is not found in the request', async () => {
-    itemHttpService.getUserMFASecret = jest.fn().mockReturnValue({
-      secret: 'shhhh',
-      extensionUuid: '1-2-3',
-    })
-
-    expect(await createVerifyMFA().execute({ email: 'test@test.te', requestParams: {} })).toEqual({
-      success: false,
-      errorTag: 'mfa-required',
-      errorMessage: 'Please enter your two-factor authentication code.',
-      errorPayload: { mfa_key: 'mfa_1-2-3' },
-    })
-  })
-
-  it('should not pass MFA verification if mfa is not correct', async () => {
-    itemHttpService.getUserMFASecret = jest.fn().mockReturnValue({
-      secret: 'shhhh',
-      extensionUuid: '1-2-3',
-    })
-
-    expect(await createVerifyMFA().execute({ email: 'test@test.te', requestParams: { 'mfa_1-2-3': 'test' } })).toEqual({
-      success: false,
-      errorTag: 'mfa-invalid',
-      errorMessage: 'The two-factor authentication code you entered is incorrect. Please try again.',
-      errorPayload: { mfa_key: 'mfa_1-2-3' },
-    })
-  })
-
-  it('should pass MFA verification if mfa key is correct', async () => {
-    itemHttpService.getUserMFASecret = jest.fn().mockReturnValue({
-      secret: 'shhhh',
-      extensionUuid: '1-2-3',
-    })
-
-    expect(await createVerifyMFA().execute({ email: 'test@test.te', requestParams: { 'mfa_1-2-3': authenticator.generate('shhhh') } })).toEqual({
-      success: true,
-    })
-  })
-
-  it('should pass MFA verification from user settings if mfa key is correctly encrypted', async () => {
+  it('should pass MFA verification if mfa key is correctly encrypted', async () => {
     settingRepository.findLastByNameAndUserUuid = jest.fn().mockReturnValue({
       serverEncryptionVersion: Setting.ENCRYPTION_VERSION_DEFAULT,
     } as jest.Mocked<Setting>)
@@ -115,7 +70,7 @@ describe('VerifyMFA', () => {
     })
   })
 
-  it('should pass MFA verification from user settings if mfa key is correctly encoded and encrypted', async () => {
+  it('should pass MFA verification if mfa key is correctly encoded and encrypted', async () => {
     settingRepository.findLastByNameAndUserUuid = jest.fn().mockReturnValue({
       serverEncryptionVersion: Setting.ENCRYPTION_VERSION_CLIENT_ENCODED_AND_SERVER_ENCRYPTED,
     } as jest.Mocked<Setting>)
@@ -129,7 +84,7 @@ describe('VerifyMFA', () => {
     })
   })
 
-  it('should pass MFA verification from user settings if mfa key is correctly unencrypted', async () => {
+  it('should pass MFA verification if mfa key is correctly unencrypted', async () => {
     settingRepository.findLastByNameAndUserUuid = jest.fn().mockReturnValue({
       serverEncryptionVersion: Setting.ENCRYPTION_VERSION_UNENCRYPTED,
       value: 'shhhh',
@@ -140,7 +95,7 @@ describe('VerifyMFA', () => {
     })
   })
 
-  it('should not pass MFA verification from user settings if mfa is not correct', async () => {
+  it('should not pass MFA verification if mfa is not correct', async () => {
     settingRepository.findLastByNameAndUserUuid = jest.fn().mockReturnValue({
       serverEncryptionVersion: Setting.ENCRYPTION_VERSION_DEFAULT,
     } as jest.Mocked<Setting>)
@@ -158,7 +113,7 @@ describe('VerifyMFA', () => {
   })
 
 
-  it('should not pass MFA verification from user settings if no mfa param is found in the request', async () => {
+  it('should not pass MFA verification if no mfa param is found in the request', async () => {
     settingRepository.findLastByNameAndUserUuid = jest.fn().mockReturnValue({
       serverEncryptionVersion: Setting.ENCRYPTION_VERSION_DEFAULT,
     } as jest.Mocked<Setting>)
