@@ -100,7 +100,6 @@ const TYPES = {
   Crypter: Symbol.for('Crypter'),
   SnCryptoNode: Symbol.for('SnCryptoNode'),
   Timer: Symbol.for('Timer'),
-  ItemHttpService: Symbol.for('ItemHttpService'),
   ContenDecoder: Symbol.for('ContenDecoder'),
 }
 
