@@ -19,8 +19,7 @@ export class WebSocketsClientService implements ClientServiceInterface {
 
   async sendUserRoleChangedEvent(
     user: User,
-    fromRole: RoleName,
-    toRole: RoleName,
+    role: RoleName,
   ): Promise<void> {
     const userConnections =
       await this.webSocketsConnectionRepository.findAllByUserUuid(user.uuid)
@@ -28,8 +27,7 @@ export class WebSocketsClientService implements ClientServiceInterface {
     const event = this.domainEventFactory.createUserRoleChangedEvent(
       user.uuid,
       user.email,
-      fromRole,
-      toRole
+      role,
     )
 
     for (const connectionUuid of userConnections) {

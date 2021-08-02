@@ -34,15 +34,14 @@ export class DomainEventFactory implements DomainEventFactoryInterface {
     }
   }
 
-  createUserRoleChangedEvent(userUuid: string, email: string, fromRole: RoleName, toRole: RoleName): UserRoleChangedEvent {
+  createUserRoleChangedEvent(userUuid: string, email: string, role: RoleName): UserRoleChangedEvent {
     return {
       type: 'USER_ROLE_CHANGED',
       createdAt: dayjs.utc().toDate(),
       payload: {
         userUuid,
         email,
-        fromRole,
-        toRole,
+        role,
         timestamp: this.timer.getTimestampInMicroseconds(),
       },
     }

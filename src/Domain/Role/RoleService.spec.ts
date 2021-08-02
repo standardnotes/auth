@@ -67,7 +67,6 @@ describe('RoleService', () => {
 
     expect(webSocketsClientService.sendUserRoleChangedEvent).toHaveBeenCalledWith(
       user,
-      RoleName.CoreUser,
       RoleName.ProUser
     )
   })

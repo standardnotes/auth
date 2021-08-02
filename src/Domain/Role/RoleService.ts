@@ -22,20 +22,19 @@ export class RoleService implements RoleServiceInterface {
     user: User,
     subscriptionName: SubscriptionName
   ): Promise<void> {
-    const currentRoleName = (await user.roles)[0].name as RoleName
-    const newRoleName = this.subscriptionNameToRoleNameMap.get(subscriptionName)
+    const roleName = this.subscriptionNameToRoleNameMap.get(subscriptionName)
 
-    if (newRoleName === undefined) {
+    if (roleName === undefined) {
       this.logger.warn(
         `Could not find role name for subscription name: ${subscriptionName}`
       )
       return
     }
 
-    const role = await this.roleRepository.findOneByName(newRoleName)
+    const role = await this.roleRepository.findOneByName(roleName)
 
     if (role === undefined) {
-      this.logger.warn(`Could not find role for role name: ${newRoleName}`)
+      this.logger.warn(`Could not find role for role name: ${roleName}`)
       return
     }
 
@@ -47,8 +46,7 @@ export class RoleService implements RoleServiceInterface {
     await this.userRepository.save(user)
     await this.webSocketsClientService.sendUserRoleChangedEvent(
       user,
-      currentRoleName,
-      newRoleName
+      roleName,
     )
   }
 

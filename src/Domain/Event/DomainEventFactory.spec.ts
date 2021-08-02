@@ -40,14 +40,13 @@ describe('DomainEventFactory', () => {
   })
 
   it('should create a USER_ROLE_CHANGED event', () => {
-    expect(createFactory().createUserRoleChangedEvent('1-2-3', 'test@test.com', RoleName.CoreUser, RoleName.ProUser))
+    expect(createFactory().createUserRoleChangedEvent('1-2-3', 'test@test.com', RoleName.ProUser))
       .toEqual({
         createdAt: expect.any(Date),
         payload: {
           userUuid: '1-2-3',
           email: 'test@test.com',
-          fromRole: RoleName.CoreUser,
-          toRole: RoleName.ProUser,
+          role: RoleName.ProUser,
           timestamp: expect.any(Number),
         },
         type: 'USER_ROLE_CHANGED',

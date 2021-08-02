@@ -12,8 +12,7 @@ import { AxiosInstance } from 'axios'
 describe('WebSocketsClientService', () => {
   let connectionIds: string[]
   let user: User
-  let fromRole: RoleName
-  let toRole: RoleName
+  let roleName: RoleName
   let event: UserRoleChangedEvent
   let webSocketsConnectionRepository: WebSocketsConnectionRepositoryInterface
   let domainEventFactory: DomainEventFactoryInterface
@@ -36,8 +35,7 @@ describe('WebSocketsClientService', () => {
       email: 'test@test.com',
     } as jest.Mocked<User>
 
-    fromRole = RoleName.CoreUser
-    toRole = RoleName.ProUser
+    roleName = RoleName.ProUser
 
     event = {} as jest.Mocked<UserRoleChangedEvent>
 
@@ -53,7 +51,7 @@ describe('WebSocketsClientService', () => {
 
   describe('send user role changed event', () => {
     it('should send a user role changed event to all user connections', async () => {
-      await createService().sendUserRoleChangedEvent(user, fromRole, toRole)
+      await createService().sendUserRoleChangedEvent(user, roleName)
 
       expect(httpClient.request).toHaveBeenCalledTimes(connectionIds.length)
       connectionIds.map((id, index) => {
