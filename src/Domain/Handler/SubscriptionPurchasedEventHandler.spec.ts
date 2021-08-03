@@ -71,7 +71,7 @@ describe('SubscriptionPurchasedEventHandler', () => {
     await createHandler().handle(event)
 
     expect(userRepository.findOneByEmail).toHaveBeenCalledWith('test@test.com')
-    expect(roleService.updateUserRole).toHaveBeenCalledWith(user, SubscriptionName.ProPlan)
+    expect(roleService.updateUserRole).toHaveBeenCalledWith(user, undefined, SubscriptionName.ProPlan)
   })
 
   it('should create subscription', async () => {

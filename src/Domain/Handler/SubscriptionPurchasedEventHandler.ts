@@ -52,7 +52,7 @@ implements DomainEventHandlerInterface
     user: User,
     subscriptionName: SubscriptionName
   ): Promise<void> {
-    await this.roleService.updateUserRole(user, subscriptionName)
+    await this.roleService.updateUserRole(user, undefined, subscriptionName)
   }
 
   private async createSubscription(

@@ -29,9 +29,7 @@ describe('RoleService', () => {
     user = {
       uuid: '123',
       email: 'test@test.com',
-      roles: Promise.resolve([{
-        name: RoleName.CoreUser,
-      }]),
+      roles: Promise.resolve([{} as jest.Mocked<Role>]),
     } as jest.Mocked<User>
     role = {} as jest.Mocked<Role>
 
@@ -51,19 +49,52 @@ describe('RoleService', () => {
   })
 
   it('should update the user role', async () => {
-    await createService().updateUserRole(user, SubscriptionName.ProPlan)
+    user.roles = Promise.resolve([
+      {
+        name: RoleName.CoreUser,
+      } as jest.Mocked<Role>,
+    ])
+    await createService().updateUserRole(user, SubscriptionName.CorePlan, SubscriptionName.ProPlan)
+
+    expect(roleRepository.findOneByName).toHaveBeenCalledWith(RoleName.ProUser)  
+    user.roles = Promise.resolve([
+      role,
+    ])
+    expect(userRepository.save).toHaveBeenCalledWith(user)
+  })
+
+  it('should remove basic user role if there was no previous subscription', async () => {
+    user.roles = Promise.resolve([
+      {
+        name: RoleName.BasicUser,
+      } as jest.Mocked<Role>,
+    ])
+    await createService().updateUserRole(user, undefined, SubscriptionName.ProPlan)
 
     expect(roleRepository.findOneByName).toHaveBeenCalledWith(RoleName.ProUser)
-    
     user.roles = Promise.resolve([
-      ...(await user.roles),
+      role,
+    ])
+    expect(userRepository.save).toHaveBeenCalledWith(user)
+  })
+
+  it('should set user role to basic user if there is no new subscription', async () => {
+    user.roles = Promise.resolve([
+      {
+        name: RoleName.ProUser,
+      } as jest.Mocked<Role>,
+    ])
+    await createService().updateUserRole(user, SubscriptionName.ProPlan)
+
+    expect(roleRepository.findOneByName).toHaveBeenCalledWith(RoleName.BasicUser)
+    user.roles = Promise.resolve([
       role,
     ])
     expect(userRepository.save).toHaveBeenCalledWith(user)
   })
 
   it('should send websockets event', async () => {
-    await createService().updateUserRole(user, SubscriptionName.ProPlan)
+    await createService().updateUserRole(user, undefined, SubscriptionName.ProPlan)
 
     expect(webSocketsClientService.sendUserRoleChangedEvent).toHaveBeenCalledWith(
       user,
@@ -72,7 +103,7 @@ describe('RoleService', () => {
   })
 
   it('should not update role if no role name exists for subscription name', async () => {
-    await createService().updateUserRole(user, '' as SubscriptionName)
+    await createService().updateUserRole(user, undefined, 'test' as SubscriptionName)
 
     expect(userRepository.save).not.toHaveBeenCalled()
   })
@@ -80,7 +111,7 @@ describe('RoleService', () => {
   it ('should not update role if no role exists for role name', async () => {
     roleRepository.findOneByName = jest.fn().mockReturnValue(undefined)
 
-    await createService().updateUserRole(user, SubscriptionName.ProPlan)
+    await createService().updateUserRole(user, undefined, SubscriptionName.ProPlan)
 
     expect(userRepository.save).not.toHaveBeenCalled()
   })
