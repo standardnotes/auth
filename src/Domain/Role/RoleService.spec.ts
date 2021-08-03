@@ -87,6 +87,13 @@ describe('RoleService', () => {
 
       expect(userRepository.save).not.toHaveBeenCalled()
     })
+
+    it('should not add role if no role exists for role name', async () => {
+      roleRepository.findOneByName = jest.fn().mockReturnValue(undefined)
+      await createService().addUserRole(user, SubscriptionName.ProPlan)
+
+      expect(userRepository.save).not.toHaveBeenCalled()
+    })
   })
 
   describe('removeUserRole', () => {
