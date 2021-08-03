@@ -42,15 +42,15 @@ implements DomainEventHandlerInterface
       user.uuid,
       event.payload.timestamp,
     )
-    await this.updateUserRole(user, event.payload.subscriptionName)
+    await this.removeUserRole(user, event.payload.subscriptionName)
 
   }
 
-  private async updateUserRole(
+  private async removeUserRole(
     user: User,
     subscriptionName: SubscriptionName
   ): Promise<void> {
-    await this.roleService.updateUserRole(user, subscriptionName)
+    await this.roleService.removeUserRole(user, subscriptionName)
   }
 
   private async updateSubscriptionEndsAt(

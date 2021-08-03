@@ -49,7 +49,7 @@ describe('SubscriptionPurchasedEventHandler', () => {
     userSubscriptionRepository.save = jest.fn().mockReturnValue(subscription)
 
     roleService = {} as jest.Mocked<RoleServiceInterface>
-    roleService.updateUserRole = jest.fn()
+    roleService.addUserRole = jest.fn()
 
     subscriptionExpiresAt = timestamp + 365*1000
 
@@ -71,7 +71,7 @@ describe('SubscriptionPurchasedEventHandler', () => {
     await createHandler().handle(event)
 
     expect(userRepository.findOneByEmail).toHaveBeenCalledWith('test@test.com')
-    expect(roleService.updateUserRole).toHaveBeenCalledWith(user, undefined, SubscriptionName.ProPlan)
+    expect(roleService.addUserRole).toHaveBeenCalledWith(user, SubscriptionName.ProPlan)
   })
 
   it('should create subscription', async () => {
@@ -96,7 +96,7 @@ describe('SubscriptionPurchasedEventHandler', () => {
 
     await createHandler().handle(event)
 
-    expect(roleService.updateUserRole).not.toHaveBeenCalled()
+    expect(roleService.addUserRole).not.toHaveBeenCalled()
     expect(userSubscriptionRepository.save).not.toHaveBeenCalled()
   })
 })

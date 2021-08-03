@@ -45,14 +45,14 @@ implements DomainEventHandlerInterface
       event.payload.subscriptionExpiresAt,
       event.payload.timestamp,
     )
-    await this.updateUserRole(user, event.payload.subscriptionName)
+    await this.addUserRole(user, event.payload.subscriptionName)
   }
 
-  private async updateUserRole(
+  private async addUserRole(
     user: User,
     subscriptionName: SubscriptionName
   ): Promise<void> {
-    await this.roleService.updateUserRole(user, undefined, subscriptionName)
+    await this.roleService.addUserRole(user, subscriptionName)
   }
 
   private async createSubscription(

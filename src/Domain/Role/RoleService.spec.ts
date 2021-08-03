@@ -16,7 +16,8 @@ describe('RoleService', () => {
   let webSocketsClientService: ClientServiceInterface
   let logger: Logger
   let user: User
-  let role: Role
+  let basicRole: Role
+  let proRole: Role
 
   const createService = () => new RoleService(
     userRepository,
@@ -26,19 +27,18 @@ describe('RoleService', () => {
   )
 
   beforeEach(() => {
-    user = {
-      uuid: '123',
-      email: 'test@test.com',
-      roles: Promise.resolve([{} as jest.Mocked<Role>]),
-    } as jest.Mocked<User>
-    role = {} as jest.Mocked<Role>
+    basicRole = {
+      name: RoleName.BasicUser,
+    } as jest.Mocked<Role>
+
+    proRole = {
+      name: RoleName.ProUser,
+    } as jest.Mocked<Role>
 
     userRepository = {} as jest.Mocked<UserRepositoryInterface>
-    userRepository.findOneByEmail = jest.fn().mockReturnValue(user)
-    userRepository.save = jest.fn().mockReturnValue(user)
 
     roleRepository = {} as jest.Mocked<RoleRepositoryInterface>
-    roleRepository.findOneByName = jest.fn().mockReturnValue(role)
+    roleRepository.findOneByName = jest.fn().mockReturnValue(proRole)
     
     webSocketsClientService = {} as jest.Mocked<ClientServiceInterface>
     webSocketsClientService.sendUserRoleChangedEvent = jest.fn() 
@@ -48,71 +48,84 @@ describe('RoleService', () => {
     logger.warn = jest.fn()
   })
 
-  it('should update the user role', async () => {
-    user.roles = Promise.resolve([
-      {
-        name: RoleName.CoreUser,
-      } as jest.Mocked<Role>,
-    ])
-    await createService().updateUserRole(user, SubscriptionName.CorePlan, SubscriptionName.ProPlan)
+  describe('addUserRole', () => {
+    beforeEach(() => {  
+      user = {
+        uuid: '123',
+        email: 'test@test.com',
+        roles: Promise.resolve([
+          basicRole,
+        ]),
+      } as jest.Mocked<User>
+  
+      userRepository.findOneByEmail = jest.fn().mockReturnValue(user)
+      userRepository.save = jest.fn().mockReturnValue(user)
+    })
 
-    expect(roleRepository.findOneByName).toHaveBeenCalledWith(RoleName.ProUser)  
-    user.roles = Promise.resolve([
-      role,
-    ])
-    expect(userRepository.save).toHaveBeenCalledWith(user)
+    it('should add role to user', async () => {
+      await createService().addUserRole(user, SubscriptionName.ProPlan)
+
+      expect(roleRepository.findOneByName).toHaveBeenCalledWith(RoleName.ProUser)
+      user.roles = Promise.resolve([
+        basicRole,
+        proRole,
+      ])
+      expect(userRepository.save).toHaveBeenCalledWith(user)
+    })
+
+    it('should send websockets event', async () => {
+      await createService().addUserRole(user, SubscriptionName.ProPlan)
+
+      expect(webSocketsClientService.sendUserRoleChangedEvent).toHaveBeenCalledWith(
+        user,
+        RoleName.ProUser
+      )
+    })
+
+    it('should not add role if no role name exists for subscription name', async () => {
+      await createService().addUserRole(user, 'test' as SubscriptionName)
+
+      expect(userRepository.save).not.toHaveBeenCalled()
+    })
   })
 
-  it('should remove basic user role if there was no previous subscription', async () => {
-    user.roles = Promise.resolve([
-      {
-        name: RoleName.BasicUser,
-      } as jest.Mocked<Role>,
-    ])
-    await createService().updateUserRole(user, undefined, SubscriptionName.ProPlan)
+  describe('removeUserRole', () => {
+    beforeEach(() => {  
+      user = {
+        uuid: '123',
+        email: 'test@test.com',
+        roles: Promise.resolve([
+          basicRole,
+          proRole,
+        ]),
+      } as jest.Mocked<User>
+  
+      userRepository.findOneByEmail = jest.fn().mockReturnValue(user)
+      userRepository.save = jest.fn().mockReturnValue(user)
+    })
 
-    expect(roleRepository.findOneByName).toHaveBeenCalledWith(RoleName.ProUser)
-    user.roles = Promise.resolve([
-      role,
-    ])
-    expect(userRepository.save).toHaveBeenCalledWith(user)
-  })
+    it('should remove role from user', async () => {
+      await createService().removeUserRole(user, SubscriptionName.ProPlan)
 
-  it('should set user role to basic user if there is no new subscription', async () => {
-    user.roles = Promise.resolve([
-      {
-        name: RoleName.ProUser,
-      } as jest.Mocked<Role>,
-    ])
-    await createService().updateUserRole(user, SubscriptionName.ProPlan)
+      user.roles = Promise.resolve([
+        basicRole,
+      ])
+      expect(userRepository.save).toHaveBeenCalledWith(user)
+    })
 
-    expect(roleRepository.findOneByName).toHaveBeenCalledWith(RoleName.BasicUser)
-    user.roles = Promise.resolve([
-      role,
-    ])
-    expect(userRepository.save).toHaveBeenCalledWith(user)
-  })
+    it('should send websockets event', async () => {
+      await createService().removeUserRole(user, SubscriptionName.ProPlan)
 
-  it('should send websockets event', async () => {
-    await createService().updateUserRole(user, undefined, SubscriptionName.ProPlan)
+      expect(webSocketsClientService.sendUserRoleChangedEvent).toHaveBeenCalledWith(
+        user,
+        RoleName.ProUser
+      )
+    })
 
-    expect(webSocketsClientService.sendUserRoleChangedEvent).toHaveBeenCalledWith(
-      user,
-      RoleName.ProUser
-    )
-  })
+    it('should not add role if no role name exists for subscription name', async () => {
+      await createService().removeUserRole(user, 'test' as SubscriptionName)
 
-  it('should not update role if no role name exists for subscription name', async () => {
-    await createService().updateUserRole(user, undefined, 'test' as SubscriptionName)
-
-    expect(userRepository.save).not.toHaveBeenCalled()
-  })
-
-  it ('should not update role if no role exists for role name', async () => {
-    roleRepository.findOneByName = jest.fn().mockReturnValue(undefined)
-
-    await createService().updateUserRole(user, undefined, SubscriptionName.ProPlan)
-
-    expect(userRepository.save).not.toHaveBeenCalled()
+      expect(userRepository.save).not.toHaveBeenCalled()
+    })
   })
 })

@@ -21,49 +21,59 @@ export class RoleService implements RoleServiceInterface {
     @inject(TYPES.Logger) private logger: Logger
   ) {}
 
-  async updateUserRole(
+  async addUserRole(
     user: User,
-    fromSubscriptionName?: SubscriptionName,
-    toSubscriptionName?: SubscriptionName
+    subscriptionName: SubscriptionName,
   ): Promise<void> {
-    const newRoleName = toSubscriptionName
-      ? this.subscriptionNameToRoleNameMap.get(toSubscriptionName)
-      : RoleName.BasicUser
+    const roleName = this.subscriptionNameToRoleNameMap.get(subscriptionName)
 
-    if (newRoleName === undefined) {
+    if (roleName === undefined) {
       this.logger.warn(
-        `Could not find role name for subscription name: ${toSubscriptionName}`
+        `Could not find role name for subscription name: ${subscriptionName}`
       )
       return
     }
 
-    const roleToRemoveName = fromSubscriptionName
-      ? this.subscriptionNameToRoleNameMap.get(fromSubscriptionName)
-      : RoleName.BasicUser
+    const role = await this.roleRepository.findOneByName(roleName)
 
-    if (roleToRemoveName === undefined) {
-      this.logger.warn(
-        `Could not find role name for subscription name: ${fromSubscriptionName}`
-      )
-      return
-    }
-
-    const newRole = await this.roleRepository.findOneByName(newRoleName)
-
-    if (newRole === undefined) {
-      this.logger.warn(`Could not find role for role name: ${newRoleName}`)
+    if (role === undefined) {
+      this.logger.warn(`Could not find role for role name: ${roleName}`)
       return
     }
 
     const currentRoles = await user.roles
     user.roles = Promise.resolve([
-      ...currentRoles.filter((role) => role.name !== roleToRemoveName),
-      newRole,
+      ...currentRoles,
+      role,
     ])
     await this.userRepository.save(user)
     await this.webSocketsClientService.sendUserRoleChangedEvent(
       user,
-      newRoleName
+      roleName
+    )
+  }
+
+  async removeUserRole(
+    user: User,
+    subscriptionName: SubscriptionName,
+  ): Promise<void> {
+    const roleName = this.subscriptionNameToRoleNameMap.get(subscriptionName)
+
+    if (roleName === undefined) {
+      this.logger.warn(
+        `Could not find role name for subscription name: ${subscriptionName}`
+      )
+      return
+    }
+
+    const currentRoles = await user.roles
+    user.roles = Promise.resolve(
+      currentRoles.filter(role => role.name !== roleName)
+    )
+    await this.userRepository.save(user)
+    await this.webSocketsClientService.sendUserRoleChangedEvent(
+      user,
+      roleName
     )
   }
 

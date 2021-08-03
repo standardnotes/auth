@@ -45,7 +45,7 @@ describe('SubscriptionRefundedEventHandler', () => {
     userSubscriptionRepository.updateEndsAtByNameAndUserUuid = jest.fn()  
 
     roleService = {} as jest.Mocked<RoleServiceInterface>
-    roleService.updateUserRole = jest.fn()
+    roleService.removeUserRole = jest.fn()
 
     timestamp = dayjs.utc().valueOf()
 
@@ -66,7 +66,7 @@ describe('SubscriptionRefundedEventHandler', () => {
     await createHandler().handle(event)
 
     expect(userRepository.findOneByEmail).toHaveBeenCalledWith('test@test.com')
-    expect(roleService.updateUserRole).toHaveBeenCalledWith(user, SubscriptionName.CorePlan)
+    expect(roleService.removeUserRole).toHaveBeenCalledWith(user, SubscriptionName.CorePlan)
   })
 
   it('should update subscription ends at', async () => {
@@ -88,7 +88,7 @@ describe('SubscriptionRefundedEventHandler', () => {
 
     await createHandler().handle(event)
 
-    expect(roleService.updateUserRole).not.toHaveBeenCalled()
+    expect(roleService.removeUserRole).not.toHaveBeenCalled()
     expect(userSubscriptionRepository.updateEndsAtByNameAndUserUuid).not.toHaveBeenCalled()
   })
 })
