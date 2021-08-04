@@ -676,10 +676,10 @@
     "@typescript-eslint/eslint-plugin" "^4.14.0"
     "@typescript-eslint/parser" "^4.14.0"
 
-"@standardnotes/domain-events@1.4.1":
-  version "1.4.1"
-  resolved "https://registry.yarnpkg.com/@standardnotes/domain-events/-/domain-events-1.4.1.tgz#f370c8cc88c6017881c1b49a4ed4f2ccde29d031"
-  integrity sha512-/evc7G8FSEoxL5rt4RoC56vsmBZ1warkYJqMIwNhQfNmrWf9VHIsarSrg9fzqHIzL0OqfEvWotmI70j0UPX8GQ==
+"@standardnotes/domain-events@1.4.2":
+  version "1.4.2"
+  resolved "https://registry.yarnpkg.com/@standardnotes/domain-events/-/domain-events-1.4.2.tgz#52686d316b83c43d9b9546a309d262cc8a2b5453"
+  integrity sha512-z9LSHZ3Hc+slMI8tuDbWTkqawV7DKRn4ZvdX6jSD3U3vhreZVXx2wJBC/0oC2wenHX+jDgq509b5BOU4dt+5aQ==
   dependencies:
     "@standardnotes/auth" "^3.2.0"
     aws-sdk "^2.824.0"

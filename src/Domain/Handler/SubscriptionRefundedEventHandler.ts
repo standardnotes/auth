@@ -1,4 +1,4 @@
-import { RoleName } from '@standardnotes/auth'
+import { SubscriptionName } from '@standardnotes/auth'
 import {
   DomainEventHandlerInterface,
   SubscriptionRefundedEvent,
@@ -7,7 +7,7 @@ import { inject, injectable } from 'inversify'
 import { Logger } from 'winston'
 
 import TYPES from '../../Bootstrap/Types'
-import { RoleRepositoryInterface } from '../Role/RoleRepositoryInterface'
+import { RoleServiceInterface } from '../Role/RoleServiceInterface'
 import { User } from '../User/User'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { UserSubscriptionRepositoryInterface } from '../User/UserSubscriptionRepositoryInterface'
@@ -18,8 +18,8 @@ implements DomainEventHandlerInterface
 {
   constructor(
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
-    @inject(TYPES.RoleRepository) private roleRepository: RoleRepositoryInterface,
     @inject(TYPES.UserSubscriptionRepository) private userSubscriptionRepository: UserSubscriptionRepositoryInterface,
+    @inject(TYPES.RoleService) private roleService: RoleServiceInterface,
     @inject(TYPES.Logger) private logger: Logger
   ) {}
 
@@ -37,24 +37,20 @@ implements DomainEventHandlerInterface
       return
     }
 
-    await this.updateUserRole(user)
     await this.updateSubscriptionEndsAt(
       event.payload.subscriptionName,
       user.uuid,
       event.payload.timestamp,
     )
+    await this.removeUserRole(user, event.payload.subscriptionName)
+
   }
 
-  private async updateUserRole(user: User): Promise<void> {
-    const role = await this.roleRepository.findOneByName(RoleName.CoreUser)
-
-    if (role === undefined) {
-      this.logger.warn(`Could not find role for role name: ${RoleName.CoreUser}`)
-      return
-    }
-
-    user.roles = Promise.resolve([role])
-    await this.userRepository.save(user)
+  private async removeUserRole(
+    user: User,
+    subscriptionName: SubscriptionName
+  ): Promise<void> {
+    await this.roleService.removeUserRole(user, subscriptionName)
   }
 
   private async updateSubscriptionEndsAt(

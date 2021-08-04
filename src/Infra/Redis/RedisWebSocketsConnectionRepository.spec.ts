@@ -16,6 +16,7 @@ describe('RedisWebSocketsConnectionRepository', () => {
     redisClient.get = jest.fn()
     redisClient.srem = jest.fn()
     redisClient.del = jest.fn()
+    redisClient.smembers = jest.fn()
   })
 
   it('should save a connection to set of user connections', async () => {
@@ -32,5 +33,12 @@ describe('RedisWebSocketsConnectionRepository', () => {
 
     expect(redisClient.srem).toHaveBeenCalledWith('ws_user_connections:1-2-3', '2-3-4')
     expect(redisClient.del).toHaveBeenCalledWith('ws_connection:2-3-4')
+  })
+
+  it('should return all connections for a user uuid', async () => {
+    const userUuid = '1-2-3'
+
+    await createRepository().findAllByUserUuid(userUuid)
+    expect(redisClient.smembers).toHaveBeenCalledWith(`ws_user_connections:${userUuid}`)
   })
 })

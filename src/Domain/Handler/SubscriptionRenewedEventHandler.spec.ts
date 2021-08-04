@@ -1,13 +1,15 @@
 import 'reflect-metadata'
 
+import { SubscriptionName } from '@standardnotes/auth'
 import { SubscriptionPurchasedEvent } from '@standardnotes/domain-events'
 import { Logger } from 'winston'
+
+import * as dayjs from 'dayjs'
+
 import { User } from '../User/User'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { SubscriptionRenewedEventHandler } from './SubscriptionRenewedEventHandler'
 import { UserSubscriptionRepositoryInterface } from '../User/UserSubscriptionRepositoryInterface'
-import { SubscriptionName } from '@standardnotes/auth'
-import * as dayjs from 'dayjs'
 
 describe('SubscriptionRenewedEventHandler', () => {
   let userRepository: UserRepositoryInterface
@@ -62,7 +64,7 @@ describe('SubscriptionRenewedEventHandler', () => {
       SubscriptionName.ProPlan,
       '123',
       subscriptionExpirationDate,
-      timestamp
+      timestamp,
     )
   })
 
