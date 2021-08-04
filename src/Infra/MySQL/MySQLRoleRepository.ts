@@ -12,4 +12,10 @@ export class MySQLRoleRepository extends Repository<Role> implements RoleReposit
       .cache(`role_${name}`, 600000)
       .getOne()
   }
+
+  async findAllByNames(names: string[]): Promise<Role[] | undefined> {
+    return this.createQueryBuilder('role')
+      .where('role.name in (:names)', { names })
+      .getMany()
+  }
 }
