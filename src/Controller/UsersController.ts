@@ -260,7 +260,15 @@ export class UsersController extends BaseHttpController {
   }
 
   @httpGet('/:userUuid/features', TYPES.AuthMiddleware)
-  async getFeatures(request: Request): Promise<results.JsonResult> {
+  async getFeatures(request: Request, response: Response): Promise<results.JsonResult> {
+    if (request.params.userUuid !== response.locals.user.uuid) {
+      return this.json({
+        error: {
+          message: 'Operation not allowed.',
+        },
+      }, 401)
+    }
+
     const result = await this.doGetUserFeatures.execute({
       userUuid: request.params.userUuid,
     })
