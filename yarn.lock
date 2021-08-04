@@ -689,7 +689,7 @@
     sqs-consumer "^5.5.0"
     winston "^3.3.3"
 
-"@standardnotes/features@^1.2.0":
+"@standardnotes/features@1.2.0":
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/@standardnotes/features/-/features-1.2.0.tgz#b373fc0ee74bc3468db5b1f72be1d6094c536efa"
   integrity sha512-OxUHWqALMDdhfu2CTNoI873A9YewsW8xzaoMu3wu1jk59/eslOj5qZ1jx0Zjvwt/54ZraRBIasEhBRCPMUTcSw==
