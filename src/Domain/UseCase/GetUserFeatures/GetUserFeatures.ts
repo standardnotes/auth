@@ -421,7 +421,7 @@ export class GetUserFeatures implements UseCaseInterface {
     const userSubscriptions = await user.subscriptions
 
     const features = await Promise.all(roles.map(async (role) => {
-      const subscriptionName = this.roleNameToSubscriptionNameMap.get(role.name as RoleName) // TODO: Vardan: try to avoid casting
+      const subscriptionName = this.roleNameToSubscriptionNameMap.get(role.name as RoleName)
       const expiresAt = (userSubscriptions.find(subscription => subscription.planName === subscriptionName) as UserSubscription).endsAt
 
       const permissions = await role.permissions
