@@ -90,6 +90,7 @@ import { ContentDecoder } from '../Domain/Encryption/ContentDecoder'
 import axios, { AxiosInstance } from 'axios'
 import { UserSubscription } from '../Domain/User/UserSubscription'
 import { MySQLUserSubscriptionRepository } from '../Infra/MySQL/MySQLUserSubscriptionRepository'
+import { GetUserFeatures } from '../Domain/UseCase/GetUserFeatures/GetUserFeatures'
 
 export class ContainerConfigLoader {
   async load(): Promise<Container> {
@@ -241,6 +242,7 @@ export class ContainerConfigLoader {
     container.bind<ChangePassword>(TYPES.ChangePassword).to(ChangePassword)
     container.bind<GetSettings>(TYPES.GetSettings).to(GetSettings)
     container.bind<GetSetting>(TYPES.GetSetting).to(GetSetting)
+    container.bind<GetUserFeatures>(TYPES.GetUserFeatures).to(GetUserFeatures)
     container.bind<UpdateSetting>(TYPES.UpdateSetting).to(UpdateSetting)
     container.bind<DeleteSetting>(TYPES.DeleteSetting).to(DeleteSetting)
     container.bind<GetAuthMethods>(TYPES.GetAuthMethods).to(GetAuthMethods)

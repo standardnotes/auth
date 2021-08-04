@@ -689,6 +689,11 @@
     sqs-consumer "^5.5.0"
     winston "^3.3.3"
 
+"@standardnotes/features@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@standardnotes/features/-/features-1.0.0.tgz#906af029b6e58241689ca37436982c37a888a418"
+  integrity sha512-PEQyP/p/TQLVcNYcbu9jEIWNRqBrFFG1Qyy8QIcvNUt5o4lpLZGEY1T+PJUsPSisnuKKNpQrgVLc9LjhUKpuYw==
+
 "@standardnotes/sncrypto-common@^1.3.0":
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/@standardnotes/sncrypto-common/-/sncrypto-common-1.3.0.tgz#ba0a66a634c7aa21ab9cf34548b249a96533a584"
