@@ -90,6 +90,10 @@ import { ContentDecoder } from '../Domain/Encryption/ContentDecoder'
 import axios, { AxiosInstance } from 'axios'
 import { UserSubscription } from '../Domain/User/UserSubscription'
 import { MySQLUserSubscriptionRepository } from '../Infra/MySQL/MySQLUserSubscriptionRepository'
+import { WebSocketsClientService } from '../Infra/WebSockets/WebSocketsClientService'
+import { RoleService } from '../Domain/Role/RoleService'
+import { ClientServiceInterface } from '../Domain/Client/ClientServiceInterface'
+import { RoleServiceInterface } from '../Domain/Role/RoleServiceInterface'
 import { GetUserFeatures } from '../Domain/UseCase/GetUserFeatures/GetUserFeatures'
 
 export class ContainerConfigLoader {
@@ -223,6 +227,7 @@ export class ContainerConfigLoader {
     container.bind(TYPES.REDIS_EVENTS_CHANNEL).toConstantValue(env.get('REDIS_EVENTS_CHANNEL'))
     container.bind(TYPES.NEW_RELIC_ENABLED).toConstantValue(env.get('NEW_RELIC_ENABLED', true))
     container.bind(TYPES.SYNCING_SERVER_URL).toConstantValue(env.get('SYNCING_SERVER_URL'))
+    container.bind(TYPES.WEBSOCKETS_API_URL).toConstantValue(env.get('WEBSOCKETS_API_URL'))
     container.bind(TYPES.VERSION).toConstantValue(env.get('VERSION'))
 
     // use cases
@@ -274,6 +279,8 @@ export class ContainerConfigLoader {
     container.bind<SnCryptoNode>(TYPES.SnCryptoNode).toConstantValue(new SnCryptoNode())
     container.bind<TimerInterface>(TYPES.Timer).toConstantValue(new Timer())
     container.bind<ContentDecoderInterface>(TYPES.ContenDecoder).to(ContentDecoder)
+    container.bind<ClientServiceInterface>(TYPES.WebSocketsClientService).to(WebSocketsClientService)
+    container.bind<RoleServiceInterface>(TYPES.RoleService).to(RoleService)
 
     if (env.get('SNS_TOPIC_ARN', true)) {
       container.bind<SNSDomainEventPublisher>(TYPES.DomainEventPublisher).toConstantValue(
