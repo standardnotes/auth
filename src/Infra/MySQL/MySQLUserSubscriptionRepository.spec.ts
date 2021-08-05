@@ -30,8 +30,8 @@ describe('MySQLUserSubscriptionRepository', () => {
     expect(queryBuilder.update).toHaveBeenCalled()
     expect(queryBuilder.set).toHaveBeenCalledWith(
       {
+        updatedAt: expect.any(Number),
         endsAt: 1000,
-        updatedAt: 1000,
       }
     )
     expect(queryBuilder.where).toHaveBeenCalledWith(

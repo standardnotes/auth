@@ -1,4 +1,4 @@
-import { RoleName, SubscriptionName } from '@standardnotes/auth'
+import { SubscriptionName } from '@standardnotes/auth'
 import {
   DomainEventHandlerInterface,
   SubscriptionPurchasedEvent,
@@ -8,7 +8,7 @@ import { inject, injectable } from 'inversify'
 import { Logger } from 'winston'
 
 import TYPES from '../../Bootstrap/Types'
-import { RoleRepositoryInterface } from '../Role/RoleRepositoryInterface'
+import { RoleServiceInterface } from '../Role/RoleServiceInterface'
 import { User } from '../User/User'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { UserSubscription } from '../User/UserSubscription'
@@ -20,8 +20,8 @@ implements DomainEventHandlerInterface
 {
   constructor(
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
-    @inject(TYPES.RoleRepository) private roleRepository: RoleRepositoryInterface,
     @inject(TYPES.UserSubscriptionRepository) private userSubscriptionRepository: UserSubscriptionRepositoryInterface,
+    @inject(TYPES.RoleService) private roleService: RoleServiceInterface,
     @inject(TYPES.Logger) private logger: Logger
   ) {}
 
@@ -45,37 +45,14 @@ implements DomainEventHandlerInterface
       event.payload.subscriptionExpiresAt,
       event.payload.timestamp,
     )
-    await this.updateUserRole(user, event.payload.subscriptionName)
+    await this.addUserRole(user, event.payload.subscriptionName)
   }
 
-  private subscriptionNameToRoleNameMap = new Map<SubscriptionName, RoleName>([
-    [SubscriptionName.CorePlan, RoleName.CoreUser],
-    [SubscriptionName.PlusPlan, RoleName.PlusUser],
-    [SubscriptionName.ProPlan, RoleName.ProUser],
-  ]);
-
-  private async updateUserRole(
+  private async addUserRole(
     user: User,
     subscriptionName: SubscriptionName
   ): Promise<void> {
-    const roleName = this.subscriptionNameToRoleNameMap.get(subscriptionName)
-
-    if (roleName === undefined) {
-      this.logger.warn(
-        `Could not find role name for subscription name: ${subscriptionName}`
-      )
-      return
-    }
-
-    const role = await this.roleRepository.findOneByName(roleName)
-
-    if (role === undefined) {
-      this.logger.warn(`Could not find role for role name: ${roleName}`)
-      return
-    }
-
-    user.roles = Promise.resolve([role])
-    await this.userRepository.save(user)
+    await this.roleService.addUserRole(user, subscriptionName)
   }
 
   private async createSubscription(
