@@ -10,6 +10,7 @@ coverage
 junit.xml
 
 .DS_Store
+.idea
 
 # MySQL data
 data

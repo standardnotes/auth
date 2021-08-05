@@ -94,6 +94,7 @@ import { WebSocketsClientService } from '../Infra/WebSockets/WebSocketsClientSer
 import { RoleService } from '../Domain/Role/RoleService'
 import { ClientServiceInterface } from '../Domain/Client/ClientServiceInterface'
 import { RoleServiceInterface } from '../Domain/Role/RoleServiceInterface'
+import { GetUserFeatures } from '../Domain/UseCase/GetUserFeatures/GetUserFeatures'
 
 export class ContainerConfigLoader {
   async load(): Promise<Container> {
@@ -246,6 +247,7 @@ export class ContainerConfigLoader {
     container.bind<ChangePassword>(TYPES.ChangePassword).to(ChangePassword)
     container.bind<GetSettings>(TYPES.GetSettings).to(GetSettings)
     container.bind<GetSetting>(TYPES.GetSetting).to(GetSetting)
+    container.bind<GetUserFeatures>(TYPES.GetUserFeatures).to(GetUserFeatures)
     container.bind<UpdateSetting>(TYPES.UpdateSetting).to(UpdateSetting)
     container.bind<DeleteSetting>(TYPES.DeleteSetting).to(DeleteSetting)
     container.bind<GetAuthMethods>(TYPES.GetAuthMethods).to(GetAuthMethods)

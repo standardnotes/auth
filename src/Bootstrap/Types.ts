@@ -69,6 +69,7 @@ const TYPES = {
   ChangePassword: Symbol.for('ChangePassword'),
   GetSettings: Symbol.for('GetSettings'),
   GetSetting: Symbol.for('GetSetting'),
+  GetUserFeatures: Symbol.for('GetUserFeatures'),
   UpdateSetting: Symbol.for('UpdateSetting'),
   DeleteSetting: Symbol.for('DeleteSetting'),
   GetAuthMethods: Symbol.for('GetAuthMethods'),
