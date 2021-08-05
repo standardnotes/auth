@@ -48,7 +48,6 @@ describe('GetUserFeatures', () => {
       user: Promise.resolve(user),
     }
 
-
     subscription2 = {
       uuid: 'subscription-2-2-2',
       createdAt: 222,
