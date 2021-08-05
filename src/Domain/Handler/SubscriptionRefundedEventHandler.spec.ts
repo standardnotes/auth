@@ -1,48 +1,51 @@
 import 'reflect-metadata'
 
+import { RoleName, SubscriptionName } from '@standardnotes/auth'
 import { SubscriptionRefundedEvent } from '@standardnotes/domain-events'
 import { Logger } from 'winston'
+
+import * as dayjs from 'dayjs'
+
 import { User } from '../User/User'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { SubscriptionRefundedEventHandler } from './SubscriptionRefundedEventHandler'
-import { RoleRepositoryInterface } from '../Role/RoleRepositoryInterface'
 import { UserSubscriptionRepositoryInterface } from '../User/UserSubscriptionRepositoryInterface'
-import { RoleName, SubscriptionName } from '@standardnotes/auth'
-import * as dayjs from 'dayjs'
-import { Role } from '../Role/Role'
+import { RoleServiceInterface } from '../Role/RoleServiceInterface'
 
 describe('SubscriptionRefundedEventHandler', () => {
   let userRepository: UserRepositoryInterface
-  let roleRepository: RoleRepositoryInterface
   let userSubscriptionRepository: UserSubscriptionRepositoryInterface
+  let roleService: RoleServiceInterface
   let logger: Logger
   let user: User
-  let role: Role
   let event: SubscriptionRefundedEvent
   let timestamp: number
 
   const createHandler = () => new SubscriptionRefundedEventHandler(
     userRepository,
-    roleRepository,
     userSubscriptionRepository,
+    roleService,
     logger
   )
 
   beforeEach(() => {
     user = {
       uuid: '123',
+      email: 'test@test.com',
+      roles: Promise.resolve([{
+        name: RoleName.ProUser,
+      }]),
     } as jest.Mocked<User>
-    role = {} as jest.Mocked<Role>
 
     userRepository = {} as jest.Mocked<UserRepositoryInterface>
     userRepository.findOneByEmail = jest.fn().mockReturnValue(user)
     userRepository.save = jest.fn().mockReturnValue(user)
 
-    roleRepository = {} as jest.Mocked<RoleRepositoryInterface>
-    roleRepository.findOneByName = jest.fn().mockReturnValue(role)
-
     userSubscriptionRepository = {} as jest.Mocked<UserSubscriptionRepositoryInterface>
     userSubscriptionRepository.updateEndsAtByNameAndUserUuid = jest.fn()  
+
+    roleService = {} as jest.Mocked<RoleServiceInterface>
+    roleService.removeUserRole = jest.fn()
 
     timestamp = dayjs.utc().valueOf()
 
@@ -50,7 +53,7 @@ describe('SubscriptionRefundedEventHandler', () => {
     event.createdAt = new Date(1)
     event.payload = {
       userEmail: 'test@test.com',
-      subscriptionName: SubscriptionName.ProPlan,
+      subscriptionName: SubscriptionName.CorePlan,
       timestamp,
     }
 
@@ -63,10 +66,7 @@ describe('SubscriptionRefundedEventHandler', () => {
     await createHandler().handle(event)
 
     expect(userRepository.findOneByEmail).toHaveBeenCalledWith('test@test.com')
-    expect(roleRepository.findOneByName).toHaveBeenCalledWith(RoleName.CoreUser)
-    
-    user.roles = Promise.resolve([role])
-    expect(userRepository.save).toHaveBeenCalledWith(user)
+    expect(roleService.removeUserRole).toHaveBeenCalledWith(user, SubscriptionName.CorePlan)
   })
 
   it('should update subscription ends at', async () => {
@@ -76,10 +76,10 @@ describe('SubscriptionRefundedEventHandler', () => {
     expect(
       userSubscriptionRepository.updateEndsAtByNameAndUserUuid
     ).toHaveBeenCalledWith(
-      SubscriptionName.ProPlan,
+      SubscriptionName.CorePlan,
       '123',
       timestamp,
-      timestamp
+      timestamp,
     )
   })
 
@@ -88,15 +88,7 @@ describe('SubscriptionRefundedEventHandler', () => {
 
     await createHandler().handle(event)
 
-    expect(userRepository.save).not.toHaveBeenCalled()
+    expect(roleService.removeUserRole).not.toHaveBeenCalled()
     expect(userSubscriptionRepository.updateEndsAtByNameAndUserUuid).not.toHaveBeenCalled()
-  })
-
-  it ('should not update role if no role exists for role name', async () => {
-    roleRepository.findOneByName = jest.fn().mockReturnValue(undefined)
-
-    await createHandler().handle(event)
-
-    expect(userRepository.save).not.toHaveBeenCalled()
   })
 })
