@@ -1,4 +1,4 @@
-import { RoleName, SubscriptionName } from '@standardnotes/auth'
+import { SubscriptionName } from '@standardnotes/auth'
 import { inject, injectable } from 'inversify'
 import { Logger } from 'winston'
 
@@ -8,6 +8,7 @@ import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { ClientServiceInterface } from '../Client/ClientServiceInterface'
 import { RoleRepositoryInterface } from './RoleRepositoryInterface'
 import { RoleServiceInterface } from './RoleServiceInterface'
+import { getRoleNameForSubscriptionName } from './RoleToSubscriptionMap'
 
 @injectable()
 export class RoleService implements RoleServiceInterface {
@@ -25,7 +26,7 @@ export class RoleService implements RoleServiceInterface {
     user: User,
     subscriptionName: SubscriptionName,
   ): Promise<void> {
-    const roleName = this.subscriptionNameToRoleNameMap.get(subscriptionName)
+    const roleName = getRoleNameForSubscriptionName(subscriptionName)
 
     if (roleName === undefined) {
       this.logger.warn(
@@ -57,7 +58,7 @@ export class RoleService implements RoleServiceInterface {
     user: User,
     subscriptionName: SubscriptionName,
   ): Promise<void> {
-    const roleName = this.subscriptionNameToRoleNameMap.get(subscriptionName)
+    const roleName = getRoleNameForSubscriptionName(subscriptionName)
 
     if (roleName === undefined) {
       this.logger.warn(
@@ -76,10 +77,4 @@ export class RoleService implements RoleServiceInterface {
       roleName
     )
   }
-
-  private subscriptionNameToRoleNameMap = new Map<SubscriptionName, RoleName>([
-    [SubscriptionName.CorePlan, RoleName.CoreUser],
-    [SubscriptionName.PlusPlan, RoleName.PlusUser],
-    [SubscriptionName.ProPlan, RoleName.ProUser],
-  ]);
 }
