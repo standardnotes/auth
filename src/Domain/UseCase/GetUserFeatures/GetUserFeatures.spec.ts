@@ -1,70 +1,26 @@
 import 'reflect-metadata'
-import { Feature, Features } from '@standardnotes/features'
+import { Feature } from '@standardnotes/features'
 import { GetUserFeatures } from './GetUserFeatures'
 import { UserRepositoryInterface } from '../../User/UserRepositoryInterface'
 import { User } from '../../User/User'
-import { Permission, PermissionName, Role, RoleName, SubscriptionName } from '@standardnotes/auth'
-import { UserSubscription } from '../../User/UserSubscription'
+import { FeatureServiceInterface } from '../../Feature/FeatureServiceInterface'
 
 describe('GetUserFeatures', () => {
-  let userRepository: UserRepositoryInterface
   let user: User
-  let role1: Role
-  let role2: Role
-  let subscription1: UserSubscription
-  let subscription2: UserSubscription
-  let permission1: Permission
-  let permission2: Permission
+  let userRepository: UserRepositoryInterface
+  let feature1: Feature
+  let featureService: FeatureServiceInterface
 
-  const createUseCase = () => new GetUserFeatures(userRepository)
+  const createUseCase = () => new GetUserFeatures(userRepository, featureService)
 
   beforeEach(() => {
-    permission1 = {
-      uuid: 'permission-1-1-1',
-      name: PermissionName.AutobiographyTheme,
-    }
-    permission2 = {
-      uuid: 'permission-2-2-2',
-      name: PermissionName.CloudLink,
-    }
-
-    role1 = {
-      name: RoleName.CoreUser,
-      uuid: 'role-1-1-1',
-      permissions: Promise.resolve([permission1]),
-    } as jest.Mocked<Role>
-
-    role2 = {
-      name: RoleName.ProUser, uuid: 'role-2-2-2',
-      permissions: Promise.resolve([permission2]),
-    } as jest.Mocked<Role>
-
-    subscription1 = {
-      uuid: 'subscription-1-1-1',
-      createdAt: 111,
-      updatedAt: 222,
-      planName: SubscriptionName.CorePlan,
-      endsAt: 555,
-      user: Promise.resolve(user),
-    }
-
-    subscription2 = {
-      uuid: 'subscription-2-2-2',
-      createdAt: 222,
-      updatedAt: 333,
-      planName: SubscriptionName.ProPlan,
-      endsAt: 777,
-      user: Promise.resolve(user),
-    }
-
-    user = {
-      uuid: 'user-1-1-1',
-      roles: Promise.resolve([role1]),
-      subscriptions: Promise.resolve([subscription1]),
-    } as jest.Mocked<User>
-
+    user = {} as jest.Mocked<User>
     userRepository = {} as jest.Mocked<UserRepositoryInterface>
     userRepository.findOneByUuid = jest.fn().mockReturnValue(user)
+
+    feature1 = { name: 'foobar' }  as jest.Mocked<Feature>
+    featureService = {} as jest.Mocked<FeatureServiceInterface>
+    featureService.getFeaturesForUser = jest.fn().mockReturnValue([feature1])
   })
 
   it('should fail if a user is not found', async () => {
@@ -78,89 +34,13 @@ describe('GetUserFeatures', () => {
     })
   })
 
-  describe('success case', () => {
-    it('should return user\'s features with `expiresAt` field', async () => {
-      const feature = Features.find(feature => feature.identifier === PermissionName.AutobiographyTheme)
-
-      expect(await createUseCase().execute({ userUuid: user.uuid })).toEqual({
-        success: true,
-        userUuid: user.uuid,
-        features: [{
-          ...feature,
-          expiresAt: subscription1.endsAt,
-        }],
-      })
-    })
-
-    it('should return user\'s features with `expiresAt` field when user has more than 1 role & subscription', async () => {
-      user = {
-        uuid: 'user-1-1-1',
-        roles: Promise.resolve([role1, role2]),
-        subscriptions: Promise.resolve([subscription1, subscription2]),
-      } as jest.Mocked<User>
-      userRepository.findOneByUuid = jest.fn().mockReturnValue(user)
-
-      const autobiographyFeature = Features.find(feature => feature.identifier === PermissionName.AutobiographyTheme)
-      const cloudLinkFeature = Features.find(feature => feature.identifier === PermissionName.CloudLink)
-
-      const featuresData = [{
-        ...autobiographyFeature,
-        expiresAt: subscription1.endsAt,
-      }, {
-        ...cloudLinkFeature,
-        expiresAt: subscription2.endsAt,
-      }]
-
-      expect(await createUseCase().execute({ userUuid: user.uuid })).toEqual({
-        success: true,
-        userUuid: user.uuid,
-        features: featuresData,
-      })
-    })
-
-    describe('there are duplicate permissions in user\'s roles', () => {
-      beforeEach(() => {
-        role2 = {
-          name: RoleName.ProUser, uuid: 'role-2-2-2',
-          permissions: Promise.resolve([permission1, permission2]),
-        } as jest.Mocked<Role>
-        user = {
-          uuid: 'user-1-1-1',
-          roles: Promise.resolve([role1, role2]),
-          subscriptions: Promise.resolve([subscription1, subscription2]),
-        } as jest.Mocked<User>
-        userRepository.findOneByUuid = jest.fn().mockReturnValue(user)
-      })
-
-      it('should have one feature for duplicated permissions', async () => {
-        const result = await createUseCase().execute({ userUuid: user.uuid }) as {
-          success: true,
-          userUuid: string,
-          features: Feature[]
-        }
-
-        expect(result.success).toBe(true)
-        expect(result.features).toHaveLength(2)
-      })
-
-      it('should set the longest expiration date for feature that matches duplicated permissions', async () => {
-        const autobiographyFeature = Features.find(feature => feature.identifier === PermissionName.AutobiographyTheme)
-        const cloudLinkFeature = Features.find(feature => feature.identifier === PermissionName.CloudLink)
-
-        const featuresData = [{
-          ...autobiographyFeature,
-          expiresAt: subscription2.endsAt,
-        }, {
-          ...cloudLinkFeature,
-          expiresAt: subscription2.endsAt,
-        }]
-
-        expect(await createUseCase().execute({ userUuid: user.uuid })).toEqual({
-          success: true,
-          userUuid: user.uuid,
-          features: featuresData,
-        })
-      })
+  it('should return user features', async () => {
+    expect(await createUseCase().execute({ userUuid: 'user-1-1-1' })).toEqual({
+      success: true,
+      userUuid: 'user-1-1-1',
+      features: [{
+        name: 'foobar',
+      }],
     })
   })
 })

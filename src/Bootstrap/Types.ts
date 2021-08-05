@@ -105,6 +105,8 @@ const TYPES = {
   ContenDecoder: Symbol.for('ContenDecoder'),
   WebSocketsClientService: Symbol.for('WebSocketClientService'),
   RoleService: Symbol.for('RoleService'),
+  RoleToSubscriptionMap: Symbol.for('RoleToSubscriptionMap'),
+  FeatureService: Symbol.for('FeatureService'),
 }
 
 export default TYPES
