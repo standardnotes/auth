@@ -1,5 +1,5 @@
 import 'reflect-metadata'
-import { Features } from '@standardnotes/features'
+import { Feature, Features } from '@standardnotes/features'
 import { GetUserFeatures } from './GetUserFeatures'
 import { UserRepositoryInterface } from '../../User/UserRepositoryInterface'
 import { User } from '../../User/User'
@@ -54,7 +54,7 @@ describe('GetUserFeatures', () => {
       createdAt: 222,
       updatedAt: 333,
       planName: SubscriptionName.ProPlan,
-      endsAt: 444,
+      endsAt: 777,
       user: Promise.resolve(user),
     }
 
@@ -116,6 +116,51 @@ describe('GetUserFeatures', () => {
         success: true,
         userUuid: user.uuid,
         features: featuresData,
+      })
+    })
+
+    describe('there are duplicate permissions in user\'s roles', () => {
+      beforeEach(() => {
+        role2 = {
+          name: RoleName.ProUser, uuid: 'role-2-2-2',
+          permissions: Promise.resolve([permission1, permission2]),
+        } as jest.Mocked<Role>
+        user = {
+          uuid: 'user-1-1-1',
+          roles: Promise.resolve([role1, role2]),
+          subscriptions: Promise.resolve([subscription1, subscription2]),
+        } as jest.Mocked<User>
+        userRepository.findOneByUuid = jest.fn().mockReturnValue(user)
+      })
+
+      it('should have one feature for duplicated permissions', async () => {
+        const result = await createUseCase().execute({ userUuid: user.uuid }) as {
+          success: true,
+          userUuid: string,
+          features: Feature[]
+        }
+
+        expect(result.success).toBe(true)
+        expect(result.features).toHaveLength(2)
+      })
+
+      it('should set the longest expiration date for feature that matches duplicated permissions', async () => {
+        const autobiographyFeature = Features.find(feature => feature.identifier === PermissionName.AutobiographyTheme)
+        const cloudLinkFeature = Features.find(feature => feature.identifier === PermissionName.CloudLink)
+
+        const featuresData = [{
+          ...autobiographyFeature,
+          expiresAt: subscription2.endsAt,
+        }, {
+          ...cloudLinkFeature,
+          expiresAt: subscription2.endsAt,
+        }]
+
+        expect(await createUseCase().execute({ userUuid: user.uuid })).toEqual({
+          success: true,
+          userUuid: user.uuid,
+          features: featuresData,
+        })
       })
     })
   })
