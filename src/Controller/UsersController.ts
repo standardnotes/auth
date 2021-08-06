@@ -1,4 +1,4 @@
-import { MfaSetting } from '@standardnotes/auth'
+import { SettingName } from '@standardnotes/settings'
 import { Request, Response } from 'express'
 import { inject } from 'inversify'
 import {
@@ -85,7 +85,7 @@ export class UsersController extends BaseHttpController {
   async getMFASettings(request: Request): Promise<results.JsonResult> {
     const result = await this.doGetSettings.execute({
       userUuid: request.params.userUuid,
-      settingName: MfaSetting.MfaSecret,
+      settingName: SettingName.MfaSecret,
       allowMFARetrieval: true,
       updatedAfter: request.body.lastSyncTime,
     })
@@ -105,7 +105,7 @@ export class UsersController extends BaseHttpController {
     const result = await this.doDeleteSetting.execute({
       uuid,
       userUuid,
-      settingName: MfaSetting.MfaSecret,
+      settingName: SettingName.MfaSecret,
       timestamp: updatedAt,
       softDelete: true,
     })
@@ -131,7 +131,7 @@ export class UsersController extends BaseHttpController {
       uuid,
       value,
       serverEncryptionVersion,
-      name: MfaSetting.MfaSecret,
+      name: SettingName.MfaSecret,
       createdAt,
       updatedAt,
     }

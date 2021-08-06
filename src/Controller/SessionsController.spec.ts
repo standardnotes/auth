@@ -11,7 +11,8 @@ import { GetActiveSessionsForUser } from '../Domain/UseCase/GetActiveSessionsFor
 import { AuthenticateRequest } from '../Domain/UseCase/AuthenticateRequest'
 import { User } from '../Domain/User/User'
 import { Role } from '../Domain/Role/Role'
-import { Permission } from '../Domain/Permission/Permission'
+import { FeatureServiceInterface } from '../Domain/Feature/FeatureServiceInterface'
+import { Feature } from '@standardnotes/features'
 
 describe('SessionsController', () => {
   let getActiveSessionsForUser: GetActiveSessionsForUser
@@ -21,13 +22,13 @@ describe('SessionsController', () => {
   const jwtTTL = 60
   let sessionProjector: ProjectorInterface<Session>
   let roleProjector: ProjectorInterface<Role>
-  let permissionProjector: ProjectorInterface<Permission>
+  let featureService: FeatureServiceInterface
   let session: Session
   let request: express.Request
   let response: express.Response
   let user: User
   let role: Role
-  let permission: Permission
+  let feature: Feature
 
   const createController = () => new SessionsController(
     getActiveSessionsForUser,
@@ -35,18 +36,13 @@ describe('SessionsController', () => {
     userProjector,
     sessionProjector,
     roleProjector,
-    permissionProjector,
+    featureService,
     jwtSecret,
     jwtTTL
   )
 
   beforeEach(() => {
     session = {} as jest.Mocked<Session>
-
-    permission = {} as jest.Mocked<Permission>
-
-    role = {} as jest.Mocked<Role>
-    role.permissions = Promise.resolve([ permission ])
 
     user = {} as jest.Mocked<User>
     user.roles = Promise.resolve([ role ])
@@ -63,8 +59,10 @@ describe('SessionsController', () => {
     roleProjector = {} as jest.Mocked<ProjectorInterface<Role>>
     roleProjector.projectSimple = jest.fn().mockReturnValue({ name: 'role1', uuid: '1-3-4' })
 
-    permissionProjector = {} as jest.Mocked<ProjectorInterface<Permission>>
-    permissionProjector.projectSimple = jest.fn().mockReturnValue({ name: 'permission1', uuid: '1-2-3' })
+    feature = { name: 'foobar' } as jest.Mocked<Feature>
+
+    featureService = {} as jest.Mocked<FeatureServiceInterface>
+    featureService.getFeaturesForUser = jest.fn().mockReturnValue([feature])
 
     sessionProjector = {} as jest.Mocked<ProjectorInterface<Session>>
     sessionProjector.projectCustom = jest.fn().mockReturnValue({ foo: 'bar' })
@@ -130,10 +128,9 @@ describe('SessionsController', () => {
           name: 'role1',
         },
       ],
-      permissions: [
+      features: [
         {
-          uuid: '1-2-3',
-          name: 'permission1',
+          name: 'foobar',
         },
       ],
     })
@@ -167,10 +164,9 @@ describe('SessionsController', () => {
           name: 'role1',
         },
       ],
-      permissions: [
+      features: [
         {
-          uuid: '1-2-3',
-          name: 'permission1',
+          name: 'foobar',
         },
       ],
     })

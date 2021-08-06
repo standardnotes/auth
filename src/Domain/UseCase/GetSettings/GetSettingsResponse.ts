@@ -1,5 +1,6 @@
+import { Uuid } from '@standardnotes/common'
+
 import { SimpleSetting } from '../../Setting/SimpleSetting'
-import { Uuid } from '@standardnotes/auth'
 
 export type GetSettingsResponse = {
   success: true,

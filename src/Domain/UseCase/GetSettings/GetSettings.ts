@@ -1,3 +1,5 @@
+import { SettingName } from '@standardnotes/settings'
+
 import { inject, injectable } from 'inversify'
 import { GetSettingsDto } from './GetSettingsDto'
 import { GetSettingsResponse } from './GetSettingsResponse'
@@ -6,7 +8,6 @@ import TYPES from '../../../Bootstrap/Types'
 import { SettingRepositoryInterface } from '../../Setting/SettingRepositoryInterface'
 import { SettingProjector } from '../../../Projection/SettingProjector'
 import { Setting } from '../../Setting/Setting'
-import { MfaSetting } from '@standardnotes/auth'
 import { UserRepositoryInterface } from '../../User/UserRepositoryInterface'
 import { CrypterInterface } from '../../Encryption/CrypterInterface'
 
@@ -45,7 +46,7 @@ export class GetSettings implements UseCaseInterface {
     }
 
     if (!dto.allowMFARetrieval) {
-      settings = settings.filter((setting: Setting) => setting.name !== MfaSetting.MfaSecret)
+      settings = settings.filter((setting: Setting) => setting.name !== SettingName.MfaSecret)
     }
 
     for (const setting of settings) {

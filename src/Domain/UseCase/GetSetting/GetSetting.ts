@@ -1,3 +1,4 @@
+import { SettingName } from '@standardnotes/settings'
 import { inject, injectable } from 'inversify'
 import { GetSettingDto } from './GetSettingDto'
 import { GetSettingResponse } from './GetSettingResponse'
@@ -5,7 +6,6 @@ import { UseCaseInterface } from '../UseCaseInterface'
 import TYPES from '../../../Bootstrap/Types'
 import { SettingProjector } from '../../../Projection/SettingProjector'
 import { SettingRepositoryInterface } from '../../Setting/SettingRepositoryInterface'
-import { MfaSetting } from '@standardnotes/auth'
 import { CrypterInterface } from '../../Encryption/CrypterInterface'
 import { UserRepositoryInterface } from '../../User/UserRepositoryInterface'
 import { Setting } from '../../Setting/Setting'
@@ -23,7 +23,7 @@ export class GetSetting implements UseCaseInterface {
   async execute(dto: GetSettingDto): Promise<GetSettingResponse> {
     const { userUuid, settingName } = dto
 
-    if (settingName === MfaSetting.MfaSecret && !dto.allowMFARetrieval) {
+    if (settingName === SettingName.MfaSecret && !dto.allowMFARetrieval) {
       return {
         success: false,
         error: {
