@@ -676,7 +676,7 @@
   resolved "https://registry.yarnpkg.com/@standardnotes/auth/-/auth-3.2.0.tgz#2a6e419da4d155bdf0e1bf8402655228759c7b30"
   integrity sha512-Tsmy5aOjyoe1x2TQb9eXbv/LNKn4Yx+6fdcYMPjzmUZy3FMBe4mO+YOLW5Pjqq9A7A88ZAjwABNzDGCT0wI/kg==
 
-"@standardnotes/common@^1.0.0":
+"@standardnotes/common@1.0.0", "@standardnotes/common@^1.0.0":
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@standardnotes/common/-/common-1.0.0.tgz#5647ed068c5f022f1d2cc5fa9766d77115ff23bf"
   integrity sha512-4DFoBiaI3YgJY2AX/Yd8NeGC9J3IuqDl15xWNj/b54zrMx3M5OSvUts62PhQ7lByVgLMakY3v8gaYzZXA7ptLg==
@@ -716,17 +716,17 @@
   dependencies:
     "@standardnotes/common" "^1.0.0"
 
-"@standardnotes/settings@^1.0.0":
+"@standardnotes/settings@1.0.0":
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@standardnotes/settings/-/settings-1.0.0.tgz#bf5c60a36179fd6add29c98f40550492baba89e0"
   integrity sha512-N6rADez/kvXqz1SORIuAIP1vkdYghJpb6YtM0wMbrYMO0VF0HA5LJunhd9bGExWBZmt2lWhqe/tUVo/ssqEwmA==
 
-"@standardnotes/sncrypto-common@^1.3.0":
+"@standardnotes/sncrypto-common@1.3.0", "@standardnotes/sncrypto-common@^1.3.0":
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/@standardnotes/sncrypto-common/-/sncrypto-common-1.3.0.tgz#ba0a66a634c7aa21ab9cf34548b249a96533a584"
   integrity sha512-cdcusXk4VGbvLirTrd91BSPO7C5zOZNaEoHLWUS2EJpxU21aY1E7nfEbJ3B2DdBRdVwYMfn6YuRXk1fS5V44Gg==
 
-"@standardnotes/sncrypto-node@^1.3.0":
+"@standardnotes/sncrypto-node@1.3.0":
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/@standardnotes/sncrypto-node/-/sncrypto-node-1.3.0.tgz#d4572d94e79a35a16d3b75bdc8ad7542f4337e99"
   integrity sha512-AF2kdjBy0oRT37uSRPJdGvzrQrOMk1rcOdaaLjX5hhhpHFA3KhxH1bpkuQ/KKqP44CELXJASwDmVEiwpoijBXg==
