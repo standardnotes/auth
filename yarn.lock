@@ -663,10 +663,23 @@
   resolved "https://registry.yarnpkg.com/@sqltools/formatter/-/formatter-1.2.2.tgz#9390a8127c0dcba61ebd7fdcc748655e191bdd68"
   integrity sha512-/5O7Fq6Vnv8L6ucmPjaWbVG1XkP4FO+w5glqfkIsq3Xw4oyNAdJddbnYodNDAfjVUvo/rrSCTom4kAND7T1o5Q==
 
-"@standardnotes/auth@3.2.0", "@standardnotes/auth@^3.2.0":
+"@standardnotes/auth@3.4.0":
+  version "3.4.0"
+  resolved "https://registry.yarnpkg.com/@standardnotes/auth/-/auth-3.4.0.tgz#8a5f07aa82a53810eb3e5630bf5dba796c68b45a"
+  integrity sha512-vO5u96FdsHIxZTimgLSyPcfPFvyMYI4L1t4L+TpDv04D+exVPyRAyce/FayZrtlyyu4QNhhr9mQGMetotjsPSg==
+  dependencies:
+    "@standardnotes/common" "^1.0.0"
+    "@standardnotes/features" "^1.2.0"
+
+"@standardnotes/auth@^3.2.0":
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/@standardnotes/auth/-/auth-3.2.0.tgz#2a6e419da4d155bdf0e1bf8402655228759c7b30"
   integrity sha512-Tsmy5aOjyoe1x2TQb9eXbv/LNKn4Yx+6fdcYMPjzmUZy3FMBe4mO+YOLW5Pjqq9A7A88ZAjwABNzDGCT0wI/kg==
+
+"@standardnotes/common@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@standardnotes/common/-/common-1.0.0.tgz#5647ed068c5f022f1d2cc5fa9766d77115ff23bf"
+  integrity sha512-4DFoBiaI3YgJY2AX/Yd8NeGC9J3IuqDl15xWNj/b54zrMx3M5OSvUts62PhQ7lByVgLMakY3v8gaYzZXA7ptLg==
 
 "@standardnotes/config@2.0.0":
   version "2.0.0"
@@ -689,10 +702,24 @@
     sqs-consumer "^5.5.0"
     winston "^3.3.3"
 
-"@standardnotes/features@1.2.0":
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/@standardnotes/features/-/features-1.2.0.tgz#b373fc0ee74bc3468db5b1f72be1d6094c536efa"
-  integrity sha512-OxUHWqALMDdhfu2CTNoI873A9YewsW8xzaoMu3wu1jk59/eslOj5qZ1jx0Zjvwt/54ZraRBIasEhBRCPMUTcSw==
+"@standardnotes/features@1.2.2":
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/@standardnotes/features/-/features-1.2.2.tgz#aa8abe8ef50f8c027af06c1c1fd165cb3445ba3f"
+  integrity sha512-32QjWGDLa7wCenr5Ffa0OnGmBZNdLUSUCzcekdcqa7g7JIO5InKAoLKvZIvyJog0KzPdp53OpETiUufEgTXhVQ==
+  dependencies:
+    "@standardnotes/common" "^1.0.0"
+
+"@standardnotes/features@^1.2.0":
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/@standardnotes/features/-/features-1.2.1.tgz#5ada49a2e83760d87bad9f333392ddb9d5c8a926"
+  integrity sha512-uZtcRGZ+HPyiKpZVOhVhOH745DUNQsv/YX1fsEbBsXfivi0WZZsvnOxIxejQAG3Ns5/GoKciwxCtrjkgOxBIpw==
+  dependencies:
+    "@standardnotes/common" "^1.0.0"
+
+"@standardnotes/settings@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@standardnotes/settings/-/settings-1.0.0.tgz#bf5c60a36179fd6add29c98f40550492baba89e0"
+  integrity sha512-N6rADez/kvXqz1SORIuAIP1vkdYghJpb6YtM0wMbrYMO0VF0HA5LJunhd9bGExWBZmt2lWhqe/tUVo/ssqEwmA==
 
 "@standardnotes/sncrypto-common@^1.3.0":
   version "1.3.0"

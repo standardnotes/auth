@@ -1,4 +1,5 @@
-import { ErrorTag, MfaSetting } from '@standardnotes/auth'
+import { ErrorTag } from '@standardnotes/common'
+import { SettingName } from '@standardnotes/settings'
 import { v4 as uuidv4 } from 'uuid'
 import { inject, injectable } from 'inversify'
 import { authenticator } from 'otplib'
@@ -81,7 +82,7 @@ export class VerifyMFA implements UseCaseInterface {
   }
 
   private async getMFASecret(user: User): Promise<string | undefined> {
-    const mfaSetting = await this.settingRepository.findLastByNameAndUserUuid(MfaSetting.MfaSecret, user.uuid)
+    const mfaSetting = await this.settingRepository.findLastByNameAndUserUuid(SettingName.MfaSecret, user.uuid)
     if (mfaSetting === undefined || mfaSetting.value === null) {
       return undefined
     }
