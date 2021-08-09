@@ -8,25 +8,24 @@ import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { ClientServiceInterface } from '../Client/ClientServiceInterface'
 import { RoleRepositoryInterface } from './RoleRepositoryInterface'
 import { RoleServiceInterface } from './RoleServiceInterface'
-import { getRoleNameForSubscriptionName } from './RoleToSubscriptionMap'
+import { RoleToSubscriptionMapInterface } from './RoleToSubscriptionMapInterface'
 
 @injectable()
 export class RoleService implements RoleServiceInterface {
   constructor(
-    @inject(TYPES.UserRepository)
-    private userRepository: UserRepositoryInterface,
-    @inject(TYPES.RoleRepository)
-    private roleRepository: RoleRepositoryInterface,
-    @inject(TYPES.WebSocketsClientService)
-    private webSocketsClientService: ClientServiceInterface,
+    @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
+    @inject(TYPES.RoleRepository) private roleRepository: RoleRepositoryInterface,
+    @inject(TYPES.WebSocketsClientService) private webSocketsClientService: ClientServiceInterface,
+    @inject(TYPES.RoleToSubscriptionMap) private roleToSubscriptionMap: RoleToSubscriptionMapInterface,
     @inject(TYPES.Logger) private logger: Logger
-  ) {}
+  ) {
+  }
 
   async addUserRole(
     user: User,
     subscriptionName: SubscriptionName,
   ): Promise<void> {
-    const roleName = getRoleNameForSubscriptionName(subscriptionName)
+    const roleName = this.roleToSubscriptionMap.getRoleNameForSubscriptionName(subscriptionName)
 
     if (roleName === undefined) {
       this.logger.warn(
@@ -58,7 +57,7 @@ export class RoleService implements RoleServiceInterface {
     user: User,
     subscriptionName: SubscriptionName,
   ): Promise<void> {
-    const roleName = getRoleNameForSubscriptionName(subscriptionName)
+    const roleName = this.roleToSubscriptionMap.getRoleNameForSubscriptionName(subscriptionName)
 
     if (roleName === undefined) {
       this.logger.warn(

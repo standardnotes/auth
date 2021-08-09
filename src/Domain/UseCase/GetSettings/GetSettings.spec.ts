@@ -1,6 +1,7 @@
 import 'reflect-metadata'
 
-import { MfaSetting } from '@standardnotes/auth'
+import { SettingName } from '@standardnotes/settings'
+
 import { SettingProjector } from '../../../Projection/SettingProjector'
 import { Setting } from '../../Setting/Setting'
 import { SettingRepositoryInterface } from '../../Setting/SettingRepositoryInterface'
@@ -26,7 +27,7 @@ describe('GetSettings', () => {
       name: 'test',
       updatedAt: 345,
     } as jest.Mocked<Setting>
-    mfaSetting = { name: MfaSetting.MfaSecret, updatedAt: 122 } as jest.Mocked<Setting>
+    mfaSetting = { name: SettingName.MfaSecret, updatedAt: 122 } as jest.Mocked<Setting>
 
     settingRepository = {} as jest.Mocked<SettingRepositoryInterface>
     settingRepository.findAllByUserUuid = jest.fn().mockReturnValue([ setting, mfaSetting ])

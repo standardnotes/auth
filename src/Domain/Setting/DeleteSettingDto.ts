@@ -1,6 +1,6 @@
-import { Uuid } from '@standardnotes/auth'
+import { Uuid } from '@standardnotes/common'
 
-export type DeleteSettingDto = { 
+export type DeleteSettingDto = {
   settingName: string,
   userUuid: Uuid,
 }

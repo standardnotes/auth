@@ -96,6 +96,10 @@ import { RoleService } from '../Domain/Role/RoleService'
 import { ClientServiceInterface } from '../Domain/Client/ClientServiceInterface'
 import { RoleServiceInterface } from '../Domain/Role/RoleServiceInterface'
 import { GetUserFeatures } from '../Domain/UseCase/GetUserFeatures/GetUserFeatures'
+import { RoleToSubscriptionMapInterface } from '../Domain/Role/RoleToSubscriptionMapInterface'
+import { RoleToSubscriptionMap } from '../Domain/Role/RoleToSubscriptionMap'
+import { FeatureServiceInterface } from '../Domain/Feature/FeatureServiceInterface'
+import { FeatureService } from '../Domain/Feature/FeatureService'
 
 export class ContainerConfigLoader {
   async load(): Promise<Container> {
@@ -283,6 +287,8 @@ export class ContainerConfigLoader {
     container.bind<ContentDecoderInterface>(TYPES.ContenDecoder).to(ContentDecoder)
     container.bind<ClientServiceInterface>(TYPES.WebSocketsClientService).to(WebSocketsClientService)
     container.bind<RoleServiceInterface>(TYPES.RoleService).to(RoleService)
+    container.bind<RoleToSubscriptionMapInterface>(TYPES.RoleToSubscriptionMap).to(RoleToSubscriptionMap)
+    container.bind<FeatureServiceInterface>(TYPES.FeatureService).to(FeatureService)
 
     if (env.get('SNS_TOPIC_ARN', true)) {
       container.bind<SNSDomainEventPublisher>(TYPES.DomainEventPublisher).toConstantValue(
