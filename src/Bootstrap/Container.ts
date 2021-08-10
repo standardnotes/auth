@@ -100,6 +100,7 @@ import { RoleToSubscriptionMapInterface } from '../Domain/Role/RoleToSubscriptio
 import { RoleToSubscriptionMap } from '../Domain/Role/RoleToSubscriptionMap'
 import { FeatureServiceInterface } from '../Domain/Feature/FeatureServiceInterface'
 import { FeatureService } from '../Domain/Feature/FeatureService'
+import { SettingServiceInterface } from '../Domain/Setting/SettingServiceInterface'
 
 export class ContainerConfigLoader {
   async load(): Promise<Container> {
@@ -281,7 +282,7 @@ export class ContainerConfigLoader {
     container.bind<DomainEventFactory>(TYPES.DomainEventFactory).to(DomainEventFactory)
     container.bind<AxiosInstance>(TYPES.HTTPClient).toConstantValue(axios.create())
     container.bind<CrypterInterface>(TYPES.Crypter).to(CrypterNode)
-    container.bind<SettingService>(TYPES.SettingService).to(SettingService)
+    container.bind<SettingServiceInterface>(TYPES.SettingService).to(SettingService)
     container.bind<SnCryptoNode>(TYPES.SnCryptoNode).toConstantValue(new SnCryptoNode())
     container.bind<TimerInterface>(TYPES.Timer).toConstantValue(new Timer())
     container.bind<ContentDecoderInterface>(TYPES.ContenDecoder).to(ContentDecoder)

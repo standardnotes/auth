@@ -12,6 +12,7 @@ import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { UserSubscriptionRepositoryInterface } from '../User/UserSubscriptionRepositoryInterface'
 import { SubscriptionPurchasedEventHandler } from './SubscriptionPurchasedEventHandler'
 import { UserSubscription } from '../User/UserSubscription'
+import { SettingServiceInterface } from '../Setting/SettingServiceInterface'
 
 describe('SubscriptionPurchasedEventHandler', () => {
   let userRepository: UserRepositoryInterface
@@ -23,11 +24,13 @@ describe('SubscriptionPurchasedEventHandler', () => {
   let event: SubscriptionPurchasedEvent
   let subscriptionExpiresAt: number
   let timestamp: number
+  let settingService: SettingServiceInterface
 
   const createHandler = () => new SubscriptionPurchasedEventHandler(
     userRepository,
     userSubscriptionRepository,
     roleService,
+    settingService,
     logger
   )
 
@@ -60,7 +63,11 @@ describe('SubscriptionPurchasedEventHandler', () => {
       subscriptionName: SubscriptionName.ProPlan,
       subscriptionExpiresAt,
       timestamp: dayjs.utc().valueOf(),
+      extensionKey: 'secret-key',
     }
+
+    settingService = {} as jest.Mocked<SettingServiceInterface>
+    settingService.createOrReplace = jest.fn()
 
     logger = {} as jest.Mocked<Logger>
     logger.info = jest.fn()
@@ -72,6 +79,14 @@ describe('SubscriptionPurchasedEventHandler', () => {
 
     expect(userRepository.findOneByEmail).toHaveBeenCalledWith('test@test.com')
     expect(roleService.addUserRole).toHaveBeenCalledWith(user, SubscriptionName.ProPlan)
+    expect(settingService.createOrReplace).toHaveBeenCalledWith({
+      user,
+      props: {
+        name: 'EXTENSION_KEY',
+        value: 'secret-key',
+        serverEncryptionVersion: 1,
+      },
+    })
   })
 
   it('should create subscription', async () => {

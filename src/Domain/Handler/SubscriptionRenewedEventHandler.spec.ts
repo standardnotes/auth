@@ -10,6 +10,7 @@ import { User } from '../User/User'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { SubscriptionRenewedEventHandler } from './SubscriptionRenewedEventHandler'
 import { UserSubscriptionRepositoryInterface } from '../User/UserSubscriptionRepositoryInterface'
+import { SettingServiceInterface } from '../Setting/SettingServiceInterface'
 
 describe('SubscriptionRenewedEventHandler', () => {
   let userRepository: UserRepositoryInterface
@@ -19,10 +20,12 @@ describe('SubscriptionRenewedEventHandler', () => {
   let event: SubscriptionPurchasedEvent
   let subscriptionExpirationDate: number
   let timestamp: number
+  let settingService: SettingServiceInterface
 
   const createHandler = () => new SubscriptionRenewedEventHandler(
     userRepository,
     userSubscriptionRepository,
+    settingService,
     logger
   )
 
@@ -35,7 +38,7 @@ describe('SubscriptionRenewedEventHandler', () => {
     userRepository.findOneByEmail = jest.fn().mockReturnValue(user)
 
     userSubscriptionRepository = {} as jest.Mocked<UserSubscriptionRepositoryInterface>
-    userSubscriptionRepository.updateEndsAtByNameAndUserUuid = jest.fn()  
+    userSubscriptionRepository.updateEndsAtByNameAndUserUuid = jest.fn()
 
     timestamp = dayjs.utc().valueOf()
     subscriptionExpirationDate = dayjs.utc().valueOf() + 365*1000
@@ -47,7 +50,11 @@ describe('SubscriptionRenewedEventHandler', () => {
       subscriptionName: SubscriptionName.ProPlan,
       subscriptionExpiresAt: subscriptionExpirationDate,
       timestamp,
+      extensionKey: 'secret-key',
     }
+
+    settingService = {} as jest.Mocked<SettingServiceInterface>
+    settingService.createOrReplace = jest.fn()
 
     logger = {} as jest.Mocked<Logger>
     logger.info = jest.fn()
@@ -66,6 +73,14 @@ describe('SubscriptionRenewedEventHandler', () => {
       subscriptionExpirationDate,
       timestamp,
     )
+    expect(settingService.createOrReplace).toHaveBeenCalledWith({
+      user,
+      props: {
+        name: 'EXTENSION_KEY',
+        value: 'secret-key',
+        serverEncryptionVersion: 1,
+      },
+    })
   })
 
   it('should not do anything if no user is found for specified email', async () => {
