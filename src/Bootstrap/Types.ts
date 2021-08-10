@@ -52,6 +52,7 @@ const TYPES = {
   SYNCING_SERVER_URL: Symbol.for('SYNCING_SERVER_URL'),
   WEBSOCKETS_API_URL: Symbol.for('WEBSOCKETS_API_URL'),
   VERSION: Symbol.for('VERSION'),
+  EXTENSION_SERVER_URL: Symbol.for('EXTENSION_SERVER_URL'),
   // use cases
   AuthenticateUser: Symbol.for('AuthenticateUser'),
   AuthenticateRequest: Symbol.for('AuthenticateRequest'),
