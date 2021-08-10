@@ -235,6 +235,7 @@ export class ContainerConfigLoader {
     container.bind(TYPES.SYNCING_SERVER_URL).toConstantValue(env.get('SYNCING_SERVER_URL'))
     container.bind(TYPES.WEBSOCKETS_API_URL).toConstantValue(env.get('WEBSOCKETS_API_URL'))
     container.bind(TYPES.VERSION).toConstantValue(env.get('VERSION'))
+    container.bind(TYPES.EXTENSION_SERVER_URL).toConstantValue(env.get('EXTENSION_SERVER_URL', true))
 
     // use cases
     container.bind<AuthenticateUser>(TYPES.AuthenticateUser).to(AuthenticateUser)

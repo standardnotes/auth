@@ -8,6 +8,8 @@ import { UserSubscription } from '../User/UserSubscription'
 
 import { FeatureService } from './FeatureService'
 import { Permission, PermissionName } from '@standardnotes/features'
+import { Setting } from '../Setting/Setting'
+import { SettingServiceInterface } from '../Setting/SettingServiceInterface'
 
 describe('FeatureService', () => {
   let roleToSubscriptionMap: RoleToSubscriptionMapInterface
@@ -18,10 +20,15 @@ describe('FeatureService', () => {
   let subscription2: UserSubscription
   let permission1: Permission
   let permission2: Permission
+  let extensionKeySetting: Setting
+  let settingService: SettingServiceInterface
+  let extensionServerUrl: string
 
-  const createService = () => new FeatureService(roleToSubscriptionMap)
+  const createService = () => new FeatureService(roleToSubscriptionMap, settingService, extensionServerUrl)
 
   beforeEach(() => {
+    extensionServerUrl = 'https://extension-server'
+
     roleToSubscriptionMap = {} as jest.Mocked<RoleToSubscriptionMapInterface>
     roleToSubscriptionMap.getSubscriptionNameForRoleName = jest.fn().mockReturnValue(SubscriptionName.CorePlan)
 
@@ -68,9 +75,73 @@ describe('FeatureService', () => {
       roles: Promise.resolve([role1]),
       subscriptions: Promise.resolve([subscription1]),
     } as jest.Mocked<User>
+
+    extensionKeySetting = {
+      name: 'EXTENSION_KEY',
+      value: 'abc123',
+    } as jest.Mocked<Setting>
+
+    settingService = {} as jest.Mocked<SettingServiceInterface>
+    settingService.findSetting = jest.fn().mockReturnValue(extensionKeySetting)
   })
 
   it('should return user features with `expiresAt` field', async () => {
+    expect(await createService().getFeaturesForUser(user)).toEqual([
+      {
+        'contentType': 'SN|Theme',
+        'description': 'A theme for writers and readers.',
+        'dockIcon': {
+          'backgroundColor': '#9D7441',
+          'borderColor': '#9D7441',
+          'foregroundColor': '#ECE4DB',
+          'type': 'circle',
+        },
+        'downloadUrl': 'https://github.com/standardnotes/autobiography-theme/archive/1.0.0.zip',
+        'expiresAt': 555,
+        'flags': [
+          'New',
+        ],
+        'identifier': 'theme:autobiography',
+        'marketingUrl': '',
+        'name': 'Autobiography',
+        'thumbnailUrl': 'https://s3.amazonaws.com/standard-notes/screenshots/models/themes/autobiography.jpg',
+        'url': 'https://extension-server/abc123/themes/autobiography',
+        'version': '1.0.0',
+      },
+    ])
+  })
+
+  it('should return user features without dedicated url if the extension server url is missing', async () => {
+    extensionServerUrl = ''
+
+    expect(await createService().getFeaturesForUser(user)).toEqual([
+      {
+        'contentType': 'SN|Theme',
+        'description': 'A theme for writers and readers.',
+        'dockIcon': {
+          'backgroundColor': '#9D7441',
+          'borderColor': '#9D7441',
+          'foregroundColor': '#ECE4DB',
+          'type': 'circle',
+        },
+        'downloadUrl': 'https://github.com/standardnotes/autobiography-theme/archive/1.0.0.zip',
+        'expiresAt': 555,
+        'flags': [
+          'New',
+        ],
+        'identifier': 'theme:autobiography',
+        'marketingUrl': '',
+        'name': 'Autobiography',
+        'thumbnailUrl': 'https://s3.amazonaws.com/standard-notes/screenshots/models/themes/autobiography.jpg',
+        'url': '#{url_prefix}/themes/autobiography',
+        'version': '1.0.0',
+      },
+    ])
+  })
+
+  it('should return user features without dedicated url if the extension key setting is missing', async () => {
+    settingService.findSetting = jest.fn().mockReturnValue(undefined)
+
     expect(await createService().getFeaturesForUser(user)).toEqual([
       {
         'contentType': 'SN|Theme',
@@ -126,7 +197,7 @@ describe('FeatureService', () => {
         'marketingUrl': '',
         'name': 'Autobiography',
         'thumbnailUrl': 'https://s3.amazonaws.com/standard-notes/screenshots/models/themes/autobiography.jpg',
-        'url': '#{url_prefix}/themes/autobiography',
+        'url': 'https://extension-server/abc123/themes/autobiography',
         'version': '1.0.0',
       },
       {
@@ -178,7 +249,7 @@ describe('FeatureService', () => {
         'marketingUrl': '',
         'name': 'Autobiography',
         'thumbnailUrl': 'https://s3.amazonaws.com/standard-notes/screenshots/models/themes/autobiography.jpg',
-        'url': '#{url_prefix}/themes/autobiography',
+        'url': 'https://extension-server/abc123/themes/autobiography',
         'version': '1.0.0',
       },
       {
@@ -232,7 +303,7 @@ describe('FeatureService', () => {
         'marketingUrl': '',
         'name': 'Autobiography',
         'thumbnailUrl': 'https://s3.amazonaws.com/standard-notes/screenshots/models/themes/autobiography.jpg',
-        'url': '#{url_prefix}/themes/autobiography',
+        'url': 'https://extension-server/abc123/themes/autobiography',
         'version': '1.0.0',
       },
       {
