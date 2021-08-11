@@ -47,9 +47,8 @@ export class RoleService implements RoleServiceInterface {
       role,
     ])
     await this.userRepository.save(user)
-    await this.webSocketsClientService.sendUserRoleChangedEvent(
+    await this.webSocketsClientService.sendUserRolesChangedEvent(
       user,
-      roleName
     )
   }
 
@@ -71,9 +70,8 @@ export class RoleService implements RoleServiceInterface {
       currentRoles.filter(role => role.name !== roleName)
     )
     await this.userRepository.save(user)
-    await this.webSocketsClientService.sendUserRoleChangedEvent(
+    await this.webSocketsClientService.sendUserRolesChangedEvent(
       user,
-      roleName
     )
   }
 }
