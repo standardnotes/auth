@@ -689,12 +689,13 @@
     "@typescript-eslint/eslint-plugin" "^4.14.0"
     "@typescript-eslint/parser" "^4.14.0"
 
-"@standardnotes/domain-events@1.6.0":
-  version "1.6.0"
-  resolved "https://registry.yarnpkg.com/@standardnotes/domain-events/-/domain-events-1.6.0.tgz#1e5465aa8ea01b0631c0c2e874deb192cd015c8e"
-  integrity sha512-RM5Q5WP2jtDyoo+Bxfn34ew7QsnercbJ9UU+rh8dHAR0/yL41FEo/uYY7riT6QYVcAzRsnakX1qRkHOaYGC8Bg==
+"@standardnotes/domain-events@1.8.0":
+  version "1.8.0"
+  resolved "https://registry.yarnpkg.com/@standardnotes/domain-events/-/domain-events-1.8.0.tgz#496491583f0771fae62668b9588fd1f0a4e20b69"
+  integrity sha512-W4xaz3PRjmumD05MZ0h7n8GGKLallLKm+1AHJkSId6VGbV0VGw9Ks0HB+lREugakfogCXtcP5F41uDuUVZBSkg==
   dependencies:
     "@standardnotes/auth" "^3.2.0"
+    "@standardnotes/features" "1.2.3"
     aws-sdk "^2.824.0"
     ioredis "^4.19.4"
     newrelic "^7.4.0"
@@ -706,6 +707,13 @@
   version "1.2.2"
   resolved "https://registry.yarnpkg.com/@standardnotes/features/-/features-1.2.2.tgz#aa8abe8ef50f8c027af06c1c1fd165cb3445ba3f"
   integrity sha512-32QjWGDLa7wCenr5Ffa0OnGmBZNdLUSUCzcekdcqa7g7JIO5InKAoLKvZIvyJog0KzPdp53OpETiUufEgTXhVQ==
+  dependencies:
+    "@standardnotes/common" "^1.0.0"
+
+"@standardnotes/features@1.2.3":
+  version "1.2.3"
+  resolved "https://registry.yarnpkg.com/@standardnotes/features/-/features-1.2.3.tgz#253d320bb44ca310d53c46e98ce1609f38ef37db"
+  integrity sha512-AciezLbSU+4ZwrYl7lEBPmc0iaW3ZGVKhve2aea724T0w8mFmCnsREYShlNPd0MDE93uLAlc1QVTsc94yIQWgA==
   dependencies:
     "@standardnotes/common" "^1.0.0"
 

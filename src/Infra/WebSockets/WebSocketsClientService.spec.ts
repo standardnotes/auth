@@ -1,6 +1,6 @@
 import 'reflect-metadata'
 
-import { UserRoleChangedEvent } from '@standardnotes/domain-events'
+import { UserRolesChangedEvent } from '@standardnotes/domain-events'
 import { User } from '../../Domain/User/User'
 import { RoleName } from '@standardnotes/auth'
 
