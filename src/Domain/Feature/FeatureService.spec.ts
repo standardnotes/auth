@@ -111,6 +111,18 @@ describe('FeatureService', () => {
     ])
   })
 
+  it('should not return user features if a subscription could not be found', async () => {
+    const subscriptions: Array<UserSubscription> = []
+
+    user = {
+      uuid: 'user-1-1-1',
+      roles: Promise.resolve([role1]),
+      subscriptions: Promise.resolve(subscriptions),
+    } as jest.Mocked<User>
+
+    expect(await createService().getFeaturesForUser(user)).toEqual([])
+  })
+
   it('should return user features without dedicated url if the extension server url is missing', async () => {
     extensionServerUrl = ''
 
