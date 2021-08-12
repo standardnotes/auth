@@ -663,10 +663,10 @@
   resolved "https://registry.yarnpkg.com/@sqltools/formatter/-/formatter-1.2.2.tgz#9390a8127c0dcba61ebd7fdcc748655e191bdd68"
   integrity sha512-/5O7Fq6Vnv8L6ucmPjaWbVG1XkP4FO+w5glqfkIsq3Xw4oyNAdJddbnYodNDAfjVUvo/rrSCTom4kAND7T1o5Q==
 
-"@standardnotes/auth@3.5.0":
-  version "3.5.0"
-  resolved "https://registry.yarnpkg.com/@standardnotes/auth/-/auth-3.5.0.tgz#2726cadaa8941d23bbace44eb9e034ee6902e4c0"
-  integrity sha512-V6qt1NPkUC4dT+g73JZWpCYmB6ugOXGUrgVdMR7AE+YC3cYvmCyJFpd+mUJK4lD4JltOnCkkLO6nm9CtsCxyzQ==
+"@standardnotes/auth@3.6.0":
+  version "3.6.0"
+  resolved "https://registry.yarnpkg.com/@standardnotes/auth/-/auth-3.6.0.tgz#d0952bd1945e314a7b59682b4bdaf5a52f4733c3"
+  integrity sha512-/bSDFFkBGuqz1ctXHxq7GMiPy5lPtM//WbW41fULxaBtzEao8sHM2Y9Q50M3LMMDUc2lkEngK3kQOnuMZpoSUA==
   dependencies:
     "@standardnotes/common" "^1.0.0"
     "@standardnotes/features" "^1.2.0"
@@ -692,10 +692,10 @@
     "@typescript-eslint/eslint-plugin" "^4.14.0"
     "@typescript-eslint/parser" "^4.14.0"
 
-"@standardnotes/domain-events@1.6.0":
-  version "1.6.0"
-  resolved "https://registry.yarnpkg.com/@standardnotes/domain-events/-/domain-events-1.6.0.tgz#1e5465aa8ea01b0631c0c2e874deb192cd015c8e"
-  integrity sha512-RM5Q5WP2jtDyoo+Bxfn34ew7QsnercbJ9UU+rh8dHAR0/yL41FEo/uYY7riT6QYVcAzRsnakX1qRkHOaYGC8Bg==
+"@standardnotes/domain-events@1.7.0":
+  version "1.7.0"
+  resolved "https://registry.yarnpkg.com/@standardnotes/domain-events/-/domain-events-1.7.0.tgz#dcc6cba8c4e2b0d6f048f19d56ea78cd579f03e5"
+  integrity sha512-rk+oCRiVqmWiNOYokrpyFD8Koj1B67mMTj9H33Rq2fnOh89YDblEmDB0/YWuDhrlsyty5jEOrI8ya+FJOgv1OQ==
   dependencies:
     "@standardnotes/auth" "^3.2.0"
     aws-sdk "^2.824.0"
