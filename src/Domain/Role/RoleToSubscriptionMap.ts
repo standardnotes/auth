@@ -1,7 +1,9 @@
 import { RoleName, SubscriptionName } from '@standardnotes/auth'
+import { injectable } from 'inversify'
 
 import { RoleToSubscriptionMapInterface } from './RoleToSubscriptionMapInterface'
 
+@injectable()
 export class RoleToSubscriptionMap implements RoleToSubscriptionMapInterface {
   private readonly roleNameToSubscriptionNameMap = new Map<RoleName, SubscriptionName>([
     [RoleName.CoreUser, SubscriptionName.CorePlan],

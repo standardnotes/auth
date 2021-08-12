@@ -32,7 +32,11 @@ export class FeatureService implements FeatureServiceInterface {
     const userFeatures: Map<string, Feature> = new Map()
     for (const role of userRoles) {
       const subscriptionName = this.roleToSubscriptionMap.getSubscriptionNameForRoleName(role.name as RoleName)
-      const expiresAt = (userSubscriptions.find(subscription => subscription.planName === subscriptionName) as UserSubscription).endsAt
+      const userSubscription = userSubscriptions.find(subscription => subscription.planName === subscriptionName) as UserSubscription
+      if (userSubscription === undefined) {
+        continue
+      }
+      const expiresAt = userSubscription.endsAt
 
       const rolePermissions = await role.permissions
 
