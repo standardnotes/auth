@@ -663,13 +663,12 @@
   resolved "https://registry.yarnpkg.com/@sqltools/formatter/-/formatter-1.2.2.tgz#9390a8127c0dcba61ebd7fdcc748655e191bdd68"
   integrity sha512-/5O7Fq6Vnv8L6ucmPjaWbVG1XkP4FO+w5glqfkIsq3Xw4oyNAdJddbnYodNDAfjVUvo/rrSCTom4kAND7T1o5Q==
 
-"@standardnotes/auth@3.6.0":
-  version "3.6.0"
-  resolved "https://registry.yarnpkg.com/@standardnotes/auth/-/auth-3.6.0.tgz#d0952bd1945e314a7b59682b4bdaf5a52f4733c3"
-  integrity sha512-/bSDFFkBGuqz1ctXHxq7GMiPy5lPtM//WbW41fULxaBtzEao8sHM2Y9Q50M3LMMDUc2lkEngK3kQOnuMZpoSUA==
+"@standardnotes/auth@3.7.0":
+  version "3.7.0"
+  resolved "https://registry.yarnpkg.com/@standardnotes/auth/-/auth-3.7.0.tgz#1193f0521bd3b1c3655685c27aff894b98c7f582"
+  integrity sha512-lHMRyVOxF9g11MH04wcbhpErPysL721Hgrzbi6slRDqIuA+2VpECIkbAhI5WpgP5K8RjO/kZB4l0tzcRI1Mg/g==
   dependencies:
     "@standardnotes/common" "^1.0.0"
-    "@standardnotes/features" "^1.2.0"
 
 "@standardnotes/auth@^3.2.0":
   version "3.6.1"
@@ -692,12 +691,13 @@
     "@typescript-eslint/eslint-plugin" "^4.14.0"
     "@typescript-eslint/parser" "^4.14.0"
 
-"@standardnotes/domain-events@1.7.0":
-  version "1.7.0"
-  resolved "https://registry.yarnpkg.com/@standardnotes/domain-events/-/domain-events-1.7.0.tgz#dcc6cba8c4e2b0d6f048f19d56ea78cd579f03e5"
-  integrity sha512-rk+oCRiVqmWiNOYokrpyFD8Koj1B67mMTj9H33Rq2fnOh89YDblEmDB0/YWuDhrlsyty5jEOrI8ya+FJOgv1OQ==
+"@standardnotes/domain-events@1.8.0":
+  version "1.8.0"
+  resolved "https://registry.yarnpkg.com/@standardnotes/domain-events/-/domain-events-1.8.0.tgz#496491583f0771fae62668b9588fd1f0a4e20b69"
+  integrity sha512-W4xaz3PRjmumD05MZ0h7n8GGKLallLKm+1AHJkSId6VGbV0VGw9Ks0HB+lREugakfogCXtcP5F41uDuUVZBSkg==
   dependencies:
     "@standardnotes/auth" "^3.2.0"
+    "@standardnotes/features" "1.2.3"
     aws-sdk "^2.824.0"
     ioredis "^4.19.4"
     newrelic "^7.4.0"
@@ -712,7 +712,7 @@
   dependencies:
     "@standardnotes/common" "^1.0.0"
 
-"@standardnotes/features@1.2.3", "@standardnotes/features@^1.2.0":
+"@standardnotes/features@1.2.3":
   version "1.2.3"
   resolved "https://registry.yarnpkg.com/@standardnotes/features/-/features-1.2.3.tgz#253d320bb44ca310d53c46e98ce1609f38ef37db"
   integrity sha512-AciezLbSU+4ZwrYl7lEBPmc0iaW3ZGVKhve2aea724T0w8mFmCnsREYShlNPd0MDE93uLAlc1QVTsc94yIQWgA==
