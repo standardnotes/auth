@@ -691,10 +691,10 @@
     "@typescript-eslint/eslint-plugin" "^4.14.0"
     "@typescript-eslint/parser" "^4.14.0"
 
-"@standardnotes/domain-events@1.8.0":
-  version "1.8.0"
-  resolved "https://registry.yarnpkg.com/@standardnotes/domain-events/-/domain-events-1.8.0.tgz#496491583f0771fae62668b9588fd1f0a4e20b69"
-  integrity sha512-W4xaz3PRjmumD05MZ0h7n8GGKLallLKm+1AHJkSId6VGbV0VGw9Ks0HB+lREugakfogCXtcP5F41uDuUVZBSkg==
+"@standardnotes/domain-events@1.9.0":
+  version "1.9.0"
+  resolved "https://registry.yarnpkg.com/@standardnotes/domain-events/-/domain-events-1.9.0.tgz#38ca8e20845f71131467807042e96f09014e4f69"
+  integrity sha512-/OnXOnCfgwQnpNm3Mn47I94FjAeXLYhw3ShxeeunbBxELeTT6lfED8KbGF2BWNyGcEPX3ufvlqy/GdoleDOBzg==
   dependencies:
     "@standardnotes/auth" "^3.2.0"
     "@standardnotes/features" "1.2.3"
