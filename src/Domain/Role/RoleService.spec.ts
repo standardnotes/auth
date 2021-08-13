@@ -47,7 +47,7 @@ describe('RoleService', () => {
     roleToSubscriptionMap.getRoleNameForSubscriptionName = jest.fn().mockReturnValue(RoleName.ProUser)
 
     webSocketsClientService = {} as jest.Mocked<ClientServiceInterface>
-    webSocketsClientService.sendUserRoleChangedEvent = jest.fn()
+    webSocketsClientService.sendUserRolesChangedEvent = jest.fn()
 
     logger = {} as jest.Mocked<Logger>
     logger.info = jest.fn()
@@ -82,9 +82,8 @@ describe('RoleService', () => {
     it('should send websockets event', async () => {
       await createService().addUserRole(user, SubscriptionName.ProPlan)
 
-      expect(webSocketsClientService.sendUserRoleChangedEvent).toHaveBeenCalledWith(
+      expect(webSocketsClientService.sendUserRolesChangedEvent).toHaveBeenCalledWith(
         user,
-        RoleName.ProUser
       )
     })
 
@@ -131,9 +130,8 @@ describe('RoleService', () => {
     it('should send websockets event', async () => {
       await createService().removeUserRole(user, SubscriptionName.ProPlan)
 
-      expect(webSocketsClientService.sendUserRoleChangedEvent).toHaveBeenCalledWith(
+      expect(webSocketsClientService.sendUserRolesChangedEvent).toHaveBeenCalledWith(
         user,
-        RoleName.ProUser
       )
     })
 

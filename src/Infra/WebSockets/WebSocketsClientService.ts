@@ -1,4 +1,3 @@
-import { RoleName } from '@standardnotes/auth'
 import { AxiosInstance } from 'axios'
 import { inject, injectable } from 'inversify'
 import { Logger } from 'winston'
@@ -8,6 +7,7 @@ import { DomainEventFactoryInterface } from '../../Domain/Event/DomainEventFacto
 import { User } from '../../Domain/User/User'
 import { WebSocketsConnectionRepositoryInterface } from '../../Domain/WebSockets/WebSocketsConnectionRepositoryInterface'
 import { ClientServiceInterface } from '../../Domain/Client/ClientServiceInterface'
+import { RoleName } from '@standardnotes/auth'
 
 @injectable()
 export class WebSocketsClientService implements ClientServiceInterface {
@@ -20,9 +20,8 @@ export class WebSocketsClientService implements ClientServiceInterface {
   ) {
   }
 
-  async sendUserRoleChangedEvent(
+  async sendUserRolesChangedEvent(
     user: User,
-    role: RoleName,
   ): Promise<void> {
     if (!this.webSocketsApiUrl) {
       this.logger.debug('Web Sockets API url not defined. Skipped sending user role changed event.')
@@ -32,11 +31,10 @@ export class WebSocketsClientService implements ClientServiceInterface {
 
     const userConnections =
       await this.webSocketsConnectionRepository.findAllByUserUuid(user.uuid)
-
-    const event = this.domainEventFactory.createUserRoleChangedEvent(
+    const event = this.domainEventFactory.createUserRolesChangedEvent(
       user.uuid,
       user.email,
-      role,
+      (await user.roles).map(role => role.name) as RoleName[],
     )
 
     for (const connectionUuid of userConnections) {

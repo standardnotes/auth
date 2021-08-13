@@ -1,5 +1,5 @@
 import { RoleName } from '@standardnotes/auth'
-import { AccountDeletionRequestedEvent, UserRegisteredEvent, UserRoleChangedEvent } from '@standardnotes/domain-events'
+import { AccountDeletionRequestedEvent, UserRegisteredEvent, UserRolesChangedEvent } from '@standardnotes/domain-events'
 import { TimerInterface } from '@standardnotes/time'
 import * as dayjs from 'dayjs'
 import { inject, injectable } from 'inversify'
@@ -34,14 +34,14 @@ export class DomainEventFactory implements DomainEventFactoryInterface {
     }
   }
 
-  createUserRoleChangedEvent(userUuid: string, email: string, role: RoleName): UserRoleChangedEvent {
+  createUserRolesChangedEvent(userUuid: string, email: string, currentRoles: RoleName[]): UserRolesChangedEvent {
     return {
-      type: 'USER_ROLE_CHANGED',
+      type: 'USER_ROLES_CHANGED',
       createdAt: dayjs.utc().toDate(),
       payload: {
         userUuid,
         email,
-        role,
+        currentRoles,
         timestamp: this.timer.getTimestampInMicroseconds(),
       },
     }
