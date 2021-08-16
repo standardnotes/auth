@@ -84,7 +84,7 @@ const TYPES = {
   SubscriptionRenewedEventHandler: Symbol.for('SubscriptionRenewedEventHandler'),
   SubscriptionRefundedEventHandler: Symbol.for('SubscriptionRefundedEventHandler'),
   SubscriptionExpiredEventHandler: Symbol.for('SubscriptionExpiredEventHandler'),
-
+  ExtensionKeyGrantedEventHandler: Symbol.for('ExtensionKeyGrantedEventHandler'),
   // Services
   DeviceDetector: Symbol.for('DeviceDetector'),
   SessionService: Symbol.for('SessionService'),

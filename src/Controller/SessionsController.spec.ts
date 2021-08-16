@@ -11,8 +11,6 @@ import { GetActiveSessionsForUser } from '../Domain/UseCase/GetActiveSessionsFor
 import { AuthenticateRequest } from '../Domain/UseCase/AuthenticateRequest'
 import { User } from '../Domain/User/User'
 import { Role } from '../Domain/Role/Role'
-import { FeatureServiceInterface } from '../Domain/Feature/FeatureServiceInterface'
-import { Feature } from '@standardnotes/features'
 
 describe('SessionsController', () => {
   let getActiveSessionsForUser: GetActiveSessionsForUser
@@ -22,13 +20,11 @@ describe('SessionsController', () => {
   const jwtTTL = 60
   let sessionProjector: ProjectorInterface<Session>
   let roleProjector: ProjectorInterface<Role>
-  let featureService: FeatureServiceInterface
   let session: Session
   let request: express.Request
   let response: express.Response
   let user: User
   let role: Role
-  let feature: Feature
 
   const createController = () => new SessionsController(
     getActiveSessionsForUser,
@@ -36,7 +32,6 @@ describe('SessionsController', () => {
     userProjector,
     sessionProjector,
     roleProjector,
-    featureService,
     jwtSecret,
     jwtTTL
   )
@@ -58,11 +53,6 @@ describe('SessionsController', () => {
 
     roleProjector = {} as jest.Mocked<ProjectorInterface<Role>>
     roleProjector.projectSimple = jest.fn().mockReturnValue({ name: 'role1', uuid: '1-3-4' })
-
-    feature = { name: 'foobar' } as jest.Mocked<Feature>
-
-    featureService = {} as jest.Mocked<FeatureServiceInterface>
-    featureService.getFeaturesForUser = jest.fn().mockReturnValue([feature])
 
     sessionProjector = {} as jest.Mocked<ProjectorInterface<Session>>
     sessionProjector.projectCustom = jest.fn().mockReturnValue({ foo: 'bar' })
@@ -128,11 +118,6 @@ describe('SessionsController', () => {
           name: 'role1',
         },
       ],
-      features: [
-        {
-          name: 'foobar',
-        },
-      ],
     })
   })
 
@@ -162,11 +147,6 @@ describe('SessionsController', () => {
         {
           uuid: '1-3-4',
           name: 'role1',
-        },
-      ],
-      features: [
-        {
-          name: 'foobar',
         },
       ],
     })

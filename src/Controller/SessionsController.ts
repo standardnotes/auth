@@ -18,7 +18,6 @@ import { User } from '../Domain/User/User'
 import { ProjectorInterface } from '../Projection/ProjectorInterface'
 import { SessionProjector } from '../Projection/SessionProjector'
 import { RoleName, Token } from '@standardnotes/auth'
-import { FeatureServiceInterface } from '../Domain/Feature/FeatureServiceInterface'
 
 @controller('/sessions')
 export class SessionsController extends BaseHttpController {
@@ -28,7 +27,6 @@ export class SessionsController extends BaseHttpController {
     @inject(TYPES.UserProjector) private userProjector: ProjectorInterface<User>,
     @inject(TYPES.SessionProjector) private sessionProjector: ProjectorInterface<Session>,
     @inject(TYPES.RoleProjector) private roleProjector: ProjectorInterface<Role>,
-    @inject(TYPES.FeatureService) private featureService: FeatureServiceInterface,
     @inject(TYPES.AUTH_JWT_SECRET) private jwtSecret: string,
     @inject(TYPES.AUTH_JWT_TTL) private jwtTTL: number,
   ) {
@@ -55,7 +53,6 @@ export class SessionsController extends BaseHttpController {
     const authTokenData: Token = {
       user: this.projectUser(<User> authenticateRequestResponse.user),
       roles: this.projectRoles(roles),
-      features: await this.featureService.getFeaturesForUser(<User> authenticateRequestResponse.user),
     }
 
     if (authenticateRequestResponse.session !== undefined) {

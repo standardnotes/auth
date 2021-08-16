@@ -1,6 +1,6 @@
 import 'reflect-metadata'
 
-import { UserRoleChangedEvent } from '@standardnotes/domain-events'
+import { UserRolesChangedEvent } from '@standardnotes/domain-events'
 import { User } from '../../Domain/User/User'
 import { RoleName } from '@standardnotes/auth'
 
@@ -13,8 +13,7 @@ import { Logger } from 'winston'
 describe('WebSocketsClientService', () => {
   let connectionIds: string[]
   let user: User
-  let roleName: RoleName
-  let event: UserRoleChangedEvent
+  let event: UserRolesChangedEvent
   let webSocketsConnectionRepository: WebSocketsConnectionRepositoryInterface
   let domainEventFactory: DomainEventFactoryInterface
   let httpClient: AxiosInstance
@@ -36,17 +35,21 @@ describe('WebSocketsClientService', () => {
     user = {
       uuid: '123',
       email: 'test@test.com',
+      roles: Promise.resolve([
+        {
+          name: RoleName.ProUser,
+        },
+      ]),
     } as jest.Mocked<User>
 
-    roleName = RoleName.ProUser
 
-    event = {} as jest.Mocked<UserRoleChangedEvent>
+    event = {} as jest.Mocked<UserRolesChangedEvent>
 
     webSocketsConnectionRepository = {} as jest.Mocked<WebSocketsConnectionRepositoryInterface>
     webSocketsConnectionRepository.findAllByUserUuid = jest.fn().mockReturnValue(connectionIds)
 
     domainEventFactory = {} as jest.Mocked<DomainEventFactoryInterface>
-    domainEventFactory.createUserRoleChangedEvent = jest.fn().mockReturnValue(event)
+    domainEventFactory.createUserRolesChangedEvent = jest.fn().mockReturnValue(event)
 
     httpClient = {} as jest.Mocked<AxiosInstance>
     httpClient.request = jest.fn()
@@ -56,8 +59,15 @@ describe('WebSocketsClientService', () => {
   })
 
   it('should send a user role changed event to all user connections', async () => {
-    await createService().sendUserRoleChangedEvent(user, roleName)
+    await createService().sendUserRolesChangedEvent(user)
 
+    expect(domainEventFactory.createUserRolesChangedEvent).toHaveBeenCalledWith(
+      '123',
+      'test@test.com',
+      [
+        RoleName.ProUser,
+      ]
+    )
     expect(httpClient.request).toHaveBeenCalledTimes(connectionIds.length)
     connectionIds.map((id, index) => {
       expect(httpClient.request).toHaveBeenNthCalledWith(index + 1, expect.objectContaining({
@@ -71,7 +81,7 @@ describe('WebSocketsClientService', () => {
   it('should not send a user role changed event if web sockets api url not defined', async () => {
     webSocketsApiUrl = ''
 
-    await createService().sendUserRoleChangedEvent(user, roleName)
+    await createService().sendUserRolesChangedEvent(user)
 
     expect(httpClient.request).not.toHaveBeenCalled()
   })
