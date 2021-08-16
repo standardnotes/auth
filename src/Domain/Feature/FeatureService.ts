@@ -41,7 +41,7 @@ export class FeatureService implements FeatureServiceInterface {
       const rolePermissions = await role.permissions
 
       for (const rolePermission of rolePermissions) {
-        let featureForPermission = Features.find(feature => feature.identifier === rolePermission.name) as Feature
+        let featureForPermission = Features.find(feature => feature.permissionName === rolePermission.name) as Feature
 
         if (extensionKeySetting !== undefined) {
           featureForPermission = {
