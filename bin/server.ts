@@ -8,6 +8,7 @@ import '../src/Controller/SessionsController'
 import '../src/Controller/AuthController'
 import '../src/Controller/UsersController'
 import '../src/Controller/WebSocketsController'
+import '../src/Controller/AdminController'
 
 import * as cors from 'cors'
 import { urlencoded, json, Request, Response, NextFunction } from 'express'
