@@ -10,7 +10,7 @@ export class encryptEncodedMfaSettings1629217630132 implements MigrationInterfac
 
       const encryptedMFASecret = await this.encryptMFASecret(mfaSecret, encodedMFASetting['encrypted_server_key'])
 
-      await queryRunner.manager.query(`UDPATE settings SET value = "${encryptedMFASecret}", server_encryption_version = 1 WHERE uuid="${encodedMFASetting['uuid']}"`)
+      await queryRunner.manager.query(`UDPATE settings s SET s.value = '${encryptedMFASecret}', s.server_encryption_version = 1 WHERE s.uuid="${encodedMFASetting['uuid']}"`)
     }
   }
 
