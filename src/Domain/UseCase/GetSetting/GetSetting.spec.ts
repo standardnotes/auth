@@ -1,3 +1,4 @@
+import { SettingName } from '@standardnotes/settings'
 import 'reflect-metadata'
 import { SettingProjector } from '../../../Projection/SettingProjector'
 import { Setting } from '../../Setting/Setting'
@@ -41,17 +42,29 @@ describe('GetSetting', () => {
     })
   })
 
-  it('should not find an mfa setting for user', async () => {
-    expect(await createUseCase().execute({ userUuid: '1-2-3', settingName: 'MFA_SECRET' })).toEqual({
-      success: false,
-      error: {
-        message: 'Setting MFA_SECRET for user 1-2-3 not found!',
-      },
+  it('should not retrieve a sensitive setting for user', async () => {
+    setting = {
+      sensitive: true,
+      name: SettingName.MfaSecret,
+    } as jest.Mocked<Setting>
+
+    settingService.findSetting = jest.fn().mockReturnValue(setting)
+
+    expect(await createUseCase().execute({ userUuid: '1-2-3', settingName: SettingName.MfaSecret })).toEqual({
+      success: true,
+      sensitive: true,
     })
   })
 
-  it('should find an mfa setting for user if explicitly told to', async () => {
-    expect(await createUseCase().execute({ userUuid: '1-2-3', settingName: 'MFA_SECRET', allowMFARetrieval: true })).toEqual({
+  it('should retrieve a sensitive setting for user if explicitly told to', async () => {
+    setting = {
+      sensitive: true,
+      name: SettingName.MfaSecret,
+    } as jest.Mocked<Setting>
+
+    settingService.findSetting = jest.fn().mockReturnValue(setting)
+
+    expect(await createUseCase().execute({ userUuid: '1-2-3', settingName: 'MFA_SECRET', allowSensitiveRetrieval: true })).toEqual({
       success: true,
       userUuid: '1-2-3',
       setting: { foo: 'bar' },

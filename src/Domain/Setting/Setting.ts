@@ -52,4 +52,12 @@ export class Setting {
   )
   @JoinColumn({ name: 'user_uuid', referencedColumnName: 'uuid' })
   user: Promise<User>
+
+  @Column({
+    type: 'tinyint',
+    width: 1,
+    nullable: false,
+    default: 0,
+  })
+  sensitive: boolean
 }

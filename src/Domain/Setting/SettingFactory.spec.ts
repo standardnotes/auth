@@ -28,6 +28,7 @@ describe('SettingFactory', () => {
       name: 'name',
       value: 'value',
       serverEncryptionVersion: Setting.ENCRYPTION_VERSION_UNENCRYPTED,
+      sensitive: false,
     }
     const actual = await createFactory().create(props, user)
 
@@ -35,6 +36,7 @@ describe('SettingFactory', () => {
       createdAt: 1,
       updatedAt: 1,
       name: 'name',
+      sensitive: false,
       serverEncryptionVersion: 0,
       user: Promise.resolve(user),
       uuid: expect.any(String),
@@ -50,6 +52,7 @@ describe('SettingFactory', () => {
       name: 'name',
       value: 'value2',
       serverEncryptionVersion: Setting.ENCRYPTION_VERSION_UNENCRYPTED,
+      sensitive: true,
     }
 
     const actual = await createFactory().createReplacement(original, props)
@@ -58,6 +61,7 @@ describe('SettingFactory', () => {
       createdAt: 1,
       updatedAt: 1,
       name: 'name',
+      sensitive: true,
       serverEncryptionVersion: 0,
       user: Promise.resolve(user),
       uuid: '2-3-4',
@@ -70,6 +74,7 @@ describe('SettingFactory', () => {
     const props: SettingProps = {
       name: 'name',
       value,
+      sensitive: false,
     }
 
     const actual = await createFactory()
@@ -79,6 +84,7 @@ describe('SettingFactory', () => {
       createdAt: 1,
       updatedAt: 1,
       name: 'name',
+      sensitive: false,
       serverEncryptionVersion: 1,
       user: Promise.resolve(user),
       uuid: expect.any(String),
@@ -92,6 +98,7 @@ describe('SettingFactory', () => {
       name: 'name',
       value,
       serverEncryptionVersion: 99999999999,
+      sensitive: false,
     }
 
     await expect(async () => await createFactory()

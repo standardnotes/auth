@@ -51,6 +51,7 @@ describe('SettingService', () => {
         name: 'name',
         value: 'value',
         serverEncryptionVersion: 1,
+        sensitive: false,
       },
     })
 
@@ -67,6 +68,7 @@ describe('SettingService', () => {
         name: 'name',
         value: 'value',
         serverEncryptionVersion: 1,
+        sensitive: false,
       },
     })
 

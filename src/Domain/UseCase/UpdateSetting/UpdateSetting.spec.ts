@@ -43,6 +43,7 @@ describe('UpdateSetting', () => {
       name: 'test-setting-name',
       value: 'test-setting-value',
       serverEncryptionVersion: Setting.ENCRYPTION_VERSION_UNENCRYPTED,
+      sensitive: false,
     }
 
     const response = await createUseCase().execute({ props, userUuid: '1-2-3' })
@@ -52,6 +53,7 @@ describe('UpdateSetting', () => {
         name: 'test-setting-name',
         value: 'test-setting-value',
         serverEncryptionVersion: 0,
+        sensitive: false,
       },
       user,
     })
@@ -70,6 +72,7 @@ describe('UpdateSetting', () => {
       name: 'test-setting-name',
       value: 'test-setting-value',
       serverEncryptionVersion: Setting.ENCRYPTION_VERSION_UNENCRYPTED,
+      sensitive: false,
     }
 
     const response = await createUseCase().execute({ props, userUuid: '1-2-3' })
