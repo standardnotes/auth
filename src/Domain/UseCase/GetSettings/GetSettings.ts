@@ -1,5 +1,3 @@
-import { SettingName } from '@standardnotes/settings'
-
 import { inject, injectable } from 'inversify'
 import { GetSettingsDto } from './GetSettingsDto'
 import { GetSettingsResponse } from './GetSettingsResponse'
@@ -45,8 +43,8 @@ export class GetSettings implements UseCaseInterface {
       settings = settings.filter((setting: Setting) => setting.updatedAt >= (dto.updatedAfter as number))
     }
 
-    if (!dto.allowMFARetrieval) {
-      settings = settings.filter((setting: Setting) => setting.name !== SettingName.MfaSecret)
+    if (!dto.allowSensitiveRetrieval) {
+      settings = settings.filter((setting: Setting) => !setting.sensitive)
     }
 
     for (const setting of settings) {

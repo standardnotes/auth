@@ -7,6 +7,9 @@ export type GetSettingResponse = {
   userUuid: Uuid,
   setting: SimpleSetting,
 } | {
+  success: true,
+  sensitive: true
+} | {
   success: false,
   error: {
     message: string,

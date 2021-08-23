@@ -60,6 +60,7 @@ describe('ExtensionKeyGrantedEventHandler', () => {
         name: 'EXTENSION_KEY',
         serverEncryptionVersion: 1,
         value: 'abc123',
+        sensitive: true,
       },
       user: {
         uuid: '123',

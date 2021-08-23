@@ -172,7 +172,7 @@ describe('UsersController', () => {
     const httpResponse = <results.JsonResult> await createController().getMFASettings(request)
     const result = await httpResponse.executeAsync()
 
-    expect(getSettings.execute).toHaveBeenCalledWith({ userUuid: '1-2-3', settingName: 'MFA_SECRET', allowMFARetrieval: true, updatedAfter: 123 })
+    expect(getSettings.execute).toHaveBeenCalledWith({ userUuid: '1-2-3', settingName: 'MFA_SECRET', allowSensitiveRetrieval: true, updatedAfter: 123 })
 
     expect(result.statusCode).toEqual(200)
   })
@@ -185,7 +185,7 @@ describe('UsersController', () => {
     const httpResponse = <results.JsonResult> await createController().getMFASettings(request)
     const result = await httpResponse.executeAsync()
 
-    expect(getSettings.execute).toHaveBeenCalledWith({ userUuid: '1-2-3', settingName: 'MFA_SECRET', allowMFARetrieval: true })
+    expect(getSettings.execute).toHaveBeenCalledWith({ userUuid: '1-2-3', settingName: 'MFA_SECRET', allowSensitiveRetrieval: true })
 
     expect(result.statusCode).toEqual(400)
   })
@@ -235,6 +235,7 @@ describe('UsersController', () => {
         createdAt: 123,
         name: 'MFA_SECRET',
         serverEncryptionVersion: Setting.ENCRYPTION_VERSION_CLIENT_ENCODED_AND_SERVER_ENCRYPTED,
+        sensitive: true,
         updatedAt: 234,
         uuid: '2-3-4',
         value: 'test',
@@ -250,6 +251,7 @@ describe('UsersController', () => {
     request.body = {
       uuid: '2-3-4',
       value: 'test',
+      sensitive: true,
       serverEncryptionVersion: Setting.ENCRYPTION_VERSION_DEFAULT,
       createdAt: 123,
       updatedAt: 234,
@@ -266,6 +268,7 @@ describe('UsersController', () => {
         name: 'MFA_SECRET',
         serverEncryptionVersion: 1,
         updatedAt: 234,
+        sensitive: true,
         uuid: '2-3-4',
         value: 'test',
       },
@@ -298,6 +301,7 @@ describe('UsersController', () => {
         updatedAt: 234,
         uuid: '2-3-4',
         value: 'test',
+        sensitive: true,
       },
       userUuid: '1-2-3',
     })
@@ -375,6 +379,7 @@ describe('UsersController', () => {
     expect(updateSetting.execute).toHaveBeenCalledWith({
       props: {
         name: 'foo',
+        sensitive: false,
         serverEncryptionVersion: 1,
         value: 'bar',
       },
@@ -404,6 +409,7 @@ describe('UsersController', () => {
     expect(updateSetting.execute).toHaveBeenCalledWith({
       props: {
         name: 'foo',
+        sensitive: false,
         serverEncryptionVersion: 0,
         value: 'bar',
       },
@@ -456,6 +462,7 @@ describe('UsersController', () => {
       props: {
         name: 'foo',
         serverEncryptionVersion: 1,
+        sensitive: false,
         value: 'bar',
       },
       userUuid: '1-2-3',

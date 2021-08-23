@@ -26,8 +26,14 @@ describe('GetSettings', () => {
     setting = {
       name: 'test',
       updatedAt: 345,
+      sensitive: false,
     } as jest.Mocked<Setting>
-    mfaSetting = { name: SettingName.MfaSecret, updatedAt: 122 } as jest.Mocked<Setting>
+
+    mfaSetting = {
+      name: SettingName.MfaSecret,
+      updatedAt: 122,
+      sensitive: true,
+    } as jest.Mocked<Setting>
 
     settingRepository = {} as jest.Mocked<SettingRepositoryInterface>
     settingRepository.findAllByUserUuid = jest.fn().mockReturnValue([ setting, mfaSetting ])
@@ -89,7 +95,7 @@ describe('GetSettings', () => {
   })
 
   it('should return all user settings of certain name', async () => {
-    expect(await createUseCase().execute({ userUuid: '1-2-3', settingName: 'test', allowMFARetrieval: true })).toEqual({
+    expect(await createUseCase().execute({ userUuid: '1-2-3', settingName: 'test', allowSensitiveRetrieval: true })).toEqual({
       success: true,
       userUuid: '1-2-3',
       settings: [{ foo: 'bar' }],
@@ -99,7 +105,7 @@ describe('GetSettings', () => {
   })
 
   it('should return all user settings updated after', async () => {
-    expect(await createUseCase().execute({ userUuid: '1-2-3', allowMFARetrieval: true, updatedAfter: 123 })).toEqual({
+    expect(await createUseCase().execute({ userUuid: '1-2-3', allowSensitiveRetrieval: true, updatedAfter: 123 })).toEqual({
       success: true,
       userUuid: '1-2-3',
       settings: [{ foo: 'bar' }],
@@ -108,8 +114,8 @@ describe('GetSettings', () => {
     expect(settingProjector.projectManySimple).toHaveBeenCalledWith([ setting ])
   })
 
-  it('should return all user settings with mfa if explicit', async () => {
-    expect(await createUseCase().execute({ userUuid: '1-2-3', allowMFARetrieval: true })).toEqual({
+  it('should return all sensitive user settings if explicit', async () => {
+    expect(await createUseCase().execute({ userUuid: '1-2-3', allowSensitiveRetrieval: true })).toEqual({
       success: true,
       userUuid: '1-2-3',
       settings: [{ foo: 'bar' }],

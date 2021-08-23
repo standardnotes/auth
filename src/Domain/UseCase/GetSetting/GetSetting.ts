@@ -18,15 +18,6 @@ export class GetSetting implements UseCaseInterface {
   async execute(dto: GetSettingDto): Promise<GetSettingResponse> {
     const { userUuid, settingName } = dto
 
-    if (settingName === SettingName.MfaSecret && !dto.allowMFARetrieval) {
-      return {
-        success: false,
-        error: {
-          message: `Setting ${settingName} for user ${userUuid} not found!`,
-        },
-      }
-    }
-
     const setting = await this.settingService.findSetting({
       userUuid,
       settingName: settingName as SettingName,
@@ -38,6 +29,13 @@ export class GetSetting implements UseCaseInterface {
         error: {
           message: `Setting ${settingName} for user ${userUuid} not found!`,
         },
+      }
+    }
+
+    if (setting.sensitive && !dto.allowSensitiveRetrieval) {
+      return {
+        success: true,
+        sensitive: true,
       }
     }
 

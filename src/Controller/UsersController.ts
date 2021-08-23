@@ -86,7 +86,7 @@ export class UsersController extends BaseHttpController {
     const result = await this.doGetSettings.execute({
       userUuid: request.params.userUuid,
       settingName: SettingName.MfaSecret,
-      allowMFARetrieval: true,
+      allowSensitiveRetrieval: true,
       updatedAfter: request.body.lastSyncTime,
     })
 
@@ -134,6 +134,7 @@ export class UsersController extends BaseHttpController {
       name: SettingName.MfaSecret,
       createdAt,
       updatedAt,
+      sensitive: true,
     }
 
     const { userUuid } = request.params
@@ -183,12 +184,14 @@ export class UsersController extends BaseHttpController {
       name,
       value,
       serverEncryptionVersion = Setting.ENCRYPTION_VERSION_DEFAULT,
+      sensitive = false,
     } = request.body
 
     const props = {
       name,
       value,
       serverEncryptionVersion,
+      sensitive,
     }
 
     const { userUuid } = request.params
