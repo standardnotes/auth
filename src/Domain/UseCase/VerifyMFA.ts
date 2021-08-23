@@ -3,27 +3,19 @@ import { SettingName } from '@standardnotes/settings'
 import { v4 as uuidv4 } from 'uuid'
 import { inject, injectable } from 'inversify'
 import { authenticator } from 'otplib'
-import { Logger } from 'winston'
 import TYPES from '../../Bootstrap/Types'
-import { CrypterInterface } from '../Encryption/CrypterInterface'
 import { MFAValidationError } from '../Error/MFAValidationError'
-import { Setting } from '../Setting/Setting'
-import { SettingRepositoryInterface } from '../Setting/SettingRepositoryInterface'
-import { User } from '../User/User'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { UseCaseInterface } from './UseCaseInterface'
 import { VerifyMFADTO } from './VerifyMFADTO'
 import { VerifyMFAResponse } from './VerifyMFAResponse'
-import { ContentDecoderInterface } from '../Encryption/ContentDecoderInterface'
+import { SettingServiceInterface } from '../Setting/SettingServiceInterface'
 
 @injectable()
 export class VerifyMFA implements UseCaseInterface {
   constructor(
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
-    @inject(TYPES.SettingRepository) private settingRepository: SettingRepositoryInterface,
-    @inject(TYPES.Crypter) private crypter: CrypterInterface,
-    @inject(TYPES.ContenDecoder) private contentDecoder: ContentDecoderInterface,
-    @inject(TYPES.Logger) private logger: Logger
+    @inject(TYPES.SettingService) private settingService: SettingServiceInterface,
   ) {
   }
 
@@ -36,14 +28,17 @@ export class VerifyMFA implements UseCaseInterface {
         }
       }
 
-      const mfaSecret = await this.getMFASecret(user)
-      if (mfaSecret === undefined) {
+      const mfaSecret = await this.settingService.findSetting({
+        userUuid: user.uuid,
+        settingName: SettingName.MfaSecret,
+      })
+      if (mfaSecret === undefined || mfaSecret.value === null) {
         return {
           success: true,
         }
       }
 
-      return this.verifyMFASecret(mfaSecret, dto.requestParams)
+      return this.verifyMFASecret(mfaSecret.value, dto.requestParams)
     } catch (error) {
       if (error instanceof MFAValidationError) {
         return {
@@ -79,30 +74,6 @@ export class VerifyMFA implements UseCaseInterface {
       token: requestParams[mfaParamKey] as string,
       key: mfaParamKey,
     }
-  }
-
-  private async getMFASecret(user: User): Promise<string | undefined> {
-    const mfaSetting = await this.settingRepository.findLastByNameAndUserUuid(SettingName.MfaSecret, user.uuid)
-    if (mfaSetting === undefined || mfaSetting.value === null) {
-      return undefined
-    }
-
-    this.logger.debug('Found MFA Setting %O', mfaSetting)
-
-    let decrypted = mfaSetting.value
-
-    const encryptedVersions = [
-      Setting.ENCRYPTION_VERSION_DEFAULT,
-      Setting.ENCRYPTION_VERSION_CLIENT_ENCODED_AND_SERVER_ENCRYPTED,
-    ]
-
-    if (encryptedVersions.includes(mfaSetting.serverEncryptionVersion)) {
-      decrypted = await this.crypter.decryptForUser(mfaSetting.value, user)
-    }
-
-    const decoded = this.contentDecoder.decode(decrypted)
-
-    return decoded.secret as string
   }
 
   private verifyMFASecret(secret: string, requestParams: Record<string, unknown>): VerifyMFAResponse {
