@@ -12,7 +12,7 @@ export class flattenMfaSettingAndEncrypt1629223072059 implements MigrationInterf
 
       const encryptedMFASecret = await this.encryptMFASecret(mfaSecret, encryptedAndEncodedMFASetting['encrypted_server_key'])
 
-      await queryRunner.manager.query(`UDPATE settings SET value = "${encryptedMFASecret}", server_encryption_version = 1 WHERE uuid="${encryptedAndEncodedMFASetting['uuid']}"`)
+      await queryRunner.manager.query(`UDPATE settings s SET s.value = '${encryptedMFASecret}', s.server_encryption_version = 1 WHERE s.uuid="${encryptedAndEncodedMFASetting['uuid']}"`)
     }
   }
 
