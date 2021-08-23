@@ -6,6 +6,10 @@ export class encryptEncodedMfaSettings1629217630132 implements MigrationInterfac
     const encodedMFASettings = await queryRunner.manager.query('SELECT s.uuid as uuid, s.value as value, u.encrypted_server_key as encrypted_server_key FROM settings s LEFT JOIN users u ON u.uuid = s.user_uuid WHERE s.name = "MFA_SECRET" AND s.server_encryption_version = 0')
 
     for (const encodedMFASetting of encodedMFASettings) {
+      if (!encodedMFASetting['value']) {
+        continue
+      }
+
       const mfaSecret = this.getDecodedMFASecret(encodedMFASetting['value'])
 
       const encryptedMFASecret = await this.encryptMFASecret(mfaSecret, encodedMFASetting['encrypted_server_key'])

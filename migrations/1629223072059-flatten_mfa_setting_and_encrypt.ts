@@ -6,6 +6,10 @@ export class flattenMfaSettingAndEncrypt1629223072059 implements MigrationInterf
     const encryptedAndEncodedMFASettings = await queryRunner.manager.query('SELECT s.uuid as uuid, s.value as value, u.encrypted_server_key as encrypted_server_key FROM settings s LEFT JOIN users u ON u.uuid = s.user_uuid WHERE s.name = "MFA_SECRET" AND s.server_encryption_version = 2')
 
     for (const encryptedAndEncodedMFASetting of encryptedAndEncodedMFASettings) {
+      if (!encryptedAndEncodedMFASetting['value']) {
+        continue
+      }
+
       const encodedMFASetting = await this.decryptMFASetting(encryptedAndEncodedMFASetting['value'], encryptedAndEncodedMFASetting['encrypted_server_key'])
 
       const mfaSecret = this.getDecodedMFASecret(encodedMFASetting)
