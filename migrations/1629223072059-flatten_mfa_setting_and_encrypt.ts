@@ -13,6 +13,9 @@ export class flattenMfaSettingAndEncrypt1629223072059 implements MigrationInterf
       const encodedMFASetting = await this.decryptMFASetting(encryptedAndEncodedMFASetting['value'], encryptedAndEncodedMFASetting['encrypted_server_key'])
 
       const mfaSecret = this.getDecodedMFASecret(encodedMFASetting)
+      if (!mfaSecret) {
+        continue
+      }
 
       const encryptedMFASecret = await this.encryptMFASecret(mfaSecret, encryptedAndEncodedMFASetting['encrypted_server_key'])
 
@@ -54,12 +57,16 @@ export class flattenMfaSettingAndEncrypt1629223072059 implements MigrationInterf
     return JSON.stringify({ version: 1, encrypted })
   }
 
-  private getDecodedMFASecret(encodedValue: string): string {
+  private getDecodedMFASecret(encodedValue: string): string | undefined {
     const valueBuffer = Buffer.from(encodedValue.substring(3), 'base64')
     const decodedValue = valueBuffer.toString()
 
     const decodedMFASecretObject = JSON.parse(decodedValue)
 
-    return decodedMFASecretObject.secret as string
+    if ('secret' in decodedMFASecretObject && decodedMFASecretObject.secret) {
+      return decodedMFASecretObject.secret
+    }
+
+    return undefined
   }
 }
