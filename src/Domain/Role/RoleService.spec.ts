@@ -9,10 +9,12 @@ import { Role } from '../Role/Role'
 
 import { ClientServiceInterface } from '../Client/ClientServiceInterface'
 import { RoleService } from './RoleService'
+import { RoleToSubscriptionMapInterface } from './RoleToSubscriptionMapInterface'
 
 describe('RoleService', () => {
   let userRepository: UserRepositoryInterface
   let roleRepository: RoleRepositoryInterface
+  let roleToSubscriptionMap: RoleToSubscriptionMapInterface
   let webSocketsClientService: ClientServiceInterface
   let logger: Logger
   let user: User
@@ -23,6 +25,7 @@ describe('RoleService', () => {
     userRepository,
     roleRepository,
     webSocketsClientService,
+    roleToSubscriptionMap,
     logger
   )
 
@@ -39,9 +42,12 @@ describe('RoleService', () => {
 
     roleRepository = {} as jest.Mocked<RoleRepositoryInterface>
     roleRepository.findOneByName = jest.fn().mockReturnValue(proRole)
-    
+
+    roleToSubscriptionMap = {} as jest.Mocked<RoleToSubscriptionMapInterface>
+    roleToSubscriptionMap.getRoleNameForSubscriptionName = jest.fn().mockReturnValue(RoleName.ProUser)
+
     webSocketsClientService = {} as jest.Mocked<ClientServiceInterface>
-    webSocketsClientService.sendUserRoleChangedEvent = jest.fn() 
+    webSocketsClientService.sendUserRolesChangedEvent = jest.fn()
 
     logger = {} as jest.Mocked<Logger>
     logger.info = jest.fn()
@@ -49,7 +55,7 @@ describe('RoleService', () => {
   })
 
   describe('addUserRole', () => {
-    beforeEach(() => {  
+    beforeEach(() => {
       user = {
         uuid: '123',
         email: 'test@test.com',
@@ -57,7 +63,7 @@ describe('RoleService', () => {
           basicRole,
         ]),
       } as jest.Mocked<User>
-  
+
       userRepository.findOneByEmail = jest.fn().mockReturnValue(user)
       userRepository.save = jest.fn().mockReturnValue(user)
     })
@@ -76,13 +82,14 @@ describe('RoleService', () => {
     it('should send websockets event', async () => {
       await createService().addUserRole(user, SubscriptionName.ProPlan)
 
-      expect(webSocketsClientService.sendUserRoleChangedEvent).toHaveBeenCalledWith(
+      expect(webSocketsClientService.sendUserRolesChangedEvent).toHaveBeenCalledWith(
         user,
-        RoleName.ProUser
       )
     })
 
     it('should not add role if no role name exists for subscription name', async () => {
+      roleToSubscriptionMap.getRoleNameForSubscriptionName = jest.fn().mockReturnValue(undefined)
+
       await createService().addUserRole(user, 'test' as SubscriptionName)
 
       expect(userRepository.save).not.toHaveBeenCalled()
@@ -97,7 +104,7 @@ describe('RoleService', () => {
   })
 
   describe('removeUserRole', () => {
-    beforeEach(() => {  
+    beforeEach(() => {
       user = {
         uuid: '123',
         email: 'test@test.com',
@@ -106,7 +113,7 @@ describe('RoleService', () => {
           proRole,
         ]),
       } as jest.Mocked<User>
-  
+
       userRepository.findOneByEmail = jest.fn().mockReturnValue(user)
       userRepository.save = jest.fn().mockReturnValue(user)
     })
@@ -123,13 +130,14 @@ describe('RoleService', () => {
     it('should send websockets event', async () => {
       await createService().removeUserRole(user, SubscriptionName.ProPlan)
 
-      expect(webSocketsClientService.sendUserRoleChangedEvent).toHaveBeenCalledWith(
+      expect(webSocketsClientService.sendUserRolesChangedEvent).toHaveBeenCalledWith(
         user,
-        RoleName.ProUser
       )
     })
 
     it('should not add role if no role name exists for subscription name', async () => {
+      roleToSubscriptionMap.getRoleNameForSubscriptionName = jest.fn().mockReturnValue(undefined)
+
       await createService().removeUserRole(user, 'test' as SubscriptionName)
 
       expect(userRepository.save).not.toHaveBeenCalled()

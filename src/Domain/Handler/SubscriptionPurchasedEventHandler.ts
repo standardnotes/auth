@@ -45,6 +45,7 @@ implements DomainEventHandlerInterface
       event.payload.subscriptionExpiresAt,
       event.payload.timestamp,
     )
+
     await this.addUserRole(user, event.payload.subscriptionName)
   }
 

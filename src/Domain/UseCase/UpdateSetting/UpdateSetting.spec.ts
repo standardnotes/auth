@@ -3,14 +3,14 @@ import { Logger } from 'winston'
 import { SettingProjector } from '../../../Projection/SettingProjector'
 
 import { Setting } from '../../Setting/Setting'
-import { SettingService } from '../../Setting/SettingService'
+import { SettingServiceInterface } from '../../Setting/SettingServiceInterface'
 import { SimpleSetting } from '../../Setting/SimpleSetting'
 import { User } from '../../User/User'
 import { UserRepositoryInterface } from '../../User/UserRepositoryInterface'
 import { UpdateSetting } from './UpdateSetting'
 
 describe('UpdateSetting', () => {
-  let settingService: SettingService
+  let settingService: SettingServiceInterface
   let settingProjection: SimpleSetting
   let settingProjector: SettingProjector
   let setting: Setting
@@ -23,7 +23,7 @@ describe('UpdateSetting', () => {
   beforeEach(() => {
     setting = {} as jest.Mocked<Setting>
 
-    settingService = {} as jest.Mocked<SettingService>
+    settingService = {} as jest.Mocked<SettingServiceInterface>
     settingService.createOrReplace = jest.fn().mockReturnValue({ status: 'created', setting })
 
     settingProjector = {} as jest.Mocked<SettingProjector>
@@ -43,6 +43,7 @@ describe('UpdateSetting', () => {
       name: 'test-setting-name',
       value: 'test-setting-value',
       serverEncryptionVersion: Setting.ENCRYPTION_VERSION_UNENCRYPTED,
+      sensitive: false,
     }
 
     const response = await createUseCase().execute({ props, userUuid: '1-2-3' })
@@ -52,6 +53,7 @@ describe('UpdateSetting', () => {
         name: 'test-setting-name',
         value: 'test-setting-value',
         serverEncryptionVersion: 0,
+        sensitive: false,
       },
       user,
     })
@@ -70,6 +72,7 @@ describe('UpdateSetting', () => {
       name: 'test-setting-name',
       value: 'test-setting-value',
       serverEncryptionVersion: Setting.ENCRYPTION_VERSION_UNENCRYPTED,
+      sensitive: false,
     }
 
     const response = await createUseCase().execute({ props, userUuid: '1-2-3' })

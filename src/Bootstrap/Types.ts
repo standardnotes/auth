@@ -52,6 +52,7 @@ const TYPES = {
   SYNCING_SERVER_URL: Symbol.for('SYNCING_SERVER_URL'),
   WEBSOCKETS_API_URL: Symbol.for('WEBSOCKETS_API_URL'),
   VERSION: Symbol.for('VERSION'),
+  EXTENSION_SERVER_URL: Symbol.for('EXTENSION_SERVER_URL'),
   // use cases
   AuthenticateUser: Symbol.for('AuthenticateUser'),
   AuthenticateRequest: Symbol.for('AuthenticateRequest'),
@@ -69,6 +70,7 @@ const TYPES = {
   ChangePassword: Symbol.for('ChangePassword'),
   GetSettings: Symbol.for('GetSettings'),
   GetSetting: Symbol.for('GetSetting'),
+  GetUserFeatures: Symbol.for('GetUserFeatures'),
   UpdateSetting: Symbol.for('UpdateSetting'),
   DeleteSetting: Symbol.for('DeleteSetting'),
   GetAuthMethods: Symbol.for('GetAuthMethods'),
@@ -81,7 +83,8 @@ const TYPES = {
   SubscriptionPurchasedEventHandler: Symbol.for('SubscriptionPurchasedEventHandler'),
   SubscriptionRenewedEventHandler: Symbol.for('SubscriptionRenewedEventHandler'),
   SubscriptionRefundedEventHandler: Symbol.for('SubscriptionRefundedEventHandler'),
-
+  SubscriptionExpiredEventHandler: Symbol.for('SubscriptionExpiredEventHandler'),
+  ExtensionKeyGrantedEventHandler: Symbol.for('ExtensionKeyGrantedEventHandler'),
   // Services
   DeviceDetector: Symbol.for('DeviceDetector'),
   SessionService: Symbol.for('SessionService'),
@@ -104,6 +107,8 @@ const TYPES = {
   ContenDecoder: Symbol.for('ContenDecoder'),
   WebSocketsClientService: Symbol.for('WebSocketClientService'),
   RoleService: Symbol.for('RoleService'),
+  RoleToSubscriptionMap: Symbol.for('RoleToSubscriptionMap'),
+  FeatureService: Symbol.for('FeatureService'),
 }
 
 export default TYPES

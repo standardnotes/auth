@@ -1,4 +1,4 @@
-import { RoleName, SubscriptionName } from '@standardnotes/auth'
+import { SubscriptionName } from '@standardnotes/auth'
 import { inject, injectable } from 'inversify'
 import { Logger } from 'winston'
 
@@ -8,24 +8,24 @@ import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { ClientServiceInterface } from '../Client/ClientServiceInterface'
 import { RoleRepositoryInterface } from './RoleRepositoryInterface'
 import { RoleServiceInterface } from './RoleServiceInterface'
+import { RoleToSubscriptionMapInterface } from './RoleToSubscriptionMapInterface'
 
 @injectable()
 export class RoleService implements RoleServiceInterface {
   constructor(
-    @inject(TYPES.UserRepository)
-    private userRepository: UserRepositoryInterface,
-    @inject(TYPES.RoleRepository)
-    private roleRepository: RoleRepositoryInterface,
-    @inject(TYPES.WebSocketsClientService)
-    private webSocketsClientService: ClientServiceInterface,
+    @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
+    @inject(TYPES.RoleRepository) private roleRepository: RoleRepositoryInterface,
+    @inject(TYPES.WebSocketsClientService) private webSocketsClientService: ClientServiceInterface,
+    @inject(TYPES.RoleToSubscriptionMap) private roleToSubscriptionMap: RoleToSubscriptionMapInterface,
     @inject(TYPES.Logger) private logger: Logger
-  ) {}
+  ) {
+  }
 
   async addUserRole(
     user: User,
     subscriptionName: SubscriptionName,
   ): Promise<void> {
-    const roleName = this.subscriptionNameToRoleNameMap.get(subscriptionName)
+    const roleName = this.roleToSubscriptionMap.getRoleNameForSubscriptionName(subscriptionName)
 
     if (roleName === undefined) {
       this.logger.warn(
@@ -47,9 +47,8 @@ export class RoleService implements RoleServiceInterface {
       role,
     ])
     await this.userRepository.save(user)
-    await this.webSocketsClientService.sendUserRoleChangedEvent(
+    await this.webSocketsClientService.sendUserRolesChangedEvent(
       user,
-      roleName
     )
   }
 
@@ -57,7 +56,7 @@ export class RoleService implements RoleServiceInterface {
     user: User,
     subscriptionName: SubscriptionName,
   ): Promise<void> {
-    const roleName = this.subscriptionNameToRoleNameMap.get(subscriptionName)
+    const roleName = this.roleToSubscriptionMap.getRoleNameForSubscriptionName(subscriptionName)
 
     if (roleName === undefined) {
       this.logger.warn(
@@ -71,15 +70,8 @@ export class RoleService implements RoleServiceInterface {
       currentRoles.filter(role => role.name !== roleName)
     )
     await this.userRepository.save(user)
-    await this.webSocketsClientService.sendUserRoleChangedEvent(
+    await this.webSocketsClientService.sendUserRolesChangedEvent(
       user,
-      roleName
     )
   }
-
-  private subscriptionNameToRoleNameMap = new Map<SubscriptionName, RoleName>([
-    [SubscriptionName.CorePlan, RoleName.CoreUser],
-    [SubscriptionName.PlusPlan, RoleName.PlusUser],
-    [SubscriptionName.ProPlan, RoleName.ProUser],
-  ]);
 }

@@ -1,6 +1,5 @@
 import * as IORedis from 'ioredis'
-
-import { MfaSetting } from '@standardnotes/auth'
+import { SettingName } from '@standardnotes/settings'
 import { MigrationInterface, QueryRunner } from 'typeorm'
 
 import { Setting } from '../src/Domain/Setting/Setting'
@@ -30,7 +29,7 @@ export class moveMfaItemsToUserSettings1627638504691 implements MigrationInterfa
 
       const setting = new Setting()
       setting.uuid = item['uuid']
-      setting.name = MfaSetting.MfaSecret
+      setting.name = SettingName.MfaSecret
       setting.value = item['content']
       if (item['deleted']) {
         setting.value = null

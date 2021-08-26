@@ -24,6 +24,7 @@ export class SettingFactory {
       name,
       value,
       serverEncryptionVersion = Setting.ENCRYPTION_VERSION_DEFAULT,
+      sensitive,
     } = props
 
     const setting: Setting = {
@@ -38,6 +39,7 @@ export class SettingFactory {
       serverEncryptionVersion,
       createdAt,
       updatedAt,
+      sensitive,
     }
 
     return Object.assign(new Setting(), setting)

@@ -1,4 +1,4 @@
-import { MfaSetting } from '@standardnotes/auth'
+import { SettingName } from '@standardnotes/settings'
 import { Request, Response } from 'express'
 import { inject } from 'inversify'
 import {
@@ -20,6 +20,7 @@ import { GetSettings } from '../Domain/UseCase/GetSettings/GetSettings'
 import { GetUserKeyParams } from '../Domain/UseCase/GetUserKeyParams/GetUserKeyParams'
 import { UpdateSetting } from '../Domain/UseCase/UpdateSetting/UpdateSetting'
 import { UpdateUser } from '../Domain/UseCase/UpdateUser'
+import { GetUserFeatures } from '../Domain/UseCase/GetUserFeatures/GetUserFeatures'
 
 @controller('/users')
 export class UsersController extends BaseHttpController {
@@ -27,6 +28,7 @@ export class UsersController extends BaseHttpController {
     @inject(TYPES.UpdateUser) private updateUser: UpdateUser,
     @inject(TYPES.GetSettings) private doGetSettings: GetSettings,
     @inject(TYPES.GetSetting) private doGetSetting: GetSetting,
+    @inject(TYPES.GetUserFeatures) private doGetUserFeatures: GetUserFeatures,
     @inject(TYPES.GetUserKeyParams) private getUserKeyParams: GetUserKeyParams,
     @inject(TYPES.UpdateSetting) private doUpdateSetting: UpdateSetting,
     @inject(TYPES.DeleteAccount) private doDeleteAccount: DeleteAccount,
@@ -83,8 +85,8 @@ export class UsersController extends BaseHttpController {
   async getMFASettings(request: Request): Promise<results.JsonResult> {
     const result = await this.doGetSettings.execute({
       userUuid: request.params.userUuid,
-      settingName: MfaSetting.MfaSecret,
-      allowMFARetrieval: true,
+      settingName: SettingName.MfaSecret,
+      allowSensitiveRetrieval: true,
       updatedAfter: request.body.lastSyncTime,
     })
 
@@ -103,7 +105,7 @@ export class UsersController extends BaseHttpController {
     const result = await this.doDeleteSetting.execute({
       uuid,
       userUuid,
-      settingName: MfaSetting.MfaSecret,
+      settingName: SettingName.MfaSecret,
       timestamp: updatedAt,
       softDelete: true,
     })
@@ -129,9 +131,10 @@ export class UsersController extends BaseHttpController {
       uuid,
       value,
       serverEncryptionVersion,
-      name: MfaSetting.MfaSecret,
+      name: SettingName.MfaSecret,
       createdAt,
       updatedAt,
+      sensitive: true,
     }
 
     const { userUuid } = request.params
@@ -181,12 +184,14 @@ export class UsersController extends BaseHttpController {
       name,
       value,
       serverEncryptionVersion = Setting.ENCRYPTION_VERSION_DEFAULT,
+      sensitive = false,
     } = request.body
 
     const props = {
       name,
       value,
       serverEncryptionVersion,
+      sensitive,
     }
 
     const { userUuid } = request.params
@@ -255,5 +260,26 @@ export class UsersController extends BaseHttpController {
     })
 
     return this.json({ message: result.message }, result.responseCode)
+  }
+
+  @httpGet('/:userUuid/features', TYPES.AuthMiddleware)
+  async getFeatures(request: Request, response: Response): Promise<results.JsonResult> {
+    if (request.params.userUuid !== response.locals.user.uuid) {
+      return this.json({
+        error: {
+          message: 'Operation not allowed.',
+        },
+      }, 401)
+    }
+
+    const result = await this.doGetUserFeatures.execute({
+      userUuid: request.params.userUuid,
+    })
+
+    if (result.success) {
+      return this.json(result)
+    }
+
+    return this.json(result, 400)
   }
 }

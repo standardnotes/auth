@@ -13,12 +13,11 @@ import TYPES from '../Bootstrap/Types'
 import { Session } from '../Domain/Session/Session'
 import { AuthenticateRequest } from '../Domain/UseCase/AuthenticateRequest'
 import { GetActiveSessionsForUser } from '../Domain/UseCase/GetActiveSessionsForUser'
-import { Permission } from '../Domain/Permission/Permission'
 import { Role } from '../Domain/Role/Role'
 import { User } from '../Domain/User/User'
 import { ProjectorInterface } from '../Projection/ProjectorInterface'
 import { SessionProjector } from '../Projection/SessionProjector'
-import { Token } from '@standardnotes/auth'
+import { RoleName, Token } from '@standardnotes/auth'
 
 @controller('/sessions')
 export class SessionsController extends BaseHttpController {
@@ -28,7 +27,6 @@ export class SessionsController extends BaseHttpController {
     @inject(TYPES.UserProjector) private userProjector: ProjectorInterface<User>,
     @inject(TYPES.SessionProjector) private sessionProjector: ProjectorInterface<Session>,
     @inject(TYPES.RoleProjector) private roleProjector: ProjectorInterface<Role>,
-    @inject(TYPES.PermissionProjector) private permissionProjector: ProjectorInterface<Permission>,
     @inject(TYPES.AUTH_JWT_SECRET) private jwtSecret: string,
     @inject(TYPES.AUTH_JWT_TTL) private jwtTTL: number,
   ) {
@@ -51,18 +49,10 @@ export class SessionsController extends BaseHttpController {
     }
 
     const roles = await (<User> authenticateRequestResponse.user).roles
-    const permissions: Map<string, Permission> = new Map()
-    await Promise.all(roles.map(async (role: Role) => {
-      const rolePermissions = await role.permissions
-      for(const permission of rolePermissions) {
-        permissions.set(permission.uuid, permission)
-      }
-    }))
 
     const authTokenData: Token = {
       user: this.projectUser(<User> authenticateRequestResponse.user),
       roles: this.projectRoles(roles),
-      permissions: this.projectPermissions([...permissions.values()]),
     }
 
     if (authenticateRequestResponse.session !== undefined) {
@@ -112,11 +102,7 @@ export class SessionsController extends BaseHttpController {
     }> this.sessionProjector.projectSimple(session)
   }
 
-  private projectRoles(roles: Array<Role>): Array<{ uuid: string, name: string }> {
-    return roles.map(role => <{ uuid: string, name: string }> this.roleProjector.projectSimple(role))
-  }
-
-  private projectPermissions(permissions: Array<Permission>): Array<{ uuid: string, name: string }> {
-    return permissions.map(permission => <{ uuid: string, name: string }> this.permissionProjector.projectSimple(permission))
+  private projectRoles(roles: Array<Role>): Array<{ uuid: string, name: RoleName }> {
+    return roles.map(role => <{ uuid: string, name: RoleName }> this.roleProjector.projectSimple(role))
   }
 }

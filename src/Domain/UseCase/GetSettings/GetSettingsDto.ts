@@ -1,8 +1,8 @@
-import { Uuid } from '@standardnotes/auth'
+import { Uuid } from '@standardnotes/common'
 
 export type GetSettingsDto = {
   userUuid: Uuid,
   settingName?: string
-  allowMFARetrieval?: boolean
+  allowSensitiveRetrieval?: boolean
   updatedAfter?: number
 }

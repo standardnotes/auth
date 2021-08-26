@@ -6,7 +6,6 @@ import TYPES from '../../../Bootstrap/Types'
 import { SettingRepositoryInterface } from '../../Setting/SettingRepositoryInterface'
 import { SettingProjector } from '../../../Projection/SettingProjector'
 import { Setting } from '../../Setting/Setting'
-import { MfaSetting } from '@standardnotes/auth'
 import { UserRepositoryInterface } from '../../User/UserRepositoryInterface'
 import { CrypterInterface } from '../../Encryption/CrypterInterface'
 
@@ -44,8 +43,8 @@ export class GetSettings implements UseCaseInterface {
       settings = settings.filter((setting: Setting) => setting.updatedAt >= (dto.updatedAfter as number))
     }
 
-    if (!dto.allowMFARetrieval) {
-      settings = settings.filter((setting: Setting) => setting.name !== MfaSetting.MfaSecret)
+    if (!dto.allowSensitiveRetrieval) {
+      settings = settings.filter((setting: Setting) => !setting.sensitive)
     }
 
     for (const setting of settings) {

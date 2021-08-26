@@ -1,3 +1,4 @@
+import { SettingName } from '@standardnotes/settings'
 import { inject, injectable } from 'inversify'
 import { GetAuthMethodsDto } from './GetAuthMethodsDto'
 import { GetAuthMethodsResponse } from './GetAuthMethodsResponse'
@@ -5,7 +6,6 @@ import { UseCaseInterface } from '../UseCaseInterface'
 import TYPES from '../../../Bootstrap/Types'
 import { SettingRepositoryInterface } from '../../Setting/SettingRepositoryInterface'
 import { UserRepositoryInterface } from '../../User/UserRepositoryInterface'
-import { MfaSetting } from '@standardnotes/auth'
 
 @injectable()
 export class GetAuthMethods implements UseCaseInterface {
@@ -25,7 +25,7 @@ export class GetAuthMethods implements UseCaseInterface {
     }
 
     const mfaSetting = await this.settingRepository.findLastByNameAndUserUuid(
-      MfaSetting.MfaSecret,
+      SettingName.MfaSecret,
       user.uuid,
     )
 

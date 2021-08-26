@@ -35,7 +35,7 @@ describe('SubscriptionRenewedEventHandler', () => {
     userRepository.findOneByEmail = jest.fn().mockReturnValue(user)
 
     userSubscriptionRepository = {} as jest.Mocked<UserSubscriptionRepositoryInterface>
-    userSubscriptionRepository.updateEndsAtByNameAndUserUuid = jest.fn()  
+    userSubscriptionRepository.updateEndsAtByNameAndUserUuid = jest.fn()
 
     timestamp = dayjs.utc().valueOf()
     subscriptionExpirationDate = dayjs.utc().valueOf() + 365*1000

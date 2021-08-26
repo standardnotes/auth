@@ -1,6 +1,9 @@
+import { SettingName } from '@standardnotes/settings'
 import 'reflect-metadata'
 import { Logger } from 'winston'
+import { CrypterInterface } from '../Encryption/CrypterInterface'
 import { User } from '../User/User'
+import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { Setting } from './Setting'
 import { SettingFactory } from './SettingFactory'
 import { SettingRepositoryInterface } from './SettingRepositoryInterface'
@@ -11,10 +14,12 @@ describe('SettingService', () => {
   let setting: Setting
   let user: User
   let factory: SettingFactory
-  let repository: SettingRepositoryInterface
+  let settingRepository: SettingRepositoryInterface
+  let userRepository: UserRepositoryInterface
+  let crypter: CrypterInterface
   let logger: Logger
 
-  const createService = () => new SettingService(factory, repository, logger)
+  const createService = () => new SettingService(factory, settingRepository, userRepository, crypter, logger)
 
   beforeEach(() => {
     user = {} as jest.Mocked<User>
@@ -25,9 +30,15 @@ describe('SettingService', () => {
     factory.create = jest.fn().mockReturnValue(setting)
     factory.createReplacement = jest.fn().mockReturnValue(setting)
 
-    repository = {} as jest.Mocked<SettingRepositoryInterface>
-    repository.findLastByNameAndUserUuid = jest.fn().mockReturnValue(undefined)
-    repository.save = jest.fn()
+    settingRepository = {} as jest.Mocked<SettingRepositoryInterface>
+    settingRepository.findLastByNameAndUserUuid = jest.fn().mockReturnValue(undefined)
+    settingRepository.save = jest.fn()
+
+    userRepository = {} as jest.Mocked<UserRepositoryInterface>
+    userRepository.findOneByUuid = jest.fn().mockReturnValue(user)
+
+    crypter = {} as jest.Mocked<CrypterInterface>
+    crypter.decryptForUser = jest.fn().mockReturnValue('decrypted')
 
     logger = {} as jest.Mocked<Logger>
     logger.debug = jest.fn()
@@ -40,6 +51,7 @@ describe('SettingService', () => {
         name: 'name',
         value: 'value',
         serverEncryptionVersion: 1,
+        sensitive: false,
       },
     })
 
@@ -47,7 +59,7 @@ describe('SettingService', () => {
   })
 
   it ('should create setting with a given uuid if it does not exist', async () => {
-    repository.findOneByUuid = jest.fn().mockReturnValue(undefined)
+    settingRepository.findOneByUuid = jest.fn().mockReturnValue(undefined)
 
     const result = await createService().createOrReplace({
       user,
@@ -56,6 +68,7 @@ describe('SettingService', () => {
         name: 'name',
         value: 'value',
         serverEncryptionVersion: 1,
+        sensitive: false,
       },
     })
 
@@ -63,7 +76,7 @@ describe('SettingService', () => {
   })
 
   it ('should replace setting if it does exist', async () => {
-    repository.findLastByNameAndUserUuid = jest.fn().mockReturnValue(setting)
+    settingRepository.findLastByNameAndUserUuid = jest.fn().mockReturnValue(setting)
 
     const result = await createService().createOrReplace({
       user: user,
@@ -78,7 +91,7 @@ describe('SettingService', () => {
   })
 
   it ('should replace setting with a given uuid if it does exist', async () => {
-    repository.findOneByUuid = jest.fn().mockReturnValue(setting)
+    settingRepository.findOneByUuid = jest.fn().mockReturnValue(setting)
 
     const result = await createService().createOrReplace({
       user: user,
@@ -91,5 +104,48 @@ describe('SettingService', () => {
     })
 
     expect(result.status).toEqual('replaced')
+  })
+
+  it('should find and decrypt the value of a setting for user', async () => {
+    setting = {
+      value: 'encrypted',
+      serverEncryptionVersion: Setting.ENCRYPTION_VERSION_DEFAULT,
+    } as jest.Mocked<Setting>
+
+    settingRepository.findLastByNameAndUserUuid = jest.fn().mockReturnValue(setting)
+
+    expect(await createService().findSetting({ userUuid: '1-2-3', settingName: 'test' as SettingName })).toEqual({
+      serverEncryptionVersion: 1,
+      value: 'decrypted',
+    })
+  })
+
+  it('should not find a setting for user if the user does not exist', async () => {
+    setting = {
+      value: 'encrypted',
+      serverEncryptionVersion: Setting.ENCRYPTION_VERSION_DEFAULT,
+    } as jest.Mocked<Setting>
+
+    settingRepository.findLastByNameAndUserUuid = jest.fn().mockReturnValue(setting)
+
+    userRepository.findOneByUuid = jest.fn().mockReturnValue(undefined)
+
+    expect(await createService().findSetting({ userUuid: '1-2-3', settingName: 'test' as SettingName })).toEqual(undefined)
+  })
+
+  it('should decrypt a encoded value of a setting for user', async () => {
+    setting = {
+      value: 'encoded_and_encrypted',
+      serverEncryptionVersion: Setting.ENCRYPTION_VERSION_CLIENT_ENCODED_AND_SERVER_ENCRYPTED,
+    } as jest.Mocked<Setting>
+
+    settingRepository.findLastByNameAndUserUuid = jest.fn().mockReturnValue(setting)
+
+    crypter.decryptForUser = jest.fn().mockReturnValue('encoded_and_decrypted')
+
+    expect(await createService().findSetting({ userUuid: '1-2-3', settingName: 'test' as SettingName })).toEqual({
+      serverEncryptionVersion: 2,
+      value: 'encoded_and_decrypted',
+    })
   })
 })
