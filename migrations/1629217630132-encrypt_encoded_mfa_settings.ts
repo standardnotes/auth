@@ -12,6 +12,10 @@ export class encryptEncodedMfaSettings1629217630132 implements MigrationInterfac
 
       const mfaSecret = this.getDecodedMFASecret(encodedMFASetting['value'])
 
+      if (!mfaSecret) {
+        continue
+      }
+
       const encryptedMFASecret = await this.encryptMFASecret(mfaSecret, encodedMFASetting['encrypted_server_key'])
 
       await queryRunner.manager.query(`UPDATE settings s SET s.value = '${encryptedMFASecret}', s.server_encryption_version = 1 WHERE s.uuid="${encodedMFASetting['uuid']}"`)
@@ -40,12 +44,16 @@ export class encryptEncodedMfaSettings1629217630132 implements MigrationInterfac
     return JSON.stringify({ version: 1, encrypted })
   }
 
-  private getDecodedMFASecret(encodedValue: string): string {
+  private getDecodedMFASecret(encodedValue: string): string | undefined {
     const valueBuffer = Buffer.from(encodedValue.substring(3), 'base64')
     const decodedValue = valueBuffer.toString()
 
     const decodedMFASecretObject = JSON.parse(decodedValue)
 
-    return decodedMFASecretObject.secret as string
+    if ('secret' in decodedMFASecretObject && decodedMFASecretObject.secret) {
+      return decodedMFASecretObject.secret
+    }
+
+    return undefined
   }
 }
