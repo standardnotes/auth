@@ -8,7 +8,7 @@ import { User } from '../src/Domain/User/User'
 export class moveMfaItemsToUserSettings1627638504691 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     const itemsTableExistsQueryResult = await queryRunner.manager.query('SELECT COUNT(*) as count FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = "items"')
-    const itemsTableExists = itemsTableExistsQueryResult[0].count === '1'
+    const itemsTableExists = itemsTableExistsQueryResult[0].count === 1
     if (!itemsTableExists) {
       return
     }
