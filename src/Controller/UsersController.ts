@@ -13,13 +13,11 @@ import TYPES from '../Bootstrap/Types'
 import { DeleteAccount } from '../Domain/UseCase/DeleteAccount/DeleteAccount'
 import { GetUserKeyParams } from '../Domain/UseCase/GetUserKeyParams/GetUserKeyParams'
 import { UpdateUser } from '../Domain/UseCase/UpdateUser'
-import { GetUserFeatures } from '../Domain/UseCase/GetUserFeatures/GetUserFeatures'
 
 @controller('/users')
 export class UsersController extends BaseHttpController {
   constructor(
     @inject(TYPES.UpdateUser) private updateUser: UpdateUser,
-    @inject(TYPES.GetUserFeatures) private doGetUserFeatures: GetUserFeatures,
     @inject(TYPES.GetUserKeyParams) private getUserKeyParams: GetUserKeyParams,
     @inject(TYPES.DeleteAccount) private doDeleteAccount: DeleteAccount,
   ) {
@@ -83,26 +81,5 @@ export class UsersController extends BaseHttpController {
     })
 
     return this.json({ message: result.message }, result.responseCode)
-  }
-
-  @httpGet('/:userUuid/features', TYPES.AuthMiddleware)
-  async getFeatures(request: Request, response: Response): Promise<results.JsonResult> {
-    if (request.params.userUuid !== response.locals.user.uuid) {
-      return this.json({
-        error: {
-          message: 'Operation not allowed.',
-        },
-      }, 401)
-    }
-
-    const result = await this.doGetUserFeatures.execute({
-      userUuid: request.params.userUuid,
-    })
-
-    if (result.success) {
-      return this.json(result)
-    }
-
-    return this.json(result, 400)
   }
 }

@@ -8,12 +8,10 @@ import { User } from '../Domain/User/User'
 import { UpdateUser } from '../Domain/UseCase/UpdateUser'
 import { GetUserKeyParams } from '../Domain/UseCase/GetUserKeyParams/GetUserKeyParams'
 import { DeleteAccount } from '../Domain/UseCase/DeleteAccount/DeleteAccount'
-import { GetUserFeatures } from '../Domain/UseCase/GetUserFeatures/GetUserFeatures'
 
 describe('UsersController', () => {
   let updateUser: UpdateUser
   let deleteAccount: DeleteAccount
-  let getUserFeatures: GetUserFeatures
   let getUserKeyParams: GetUserKeyParams
 
   let request: express.Request
@@ -22,7 +20,6 @@ describe('UsersController', () => {
 
   const createController = () => new UsersController(
     updateUser,
-    getUserFeatures,
     getUserKeyParams,
     deleteAccount,
   )
@@ -39,9 +36,6 @@ describe('UsersController', () => {
 
     getUserKeyParams = {} as jest.Mocked<GetUserKeyParams>
     getUserKeyParams.execute = jest.fn()
-
-    getUserFeatures = {} as jest.Mocked<GetUserFeatures>
-    getUserFeatures.execute = jest.fn()
 
     request = {
       headers: {},
@@ -163,58 +157,5 @@ describe('UsersController', () => {
     expect(getUserKeyParams.execute).not.toHaveBeenCalled()
 
     expect(result.statusCode).toEqual(400)
-  })
-
-  describe('getUserFeatures', () => {
-    it('should get authenticated user features', async () => {
-      request.params.userUuid = '1-2-3'
-      response.locals.user =  {
-        uuid: '1-2-3',
-      }
-
-      getUserFeatures.execute = jest.fn().mockReturnValue({ success: true })
-
-      const httpResponse = <results.JsonResult> await createController().getFeatures(request, response)
-      const result = await httpResponse.executeAsync()
-
-      expect(getUserFeatures.execute).toHaveBeenCalledWith({
-        userUuid: '1-2-3',
-      })
-
-      expect(result.statusCode).toEqual(200)
-    })
-
-    it('should not get user features if the user with provided uuid does not exist', async () => {
-      request.params.userUuid = '1-2-3'
-      response.locals.user = {
-        uuid: '1-2-3',
-      }
-
-      getUserFeatures.execute = jest.fn().mockReturnValue({ success: false })
-
-      const httpResponse = <results.JsonResult> await createController().getFeatures(request, response)
-      const result = await httpResponse.executeAsync()
-
-      expect(getUserFeatures.execute).toHaveBeenCalledWith({ userUuid: '1-2-3' })
-
-      expect(result.statusCode).toEqual(400)
-
-    })
-
-    it('should not get user features if not allowed', async () => {
-      request.params.userUuid = '1-2-3'
-      response.locals.user = {
-        uuid: '2-3-4',
-      }
-
-      getUserFeatures.execute = jest.fn()
-
-      const httpResponse = <results.JsonResult> await createController().getFeatures(request, response)
-      const result = await httpResponse.executeAsync()
-
-      expect(getUserFeatures.execute).not.toHaveBeenCalled()
-
-      expect(result.statusCode).toEqual(401)
-    })
   })
 })
