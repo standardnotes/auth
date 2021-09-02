@@ -52,11 +52,12 @@ describe('UsersController', () => {
     request.body.version = '002'
     request.body.api = '20190520'
     request.body.origination = 'test'
+    request.body.email = 'newemail@test.te'
     request.params.userId = '123'
     request.headers['user-agent'] = 'Google Chrome'
     response.locals.user = user
 
-    updateUser.execute = jest.fn().mockReturnValue({ authResponse: { foo: 'bar' } })
+    updateUser.execute = jest.fn().mockReturnValue({ success: true, authResponse: { foo: 'bar' } })
 
     const httpResponse = <results.JsonResult> await createController().update(request, response)
     const result = await httpResponse.executeAsync()
@@ -65,6 +66,7 @@ describe('UsersController', () => {
       apiVersion: '20190520',
       kpOrigination: 'test',
       updatedWithUserAgent: 'Google Chrome',
+      email: 'newemail@test.te',
       version: '002',
       user: {
         uuid: '123',
@@ -73,6 +75,35 @@ describe('UsersController', () => {
 
     expect(result.statusCode).toEqual(200)
     expect(await result.content.readAsStringAsync()).toEqual('{"foo":"bar"}')
+  })
+
+  it('should not update a user if the procedure fails', async () => {
+    request.body.version = '002'
+    request.body.api = '20190520'
+    request.body.origination = 'test'
+    request.body.email = 'newemail@test.te'
+    request.params.userId = '123'
+    request.headers['user-agent'] = 'Google Chrome'
+    response.locals.user = user
+
+    updateUser.execute = jest.fn().mockReturnValue({ success: false })
+
+    const httpResponse = <results.JsonResult> await createController().update(request, response)
+    const result = await httpResponse.executeAsync()
+
+    expect(updateUser.execute).toHaveBeenCalledWith({
+      apiVersion: '20190520',
+      kpOrigination: 'test',
+      updatedWithUserAgent: 'Google Chrome',
+      email: 'newemail@test.te',
+      version: '002',
+      user: {
+        uuid: '123',
+      },
+    })
+
+    expect(result.statusCode).toEqual(400)
+    expect(await result.content.readAsStringAsync()).toEqual('{"error":{"message":"Could not update user."}}')
   })
 
   it('should not update a user if it is not the same as logged in user', async () => {

@@ -40,6 +40,7 @@ export class UsersController extends BaseHttpController {
       apiVersion: request.body.api,
       pwFunc: request.body.pw_func,
       pwAlg: request.body.pw_alg,
+      email: request.body.email,
       pwCost: request.body.pw_cost,
       pwKeySize: request.body.pw_key_size,
       pwNonce: request.body.pw_nonce,
@@ -49,7 +50,15 @@ export class UsersController extends BaseHttpController {
       version: request.body.version,
     })
 
-    return this.json(updateResult.authResponse)
+    if (updateResult.success) {
+      return this.json(updateResult.authResponse)
+    }
+
+    return this.json({
+      error: {
+        message: 'Could not update user.',
+      },
+    }, 400)
   }
 
   @httpGet('/params')
