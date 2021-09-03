@@ -28,6 +28,19 @@ describe('DomainEventFactory', () => {
       })
   })
 
+  it('should create a USER_CHANGED_EMAIL event', () => {
+    expect(createFactory().createUserEmailChangedEvent('1-2-3', 'test@test.te', 'test2@test.te'))
+      .toEqual({
+        createdAt: expect.any(Date),
+        payload: {
+          userUuid: '1-2-3',
+          fromEmail: 'test@test.te',
+          toEmail: 'test2@test.te',
+        },
+        type: 'USER_EMAIL_CHANGED',
+      })
+  })
+
   it('should create a ACCOUNT_DELETION_REQUESTED event', () => {
     expect(createFactory().createAccountDeletionRequestedEvent('1-2-3'))
       .toEqual({

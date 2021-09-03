@@ -132,20 +132,4 @@ describe('SettingService', () => {
 
     expect(await createService().findSetting({ userUuid: '1-2-3', settingName: 'test' as SettingName })).toEqual(undefined)
   })
-
-  it('should decrypt a encoded value of a setting for user', async () => {
-    setting = {
-      value: 'encoded_and_encrypted',
-      serverEncryptionVersion: Setting.ENCRYPTION_VERSION_CLIENT_ENCODED_AND_SERVER_ENCRYPTED,
-    } as jest.Mocked<Setting>
-
-    settingRepository.findLastByNameAndUserUuid = jest.fn().mockReturnValue(setting)
-
-    crypter.decryptForUser = jest.fn().mockReturnValue('encoded_and_decrypted')
-
-    expect(await createService().findSetting({ userUuid: '1-2-3', settingName: 'test' as SettingName })).toEqual({
-      serverEncryptionVersion: 2,
-      value: 'encoded_and_decrypted',
-    })
-  })
 })

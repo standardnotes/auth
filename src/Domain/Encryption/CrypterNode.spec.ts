@@ -2,18 +2,16 @@ import { Aes256GcmEncrypted } from '@standardnotes/sncrypto-common'
 import { SnCryptoNode } from '@standardnotes/sncrypto-node'
 import { Logger } from 'winston'
 import { User } from '../User/User'
-import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { CrypterNode } from './CrypterNode'
 
 describe('CrypterNode', () => {
   let crypto: SnCryptoNode
   let user: User
-  let userRepository: UserRepositoryInterface
   let logger: Logger
 
   const iv = 'iv'
 
-  const createCrypter = () => new CrypterNode(serverKey, crypto, userRepository, logger)
+  const createCrypter = () => new CrypterNode(serverKey, crypto, logger)
 
   const makeEncrypted = (ciphertext: string): Aes256GcmEncrypted<string> => {
     return {
@@ -48,15 +46,12 @@ describe('CrypterNode', () => {
     user = {} as jest.Mocked<User>
     user.encryptedServerKey = version(encryptedUserKey)
 
-    userRepository = {} as jest.Mocked<UserRepositoryInterface>
-    userRepository.save = jest.fn()
-
     logger = {} as jest.Mocked<Logger>
     logger.debug = jest.fn()
   })
 
   it('should fail to instantiate on non-32-byte key', async () => {
-    expect(() => new CrypterNode('short-key', crypto, userRepository, logger)).toThrow()
+    expect(() => new CrypterNode('short-key', crypto, logger)).toThrow()
   })
 
   it('should encrypt a value for user', async () => {
@@ -77,17 +72,6 @@ describe('CrypterNode', () => {
     expect(crypto.aes256GcmDecrypt).toHaveBeenNthCalledWith(1, encryptedUserKey, serverKey)
 
     expect(crypto.aes256GcmDecrypt).toHaveBeenNthCalledWith(2, encrypted, decrypted)
-  })
-
-  it('should generate an encrypted server key for user during decryption if one does not exist', async () => {
-    user.encryptedServerKey = null
-    user.serverEncryptionVersion = 0
-
-    expect(await createCrypter().decryptForUser(version(encrypted), user)).toEqual(decrypted)
-
-    expect(crypto.aes256GcmDecrypt).toHaveBeenCalledTimes(2)
-
-    expect(userRepository.save).toHaveBeenCalled()
   })
 
   it('should generate an encrypted user server key', async () => {

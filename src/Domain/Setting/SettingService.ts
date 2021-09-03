@@ -35,12 +35,7 @@ export class SettingService implements SettingServiceInterface {
       return undefined
     }
 
-    if (setting.value !== null &&
-      (
-        setting.serverEncryptionVersion === Setting.ENCRYPTION_VERSION_DEFAULT ||
-        setting.serverEncryptionVersion === Setting.ENCRYPTION_VERSION_CLIENT_ENCODED_AND_SERVER_ENCRYPTED
-      )
-    ) {
+    if (setting.value !== null && setting.serverEncryptionVersion === Setting.ENCRYPTION_VERSION_DEFAULT) {
       const user = await this.userRepository.findOneByUuid(dto.userUuid)
 
       if (user === undefined) {
