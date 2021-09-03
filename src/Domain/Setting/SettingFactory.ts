@@ -69,7 +69,6 @@ export class SettingFactory {
     case Setting.ENCRYPTION_VERSION_UNENCRYPTED:
       return value
     case Setting.ENCRYPTION_VERSION_DEFAULT:
-    case Setting.ENCRYPTION_VERSION_CLIENT_ENCODED_AND_SERVER_ENCRYPTED:
       return this.crypter.encryptForUser(value as string, user)
     default:
       throw Error(`Unrecognized encryption version: ${serverEncryptionVersion}!`)

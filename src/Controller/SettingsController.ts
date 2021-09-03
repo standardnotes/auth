@@ -85,7 +85,7 @@ export class SettingsController extends BaseHttpController {
     const {
       uuid,
       value,
-      serverEncryptionVersion = Setting.ENCRYPTION_VERSION_CLIENT_ENCODED_AND_SERVER_ENCRYPTED,
+      serverEncryptionVersion = Setting.ENCRYPTION_VERSION_DEFAULT,
       createdAt,
       updatedAt,
     } = request.body
