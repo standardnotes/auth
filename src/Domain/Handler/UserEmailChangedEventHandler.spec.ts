@@ -1,19 +1,19 @@
 import 'reflect-metadata'
 
-import { UserChangedEmailEvent } from '@standardnotes/domain-events'
+import { UserEmailChangedEvent } from '@standardnotes/domain-events'
 import { Logger } from 'winston'
 import { AxiosInstance } from 'axios'
 
-import { UserChangedEmailEventHandler } from './UserChangedEmailEventHandler'
+import { UserEmailChangedEventHandler } from './UserEmailChangedEventHandler'
 
-describe('UserChangedEmailEventHandler', () => {
+describe('UserEmailChangedEventHandler', () => {
   let httpClient: AxiosInstance
   const userServerChangeEmailUrl = 'https://user-server/change-email'
   const userServerAuthKey = 'auth-key'
-  let event: UserChangedEmailEvent
+  let event: UserEmailChangedEvent
   let logger: Logger
 
-  const createHandler = () => new UserChangedEmailEventHandler(
+  const createHandler = () => new UserEmailChangedEventHandler(
     httpClient,
     userServerChangeEmailUrl,
     userServerAuthKey,
@@ -24,7 +24,7 @@ describe('UserChangedEmailEventHandler', () => {
     httpClient = {} as jest.Mocked<AxiosInstance>
     httpClient.request = jest.fn()
 
-    event = {} as jest.Mocked<UserChangedEmailEvent>
+    event = {} as jest.Mocked<UserEmailChangedEvent>
     event.createdAt = new Date(1)
     event.payload = {
       userUuid: '1-2-3',
@@ -59,7 +59,7 @@ describe('UserChangedEmailEventHandler', () => {
   })
 
   it('should not send a request to the user management server about an email change if url is not defined', async () => {
-    const handler = new UserChangedEmailEventHandler(
+    const handler = new UserEmailChangedEventHandler(
       httpClient,
       '',
       userServerAuthKey,
