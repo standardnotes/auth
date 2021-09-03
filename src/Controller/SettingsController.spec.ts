@@ -136,7 +136,7 @@ describe('SettingsController', () => {
     expect(result.statusCode).toEqual(400)
   })
 
-  it('should update user mfa setting with default encoded and encrypted setting', async () => {
+  it('should update user mfa setting with default encrypted setting', async () => {
     request.params.userUuid = '1-2-3'
     request.body = {
       uuid: '2-3-4',
@@ -154,7 +154,7 @@ describe('SettingsController', () => {
       props: {
         createdAt: 123,
         name: 'MFA_SECRET',
-        serverEncryptionVersion: Setting.ENCRYPTION_VERSION_CLIENT_ENCODED_AND_SERVER_ENCRYPTED,
+        serverEncryptionVersion: Setting.ENCRYPTION_VERSION_DEFAULT,
         sensitive: true,
         updatedAt: 234,
         uuid: '2-3-4',
@@ -203,7 +203,7 @@ describe('SettingsController', () => {
     request.body = {
       uuid: '2-3-4',
       value: 'test',
-      serverEncryptionVersion: Setting.ENCRYPTION_VERSION_CLIENT_ENCODED_AND_SERVER_ENCRYPTED,
+      serverEncryptionVersion: Setting.ENCRYPTION_VERSION_DEFAULT,
       createdAt: 123,
       updatedAt: 234,
     }
@@ -217,7 +217,7 @@ describe('SettingsController', () => {
       props: {
         createdAt: 123,
         name: 'MFA_SECRET',
-        serverEncryptionVersion: 2,
+        serverEncryptionVersion: 1,
         updatedAt: 234,
         uuid: '2-3-4',
         value: 'test',
