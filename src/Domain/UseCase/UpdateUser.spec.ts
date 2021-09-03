@@ -6,7 +6,7 @@ import { AuthResponseFactoryInterface } from '../Auth/AuthResponseFactoryInterfa
 import { AuthResponseFactoryResolverInterface } from '../Auth/AuthResponseFactoryResolverInterface'
 
 import { UpdateUser } from './UpdateUser'
-import { DomainEventPublisherInterface, UserChangedEmailEvent } from '@standardnotes/domain-events'
+import { DomainEventPublisherInterface, UserEmailChangedEvent } from '@standardnotes/domain-events'
 import { DomainEventFactoryInterface } from '../Event/DomainEventFactoryInterface'
 
 describe('UpdateUser', () => {
@@ -39,7 +39,7 @@ describe('UpdateUser', () => {
     domainEventPublisher.publish = jest.fn()
 
     domainEventFactory = {} as jest.Mocked<DomainEventFactoryInterface>
-    domainEventFactory.createUserChangedEmailEvent = jest.fn().mockReturnValue({} as jest.Mocked<UserChangedEmailEvent>)
+    domainEventFactory.createUserEmailChangedEvent = jest.fn().mockReturnValue({} as jest.Mocked<UserEmailChangedEvent>)
 
     user = {} as jest.Mocked<User>
     user.uuid = '123'
@@ -68,7 +68,7 @@ describe('UpdateUser', () => {
       version: '004',
     })
     expect(domainEventPublisher.publish).not.toHaveBeenCalled()
-    expect(domainEventFactory.createUserChangedEmailEvent).not.toHaveBeenCalled()
+    expect(domainEventFactory.createUserEmailChangedEvent).not.toHaveBeenCalled()
   })
 
   it('should fail to change user email if a user already exists with that email', async () => {
@@ -93,6 +93,6 @@ describe('UpdateUser', () => {
     })).toEqual({ success: true, authResponse: { foo: 'bar' } })
 
     expect(domainEventPublisher.publish).toHaveBeenCalledTimes(1)
-    expect(domainEventFactory.createUserChangedEmailEvent).toHaveBeenLastCalledWith('123', 'test@test.te', 'test2@test.te')
+    expect(domainEventFactory.createUserEmailChangedEvent).toHaveBeenLastCalledWith('123', 'test@test.te', 'test2@test.te')
   })
 })

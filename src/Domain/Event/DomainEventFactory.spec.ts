@@ -29,7 +29,7 @@ describe('DomainEventFactory', () => {
   })
 
   it('should create a USER_CHANGED_EMAIL event', () => {
-    expect(createFactory().createUserChangedEmailEvent('1-2-3', 'test@test.te', 'test2@test.te'))
+    expect(createFactory().createUserEmailChangedEvent('1-2-3', 'test@test.te', 'test2@test.te'))
       .toEqual({
         createdAt: expect.any(Date),
         payload: {
@@ -37,7 +37,7 @@ describe('DomainEventFactory', () => {
           fromEmail: 'test@test.te',
           toEmail: 'test2@test.te',
         },
-        type: 'USER_CHANGED_EMAIL',
+        type: 'USER_EMAIL_CHANGED',
       })
   })
 

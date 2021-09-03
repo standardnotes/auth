@@ -6,13 +6,6 @@ import {
   DomainEventHandlerInterface,
   DomainEventMessageHandlerInterface,
   DomainEventSubscriberFactoryInterface,
-  RedisDomainEventPublisher,
-  RedisDomainEventSubscriberFactory,
-  RedisEventMessageHandler,
-  SNSDomainEventPublisher,
-  SQSDomainEventSubscriberFactory,
-  SQSEventMessageHandler,
-  SQSNewRelicEventMessageHandler,
 } from '@standardnotes/domain-events'
 import { TimerInterface, Timer } from '@standardnotes/time'
 import { UAParser } from 'ua-parser-js'
@@ -102,6 +95,7 @@ import { FeatureServiceInterface } from '../Domain/Feature/FeatureServiceInterfa
 import { FeatureService } from '../Domain/Feature/FeatureService'
 import { SettingServiceInterface } from '../Domain/Setting/SettingServiceInterface'
 import { ExtensionKeyGrantedEventHandler } from '../Domain/Handler/ExtensionKeyGrantedEventHandler'
+import { RedisDomainEventPublisher, RedisDomainEventSubscriberFactory, RedisEventMessageHandler, SNSDomainEventPublisher, SQSDomainEventSubscriberFactory, SQSEventMessageHandler, SQSNewRelicEventMessageHandler } from '@standardnotes/domain-events-infra'
 
 export class ContainerConfigLoader {
   async load(): Promise<Container> {

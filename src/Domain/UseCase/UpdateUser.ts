@@ -1,4 +1,4 @@
-import { DomainEventPublisherInterface, UserChangedEmailEvent } from '@standardnotes/domain-events'
+import { DomainEventPublisherInterface, UserEmailChangedEvent } from '@standardnotes/domain-events'
 import { inject, injectable } from 'inversify'
 import TYPES from '../../Bootstrap/Types'
 import { AuthResponseFactoryResolverInterface } from '../Auth/AuthResponseFactoryResolverInterface'
@@ -27,7 +27,7 @@ export class UpdateUser implements UseCaseInterface {
         && delete updateFields[key]
     )
 
-    let userChangedEmailEvent: UserChangedEmailEvent | undefined = undefined
+    let UserEmailChangedEvent: UserEmailChangedEvent | undefined = undefined
     if ('email' in updateFields) {
       const existingUser = await this.userRepository.findOneByEmail(updateFields.email as string)
       if (existingUser !== undefined) {
@@ -36,15 +36,15 @@ export class UpdateUser implements UseCaseInterface {
         }
       }
 
-      userChangedEmailEvent = this.domainEventFactory.createUserChangedEmailEvent(user.uuid, user.email, updateFields.email as string)
+      UserEmailChangedEvent = this.domainEventFactory.createUserEmailChangedEvent(user.uuid, user.email, updateFields.email as string)
     }
 
     Object.assign(user, updateFields)
 
     await this.userRepository.save(user)
 
-    if (userChangedEmailEvent) {
-      await this.domainEventPublisher.publish(userChangedEmailEvent)
+    if (UserEmailChangedEvent) {
+      await this.domainEventPublisher.publish(UserEmailChangedEvent)
     }
 
     const authResponseFactory = this.authResponseFactoryResolver.resolveAuthResponseFactoryVersion(apiVersion)
