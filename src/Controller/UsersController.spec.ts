@@ -8,11 +8,13 @@ import { User } from '../Domain/User/User'
 import { UpdateUser } from '../Domain/UseCase/UpdateUser'
 import { GetUserKeyParams } from '../Domain/UseCase/GetUserKeyParams/GetUserKeyParams'
 import { DeleteAccount } from '../Domain/UseCase/DeleteAccount/DeleteAccount'
+import { GetUserSubscription } from '../Domain/UseCase/GetUserSubscription/GetUserSubscription'
 
 describe('UsersController', () => {
   let updateUser: UpdateUser
   let deleteAccount: DeleteAccount
   let getUserKeyParams: GetUserKeyParams
+  let getUserSubscription: GetUserSubscription
 
   let request: express.Request
   let response: express.Response
@@ -22,6 +24,7 @@ describe('UsersController', () => {
     updateUser,
     getUserKeyParams,
     deleteAccount,
+    getUserSubscription,
   )
 
   beforeEach(() => {
@@ -36,6 +39,9 @@ describe('UsersController', () => {
 
     getUserKeyParams = {} as jest.Mocked<GetUserKeyParams>
     getUserKeyParams.execute = jest.fn()
+
+    getUserSubscription = {} as jest.Mocked<GetUserSubscription>
+    getUserSubscription.execute = jest.fn()
 
     request = {
       headers: {},
@@ -188,5 +194,28 @@ describe('UsersController', () => {
     expect(getUserKeyParams.execute).not.toHaveBeenCalled()
 
     expect(result.statusCode).toEqual(400)
+  })
+
+  it('should get user subscription', async () => {
+    request.params = {
+      userUuid: '1-2-3',
+    }
+
+    response.locals.user = {
+      uuid: '1-2-3',
+    }
+
+    getUserSubscription.execute = jest.fn().mockReturnValue({
+      success: true,
+    })
+
+    const httpResponse = <results.JsonResult> await createController().getSubscription(request, response)
+    const result = await httpResponse.executeAsync()
+    
+    expect(getUserSubscription.execute).toHaveBeenCalledWith({
+      userUuid: '1-2-3',
+    })
+
+    expect(result.statusCode).toEqual(200)
   })
 })
