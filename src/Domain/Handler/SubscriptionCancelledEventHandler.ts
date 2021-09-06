@@ -1,6 +1,6 @@
 import {
   DomainEventHandlerInterface,
-  SubscriptionRenewedEvent,
+  SubscriptionCancelledEvent,
 } from '@standardnotes/domain-events'
 import { inject, injectable } from 'inversify'
 import { Logger } from 'winston'
@@ -10,7 +10,7 @@ import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { UserSubscriptionRepositoryInterface } from '../User/UserSubscriptionRepositoryInterface'
 
 @injectable()
-export class SubscriptionRenewedEventHandler
+export class SubscriptionCancelledEventHandler
 implements DomainEventHandlerInterface
 {
   constructor(
@@ -19,7 +19,7 @@ implements DomainEventHandlerInterface
     @inject(TYPES.Logger) private logger: Logger
   ) {}
   async handle(
-    event: SubscriptionRenewedEvent
+    event: SubscriptionCancelledEvent
   ): Promise<void> {
     const user = await this.userRepository.findOneByEmail(
       event.payload.userEmail
@@ -32,24 +32,22 @@ implements DomainEventHandlerInterface
       return
     }
 
-    await this.updateSubscriptionEndsAt(
+    await this.updateSubscriptionCancelled(
       event.payload.subscriptionName,
       user.uuid,
-      event.payload.subscriptionExpiresAt,
       event.payload.timestamp,
     )
   }
 
-  private async updateSubscriptionEndsAt(
+  private async updateSubscriptionCancelled(
     subscriptionName: string,
     userUuid: string,
-    subscriptionExpiresAt: number,
     timestamp: number,
   ): Promise<void> {
-    await this.userSubscriptionRepository.updateEndsAtByNameAndUserUuid(
+    await this.userSubscriptionRepository.updateSubscriptionCancelled(
       subscriptionName,
       userUuid,
-      subscriptionExpiresAt,
+      true,
       timestamp,
     )
   }

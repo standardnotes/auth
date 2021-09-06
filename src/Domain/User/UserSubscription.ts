@@ -32,6 +32,14 @@ export class UserSubscription {
   @Index('updated_at')
   updatedAt: number
 
+  @Column({
+    type: 'tinyint',
+    width: 1,
+    nullable: false,
+    default: 0,
+  })
+  cancelled: boolean
+
   @ManyToOne(
     /* istanbul ignore next */
     () => User,
