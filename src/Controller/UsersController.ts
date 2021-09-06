@@ -13,6 +13,7 @@ import TYPES from '../Bootstrap/Types'
 import { DeleteAccount } from '../Domain/UseCase/DeleteAccount/DeleteAccount'
 import { GetUserKeyParams } from '../Domain/UseCase/GetUserKeyParams/GetUserKeyParams'
 import { UpdateUser } from '../Domain/UseCase/UpdateUser'
+import { GetUserSubscription } from '../Domain/UseCase/GetUserSubscription/GetUserSubscription'
 
 @controller('/users')
 export class UsersController extends BaseHttpController {
@@ -20,6 +21,7 @@ export class UsersController extends BaseHttpController {
     @inject(TYPES.UpdateUser) private updateUser: UpdateUser,
     @inject(TYPES.GetUserKeyParams) private getUserKeyParams: GetUserKeyParams,
     @inject(TYPES.DeleteAccount) private doDeleteAccount: DeleteAccount,
+    @inject(TYPES.GetUserSubscription) private doGetUserSubscription: GetUserSubscription,
   ) {
     super()
   }
@@ -90,5 +92,26 @@ export class UsersController extends BaseHttpController {
     })
 
     return this.json({ message: result.message }, result.responseCode)
+  }
+
+  @httpGet('/:userUuid/subscription', TYPES.AuthMiddleware)
+  async getSubscription(request: Request, response: Response): Promise<results.JsonResult> {
+    if (request.params.userUuid !== response.locals.user.uuid) {
+      return this.json({
+        error: {
+          message: 'Operation not allowed.',
+        },
+      }, 401)
+    }
+
+    const result = await this.doGetUserSubscription.execute({
+      userUuid: request.params.userUuid,
+    })
+
+    if (result.success) {
+      return this.json(result)
+    }
+
+    return this.json(result, 400)
   }
 }
