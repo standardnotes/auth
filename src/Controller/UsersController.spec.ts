@@ -197,10 +197,7 @@ describe('UsersController', () => {
   })
 
   it('should get user subscription', async () => {
-    request.params = {
-      userUuid: '1-2-3',
-    }
-
+    request.params.userUuid = '1-2-3'
     response.locals.user = {
       uuid: '1-2-3',
     }
@@ -217,5 +214,40 @@ describe('UsersController', () => {
     })
 
     expect(result.statusCode).toEqual(200)
+  })
+
+  it('should not get user subscription if the user with provided uuid does not exist', async () => {
+    request.params.userUuid = '1-2-3'
+    response.locals.user = {
+      uuid: '1-2-3',
+    }
+
+    getUserSubscription.execute = jest.fn().mockReturnValue({
+      success: false,
+    })
+
+    const httpResponse = <results.JsonResult> await createController().getSubscription(request, response)
+    const result = await httpResponse.executeAsync()
+
+    expect(getUserSubscription.execute).toHaveBeenCalledWith({ userUuid: '1-2-3' })
+
+    expect(result.statusCode).toEqual(400)
+
+  })
+
+  it('should not get user subscription if not allowed', async () => {
+    request.params.userUuid = '1-2-3'
+    response.locals.user = {
+      uuid: '2-3-4',
+    }
+
+    getUserSubscription.execute = jest.fn()
+
+    const httpResponse = <results.JsonResult> await createController().getSubscription(request, response)
+    const result = await httpResponse.executeAsync()
+
+    expect(getUserSubscription.execute).not.toHaveBeenCalled()
+
+    expect(result.statusCode).toEqual(401)
   })
 })
