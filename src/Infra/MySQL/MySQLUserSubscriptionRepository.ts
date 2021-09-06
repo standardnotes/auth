@@ -36,7 +36,7 @@ export class MySQLUserSubscriptionRepository extends Repository<UserSubscription
       .execute()
   }
 
-  async updateSubscriptionCancelled(name: string, userUuid: string, cancelled: boolean, updatedAt: number): Promise<void> {
+  async updateCancelled(name: string, userUuid: string, cancelled: boolean, updatedAt: number): Promise<void> {
     await this.createQueryBuilder()
       .update()
       .set({

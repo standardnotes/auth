@@ -44,7 +44,7 @@ implements DomainEventHandlerInterface
     userUuid: string,
     timestamp: number,
   ): Promise<void> {
-    await this.userSubscriptionRepository.updateSubscriptionCancelled(
+    await this.userSubscriptionRepository.updateCancelled(
       subscriptionName,
       userUuid,
       true,
