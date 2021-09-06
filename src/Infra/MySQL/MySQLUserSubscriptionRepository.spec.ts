@@ -72,4 +72,31 @@ describe('MySQLUserSubscriptionRepository', () => {
     )
     expect(updateQueryBuilder.execute).toHaveBeenCalled()
   })
+
+  it('should update cancelled by name and user uuid', async () => {
+    repository.createQueryBuilder = jest.fn().mockImplementation(() => updateQueryBuilder)
+
+    updateQueryBuilder.update = jest.fn().mockReturnThis()
+    updateQueryBuilder.set = jest.fn().mockReturnThis()
+    updateQueryBuilder.where = jest.fn().mockReturnThis()
+    updateQueryBuilder.execute = jest.fn()
+
+    await repository.updateCancelled('test', '123', true, 1000)
+
+    expect(updateQueryBuilder.update).toHaveBeenCalled()
+    expect(updateQueryBuilder.set).toHaveBeenCalledWith(
+      {
+        updatedAt: expect.any(Number),
+        cancelled: true,
+      }
+    )
+    expect(updateQueryBuilder.where).toHaveBeenCalledWith(
+      'plan_name = :plan_name AND user_uuid = :user_uuid',
+      {
+        plan_name: 'test',
+        user_uuid: '123',
+      }
+    )
+    expect(updateQueryBuilder.execute).toHaveBeenCalled()
+  })
 })
