@@ -78,6 +78,7 @@ const TYPES = {
   DeleteAccount: Symbol.for('DeleteAccount'),
   AddWebSocketsConnection: Symbol.for('AddWebSocketsConnection'),
   RemoveWebSocketsConnection: Symbol.for('RemoveWebSocketsConnection'),
+  GetUserSubscription: Symbol.for('GetUserSubscription'),
   // Handlers
   UserRegisteredEventHandler: Symbol.for('UserRegisteredEventHandler'),
   AccountDeletionRequestedEventHandler: Symbol.for('AccountDeletionRequestedEventHandler'),

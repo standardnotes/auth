@@ -96,6 +96,7 @@ import { FeatureService } from '../Domain/Feature/FeatureService'
 import { SettingServiceInterface } from '../Domain/Setting/SettingServiceInterface'
 import { ExtensionKeyGrantedEventHandler } from '../Domain/Handler/ExtensionKeyGrantedEventHandler'
 import { RedisDomainEventPublisher, RedisDomainEventSubscriberFactory, RedisEventMessageHandler, SNSDomainEventPublisher, SQSDomainEventSubscriberFactory, SQSEventMessageHandler, SQSNewRelicEventMessageHandler } from '@standardnotes/domain-events-infra'
+import { GetUserSubscription } from '../Domain/UseCase/GetUserSubscription/GetUserSubscription'
 
 export class ContainerConfigLoader {
   async load(): Promise<Container> {
@@ -257,6 +258,7 @@ export class ContainerConfigLoader {
     container.bind<DeleteAccount>(TYPES.DeleteAccount).to(DeleteAccount)
     container.bind<AddWebSocketsConnection>(TYPES.AddWebSocketsConnection).to(AddWebSocketsConnection)
     container.bind<RemoveWebSocketsConnection>(TYPES.RemoveWebSocketsConnection).to(RemoveWebSocketsConnection)
+    container.bind<GetUserSubscription>(TYPES.GetUserSubscription).to(GetUserSubscription)
 
     // Handlers
     container.bind<UserRegisteredEventHandler>(TYPES.UserRegisteredEventHandler).to(UserRegisteredEventHandler)

@@ -2,7 +2,6 @@ import { SubscriptionName } from '@standardnotes/auth'
 import {
   DomainEventHandlerInterface,
   SubscriptionPurchasedEvent,
-  SubscriptionRenewedEvent,
 } from '@standardnotes/domain-events'
 import { inject, injectable } from 'inversify'
 import { Logger } from 'winston'
@@ -26,7 +25,7 @@ implements DomainEventHandlerInterface
   ) {}
 
   async handle(
-    event: SubscriptionPurchasedEvent | SubscriptionRenewedEvent
+    event: SubscriptionPurchasedEvent
   ): Promise<void> {
     const user = await this.userRepository.findOneByEmail(
       event.payload.userEmail
@@ -68,6 +67,7 @@ implements DomainEventHandlerInterface
     subscription.createdAt = timestamp
     subscription.updatedAt = timestamp
     subscription.endsAt = subscriptionExpiresAt
+    subscription.cancelled = false
 
     await this.userSubscriptionRepository.save(subscription)
   }
