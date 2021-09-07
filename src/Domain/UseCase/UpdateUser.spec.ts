@@ -6,22 +6,16 @@ import { AuthResponseFactoryInterface } from '../Auth/AuthResponseFactoryInterfa
 import { AuthResponseFactoryResolverInterface } from '../Auth/AuthResponseFactoryResolverInterface'
 
 import { UpdateUser } from './UpdateUser'
-import { DomainEventPublisherInterface, UserEmailChangedEvent } from '@standardnotes/domain-events'
-import { DomainEventFactoryInterface } from '../Event/DomainEventFactoryInterface'
 
 describe('UpdateUser', () => {
   let userRepository: UserRepositoryInterface
   let authResponseFactoryResolver: AuthResponseFactoryResolverInterface
   let authResponseFactory: AuthResponseFactoryInterface
-  let domainEventPublisher: DomainEventPublisherInterface
-  let domainEventFactory: DomainEventFactoryInterface
   let user: User
 
   const createUseCase = () => new UpdateUser(
     userRepository,
     authResponseFactoryResolver,
-    domainEventPublisher,
-    domainEventFactory
   )
 
   beforeEach(() => {
@@ -34,12 +28,6 @@ describe('UpdateUser', () => {
 
     authResponseFactoryResolver = {} as jest.Mocked<AuthResponseFactoryResolverInterface>
     authResponseFactoryResolver.resolveAuthResponseFactoryVersion = jest.fn().mockReturnValue(authResponseFactory)
-
-    domainEventPublisher = {} as jest.Mocked<DomainEventPublisherInterface>
-    domainEventPublisher.publish = jest.fn()
-
-    domainEventFactory = {} as jest.Mocked<DomainEventFactoryInterface>
-    domainEventFactory.createUserEmailChangedEvent = jest.fn().mockReturnValue({} as jest.Mocked<UserEmailChangedEvent>)
 
     user = {} as jest.Mocked<User>
     user.uuid = '123'
@@ -67,32 +55,5 @@ describe('UpdateUser', () => {
       uuid: '123',
       version: '004',
     })
-    expect(domainEventPublisher.publish).not.toHaveBeenCalled()
-    expect(domainEventFactory.createUserEmailChangedEvent).not.toHaveBeenCalled()
-  })
-
-  it('should fail to change user email if a user already exists with that email', async () => {
-    userRepository.findOneByEmail = jest.fn().mockReturnValue({} as jest.Mocked<User>)
-
-    expect(await createUseCase().execute({
-      user,
-      updatedWithUserAgent: 'Mozilla',
-      apiVersion: '20190520',
-      version: '004',
-      email: 'test2@test.te',
-    })).toEqual({ success: false })
-  })
-
-  it('should change user email', async () => {
-    expect(await createUseCase().execute({
-      user,
-      updatedWithUserAgent: 'Mozilla',
-      apiVersion: '20190520',
-      version: '004',
-      email: 'test2@test.te',
-    })).toEqual({ success: true, authResponse: { foo: 'bar' } })
-
-    expect(domainEventPublisher.publish).toHaveBeenCalledTimes(1)
-    expect(domainEventFactory.createUserEmailChangedEvent).toHaveBeenLastCalledWith('123', 'test@test.te', 'test2@test.te')
   })
 })
