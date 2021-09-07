@@ -87,27 +87,27 @@ describe('FeatureService', () => {
     settingService.findSetting = jest.fn().mockReturnValue(extensionKeySetting)
   })
 
-  it('should return user features with `expiresAt` field', async () => {
+  it('should return user features with `expires_at` field', async () => {
     expect(await createService().getFeaturesForUser(user)).toEqual([
       {
-        'contentType': 'SN|Theme',
+        'content_type': 'SN|Theme',
         'description': 'A theme for writers and readers.',
-        'dockIcon': {
-          'backgroundColor': '#9D7441',
-          'borderColor': '#9D7441',
-          'foregroundColor': '#ECE4DB',
+        'dock_icon': {
+          'background_color': '#9D7441',
+          'border_color': '#9D7441',
+          'foreground_color': '#ECE4DB',
           'type': 'circle',
         },
-        'downloadUrl': 'https://github.com/standardnotes/autobiography-theme/archive/1.0.0.zip',
-        'expiresAt': 555,
+        'download_url': 'https://github.com/standardnotes/autobiography-theme/archive/1.0.0.zip',
+        'expires_at': 555,
         'flags': [
           'New',
         ],
         'identifier': 'org.standardnotes.theme-autobiography',
-        'permissionName': 'theme:autobiography',
-        'marketingUrl': '',
+        'permission_name': 'theme:autobiography',
+        'marketing_url': '',
         'name': 'Autobiography',
-        'thumbnailUrl': 'https://s3.amazonaws.com/standard-notes/screenshots/models/themes/autobiography.jpg',
+        'thumbnail_url': 'https://s3.amazonaws.com/standard-notes/screenshots/models/themes/autobiography.jpg',
         'url': 'https://extension-server/abc123/themes/autobiography',
         'version': '1.0.0',
       },
@@ -131,24 +131,24 @@ describe('FeatureService', () => {
 
     expect(await createService().getFeaturesForUser(user)).toEqual([
       {
-        'contentType': 'SN|Theme',
+        'content_type': 'SN|Theme',
         'description': 'A theme for writers and readers.',
-        'dockIcon': {
-          'backgroundColor': '#9D7441',
-          'borderColor': '#9D7441',
-          'foregroundColor': '#ECE4DB',
+        'dock_icon': {
+          'background_color': '#9D7441',
+          'border_color': '#9D7441',
+          'foreground_color': '#ECE4DB',
           'type': 'circle',
         },
-        'downloadUrl': 'https://github.com/standardnotes/autobiography-theme/archive/1.0.0.zip',
-        'expiresAt': 555,
+        'download_url': 'https://github.com/standardnotes/autobiography-theme/archive/1.0.0.zip',
+        'expires_at': 555,
         'flags': [
           'New',
         ],
         'identifier': 'org.standardnotes.theme-autobiography',
-        'permissionName': 'theme:autobiography',
-        'marketingUrl': '',
+        'permission_name': 'theme:autobiography',
+        'marketing_url': '',
         'name': 'Autobiography',
-        'thumbnailUrl': 'https://s3.amazonaws.com/standard-notes/screenshots/models/themes/autobiography.jpg',
+        'thumbnail_url': 'https://s3.amazonaws.com/standard-notes/screenshots/models/themes/autobiography.jpg',
         'url': '#{url_prefix}/themes/autobiography',
         'version': '1.0.0',
       },
@@ -160,31 +160,31 @@ describe('FeatureService', () => {
 
     expect(await createService().getFeaturesForUser(user)).toEqual([
       {
-        'contentType': 'SN|Theme',
+        'content_type': 'SN|Theme',
         'description': 'A theme for writers and readers.',
-        'dockIcon': {
-          'backgroundColor': '#9D7441',
-          'borderColor': '#9D7441',
-          'foregroundColor': '#ECE4DB',
+        'dock_icon': {
+          'background_color': '#9D7441',
+          'border_color': '#9D7441',
+          'foreground_color': '#ECE4DB',
           'type': 'circle',
         },
-        'downloadUrl': 'https://github.com/standardnotes/autobiography-theme/archive/1.0.0.zip',
-        'expiresAt': 555,
+        'download_url': 'https://github.com/standardnotes/autobiography-theme/archive/1.0.0.zip',
+        'expires_at': 555,
         'flags': [
           'New',
         ],
         'identifier': 'org.standardnotes.theme-autobiography',
-        'permissionName': 'theme:autobiography',
-        'marketingUrl': '',
+        'permission_name': 'theme:autobiography',
+        'marketing_url': '',
         'name': 'Autobiography',
-        'thumbnailUrl': 'https://s3.amazonaws.com/standard-notes/screenshots/models/themes/autobiography.jpg',
+        'thumbnail_url': 'https://s3.amazonaws.com/standard-notes/screenshots/models/themes/autobiography.jpg',
         'url': '#{url_prefix}/themes/autobiography',
         'version': '1.0.0',
       },
     ])
   })
 
-  it('should return user features with `expiresAt` field when user has more than 1 role & subscription', async () => {
+  it('should return user features with `expires_at` field when user has more than 1 role & subscription', async () => {
     roleToSubscriptionMap.getSubscriptionNameForRoleName = jest.fn()
       .mockReturnValueOnce(SubscriptionName.CorePlan)
       .mockReturnValueOnce(SubscriptionName.ProPlan)
@@ -197,39 +197,39 @@ describe('FeatureService', () => {
 
     expect(await createService().getFeaturesForUser(user)).toEqual([
       {
-        'contentType': 'SN|Theme',
+        'content_type': 'SN|Theme',
         'description': 'A theme for writers and readers.',
-        'dockIcon': {
-          'backgroundColor': '#9D7441',
-          'borderColor': '#9D7441',
-          'foregroundColor': '#ECE4DB',
+        'dock_icon': {
+          'background_color': '#9D7441',
+          'border_color': '#9D7441',
+          'foreground_color': '#ECE4DB',
           'type': 'circle',
         },
-        'downloadUrl': 'https://github.com/standardnotes/autobiography-theme/archive/1.0.0.zip',
-        'expiresAt': 555,
+        'download_url': 'https://github.com/standardnotes/autobiography-theme/archive/1.0.0.zip',
+        'expires_at': 555,
         'flags': [
           'New',
         ],
         'identifier': 'org.standardnotes.theme-autobiography',
-        'permissionName': 'theme:autobiography',
-        'marketingUrl': '',
+        'permission_name': 'theme:autobiography',
+        'marketing_url': '',
         'name': 'Autobiography',
-        'thumbnailUrl': 'https://s3.amazonaws.com/standard-notes/screenshots/models/themes/autobiography.jpg',
+        'thumbnail_url': 'https://s3.amazonaws.com/standard-notes/screenshots/models/themes/autobiography.jpg',
         'url': 'https://extension-server/abc123/themes/autobiography',
         'version': '1.0.0',
       },
       {
         'area': 'modal',
-        'contentType': 'SN|Component',
-        'description': '',
-        'downloadUrl': '',
-        'expiresAt': 777,
+        'content_type': 'SN|Component',
+        'description': 'Manage and install cloud backups, including Note History, Dropbox, Google Drive, OneDrive, and Daily Email Backups.',
+        'download_url': '',
+        'expires_at': 777,
         'identifier': 'org.standardnotes.cloudlink',
-        'permissionName': 'component:cloud-link',
-        'marketingUrl': '',
-        'name': '',
-        'url': '',
-        'version': '',
+        'permission_name': 'component:cloud-link',
+        'marketing_url': '',
+        'name': 'CloudLink',
+        'url': 'https://extension-server/abc123/components/cloudlink',
+        'version': '1.2.3',
       },
     ])
   })
@@ -251,39 +251,39 @@ describe('FeatureService', () => {
 
     expect(await createService().getFeaturesForUser(user)).toEqual([
       {
-        'contentType': 'SN|Theme',
+        'content_type': 'SN|Theme',
         'description': 'A theme for writers and readers.',
-        'dockIcon': {
-          'backgroundColor': '#9D7441',
-          'borderColor': '#9D7441',
-          'foregroundColor': '#ECE4DB',
+        'dock_icon': {
+          'background_color': '#9D7441',
+          'border_color': '#9D7441',
+          'foreground_color': '#ECE4DB',
           'type': 'circle',
         },
-        'downloadUrl': 'https://github.com/standardnotes/autobiography-theme/archive/1.0.0.zip',
-        'expiresAt': 777,
+        'download_url': 'https://github.com/standardnotes/autobiography-theme/archive/1.0.0.zip',
+        'expires_at': 777,
         'flags': [
           'New',
         ],
         'identifier': 'org.standardnotes.theme-autobiography',
-        'permissionName': 'theme:autobiography',
-        'marketingUrl': '',
+        'permission_name': 'theme:autobiography',
+        'marketing_url': '',
         'name': 'Autobiography',
-        'thumbnailUrl': 'https://s3.amazonaws.com/standard-notes/screenshots/models/themes/autobiography.jpg',
+        'thumbnail_url': 'https://s3.amazonaws.com/standard-notes/screenshots/models/themes/autobiography.jpg',
         'url': 'https://extension-server/abc123/themes/autobiography',
         'version': '1.0.0',
       },
       {
         'area': 'modal',
-        'contentType': 'SN|Component',
-        'description': '',
-        'downloadUrl': '',
-        'expiresAt': 777,
+        'content_type': 'SN|Component',
+        'description': 'Manage and install cloud backups, including Note History, Dropbox, Google Drive, OneDrive, and Daily Email Backups.',
+        'download_url': '',
+        'expires_at': 777,
         'identifier': 'org.standardnotes.cloudlink',
-        'permissionName': 'component:cloud-link',
-        'marketingUrl': '',
-        'name': '',
-        'url': '',
-        'version': '',
+        'permission_name': 'component:cloud-link',
+        'marketing_url': '',
+        'name': 'CloudLink',
+        'url': 'https://extension-server/abc123/components/cloudlink',
+        'version': '1.2.3',
       },
     ])
   })
@@ -307,39 +307,39 @@ describe('FeatureService', () => {
 
     expect(await createService().getFeaturesForUser(user)).toEqual([
       {
-        'contentType': 'SN|Theme',
+        'content_type': 'SN|Theme',
         'description': 'A theme for writers and readers.',
-        'dockIcon': {
-          'backgroundColor': '#9D7441',
-          'borderColor': '#9D7441',
-          'foregroundColor': '#ECE4DB',
+        'dock_icon': {
+          'background_color': '#9D7441',
+          'border_color': '#9D7441',
+          'foreground_color': '#ECE4DB',
           'type': 'circle',
         },
-        'downloadUrl': 'https://github.com/standardnotes/autobiography-theme/archive/1.0.0.zip',
-        'expiresAt': 555,
+        'download_url': 'https://github.com/standardnotes/autobiography-theme/archive/1.0.0.zip',
+        'expires_at': 555,
         'flags': [
           'New',
         ],
         'identifier': 'org.standardnotes.theme-autobiography',
-        'permissionName': 'theme:autobiography',
-        'marketingUrl': '',
+        'permission_name': 'theme:autobiography',
+        'marketing_url': '',
         'name': 'Autobiography',
-        'thumbnailUrl': 'https://s3.amazonaws.com/standard-notes/screenshots/models/themes/autobiography.jpg',
+        'thumbnail_url': 'https://s3.amazonaws.com/standard-notes/screenshots/models/themes/autobiography.jpg',
         'url': 'https://extension-server/abc123/themes/autobiography',
         'version': '1.0.0',
       },
       {
         'area': 'modal',
-        'contentType': 'SN|Component',
-        'description': '',
-        'downloadUrl': '',
-        'expiresAt': 111,
+        'content_type': 'SN|Component',
+        'description': 'Manage and install cloud backups, including Note History, Dropbox, Google Drive, OneDrive, and Daily Email Backups.',
+        'download_url': '',
+        'expires_at': 111,
         'identifier': 'org.standardnotes.cloudlink',
-        'permissionName': 'component:cloud-link',
-        'marketingUrl': '',
-        'name': '',
-        'url': '',
-        'version': '',
+        'permission_name': 'component:cloud-link',
+        'marketing_url': '',
+        'name': 'CloudLink',
+        'url': 'https://extension-server/abc123/components/cloudlink',
+        'version': '1.2.3',
       },
     ])
   })
