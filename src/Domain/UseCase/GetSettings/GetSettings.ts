@@ -48,12 +48,7 @@ export class GetSettings implements UseCaseInterface {
     }
 
     for (const setting of settings) {
-      if (setting.value !== null &&
-        (
-          setting.serverEncryptionVersion === Setting.ENCRYPTION_VERSION_DEFAULT ||
-          setting.serverEncryptionVersion === Setting.ENCRYPTION_VERSION_CLIENT_ENCODED_AND_SERVER_ENCRYPTED
-        )
-      ) {
+      if (setting.value !== null && setting.serverEncryptionVersion === Setting.ENCRYPTION_VERSION_DEFAULT) {
         setting.value = await this.crypter.decryptForUser(setting.value, user)
       }
     }

@@ -7,6 +7,8 @@ import '../src/Controller/SessionController'
 import '../src/Controller/SessionsController'
 import '../src/Controller/AuthController'
 import '../src/Controller/UsersController'
+import '../src/Controller/SettingsController'
+import '../src/Controller/FeaturesController'
 import '../src/Controller/WebSocketsController'
 import '../src/Controller/AdminController'
 

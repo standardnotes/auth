@@ -5,6 +5,7 @@ export type UpdateUserDTO = {
   user: User,
   updatedWithUserAgent: string
   apiVersion: string
+  email?: string
   pwFunc?: string
   pwAlg?: string
   pwCost?: number

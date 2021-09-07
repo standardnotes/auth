@@ -59,6 +59,7 @@ describe('FeatureService', () => {
       planName: SubscriptionName.CorePlan,
       endsAt: 555,
       user: Promise.resolve(user),
+      cancelled: false,
     }
 
     subscription2 = {
@@ -68,6 +69,7 @@ describe('FeatureService', () => {
       planName: SubscriptionName.ProPlan,
       endsAt: 777,
       user: Promise.resolve(user),
+      cancelled: false,
     }
 
     user = {

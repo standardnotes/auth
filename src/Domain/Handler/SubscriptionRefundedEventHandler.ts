@@ -43,7 +43,6 @@ implements DomainEventHandlerInterface
       event.payload.timestamp,
     )
     await this.removeUserRole(user, event.payload.subscriptionName)
-
   }
 
   private async removeUserRole(

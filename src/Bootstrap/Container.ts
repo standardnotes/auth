@@ -6,13 +6,6 @@ import {
   DomainEventHandlerInterface,
   DomainEventMessageHandlerInterface,
   DomainEventSubscriberFactoryInterface,
-  RedisDomainEventPublisher,
-  RedisDomainEventSubscriberFactory,
-  RedisEventMessageHandler,
-  SNSDomainEventPublisher,
-  SQSDomainEventSubscriberFactory,
-  SQSEventMessageHandler,
-  SQSNewRelicEventMessageHandler,
 } from '@standardnotes/domain-events'
 import { TimerInterface, Timer } from '@standardnotes/time'
 import { UAParser } from 'ua-parser-js'
@@ -102,6 +95,8 @@ import { FeatureServiceInterface } from '../Domain/Feature/FeatureServiceInterfa
 import { FeatureService } from '../Domain/Feature/FeatureService'
 import { SettingServiceInterface } from '../Domain/Setting/SettingServiceInterface'
 import { ExtensionKeyGrantedEventHandler } from '../Domain/Handler/ExtensionKeyGrantedEventHandler'
+import { RedisDomainEventPublisher, RedisDomainEventSubscriberFactory, RedisEventMessageHandler, SNSDomainEventPublisher, SQSDomainEventSubscriberFactory, SQSEventMessageHandler, SQSNewRelicEventMessageHandler } from '@standardnotes/domain-events-infra'
+import { GetUserSubscription } from '../Domain/UseCase/GetUserSubscription/GetUserSubscription'
 
 export class ContainerConfigLoader {
   async load(): Promise<Container> {
@@ -231,6 +226,7 @@ export class ContainerConfigLoader {
     container.bind(TYPES.SQS_QUEUE_URL).toConstantValue(env.get('SQS_QUEUE_URL', true))
     container.bind(TYPES.USER_SERVER_REGISTRATION_URL).toConstantValue(env.get('USER_SERVER_REGISTRATION_URL', true))
     container.bind(TYPES.USER_SERVER_AUTH_KEY).toConstantValue(env.get('USER_SERVER_AUTH_KEY', true))
+    container.bind(TYPES.USER_SERVER_CHANGE_EMAIL_URL).toConstantValue(env.get('USER_SERVER_CHANGE_EMAIL_URL', true))
     container.bind(TYPES.REDIS_EVENTS_CHANNEL).toConstantValue(env.get('REDIS_EVENTS_CHANNEL'))
     container.bind(TYPES.NEW_RELIC_ENABLED).toConstantValue(env.get('NEW_RELIC_ENABLED', true))
     container.bind(TYPES.SYNCING_SERVER_URL).toConstantValue(env.get('SYNCING_SERVER_URL'))
@@ -262,6 +258,7 @@ export class ContainerConfigLoader {
     container.bind<DeleteAccount>(TYPES.DeleteAccount).to(DeleteAccount)
     container.bind<AddWebSocketsConnection>(TYPES.AddWebSocketsConnection).to(AddWebSocketsConnection)
     container.bind<RemoveWebSocketsConnection>(TYPES.RemoveWebSocketsConnection).to(RemoveWebSocketsConnection)
+    container.bind<GetUserSubscription>(TYPES.GetUserSubscription).to(GetUserSubscription)
 
     // Handlers
     container.bind<UserRegisteredEventHandler>(TYPES.UserRegisteredEventHandler).to(UserRegisteredEventHandler)

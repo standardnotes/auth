@@ -47,6 +47,7 @@ const TYPES = {
   SQS_AWS_REGION: Symbol.for('SQS_AWS_REGION'),
   USER_SERVER_REGISTRATION_URL: Symbol.for('USER_SERVER_REGISTRATION_URL'),
   USER_SERVER_AUTH_KEY: Symbol.for('USER_SERVER_AUTH_KEY'),
+  USER_SERVER_CHANGE_EMAIL_URL: Symbol.for('USER_SERVER_CHANGE_EMAIL_URL'),
   REDIS_EVENTS_CHANNEL: Symbol.for('REDIS_EVENTS_CHANNEL'),
   NEW_RELIC_ENABLED: Symbol.for('NEW_RELIC_ENABLED'),
   SYNCING_SERVER_URL: Symbol.for('SYNCING_SERVER_URL'),
@@ -77,6 +78,7 @@ const TYPES = {
   DeleteAccount: Symbol.for('DeleteAccount'),
   AddWebSocketsConnection: Symbol.for('AddWebSocketsConnection'),
   RemoveWebSocketsConnection: Symbol.for('RemoveWebSocketsConnection'),
+  GetUserSubscription: Symbol.for('GetUserSubscription'),
   // Handlers
   UserRegisteredEventHandler: Symbol.for('UserRegisteredEventHandler'),
   AccountDeletionRequestedEventHandler: Symbol.for('AccountDeletionRequestedEventHandler'),

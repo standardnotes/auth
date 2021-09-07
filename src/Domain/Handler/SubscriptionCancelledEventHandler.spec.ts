@@ -1,26 +1,25 @@
 import 'reflect-metadata'
 
 import { SubscriptionName } from '@standardnotes/auth'
-import { SubscriptionRenewedEvent } from '@standardnotes/domain-events'
+import { SubscriptionCancelledEvent } from '@standardnotes/domain-events'
 import { Logger } from 'winston'
 
 import * as dayjs from 'dayjs'
 
 import { User } from '../User/User'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
-import { SubscriptionRenewedEventHandler } from './SubscriptionRenewedEventHandler'
 import { UserSubscriptionRepositoryInterface } from '../User/UserSubscriptionRepositoryInterface'
+import { SubscriptionCancelledEventHandler } from './SubscriptionCancelledEventHandler'
 
-describe('SubscriptionRenewedEventHandler', () => {
+describe('SubscriptionCancelledEventHandler', () => {
   let userRepository: UserRepositoryInterface
   let userSubscriptionRepository: UserSubscriptionRepositoryInterface
   let logger: Logger
   let user: User
-  let event: SubscriptionRenewedEvent
-  let subscriptionExpirationDate: number
+  let event: SubscriptionCancelledEvent
   let timestamp: number
 
-  const createHandler = () => new SubscriptionRenewedEventHandler(
+  const createHandler = () => new SubscriptionCancelledEventHandler(
     userRepository,
     userSubscriptionRepository,
     logger
@@ -35,17 +34,15 @@ describe('SubscriptionRenewedEventHandler', () => {
     userRepository.findOneByEmail = jest.fn().mockReturnValue(user)
 
     userSubscriptionRepository = {} as jest.Mocked<UserSubscriptionRepositoryInterface>
-    userSubscriptionRepository.updateEndsAtByNameAndUserUuid = jest.fn()
+    userSubscriptionRepository.updateCancelled = jest.fn()
 
     timestamp = dayjs.utc().valueOf()
-    subscriptionExpirationDate = dayjs.utc().valueOf() + 365*1000
 
-    event = {} as jest.Mocked<SubscriptionRenewedEvent>
+    event = {} as jest.Mocked<SubscriptionCancelledEvent>
     event.createdAt = new Date(1)
     event.payload = {
       userEmail: 'test@test.com',
       subscriptionName: SubscriptionName.ProPlan,
-      subscriptionExpiresAt: subscriptionExpirationDate,
       timestamp,
     }
 
@@ -54,16 +51,16 @@ describe('SubscriptionRenewedEventHandler', () => {
     logger.warn = jest.fn()
   })
 
-  it('should update subscription ends at', async () => {
+  it('should update subscription cancelled', async () => {
     await createHandler().handle(event)
 
     expect(userRepository.findOneByEmail).toHaveBeenCalledWith('test@test.com')
     expect(
-      userSubscriptionRepository.updateEndsAtByNameAndUserUuid
+      userSubscriptionRepository.updateCancelled
     ).toHaveBeenCalledWith(
       SubscriptionName.ProPlan,
       '123',
-      subscriptionExpirationDate,
+      true,
       timestamp,
     )
   })
@@ -73,6 +70,6 @@ describe('SubscriptionRenewedEventHandler', () => {
 
     await createHandler().handle(event)
 
-    expect(userSubscriptionRepository.updateEndsAtByNameAndUserUuid).not.toHaveBeenCalled()
+    expect(userSubscriptionRepository.updateCancelled).not.toHaveBeenCalled()
   })
 })
