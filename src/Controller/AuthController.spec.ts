@@ -16,7 +16,6 @@ import { GetUserKeyParams } from '../Domain/UseCase/GetUserKeyParams/GetUserKeyP
 import { User } from '../Domain/User/User'
 import { Session } from '../Domain/Session/Session'
 import { Register } from '../Domain/UseCase/Register'
-import { ChangePassword } from '../Domain/UseCase/ChangePassword'
 import { GetAuthMethods } from '../Domain/UseCase/GetAuthMethods/GetAuthMethods'
 import { DomainEventFactoryInterface } from '../Domain/Event/DomainEventFactoryInterface'
 
@@ -28,7 +27,6 @@ describe('AuthController', () => {
   let clearLoginAttempts: ClearLoginAttempts
   let increaseLoginAttempts: IncreaseLoginAttempts
   let register: Register
-  let changePassword: ChangePassword
   let domainEventPublisher: DomainEventPublisherInterface
   let domainEventFactory: DomainEventFactoryInterface
   let event: DomainEventInterface
@@ -47,7 +45,6 @@ describe('AuthController', () => {
     clearLoginAttempts,
     increaseLoginAttempts,
     register,
-    changePassword,
     domainEventPublisher,
     domainEventFactory,
     logger,
@@ -69,9 +66,6 @@ describe('AuthController', () => {
 
     register = {} as jest.Mocked<Register>
     register.execute = jest.fn()
-
-    changePassword = {} as jest.Mocked<ChangePassword>
-    changePassword.execute = jest.fn()
 
     user = {} as jest.Mocked<User>
     user.email = 'test@test.te'
@@ -136,113 +130,6 @@ describe('AuthController', () => {
 
     expect(result.statusCode).toEqual(200)
     expect(await result.content.readAsStringAsync()).toEqual('{"user":{"email":"test@test.te"}}')
-  })
-
-  it('should change a password', async () => {
-    request.body.version = '004'
-    request.body.api = '20190520'
-    request.body.current_password = 'test123'
-    request.body.new_password = 'test234'
-    request.body.pw_nonce = 'asdzxc'
-    request.body.origination = 'change-password'
-    request.body.created = '123'
-    request.headers['user-agent'] = 'Google Chrome'
-    response.locals.user = user
-
-    changePassword.execute = jest.fn().mockReturnValue({ success: true, authResponse: { foo: 'bar' } })
-
-    const httpResponse = <results.JsonResult> await createController().changePassword(request, response)
-    const result = await httpResponse.executeAsync()
-
-    expect(changePassword.execute).toHaveBeenCalledWith({
-      apiVersion: '20190520',
-      updatedWithUserAgent: 'Google Chrome',
-      currentPassword: 'test123',
-      newPassword: 'test234',
-      kpCreated: '123',
-      kpOrigination: 'change-password',
-      pwNonce: 'asdzxc',
-      protocolVersion: '004',
-      user: {
-        email: 'test@test.te',
-      },
-    })
-
-    expect(clearLoginAttempts.execute).toHaveBeenCalled()
-
-    expect(result.statusCode).toEqual(200)
-    expect(await result.content.readAsStringAsync()).toEqual('{"foo":"bar"}')
-  })
-
-  it('should indicate if changing a password fails', async () => {
-    request.body.version = '004'
-    request.body.api = '20190520'
-    request.body.current_password = 'test123'
-    request.body.new_password = 'test234'
-    request.body.pw_nonce = 'asdzxc'
-    request.headers['user-agent'] = 'Google Chrome'
-    response.locals.user = user
-
-    changePassword.execute = jest.fn().mockReturnValue({ success: false, errorMessage: 'Something bad happened' })
-
-    const httpResponse = <results.JsonResult> await createController().changePassword(request, response)
-    const result = await httpResponse.executeAsync()
-
-    expect(increaseLoginAttempts.execute).toHaveBeenCalled()
-
-    expect(result.statusCode).toEqual(401)
-    expect(await result.content.readAsStringAsync()).toEqual('{"error":{"message":"Something bad happened"}}')
-  })
-
-  it('should not change a password if current password is missing', async () => {
-    request.body.version = '004'
-    request.body.api = '20190520'
-    request.body.new_password = 'test234'
-    request.body.pw_nonce = 'asdzxc'
-    request.headers['user-agent'] = 'Google Chrome'
-    response.locals.user = user
-
-    const httpResponse = <results.JsonResult> await createController().changePassword(request, response)
-    const result = await httpResponse.executeAsync()
-
-    expect(changePassword.execute).not.toHaveBeenCalled()
-
-    expect(result.statusCode).toEqual(400)
-    expect(await result.content.readAsStringAsync()).toEqual('{"error":{"message":"Your current password is required to change your password. Please update your application if you do not see this option."}}')
-  })
-
-  it('should not change a password if new password is missing', async () => {
-    request.body.version = '004'
-    request.body.api = '20190520'
-    request.body.current_password = 'test123'
-    request.body.pw_nonce = 'asdzxc'
-    request.headers['user-agent'] = 'Google Chrome'
-    response.locals.user = user
-
-    const httpResponse = <results.JsonResult> await createController().changePassword(request, response)
-    const result = await httpResponse.executeAsync()
-
-    expect(changePassword.execute).not.toHaveBeenCalled()
-
-    expect(result.statusCode).toEqual(400)
-    expect(await result.content.readAsStringAsync()).toEqual('{"error":{"message":"Your new password is required to change your password. Please try again."}}')
-  })
-
-  it('should not change a password if password nonce is missing', async () => {
-    request.body.version = '004'
-    request.body.api = '20190520'
-    request.body.current_password = 'test123'
-    request.body.new_password = 'test234'
-    request.headers['user-agent'] = 'Google Chrome'
-    response.locals.user = user
-
-    const httpResponse = <results.JsonResult> await createController().changePassword(request, response)
-    const result = await httpResponse.executeAsync()
-
-    expect(changePassword.execute).not.toHaveBeenCalled()
-
-    expect(result.statusCode).toEqual(400)
-    expect(await result.content.readAsStringAsync()).toEqual('{"error":{"message":"The change password request is missing new auth parameters. Please try again."}}')
   })
 
   it('should register a user - with 001 version', async () => {

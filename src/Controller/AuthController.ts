@@ -19,7 +19,6 @@ import { IncreaseLoginAttempts } from '../Domain/UseCase/IncreaseLoginAttempts'
 import { Logger } from 'winston'
 import { GetUserKeyParams } from '../Domain/UseCase/GetUserKeyParams/GetUserKeyParams'
 import { Register } from '../Domain/UseCase/Register'
-import { ChangePassword } from '../Domain/UseCase/ChangePassword'
 import { GetAuthMethods } from '../Domain/UseCase/GetAuthMethods/GetAuthMethods'
 import { DomainEventFactoryInterface } from '../Domain/Event/DomainEventFactoryInterface'
 
@@ -33,7 +32,6 @@ export class AuthController extends BaseHttpController {
     @inject(TYPES.ClearLoginAttempts) private clearLoginAttempts: ClearLoginAttempts,
     @inject(TYPES.IncreaseLoginAttempts) private increaseLoginAttempts: IncreaseLoginAttempts,
     @inject(TYPES.Register) private registerUser: Register,
-    @inject(TYPES.ChangePassword) private changePasswordUseCase: ChangePassword,
     @inject(TYPES.DomainEventPublisher) private domainEventPublisher: DomainEventPublisherInterface,
     @inject(TYPES.DomainEventFactory) private domainEventFactory: DomainEventFactoryInterface,
     @inject(TYPES.Logger) private logger: Logger,
@@ -154,59 +152,6 @@ export class AuthController extends BaseHttpController {
     await this.sessionService.deleteSessionByToken(authorizationHeader.replace('Bearer ', ''))
 
     return this.statusCode(204)
-  }
-
-  @httpPost('/change_pw', TYPES.AuthMiddleware)
-  async changePassword(request: Request, response: Response): Promise<results.JsonResult> {
-    if (!request.body.current_password) {
-      return this.json({
-        error: {
-          message: 'Your current password is required to change your password. Please update your application if you do not see this option.',
-        },
-      }, 400)
-    }
-
-    if (!request.body.new_password) {
-      return this.json({
-        error: {
-          message: 'Your new password is required to change your password. Please try again.',
-        },
-      }, 400)
-    }
-
-    if (!request.body.pw_nonce) {
-      return this.json({
-        error: {
-          message: 'The change password request is missing new auth parameters. Please try again.',
-        },
-      }, 400)
-    }
-
-    const changePasswordResult = await this.changePasswordUseCase.execute({
-      user: response.locals.user,
-      apiVersion: request.body.api,
-      currentPassword: request.body.current_password,
-      newPassword: request.body.new_password,
-      pwNonce: request.body.pw_nonce,
-      kpCreated: request.body.created,
-      kpOrigination: request.body.origination,
-      updatedWithUserAgent: <string> request.headers['user-agent'],
-      protocolVersion: request.body.version,
-    })
-
-    if (!changePasswordResult.success) {
-      await this.increaseLoginAttempts.execute({ email: response.locals.user.email })
-
-      return this.json({
-        error: {
-          message: changePasswordResult.errorMessage,
-        },
-      }, 401)
-    }
-
-    await this.clearLoginAttempts.execute({ email: response.locals.user.email })
-
-    return this.json(changePasswordResult.authResponse)
   }
 
   @httpPost('/')

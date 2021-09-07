@@ -42,7 +42,6 @@ export class UsersController extends BaseHttpController {
       apiVersion: request.body.api,
       pwFunc: request.body.pw_func,
       pwAlg: request.body.pw_alg,
-      email: request.body.email,
       pwCost: request.body.pw_cost,
       pwKeySize: request.body.pw_key_size,
       pwNonce: request.body.pw_nonce,

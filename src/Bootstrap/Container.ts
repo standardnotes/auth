@@ -48,7 +48,6 @@ import { TokenDecoder } from '../Domain/Auth/TokenDecoder'
 import { AuthenticationMethodResolver } from '../Domain/Auth/AuthenticationMethodResolver'
 import { RevokedSession } from '../Domain/Session/RevokedSession'
 import { UserRegisteredEventHandler } from '../Domain/Handler/UserRegisteredEventHandler'
-import { ChangePassword } from '../Domain/UseCase/ChangePassword'
 import { DomainEventFactory } from '../Domain/Event/DomainEventFactory'
 import { AuthenticateRequest } from '../Domain/UseCase/AuthenticateRequest'
 import { Role } from '../Domain/Role/Role'
@@ -97,6 +96,7 @@ import { SettingServiceInterface } from '../Domain/Setting/SettingServiceInterfa
 import { ExtensionKeyGrantedEventHandler } from '../Domain/Handler/ExtensionKeyGrantedEventHandler'
 import { RedisDomainEventPublisher, RedisDomainEventSubscriberFactory, RedisEventMessageHandler, SNSDomainEventPublisher, SQSDomainEventSubscriberFactory, SQSEventMessageHandler, SQSNewRelicEventMessageHandler } from '@standardnotes/domain-events-infra'
 import { GetUserSubscription } from '../Domain/UseCase/GetUserSubscription/GetUserSubscription'
+import { ChangeCredentials } from '../Domain/UseCase/ChangeCredentials/ChangeCredentials'
 
 export class ContainerConfigLoader {
   async load(): Promise<Container> {
@@ -248,7 +248,7 @@ export class ContainerConfigLoader {
     container.bind<GetActiveSessionsForUser>(TYPES.GetActiveSessionsForUser).to(GetActiveSessionsForUser)
     container.bind<DeletePreviousSessionsForUser>(TYPES.DeletePreviousSessionsForUser).to(DeletePreviousSessionsForUser)
     container.bind<DeleteSessionForUser>(TYPES.DeleteSessionForUser).to(DeleteSessionForUser)
-    container.bind<ChangePassword>(TYPES.ChangePassword).to(ChangePassword)
+    container.bind<ChangeCredentials>(TYPES.ChangeCredentials).to(ChangeCredentials)
     container.bind<GetSettings>(TYPES.GetSettings).to(GetSettings)
     container.bind<GetSetting>(TYPES.GetSetting).to(GetSetting)
     container.bind<GetUserFeatures>(TYPES.GetUserFeatures).to(GetUserFeatures)
