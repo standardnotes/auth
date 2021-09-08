@@ -1,5 +1,5 @@
 import { RoleName } from '@standardnotes/auth'
-import { Feature, Features } from '@standardnotes/features'
+import { FeatureDescription, Features } from '@standardnotes/features'
 import { SettingName } from '@standardnotes/settings'
 import { inject, injectable } from 'inversify'
 import TYPES from '../../Bootstrap/Types'
@@ -20,7 +20,7 @@ export class FeatureService implements FeatureServiceInterface {
   ) {
   }
 
-  async getFeaturesForUser(user: User): Promise<Array<Feature>> {
+  async getFeaturesForUser(user: User): Promise<Array<FeatureDescription>> {
     const userRoles = await user.roles
     const userSubscriptions = await user.subscriptions
 
@@ -29,7 +29,7 @@ export class FeatureService implements FeatureServiceInterface {
       userUuid: user.uuid,
     })
 
-    const userFeatures: Map<string, Feature> = new Map()
+    const userFeatures: Map<string, FeatureDescription> = new Map()
     for (const role of userRoles) {
       const subscriptionName = this.roleToSubscriptionMap.getSubscriptionNameForRoleName(role.name as RoleName)
       const userSubscription = userSubscriptions.find(subscription => subscription.planName === subscriptionName) as UserSubscription
@@ -41,7 +41,7 @@ export class FeatureService implements FeatureServiceInterface {
       const rolePermissions = await role.permissions
 
       for (const rolePermission of rolePermissions) {
-        let featureForPermission = Features.find(feature => feature.permissionName === rolePermission.name) as Feature
+        let featureForPermission = Features.find(feature => feature.permission_name === rolePermission.name) as FeatureDescription
 
         if (extensionKeySetting !== undefined) {
           featureForPermission = {
@@ -54,13 +54,13 @@ export class FeatureService implements FeatureServiceInterface {
         if (alreadyAddedFeature === undefined) {
           userFeatures.set(rolePermission.name, {
             ...featureForPermission,
-            expiresAt,
+            expires_at: expiresAt,
           })
           continue
         }
 
-        if (expiresAt > (alreadyAddedFeature.expiresAt as number)) {
-          alreadyAddedFeature.expiresAt = expiresAt
+        if (expiresAt > (alreadyAddedFeature.expires_at as number)) {
+          alreadyAddedFeature.expires_at = expiresAt
         }
       }
     }

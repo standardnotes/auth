@@ -68,7 +68,7 @@ const TYPES = {
   GetActiveSessionsForUser: Symbol.for('GetActiveSessionsForUser'),
   DeletePreviousSessionsForUser: Symbol.for('DeletePreviousSessionsForUser'),
   DeleteSessionForUser: Symbol.for('DeleteSessionForUser'),
-  ChangePassword: Symbol.for('ChangePassword'),
+  ChangeCredentials: Symbol.for('ChangePassword'),
   GetSettings: Symbol.for('GetSettings'),
   GetSetting: Symbol.for('GetSetting'),
   GetUserFeatures: Symbol.for('GetUserFeatures'),
@@ -78,6 +78,7 @@ const TYPES = {
   DeleteAccount: Symbol.for('DeleteAccount'),
   AddWebSocketsConnection: Symbol.for('AddWebSocketsConnection'),
   RemoveWebSocketsConnection: Symbol.for('RemoveWebSocketsConnection'),
+  GetUserSubscription: Symbol.for('GetUserSubscription'),
   // Handlers
   UserRegisteredEventHandler: Symbol.for('UserRegisteredEventHandler'),
   AccountDeletionRequestedEventHandler: Symbol.for('AccountDeletionRequestedEventHandler'),

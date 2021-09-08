@@ -8,11 +8,19 @@ import { User } from '../Domain/User/User'
 import { UpdateUser } from '../Domain/UseCase/UpdateUser'
 import { GetUserKeyParams } from '../Domain/UseCase/GetUserKeyParams/GetUserKeyParams'
 import { DeleteAccount } from '../Domain/UseCase/DeleteAccount/DeleteAccount'
+import { GetUserSubscription } from '../Domain/UseCase/GetUserSubscription/GetUserSubscription'
+import { ClearLoginAttempts } from '../Domain/UseCase/ClearLoginAttempts'
+import { IncreaseLoginAttempts } from '../Domain/UseCase/IncreaseLoginAttempts'
+import { ChangeCredentials } from '../Domain/UseCase/ChangeCredentials/ChangeCredentials'
 
 describe('UsersController', () => {
   let updateUser: UpdateUser
   let deleteAccount: DeleteAccount
   let getUserKeyParams: GetUserKeyParams
+  let getUserSubscription: GetUserSubscription
+  let clearLoginAttempts: ClearLoginAttempts
+  let increaseLoginAttempts: IncreaseLoginAttempts
+  let changeCredentials: ChangeCredentials
 
   let request: express.Request
   let response: express.Response
@@ -22,6 +30,10 @@ describe('UsersController', () => {
     updateUser,
     getUserKeyParams,
     deleteAccount,
+    getUserSubscription,
+    clearLoginAttempts,
+    increaseLoginAttempts,
+    changeCredentials
   )
 
   beforeEach(() => {
@@ -33,9 +45,22 @@ describe('UsersController', () => {
 
     user = {} as jest.Mocked<User>
     user.uuid = '123'
+    user.email = 'test@test.te'
 
     getUserKeyParams = {} as jest.Mocked<GetUserKeyParams>
     getUserKeyParams.execute = jest.fn()
+
+    getUserSubscription = {} as jest.Mocked<GetUserSubscription>
+    getUserSubscription.execute = jest.fn()
+
+    changeCredentials = {} as jest.Mocked<ChangeCredentials>
+    changeCredentials.execute = jest.fn()
+
+    clearLoginAttempts = {} as jest.Mocked<ClearLoginAttempts>
+    clearLoginAttempts.execute = jest.fn()
+
+    increaseLoginAttempts = {} as jest.Mocked<IncreaseLoginAttempts>
+    increaseLoginAttempts.execute = jest.fn()
 
     request = {
       headers: {},
@@ -52,7 +77,6 @@ describe('UsersController', () => {
     request.body.version = '002'
     request.body.api = '20190520'
     request.body.origination = 'test'
-    request.body.email = 'newemail@test.te'
     request.params.userId = '123'
     request.headers['user-agent'] = 'Google Chrome'
     response.locals.user = user
@@ -66,10 +90,10 @@ describe('UsersController', () => {
       apiVersion: '20190520',
       kpOrigination: 'test',
       updatedWithUserAgent: 'Google Chrome',
-      email: 'newemail@test.te',
       version: '002',
       user: {
         uuid: '123',
+        email: 'test@test.te',
       },
     })
 
@@ -81,7 +105,6 @@ describe('UsersController', () => {
     request.body.version = '002'
     request.body.api = '20190520'
     request.body.origination = 'test'
-    request.body.email = 'newemail@test.te'
     request.params.userId = '123'
     request.headers['user-agent'] = 'Google Chrome'
     response.locals.user = user
@@ -95,10 +118,10 @@ describe('UsersController', () => {
       apiVersion: '20190520',
       kpOrigination: 'test',
       updatedWithUserAgent: 'Google Chrome',
-      email: 'newemail@test.te',
       version: '002',
       user: {
         uuid: '123',
+        email: 'test@test.te',
       },
     })
 
@@ -188,5 +211,168 @@ describe('UsersController', () => {
     expect(getUserKeyParams.execute).not.toHaveBeenCalled()
 
     expect(result.statusCode).toEqual(400)
+  })
+
+  it('should get user subscription', async () => {
+    request.params.userUuid = '1-2-3'
+    response.locals.user = {
+      uuid: '1-2-3',
+    }
+
+    getUserSubscription.execute = jest.fn().mockReturnValue({
+      success: true,
+    })
+
+    const httpResponse = <results.JsonResult> await createController().getSubscription(request, response)
+    const result = await httpResponse.executeAsync()
+
+    expect(getUserSubscription.execute).toHaveBeenCalledWith({
+      userUuid: '1-2-3',
+    })
+
+    expect(result.statusCode).toEqual(200)
+  })
+
+  it('should not get user subscription if the user with provided uuid does not exist', async () => {
+    request.params.userUuid = '1-2-3'
+    response.locals.user = {
+      uuid: '1-2-3',
+    }
+
+    getUserSubscription.execute = jest.fn().mockReturnValue({
+      success: false,
+    })
+
+    const httpResponse = <results.JsonResult> await createController().getSubscription(request, response)
+    const result = await httpResponse.executeAsync()
+
+    expect(getUserSubscription.execute).toHaveBeenCalledWith({ userUuid: '1-2-3' })
+
+    expect(result.statusCode).toEqual(400)
+
+  })
+
+  it('should not get user subscription if not allowed', async () => {
+    request.params.userUuid = '1-2-3'
+    response.locals.user = {
+      uuid: '2-3-4',
+    }
+
+    getUserSubscription.execute = jest.fn()
+
+    const httpResponse = <results.JsonResult> await createController().getSubscription(request, response)
+    const result = await httpResponse.executeAsync()
+
+    expect(getUserSubscription.execute).not.toHaveBeenCalled()
+
+    expect(result.statusCode).toEqual(401)
+  })
+
+  it('should change a password', async () => {
+    request.body.version = '004'
+    request.body.api = '20190520'
+    request.body.current_password = 'test123'
+    request.body.new_password = 'test234'
+    request.body.pw_nonce = 'asdzxc'
+    request.body.origination = 'change-password'
+    request.body.created = '123'
+    request.headers['user-agent'] = 'Google Chrome'
+    response.locals.user = user
+
+    changeCredentials.execute = jest.fn().mockReturnValue({ success: true, authResponse: { foo: 'bar' } })
+
+    const httpResponse = <results.JsonResult> await createController().changeCredentials(request, response)
+    const result = await httpResponse.executeAsync()
+
+    expect(changeCredentials.execute).toHaveBeenCalledWith({
+      apiVersion: '20190520',
+      updatedWithUserAgent: 'Google Chrome',
+      currentPassword: 'test123',
+      newPassword: 'test234',
+      kpCreated: '123',
+      kpOrigination: 'change-password',
+      pwNonce: 'asdzxc',
+      protocolVersion: '004',
+      user: {
+        uuid: '123',
+        email: 'test@test.te',
+      },
+    })
+
+    expect(clearLoginAttempts.execute).toHaveBeenCalled()
+
+    expect(result.statusCode).toEqual(200)
+    expect(await result.content.readAsStringAsync()).toEqual('{"foo":"bar"}')
+  })
+
+  it('should indicate if changing a password fails', async () => {
+    request.body.version = '004'
+    request.body.api = '20190520'
+    request.body.current_password = 'test123'
+    request.body.new_password = 'test234'
+    request.body.pw_nonce = 'asdzxc'
+    request.headers['user-agent'] = 'Google Chrome'
+    response.locals.user = user
+
+    changeCredentials.execute = jest.fn().mockReturnValue({ success: false, errorMessage: 'Something bad happened' })
+
+    const httpResponse = <results.JsonResult> await createController().changeCredentials(request, response)
+    const result = await httpResponse.executeAsync()
+
+    expect(increaseLoginAttempts.execute).toHaveBeenCalled()
+
+    expect(result.statusCode).toEqual(401)
+    expect(await result.content.readAsStringAsync()).toEqual('{"error":{"message":"Something bad happened"}}')
+  })
+
+  it('should not change a password if current password is missing', async () => {
+    request.body.version = '004'
+    request.body.api = '20190520'
+    request.body.new_password = 'test234'
+    request.body.pw_nonce = 'asdzxc'
+    request.headers['user-agent'] = 'Google Chrome'
+    response.locals.user = user
+
+    const httpResponse = <results.JsonResult> await createController().changeCredentials(request, response)
+    const result = await httpResponse.executeAsync()
+
+    expect(changeCredentials.execute).not.toHaveBeenCalled()
+
+    expect(result.statusCode).toEqual(400)
+    expect(await result.content.readAsStringAsync()).toEqual('{"error":{"message":"Your current password is required to change your password. Please update your application if you do not see this option."}}')
+  })
+
+  it('should not change a password if new password is missing', async () => {
+    request.body.version = '004'
+    request.body.api = '20190520'
+    request.body.current_password = 'test123'
+    request.body.pw_nonce = 'asdzxc'
+    request.headers['user-agent'] = 'Google Chrome'
+    response.locals.user = user
+
+    const httpResponse = <results.JsonResult> await createController().changeCredentials(request, response)
+    const result = await httpResponse.executeAsync()
+
+    expect(changeCredentials.execute).not.toHaveBeenCalled()
+
+    expect(result.statusCode).toEqual(400)
+    expect(await result.content.readAsStringAsync()).toEqual('{"error":{"message":"Your new password is required to change your password. Please try again."}}')
+  })
+
+  it('should not change a password if password nonce is missing', async () => {
+    request.body.version = '004'
+    request.body.api = '20190520'
+    request.body.current_password = 'test123'
+    request.body.new_password = 'test234'
+    request.headers['user-agent'] = 'Google Chrome'
+    response.locals.user = user
+
+    const httpResponse = <results.JsonResult> await createController().changeCredentials(request, response)
+    const result = await httpResponse.executeAsync()
+
+    expect(changeCredentials.execute).not.toHaveBeenCalled()
+
+    expect(result.statusCode).toEqual(400)
+    expect(await result.content.readAsStringAsync()).toEqual('{"error":{"message":"The change password request is missing new auth parameters. Please try again."}}')
   })
 })

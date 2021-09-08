@@ -88,6 +88,7 @@ describe('SubscriptionPurchasedEventHandler', () => {
       ...subscription,
       createdAt: expect.any(Number),
       updatedAt: expect.any(Number),
+      cancelled: false,
     })
   })
 
