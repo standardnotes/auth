@@ -11,7 +11,6 @@ import '../src/Controller/SettingsController'
 import '../src/Controller/FeaturesController'
 import '../src/Controller/WebSocketsController'
 import '../src/Controller/AdminController'
-import '../src/Controller/AccountController'
 
 import * as cors from 'cors'
 import { urlencoded, json, Request, Response, NextFunction } from 'express'
