@@ -1,3 +1,4 @@
+import { TimerInterface } from '@standardnotes/time'
 import { inject, injectable } from 'inversify'
 import TYPES from '../../Bootstrap/Types'
 import { AuthResponseFactoryResolverInterface } from '../Auth/AuthResponseFactoryResolverInterface'
@@ -11,6 +12,7 @@ export class UpdateUser implements UseCaseInterface {
   constructor (
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
     @inject(TYPES.AuthResponseFactoryResolver) private authResponseFactoryResolver: AuthResponseFactoryResolverInterface,
+    @inject(TYPES.Timer) private timer: TimerInterface
   ) {
   }
 
@@ -24,6 +26,9 @@ export class UpdateUser implements UseCaseInterface {
     )
 
     Object.assign(user, updateFields)
+
+    user.updatedAt = this.timer.getUTCDate()
+    user.updatedWithUserAgent = dto.updatedWithUserAgent
 
     await this.userRepository.save(user)
 

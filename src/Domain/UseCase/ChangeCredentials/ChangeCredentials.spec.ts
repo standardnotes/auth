@@ -1,5 +1,7 @@
 import 'reflect-metadata'
+
 import { DomainEventPublisherInterface, UserEmailChangedEvent } from '@standardnotes/domain-events'
+import { TimerInterface } from '@standardnotes/time'
 
 import { AuthResponseFactoryInterface } from '../../Auth/AuthResponseFactoryInterface'
 import { DomainEventFactoryInterface } from '../../Event/DomainEventFactoryInterface'
@@ -16,6 +18,7 @@ describe('ChangeCredentials', () => {
   let authResponseFactory: AuthResponseFactoryInterface
   let domainEventPublisher: DomainEventPublisherInterface
   let domainEventFactory: DomainEventFactoryInterface
+  let timer: TimerInterface
   let user: User
 
   const createUseCase = () => new ChangeCredentials(
@@ -23,6 +26,7 @@ describe('ChangeCredentials', () => {
     authResponseFactoryResolver,
     domainEventPublisher,
     domainEventFactory,
+    timer
   )
 
   beforeEach(() => {
@@ -45,6 +49,9 @@ describe('ChangeCredentials', () => {
 
     domainEventFactory = {} as jest.Mocked<DomainEventFactoryInterface>
     domainEventFactory.createUserEmailChangedEvent = jest.fn().mockReturnValue({} as jest.Mocked<UserEmailChangedEvent>)
+
+    timer = {} as jest.Mocked<TimerInterface>
+    timer.getUTCDate = jest.fn().mockReturnValue(new Date(1))
   })
 
   it('should change password', async () => {
@@ -72,6 +79,7 @@ describe('ChangeCredentials', () => {
       email: 'test@test.te',
       uuid: '1-2-3',
       kpOrigination: 'password-change',
+      updatedAt: new Date(1),
     })
     expect(domainEventPublisher.publish).not.toHaveBeenCalled()
     expect(domainEventFactory.createUserEmailChangedEvent).not.toHaveBeenCalled()
@@ -105,6 +113,7 @@ describe('ChangeCredentials', () => {
       pwNonce: 'asdzxc',
       kpCreated: '123',
       kpOrigination: 'password-change',
+      updatedAt: new Date(1),
     })
     expect(domainEventFactory.createUserEmailChangedEvent).toHaveBeenCalledWith('1-2-3', 'test@test.te', 'new@test.te')
     expect(domainEventPublisher.publish).toHaveBeenCalled()
@@ -172,6 +181,7 @@ describe('ChangeCredentials', () => {
       version: '004',
       email: 'test@test.te',
       uuid: '1-2-3',
+      updatedAt: new Date(1),
     })
   })
 })
