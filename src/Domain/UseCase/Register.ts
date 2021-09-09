@@ -1,4 +1,3 @@
-import * as dayjs from 'dayjs'
 import * as bcrypt from 'bcryptjs'
 import { RoleName } from '@standardnotes/auth'
 
@@ -13,6 +12,7 @@ import { UseCaseInterface } from './UseCaseInterface'
 import { AuthResponseFactoryResolverInterface } from '../Auth/AuthResponseFactoryResolverInterface'
 import { RoleRepositoryInterface } from '../Role/RoleRepositoryInterface'
 import { CrypterInterface } from '../Encryption/CrypterInterface'
+import { TimerInterface } from '@standardnotes/time'
 
 @injectable()
 export class Register implements UseCaseInterface {
@@ -21,7 +21,8 @@ export class Register implements UseCaseInterface {
     @inject(TYPES.RoleRepository) private roleRepository: RoleRepositoryInterface,
     @inject(TYPES.AuthResponseFactoryResolver) private authResponseFactoryResolver: AuthResponseFactoryResolverInterface,
     @inject(TYPES.Crypter) private crypter: CrypterInterface,
-    @inject(TYPES.DISABLE_USER_REGISTRATION) private disableUserRegistration: boolean
+    @inject(TYPES.DISABLE_USER_REGISTRATION) private disableUserRegistration: boolean,
+    @inject(TYPES.Timer) private timer: TimerInterface,
   ) {
   }
 
@@ -46,8 +47,9 @@ export class Register implements UseCaseInterface {
     let user = new User()
     user.uuid = uuidv4()
     user.email = email
-    user.createdAt = dayjs.utc().toDate()
-    user.updatedAt = dayjs.utc().toDate()
+    user.createdAt = this.timer.getUTCDate()
+    user.updatedAt = this.timer.getUTCDate()
+    user.updatedWithUserAgent = dto.updatedWithUserAgent
     user.encryptedPassword = await bcrypt.hash(password, User.PASSWORD_HASH_COST)
     user.encryptedServerKey = await this.crypter.generateEncryptedUserServerKey()
     user.serverEncryptionVersion = User.DEFAULT_ENCRYPTION_VERSION

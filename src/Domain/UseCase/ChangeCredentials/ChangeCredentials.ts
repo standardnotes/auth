@@ -10,6 +10,7 @@ import { ChangeCredentialsResponse } from './ChangeCredentialsResponse'
 import { UseCaseInterface } from '../UseCaseInterface'
 import { DomainEventFactoryInterface } from '../../Event/DomainEventFactoryInterface'
 import { DomainEventPublisherInterface, UserEmailChangedEvent } from '@standardnotes/domain-events'
+import { TimerInterface } from '@standardnotes/time'
 
 @injectable()
 export class ChangeCredentials implements UseCaseInterface {
@@ -18,6 +19,7 @@ export class ChangeCredentials implements UseCaseInterface {
     @inject(TYPES.AuthResponseFactoryResolver) private authResponseFactoryResolver: AuthResponseFactoryResolverInterface,
     @inject(TYPES.DomainEventPublisher) private domainEventPublisher: DomainEventPublisherInterface,
     @inject(TYPES.DomainEventFactory) private domainEventFactory: DomainEventFactoryInterface,
+    @inject(TYPES.Timer) private timer: TimerInterface,
   ) {
   }
 
@@ -57,6 +59,7 @@ export class ChangeCredentials implements UseCaseInterface {
     if (dto.kpOrigination) {
       dto.user.kpOrigination = dto.kpOrigination
     }
+    dto.user.updatedAt = this.timer.getUTCDate()
 
     const updatedUser = await this.userRepository.save(dto.user)
 
