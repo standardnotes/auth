@@ -1,5 +1,7 @@
 import 'reflect-metadata'
 
+import { TimerInterface } from '@standardnotes/time'
+
 import { User } from '../User/User'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { AuthResponseFactoryInterface } from '../Auth/AuthResponseFactoryInterface'
@@ -12,10 +14,12 @@ describe('UpdateUser', () => {
   let authResponseFactoryResolver: AuthResponseFactoryResolverInterface
   let authResponseFactory: AuthResponseFactoryInterface
   let user: User
+  let timer: TimerInterface
 
   const createUseCase = () => new UpdateUser(
     userRepository,
     authResponseFactoryResolver,
+    timer,
   )
 
   beforeEach(() => {
@@ -33,6 +37,9 @@ describe('UpdateUser', () => {
     user.uuid = '123'
     user.email = 'test@test.te'
     user.createdAt = new Date(1)
+
+    timer = {} as jest.Mocked<TimerInterface>
+    timer.getUTCDate = jest.fn().mockReturnValue(new Date(1))
   })
 
   it('should update user fields and save it', async () => {
@@ -54,6 +61,7 @@ describe('UpdateUser', () => {
       updatedWithUserAgent: 'Mozilla',
       uuid: '123',
       version: '004',
+      updatedAt: new Date(1),
     })
   })
 })

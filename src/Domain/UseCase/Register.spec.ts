@@ -1,4 +1,5 @@
 import 'reflect-metadata'
+import { TimerInterface } from '@standardnotes/time'
 import { AuthResponseFactoryInterface } from '../Auth/AuthResponseFactoryInterface'
 import { AuthResponseFactoryResolverInterface } from '../Auth/AuthResponseFactoryResolverInterface'
 import { CrypterInterface } from '../Encryption/CrypterInterface'
@@ -16,8 +17,16 @@ describe('Register', () => {
   let authResponseFactory: AuthResponseFactoryInterface
   let user: User
   let crypter: CrypterInterface
+  let timer: TimerInterface
 
-  const createUseCase = () => new Register(userRepository, roleRepository, authResponseFactoryResolver, crypter, false)
+  const createUseCase = () => new Register(
+    userRepository,
+    roleRepository,
+    authResponseFactoryResolver,
+    crypter,
+    false,
+    timer
+  )
 
   beforeEach(() => {
     userRepository = {} as jest.Mocked<UserRepositoryInterface>
@@ -37,6 +46,9 @@ describe('Register', () => {
     crypter.generateEncryptedUserServerKey = jest.fn().mockReturnValue('test')
 
     user = {} as jest.Mocked<User>
+
+    timer = {} as jest.Mocked<TimerInterface>
+    timer.getUTCDate = jest.fn().mockReturnValue(new Date(1))
   })
 
   it('should register a new user', async () => {
@@ -63,8 +75,8 @@ describe('Register', () => {
       updatedWithUserAgent: 'Mozilla',
       uuid: expect.any(String),
       version: '004',
-      createdAt: expect.any(Date),
-      updatedAt: expect.any(Date),
+      createdAt: new Date(1),
+      updatedAt: new Date(1),
       SESSIONS_PROTOCOL_VERSION: 4,
     })
   })
@@ -97,8 +109,8 @@ describe('Register', () => {
       updatedWithUserAgent: 'Mozilla',
       uuid: expect.any(String),
       version: '004',
-      createdAt: expect.any(Date),
-      updatedAt: expect.any(Date),
+      createdAt: new Date(1),
+      updatedAt: new Date(1),
       SESSIONS_PROTOCOL_VERSION: 4,
       roles: Promise.resolve([ role ]),
     })
@@ -128,7 +140,7 @@ describe('Register', () => {
   it('should fail to register if a registration is disabled', async () => {
     userRepository.findOneByEmail = jest.fn().mockReturnValue(user)
 
-    expect(await new Register(userRepository, roleRepository, authResponseFactoryResolver, crypter, true).execute({
+    expect(await new Register(userRepository, roleRepository, authResponseFactoryResolver, crypter, true, timer).execute({
       email: 'test@test.te',
       password: 'asdzxc',
       updatedWithUserAgent: 'Mozilla',
