@@ -25,7 +25,7 @@
     "@newrelic/native-metrics": "^6.0.0",
     "@standardnotes/auth": "3.7.0",
     "@standardnotes/common": "1.0.0",
-    "@standardnotes/domain-events": "2.1.0",
+    "@standardnotes/domain-events": "2.2.0",
     "@standardnotes/domain-events-infra": "1.0.1",
     "@standardnotes/features": "1.6.2",
     "@standardnotes/settings": "1.1.0",

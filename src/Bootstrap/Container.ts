@@ -97,6 +97,7 @@ import { ExtensionKeyGrantedEventHandler } from '../Domain/Handler/ExtensionKeyG
 import { RedisDomainEventPublisher, RedisDomainEventSubscriberFactory, RedisEventMessageHandler, SNSDomainEventPublisher, SQSDomainEventSubscriberFactory, SQSEventMessageHandler, SQSNewRelicEventMessageHandler } from '@standardnotes/domain-events-infra'
 import { GetUserSubscription } from '../Domain/UseCase/GetUserSubscription/GetUserSubscription'
 import { ChangeCredentials } from '../Domain/UseCase/ChangeCredentials/ChangeCredentials'
+import { SubscriptionReassignedEventHandler } from '../Domain/Handler/SubscriptionReassignedEventHandler'
 
 export class ContainerConfigLoader {
   async load(): Promise<Container> {
@@ -268,6 +269,7 @@ export class ContainerConfigLoader {
     container.bind<SubscriptionRefundedEventHandler>(TYPES.SubscriptionRefundedEventHandler).to(SubscriptionRefundedEventHandler)
     container.bind<SubscriptionExpiredEventHandler>(TYPES.SubscriptionExpiredEventHandler).to(SubscriptionExpiredEventHandler)
     container.bind<ExtensionKeyGrantedEventHandler>(TYPES.ExtensionKeyGrantedEventHandler).to(ExtensionKeyGrantedEventHandler)
+    container.bind<SubscriptionReassignedEventHandler>(TYPES.SubscriptionReassignedEventHandler).to(SubscriptionReassignedEventHandler)
 
     // Services
     container.bind<UAParser>(TYPES.DeviceDetector).toConstantValue(new UAParser())
@@ -315,6 +317,7 @@ export class ContainerConfigLoader {
       ['SUBSCRIPTION_REFUNDED', container.get(TYPES.SubscriptionRefundedEventHandler)],
       ['SUBSCRIPTION_EXPIRED', container.get(TYPES.SubscriptionExpiredEventHandler)],
       ['EXTENSION_KEY_GRANTED', container.get(TYPES.ExtensionKeyGrantedEventHandler)],
+      ['SUBSCRIPTION_REASSIGNED', container.get(TYPES.SubscriptionReassignedEventHandler)],
     ])
 
     if (env.get('SQS_QUEUE_URL', true)) {
