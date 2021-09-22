@@ -167,7 +167,7 @@ export class SessionService implements SessionServiceInterace {
     }
   }
 
-  async revokeSession(session: Session): Promise<RevokedSession> {
+  async createRevokedSession(session: Session): Promise<RevokedSession> {
     const revokedSession = new RevokedSession()
     revokedSession.uuid = session.uuid
     revokedSession.userUuid = session.userUuid

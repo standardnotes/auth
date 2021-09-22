@@ -20,7 +20,7 @@ export class DeletePreviousSessionsForUser implements UseCaseInterface {
 
     await Promise.all(sessions.map(async (session: Session) => {
       if (session.uuid !== dto.currentSessionUuid) {
-        await this.sessionService.revokeSession(session)
+        await this.sessionService.createRevokedSession(session)
       }
     }))
 

@@ -13,5 +13,5 @@ export interface SessionServiceInterace {
   deleteSessionByToken(token: string): Promise<void>
   isRefreshTokenValid(session: Session, token: string): boolean
   getDeviceInfo(session: Session): string
-  revokeSession(session: Session): Promise<RevokedSession>
+  createRevokedSession(session: Session): Promise<RevokedSession>
 }

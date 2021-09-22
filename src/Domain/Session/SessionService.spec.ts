@@ -396,7 +396,7 @@ describe('SessionService', () => {
   })
 
   it('should revoked a session', async () => {
-    await createService().revokeSession(session)
+    await createService().createRevokedSession(session)
 
     expect(revokedSessionRepository.save).toHaveBeenCalledWith({
       uuid: '2e1e43',
