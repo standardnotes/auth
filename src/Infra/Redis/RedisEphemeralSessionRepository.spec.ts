@@ -78,10 +78,27 @@ describe('RedisEphemeralSessionRepository', () => {
     expect(ephemeralSession.userAgent).toEqual('Mozilla Firefox')
   })
 
+  it('should find an ephemeral session by uuid and user uuid', async () => {
+    redisClient.get = jest.fn().mockReturnValue('{"uuid":"1-2-3","userUuid":"2-3-4","userAgent":"Mozilla Firefox","createdAt":"1970-01-01T00:00:00.001Z","updatedAt":"1970-01-01T00:00:00.002Z"}')
+
+    const ephemeralSession = <EphemeralSession> await createRepository().findOneByUuidAndUserUuid('1-2-3', '2-3-4')
+
+    expect(ephemeralSession).not.toBeUndefined()
+    expect(ephemeralSession.userAgent).toEqual('Mozilla Firefox')
+  })
+
   it('should return undefined if session is not found', async () => {
     redisClient.get = jest.fn().mockReturnValue(null)
 
     const ephemeralSession = <EphemeralSession> await createRepository().findOneByUuid('1-2-3')
+
+    expect(ephemeralSession).toBeUndefined()
+  })
+
+  it('should return undefined if ephemeral session is not found', async () => {
+    redisClient.get = jest.fn().mockReturnValue(null)
+
+    const ephemeralSession = <EphemeralSession> await createRepository().findOneByUuidAndUserUuid('1-2-3', '2-3-4')
 
     expect(ephemeralSession).toBeUndefined()
   })

@@ -66,6 +66,15 @@ export class RedisEphemeralSessionRepository implements EphemeralSessionReposito
     return JSON.parse(stringifiedSession)
   }
 
+  async findOneByUuidAndUserUuid(uuid: string, userUuid: string): Promise<EphemeralSession | undefined> {
+    const stringifiedSession = await this.redisClient.get(`${this.PREFIX}:${uuid}:${userUuid}`)
+    if (!stringifiedSession) {
+      return undefined
+    }
+
+    return JSON.parse(stringifiedSession)
+  }
+
   async save(ephemeralSession: EphemeralSession): Promise<void> {
     const bySessionAndUserKey = `${this.PREFIX}:${ephemeralSession.uuid}:${ephemeralSession.userUuid}`
     const bySessionKey = `${this.PREFIX}:${ephemeralSession.uuid}`
