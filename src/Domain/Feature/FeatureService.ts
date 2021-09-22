@@ -8,7 +8,7 @@ import { Setting } from '../Setting/Setting'
 import { SettingServiceInterface } from '../Setting/SettingServiceInterface'
 
 import { User } from '../User/User'
-import { UserSubscription } from '../User/UserSubscription'
+import { UserSubscription } from '../Subscription/UserSubscription'
 import { FeatureServiceInterface } from './FeatureServiceInterface'
 
 @injectable()

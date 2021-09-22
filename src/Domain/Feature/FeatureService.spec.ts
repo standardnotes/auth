@@ -4,7 +4,7 @@ import { Role, RoleName, SubscriptionName } from '@standardnotes/auth'
 
 import { RoleToSubscriptionMapInterface } from '../Role/RoleToSubscriptionMapInterface'
 import { User } from '../User/User'
-import { UserSubscription } from '../User/UserSubscription'
+import { UserSubscription } from '../Subscription/UserSubscription'
 
 import { FeatureService } from './FeatureService'
 import { Permission, PermissionName } from '@standardnotes/features'

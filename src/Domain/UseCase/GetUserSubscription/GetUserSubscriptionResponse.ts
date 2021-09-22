@@ -1,4 +1,4 @@
-import { UserSubscription } from '../../User/UserSubscription'
+import { UserSubscription } from '../../Subscription/UserSubscription'
 
 export type GetUserSubscriptionResponse = {
   success: true,

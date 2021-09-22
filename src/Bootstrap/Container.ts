@@ -81,7 +81,7 @@ import { RemoveWebSocketsConnection } from '../Domain/UseCase/RemoveWebSocketsCo
 import { ContentDecoderInterface } from '../Domain/Encryption/ContentDecoderInterface'
 import { ContentDecoder } from '../Domain/Encryption/ContentDecoder'
 import axios, { AxiosInstance } from 'axios'
-import { UserSubscription } from '../Domain/User/UserSubscription'
+import { UserSubscription } from '../Domain/Subscription/UserSubscription'
 import { MySQLUserSubscriptionRepository } from '../Infra/MySQL/MySQLUserSubscriptionRepository'
 import { WebSocketsClientService } from '../Infra/WebSockets/WebSocketsClientService'
 import { RoleService } from '../Domain/Role/RoleService'
@@ -98,6 +98,7 @@ import { RedisDomainEventPublisher, RedisDomainEventSubscriberFactory, RedisEven
 import { GetUserSubscription } from '../Domain/UseCase/GetUserSubscription/GetUserSubscription'
 import { ChangeCredentials } from '../Domain/UseCase/ChangeCredentials/ChangeCredentials'
 import { SubscriptionReassignedEventHandler } from '../Domain/Handler/SubscriptionReassignedEventHandler'
+import { UserSubscriptionRepositoryInterface } from '../Domain/Subscription/UserSubscriptionRepositoryInterface'
 
 export class ContainerConfigLoader {
   async load(): Promise<Container> {
@@ -187,7 +188,7 @@ export class ContainerConfigLoader {
     container.bind<MySQLUserRepository>(TYPES.UserRepository).toConstantValue(connection.getCustomRepository(MySQLUserRepository))
     container.bind<MySQLSettingRepository>(TYPES.SettingRepository).toConstantValue(connection.getCustomRepository(MySQLSettingRepository))
     container.bind<MySQLRoleRepository>(TYPES.RoleRepository).toConstantValue(connection.getCustomRepository(MySQLRoleRepository))
-    container.bind<MySQLUserSubscriptionRepository>(TYPES.UserSubscriptionRepository).toConstantValue(connection.getCustomRepository(MySQLUserSubscriptionRepository))
+    container.bind<UserSubscriptionRepositoryInterface>(TYPES.UserSubscriptionRepository).toConstantValue(connection.getCustomRepository(MySQLUserSubscriptionRepository))
     container.bind<RedisEphemeralSessionRepository>(TYPES.EphemeralSessionRepository).to(RedisEphemeralSessionRepository)
     container.bind<LockRepository>(TYPES.LockRepository).to(LockRepository)
     container.bind<WebSocketsConnectionRepositoryInterface>(TYPES.WebSocketsConnectionRepository).to(RedisWebSocketsConnectionRepository)

@@ -2,8 +2,8 @@ import 'reflect-metadata'
 import { GetUserSubscription } from './GetUserSubscription'
 import { UserRepositoryInterface } from '../../User/UserRepositoryInterface'
 import { User } from '../../User/User'
-import { UserSubscriptionRepositoryInterface } from '../../User/UserSubscriptionRepositoryInterface'
-import { UserSubscription } from '../../User/UserSubscription'
+import { UserSubscriptionRepositoryInterface } from '../../Subscription/UserSubscriptionRepositoryInterface'
+import { UserSubscription } from '../../Subscription/UserSubscription'
 import { SubscriptionName } from '@standardnotes/auth'
 
 describe('GetUserSubscription', () => {

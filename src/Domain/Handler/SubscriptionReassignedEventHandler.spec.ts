@@ -9,9 +9,9 @@ import * as dayjs from 'dayjs'
 import { RoleServiceInterface } from '../Role/RoleServiceInterface'
 import { User } from '../User/User'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
-import { UserSubscriptionRepositoryInterface } from '../User/UserSubscriptionRepositoryInterface'
+import { UserSubscriptionRepositoryInterface } from '../Subscription/UserSubscriptionRepositoryInterface'
 import { SubscriptionReassignedEventHandler } from './SubscriptionReassignedEventHandler'
-import { UserSubscription } from '../User/UserSubscription'
+import { UserSubscription } from '../Subscription/UserSubscription'
 
 describe('SubscriptionReassignedEventHandler', () => {
   let userRepository: UserRepositoryInterface

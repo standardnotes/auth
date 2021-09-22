@@ -2,7 +2,7 @@ import { Column, Entity, Index, JoinTable, ManyToMany, OneToMany, PrimaryGenerat
 import { RevokedSession } from '../Session/RevokedSession'
 import { Role } from '../Role/Role'
 import { Setting } from '../Setting/Setting'
-import { UserSubscription } from './UserSubscription'
+import { UserSubscription } from '../Subscription/UserSubscription'
 
 @Entity({ name: 'users' })
 export class User {
