@@ -7,7 +7,7 @@ import { Logger } from 'winston'
 
 import TYPES from '../../Bootstrap/Types'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
-import { UserSubscriptionRepositoryInterface } from '../User/UserSubscriptionRepositoryInterface'
+import { UserSubscriptionRepositoryInterface } from '../Subscription/UserSubscriptionRepositoryInterface'
 
 @injectable()
 export class SubscriptionRenewedEventHandler

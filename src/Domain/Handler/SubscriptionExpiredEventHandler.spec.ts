@@ -9,7 +9,7 @@ import * as dayjs from 'dayjs'
 import { User } from '../User/User'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { SubscriptionExpiredEventHandler } from './SubscriptionExpiredEventHandler'
-import { UserSubscriptionRepositoryInterface } from '../User/UserSubscriptionRepositoryInterface'
+import { UserSubscriptionRepositoryInterface } from '../Subscription/UserSubscriptionRepositoryInterface'
 import { RoleServiceInterface } from '../Role/RoleServiceInterface'
 
 describe('SubscriptionExpiredEventHandler', () => {
@@ -42,7 +42,7 @@ describe('SubscriptionExpiredEventHandler', () => {
     userRepository.save = jest.fn().mockReturnValue(user)
 
     userSubscriptionRepository = {} as jest.Mocked<UserSubscriptionRepositoryInterface>
-    userSubscriptionRepository.updateEndsAtByNameAndUserUuid = jest.fn()  
+    userSubscriptionRepository.updateEndsAtByNameAndUserUuid = jest.fn()
 
     roleService = {} as jest.Mocked<RoleServiceInterface>
     roleService.removeUserRole = jest.fn()

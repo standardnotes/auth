@@ -54,6 +54,7 @@ const TYPES = {
   WEBSOCKETS_API_URL: Symbol.for('WEBSOCKETS_API_URL'),
   VERSION: Symbol.for('VERSION'),
   EXTENSION_SERVER_URL: Symbol.for('EXTENSION_SERVER_URL'),
+  PAYMENTS_SERVER_URL: Symbol.for('PAYMENTS_SERVER_URL'),
   // use cases
   AuthenticateUser: Symbol.for('AuthenticateUser'),
   AuthenticateRequest: Symbol.for('AuthenticateRequest'),
@@ -112,6 +113,7 @@ const TYPES = {
   RoleService: Symbol.for('RoleService'),
   RoleToSubscriptionMap: Symbol.for('RoleToSubscriptionMap'),
   FeatureService: Symbol.for('FeatureService'),
+  PaymentsSubscriptionHttpService: Symbol.for('PaymentsSubscriptionHttpService'),
 }
 
 export default TYPES

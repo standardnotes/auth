@@ -9,7 +9,7 @@ import * as dayjs from 'dayjs'
 import { User } from '../User/User'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { SubscriptionRenewedEventHandler } from './SubscriptionRenewedEventHandler'
-import { UserSubscriptionRepositoryInterface } from '../User/UserSubscriptionRepositoryInterface'
+import { UserSubscriptionRepositoryInterface } from '../Subscription/UserSubscriptionRepositoryInterface'
 
 describe('SubscriptionRenewedEventHandler', () => {
   let userRepository: UserRepositoryInterface

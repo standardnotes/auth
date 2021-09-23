@@ -99,6 +99,8 @@ import { GetUserSubscription } from '../Domain/UseCase/GetUserSubscription/GetUs
 import { ChangeCredentials } from '../Domain/UseCase/ChangeCredentials/ChangeCredentials'
 import { SubscriptionReassignedEventHandler } from '../Domain/Handler/SubscriptionReassignedEventHandler'
 import { UserSubscriptionRepositoryInterface } from '../Domain/Subscription/UserSubscriptionRepositoryInterface'
+import { PaymentsSubscriptionHttpServiceInterface } from '../Domain/Subscription/PaymentsSubscriptionHttpServiceInterface'
+import { PaymentsSubscriptionHttpService } from '../Infra/HTTP/PaymentsSubscriptionHttpService'
 
 export class ContainerConfigLoader {
   async load(): Promise<Container> {
@@ -235,6 +237,7 @@ export class ContainerConfigLoader {
     container.bind(TYPES.WEBSOCKETS_API_URL).toConstantValue(env.get('WEBSOCKETS_API_URL', true))
     container.bind(TYPES.VERSION).toConstantValue(env.get('VERSION'))
     container.bind(TYPES.EXTENSION_SERVER_URL).toConstantValue(env.get('EXTENSION_SERVER_URL', true))
+    container.bind(TYPES.PAYMENTS_SERVER_URL).toConstantValue(env.get('PAYMENTS_SERVER_URL', true))
 
     // use cases
     container.bind<AuthenticateUser>(TYPES.AuthenticateUser).to(AuthenticateUser)
@@ -293,6 +296,7 @@ export class ContainerConfigLoader {
     container.bind<RoleServiceInterface>(TYPES.RoleService).to(RoleService)
     container.bind<RoleToSubscriptionMapInterface>(TYPES.RoleToSubscriptionMap).to(RoleToSubscriptionMap)
     container.bind<FeatureServiceInterface>(TYPES.FeatureService).to(FeatureService)
+    container.bind<PaymentsSubscriptionHttpServiceInterface>(TYPES.PaymentsSubscriptionHttpService).to(PaymentsSubscriptionHttpService)
 
     if (env.get('SNS_TOPIC_ARN', true)) {
       container.bind<SNSDomainEventPublisher>(TYPES.DomainEventPublisher).toConstantValue(
