@@ -14,7 +14,7 @@ import { SettingProps } from '../../Setting/SettingProps'
 import { SettingName } from '@standardnotes/settings'
 import { RoleServiceInterface } from '../../Role/RoleServiceInterface'
 import { SubscriptionName } from '@standardnotes/auth'
-import { PaymentsSubscriptionHttpServiceInterface } from '../../Subscription/PaymentsSubscriptionHttpServiceInterface'
+import { PaymentsHttpServiceInterface } from '../../Subscription/PaymentsHttpServiceInterface'
 import { UserSubscription } from '../../Subscription/UserSubscription'
 import { TimerInterface } from '@standardnotes/time'
 
@@ -26,7 +26,7 @@ export class UpdateSetting implements UseCaseInterface {
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
     @inject(TYPES.UserSubscriptionRepository) private userSubscriptionRepository: UserSubscriptionRepositoryInterface,
     @inject(TYPES.RoleService) private roleService: RoleServiceInterface,
-    @inject(TYPES.PaymentsSubscriptionHttpService) private paymentsSubscriptionHttpService: PaymentsSubscriptionHttpServiceInterface,
+    @inject(TYPES.PaymentsHttpService) private paymentsHttpService: PaymentsHttpServiceInterface,
     @inject(TYPES.Timer) private timer: TimerInterface,
     @inject(TYPES.Logger) private logger: Logger,
   ) {
@@ -96,9 +96,9 @@ export class UpdateSetting implements UseCaseInterface {
       return
     }
 
-    const subscriptionDataFromPaymentsServer = await this.paymentsSubscriptionHttpService.getUserSubscription(user.uuid)
-    if (subscriptionDataFromPaymentsServer === undefined) {
-      this.logger.debug(`[${user.uuid}] No subscription data retrieved from payments server`)
+    const userWithSubscriptionDataFromPaymentsServer = await this.paymentsHttpService.getUser(props.value as string)
+    if (userWithSubscriptionDataFromPaymentsServer === undefined) {
+      this.logger.debug(`[${user.uuid}] No user with subscription data retrieved from payments server`)
 
       return
     }
@@ -108,10 +108,10 @@ export class UpdateSetting implements UseCaseInterface {
     const subscription = new UserSubscription()
     subscription.planName = SubscriptionName.ProPlan
     subscription.user = Promise.resolve(user)
-    subscription.createdAt = this.timer.convertStringDateToMicroseconds(subscriptionDataFromPaymentsServer.created_at)
-    subscription.updatedAt = this.timer.convertStringDateToMicroseconds(subscriptionDataFromPaymentsServer.updated_at)
-    subscription.endsAt = this.timer.convertStringDateToMicroseconds(subscriptionDataFromPaymentsServer.active_until)
-    subscription.cancelled = subscriptionDataFromPaymentsServer.canceled
+    subscription.createdAt = this.timer.convertStringDateToMicroseconds(userWithSubscriptionDataFromPaymentsServer.subscription.created_at)
+    subscription.updatedAt = this.timer.convertStringDateToMicroseconds(userWithSubscriptionDataFromPaymentsServer.subscription.updated_at)
+    subscription.endsAt = this.timer.convertStringDateToMicroseconds(userWithSubscriptionDataFromPaymentsServer.subscription.active_until)
+    subscription.cancelled = userWithSubscriptionDataFromPaymentsServer.subscription.canceled
 
     await this.userSubscriptionRepository.save(subscription)
   }

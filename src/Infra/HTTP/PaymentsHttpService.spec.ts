@@ -3,15 +3,15 @@ import 'reflect-metadata'
 
 
 import { Logger } from 'winston'
-import { PaymentsSubscriptionHttpService } from './PaymentsSubscriptionHttpService'
+import { PaymentsHttpService } from './PaymentsHttpService'
 
-describe('PaymentsSubscriptionHttpService', () => {
+describe('PaymentsHttpService', () => {
   let httpClient: AxiosInstance
   let logger: Logger
 
   const paymentsServerUrl = 'https://payments-server'
 
-  const createService = () => new PaymentsSubscriptionHttpService(httpClient, paymentsServerUrl, logger)
+  const createService = () => new PaymentsHttpService(httpClient, paymentsServerUrl, logger)
 
   beforeEach(() => {
     httpClient = {} as jest.Mocked<AxiosInstance>
@@ -24,22 +24,22 @@ describe('PaymentsSubscriptionHttpService', () => {
   it('should send a request to payments service in order to get user subscription data', async () => {
     httpClient.request = jest.fn().mockReturnValue({
       data: {
-        subscriptions: [
-          {
+        user: {
+          subscription: {
             canceled: false,
           },
-        ],
+        },
       },
     })
 
-    await createService().getUserSubscription('1-2-3')
+    await createService().getUser('a-b-c')
 
     expect(httpClient.request).toHaveBeenCalledWith({
       method: 'GET',
       headers: {
         'Accept': 'application/json',
       },
-      url: 'https://payments-server/internal/users/1-2-3/subscriptions',
+      url: 'https://payments-server/internal/users/a-b-c',
       validateStatus: expect.any(Function),
     })
   })
@@ -51,7 +51,26 @@ describe('PaymentsSubscriptionHttpService', () => {
 
     let error = null
     try {
-      await createService().getUserSubscription('1-2-3')
+      await createService().getUser('a-b-c')
+    } catch (caughtError) {
+      error = caughtError
+    }
+
+    expect(error).not.toBeNull()
+  })
+
+  it('should throw error when getting user subscription data if the response contains a user without a subscription', async () => {
+    httpClient.request = jest.fn().mockReturnValue({
+      data: {
+        user: {
+          email: 'test@test.te',
+        },
+      },
+    })
+
+    let error = null
+    try {
+      await createService().getUser('a-b-c')
     } catch (caughtError) {
       error = caughtError
     }
@@ -60,9 +79,9 @@ describe('PaymentsSubscriptionHttpService', () => {
   })
 
   it('should skip getting user subscription data if the payments url is not defined', async () => {
-    const service = new PaymentsSubscriptionHttpService(httpClient, '', logger)
+    const service = new PaymentsHttpService(httpClient, '', logger)
 
-    await service.getUserSubscription('1-2-3')
+    await service.getUser('a-b-c')
 
     expect(httpClient.request).not.toHaveBeenCalled()
   })

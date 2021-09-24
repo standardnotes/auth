@@ -8,7 +8,7 @@ import { RoleServiceInterface } from '../../Role/RoleServiceInterface'
 import { Setting } from '../../Setting/Setting'
 import { SettingServiceInterface } from '../../Setting/SettingServiceInterface'
 import { SimpleSetting } from '../../Setting/SimpleSetting'
-import { PaymentsSubscriptionHttpServiceInterface } from '../../Subscription/PaymentsSubscriptionHttpServiceInterface'
+import { PaymentsHttpServiceInterface } from '../../Subscription/PaymentsHttpServiceInterface'
 import { UserSubscription } from '../../Subscription/UserSubscription'
 import { UserSubscriptionRepositoryInterface } from '../../Subscription/UserSubscriptionRepositoryInterface'
 import { User } from '../../User/User'
@@ -24,7 +24,7 @@ describe('UpdateSetting', () => {
   let userRepository: UserRepositoryInterface
   let userSubscriptionRepository: UserSubscriptionRepositoryInterface
   let roleService: RoleServiceInterface
-  let paymentsSubscriptionHttpService: PaymentsSubscriptionHttpServiceInterface
+  let paymentsHttpService: PaymentsHttpServiceInterface
   let timer: TimerInterface
   let logger: Logger
 
@@ -34,7 +34,7 @@ describe('UpdateSetting', () => {
     userRepository,
     userSubscriptionRepository,
     roleService,
-    paymentsSubscriptionHttpService,
+    paymentsHttpService,
     timer,
     logger
   )
@@ -60,12 +60,17 @@ describe('UpdateSetting', () => {
     roleService = {} as jest.Mocked<RoleServiceInterface>
     roleService.addUserRole = jest.fn()
 
-    paymentsSubscriptionHttpService = {} as jest.Mocked<PaymentsSubscriptionHttpServiceInterface>
-    paymentsSubscriptionHttpService.getUserSubscription = jest.fn().mockReturnValue({
-      canceled: false,
-      created_at: new Date(1).toString(),
-      updated_at: new Date(2).toString(),
-      active_until: new Date(3).toString(),
+    paymentsHttpService = {} as jest.Mocked<PaymentsHttpServiceInterface>
+    paymentsHttpService.getUser = jest.fn().mockReturnValue({
+      id: 1,
+      email: 'test@test.te',
+      extension_server_key: 'a-b-c',
+      subscription: {
+        canceled: false,
+        created_at: new Date(1).toString(),
+        updated_at: new Date(2).toString(),
+        active_until: new Date(3).toString(),
+      },
     })
 
     timer = {} as jest.Mocked<TimerInterface>
@@ -204,7 +209,7 @@ describe('UpdateSetting', () => {
       sensitive: true,
     }
 
-    paymentsSubscriptionHttpService.getUserSubscription = jest.fn().mockReturnValue(undefined)
+    paymentsHttpService.getUser = jest.fn().mockReturnValue(undefined)
 
     const response = await createUseCase().execute({ props, userUuid: '1-2-3' })
 
@@ -237,7 +242,7 @@ describe('UpdateSetting', () => {
       sensitive: true,
     }
 
-    paymentsSubscriptionHttpService.getUserSubscription = jest.fn().mockImplementation(() => {
+    paymentsHttpService.getUser = jest.fn().mockImplementation(() => {
       throw new Error('Oops')
     })
 

@@ -113,7 +113,7 @@ const TYPES = {
   RoleService: Symbol.for('RoleService'),
   RoleToSubscriptionMap: Symbol.for('RoleToSubscriptionMap'),
   FeatureService: Symbol.for('FeatureService'),
-  PaymentsSubscriptionHttpService: Symbol.for('PaymentsSubscriptionHttpService'),
+  PaymentsHttpService: Symbol.for('PaymentsHttpService'),
 }
 
 export default TYPES

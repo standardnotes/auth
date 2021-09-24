@@ -99,8 +99,8 @@ import { GetUserSubscription } from '../Domain/UseCase/GetUserSubscription/GetUs
 import { ChangeCredentials } from '../Domain/UseCase/ChangeCredentials/ChangeCredentials'
 import { SubscriptionReassignedEventHandler } from '../Domain/Handler/SubscriptionReassignedEventHandler'
 import { UserSubscriptionRepositoryInterface } from '../Domain/Subscription/UserSubscriptionRepositoryInterface'
-import { PaymentsSubscriptionHttpServiceInterface } from '../Domain/Subscription/PaymentsSubscriptionHttpServiceInterface'
-import { PaymentsSubscriptionHttpService } from '../Infra/HTTP/PaymentsSubscriptionHttpService'
+import { PaymentsHttpServiceInterface } from '../Domain/Subscription/PaymentsHttpServiceInterface'
+import { PaymentsHttpService } from '../Infra/HTTP/PaymentsHttpService'
 
 export class ContainerConfigLoader {
   async load(): Promise<Container> {
@@ -296,7 +296,7 @@ export class ContainerConfigLoader {
     container.bind<RoleServiceInterface>(TYPES.RoleService).to(RoleService)
     container.bind<RoleToSubscriptionMapInterface>(TYPES.RoleToSubscriptionMap).to(RoleToSubscriptionMap)
     container.bind<FeatureServiceInterface>(TYPES.FeatureService).to(FeatureService)
-    container.bind<PaymentsSubscriptionHttpServiceInterface>(TYPES.PaymentsSubscriptionHttpService).to(PaymentsSubscriptionHttpService)
+    container.bind<PaymentsHttpServiceInterface>(TYPES.PaymentsHttpService).to(PaymentsHttpService)
 
     if (env.get('SNS_TOPIC_ARN', true)) {
       container.bind<SNSDomainEventPublisher>(TYPES.DomainEventPublisher).toConstantValue(
