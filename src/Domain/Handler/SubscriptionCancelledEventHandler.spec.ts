@@ -8,8 +8,8 @@ import * as dayjs from 'dayjs'
 
 import { User } from '../User/User'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
-import { UserSubscriptionRepositoryInterface } from '../User/UserSubscriptionRepositoryInterface'
 import { SubscriptionCancelledEventHandler } from './SubscriptionCancelledEventHandler'
+import { UserSubscriptionRepositoryInterface } from '../Subscription/UserSubscriptionRepositoryInterface'
 
 describe('SubscriptionCancelledEventHandler', () => {
   let userRepository: UserRepositoryInterface

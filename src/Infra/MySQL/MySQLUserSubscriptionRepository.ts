@@ -1,8 +1,8 @@
 import { injectable } from 'inversify'
 import { EntityRepository, Repository } from 'typeorm'
 
-import { UserSubscription } from '../../Domain/User/UserSubscription'
-import { UserSubscriptionRepositoryInterface } from '../../Domain/User/UserSubscriptionRepositoryInterface'
+import { UserSubscription } from '../../Domain/Subscription/UserSubscription'
+import { UserSubscriptionRepositoryInterface } from '../../Domain/Subscription/UserSubscriptionRepositoryInterface'
 
 @injectable()
 @EntityRepository(UserSubscription)
