@@ -65,4 +65,18 @@ describe('AuthMiddleware', () => {
     expect(response.status).toHaveBeenCalledWith(401)
     expect(next).not.toHaveBeenCalled()
   })
+
+  it('should pass the error to next middleware if one occurres', async () => {
+    const error = new Error('Ooops')
+
+    authenticateRequest.execute = jest.fn().mockImplementation(() => {
+      throw error
+    })
+
+    await createMiddleware().handler(request, response, next)
+
+    expect(response.status).not.toHaveBeenCalled()
+
+    expect(next).toHaveBeenCalledWith(error)
+  })
 })

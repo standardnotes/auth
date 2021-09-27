@@ -13,15 +13,19 @@ export class AuthMiddlewareWithoutResponse extends BaseMiddleware {
   }
 
   async handler (request: Request, response: Response, next: NextFunction): Promise<void> {
-    const authenticateRequestResponse = await this.authenticateRequest.execute({ authorizationHeader: request.headers.authorization })
+    try {
+      const authenticateRequestResponse = await this.authenticateRequest.execute({ authorizationHeader: request.headers.authorization })
 
-    if (!authenticateRequestResponse.success) {
+      if (!authenticateRequestResponse.success) {
+        return next()
+      }
+
+      response.locals.user = authenticateRequestResponse.user
+      response.locals.session = authenticateRequestResponse.session
+
+      return next()
+    } catch (error) {
       return next()
     }
-
-    response.locals.user = authenticateRequestResponse.user
-    response.locals.session = authenticateRequestResponse.session
-
-    return next()
   }
 }
