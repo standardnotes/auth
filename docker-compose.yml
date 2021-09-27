@@ -6,9 +6,9 @@ services:
     entrypoint: ["./wait-for.sh", "db", "3306", "./wait-for.sh", "cache", "6379", "./docker/entrypoint.sh", "start-local"]
     healthcheck:
       test: [ "CMD-SHELL", "curl -f http://localhost:3000/healthcheck || exit 1" ]
-      interval: "30"
-      retries: "3"
-      start_period: "60"
+      interval: "30s"
+      retries: 3
+      start_period: "60s"
     env_file: .env
     restart: unless-stopped
     environment:

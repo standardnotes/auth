@@ -55,4 +55,14 @@ describe('AuthMiddlewareWithoutResponse', () => {
 
     expect(next).toHaveBeenCalled()
   })
+
+  it('should skip middleware if authentication errors', async () => {
+    authenticateRequest.execute = jest.fn().mockImplementation(() => {
+      throw new Error('Ooops')
+    })
+
+    await createMiddleware().handler(request, response, next)
+
+    expect(next).toHaveBeenCalled()
+  })
 })

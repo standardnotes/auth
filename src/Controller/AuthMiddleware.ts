@@ -15,24 +15,28 @@ export class AuthMiddleware extends BaseMiddleware {
   }
 
   async handler (request: Request, response: Response, next: NextFunction): Promise<void> {
-    const authenticateRequestResponse = await this.authenticateRequest.execute({ authorizationHeader: request.headers.authorization })
+    try {
+      const authenticateRequestResponse = await this.authenticateRequest.execute({ authorizationHeader: request.headers.authorization })
 
-    if (!authenticateRequestResponse.success) {
-      this.logger.debug('AuthMiddleware authentication failure.')
+      if (!authenticateRequestResponse.success) {
+        this.logger.debug('AuthMiddleware authentication failure.')
 
-      response.status(authenticateRequestResponse.responseCode).send({
-        error: {
-          tag: authenticateRequestResponse.errorTag,
-          message: authenticateRequestResponse.errorMessage,
-        },
-      })
+        response.status(authenticateRequestResponse.responseCode).send({
+          error: {
+            tag: authenticateRequestResponse.errorTag,
+            message: authenticateRequestResponse.errorMessage,
+          },
+        })
 
-      return
+        return
+      }
+
+      response.locals.user = authenticateRequestResponse.user
+      response.locals.session = authenticateRequestResponse.session
+
+      return next()
+    } catch (error) {
+      return next(error)
     }
-
-    response.locals.user = authenticateRequestResponse.user
-    response.locals.session = authenticateRequestResponse.session
-
-    return next()
   }
 }
