@@ -37,4 +37,16 @@ describe('SessionMiddleware', () => {
 
     expect(next).not.toHaveBeenCalled()
   })
+
+  it('should pass the error to next middleware if one occurres', async () => {
+    const error = new Error('Ooops')
+
+    response.send = jest.fn().mockImplementation(() => {
+      throw error
+    })
+
+    await createMiddleware().handler(request, response, next)
+
+    expect(next).toHaveBeenCalledWith(error)
+  })
 })

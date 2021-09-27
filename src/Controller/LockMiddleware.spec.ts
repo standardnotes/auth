@@ -61,4 +61,18 @@ describe('LockMiddleware', () => {
 
     expect(next).toHaveBeenCalled()
   })
+
+  it('should pass the error to next middleware if one occurres', async () => {
+    const error = new Error('Ooops')
+
+    userRepository.findOneByEmail = jest.fn().mockImplementation(() => {
+      throw error
+    })
+
+    await createMiddleware().handler(request, response, next)
+
+    expect(response.status).not.toHaveBeenCalled()
+
+    expect(next).toHaveBeenCalledWith(error)
+  })
 })
