@@ -10,7 +10,7 @@ import TYPES from '../../Bootstrap/Types'
 import { RoleServiceInterface } from '../Role/RoleServiceInterface'
 import { User } from '../User/User'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
-import { UserSubscriptionRepositoryInterface } from '../User/UserSubscriptionRepositoryInterface'
+import { UserSubscriptionRepositoryInterface } from '../Subscription/UserSubscriptionRepositoryInterface'
 
 @injectable()
 export class SubscriptionRefundedEventHandler

@@ -1,8 +1,9 @@
-import { SubscriptionName } from '@standardnotes/auth'
 import 'reflect-metadata'
 
+import { SubscriptionName } from '@standardnotes/auth'
+
 import { SelectQueryBuilder, UpdateQueryBuilder } from 'typeorm'
-import { UserSubscription } from '../../Domain/User/UserSubscription'
+import { UserSubscription } from '../../Domain/Subscription/UserSubscription'
 
 import { MySQLUserSubscriptionRepository } from './MySQLUserSubscriptionRepository'
 
@@ -15,7 +16,7 @@ describe('MySQLUserSubscriptionRepository', () => {
   beforeEach(() => {
     selectQueryBuilder = {} as jest.Mocked<SelectQueryBuilder<UserSubscription>>
     updateQueryBuilder = {} as jest.Mocked<UpdateQueryBuilder<UserSubscription>>
-    
+
     subscription = {
       planName: SubscriptionName.ProPlan,
     } as jest.Mocked<UserSubscription>

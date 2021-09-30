@@ -4,7 +4,7 @@ import TYPES from '../../../Bootstrap/Types'
 import { GetUserSubscriptionDto } from './GetUserSubscriptionDto'
 import { UserRepositoryInterface } from '../../User/UserRepositoryInterface'
 import { GetUserSubscriptionResponse } from './GetUserSubscriptionResponse'
-import { UserSubscriptionRepositoryInterface } from '../../User/UserSubscriptionRepositoryInterface'
+import { UserSubscriptionRepositoryInterface } from '../../Subscription/UserSubscriptionRepositoryInterface'
 
 @injectable()
 export class GetUserSubscription implements UseCaseInterface {
