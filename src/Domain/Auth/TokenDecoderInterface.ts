@@ -1,3 +1,6 @@
+import { Token } from '@standardnotes/auth'
+
 export interface TokenDecoderInterface {
-  decode(token: string): Record<string, unknown> | undefined
+  decodeSessionToken(token: string): Record<string, unknown> | undefined
+  decodeCrossServiceCommunicationToken(token: string): Token | undefined
 }

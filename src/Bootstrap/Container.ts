@@ -101,6 +101,10 @@ import { SubscriptionReassignedEventHandler } from '../Domain/Handler/Subscripti
 import { UserSubscriptionRepositoryInterface } from '../Domain/Subscription/UserSubscriptionRepositoryInterface'
 import { PaymentsHttpServiceInterface } from '../Domain/Subscription/PaymentsHttpServiceInterface'
 import { PaymentsHttpService } from '../Infra/HTTP/PaymentsHttpService'
+import { CreateEphemeralToken } from '../Domain/UseCase/CreateEphemeralToken/CreateEphemeralToken'
+import { ApiGatewayAuthMiddleware } from '../Controller/ApiGatewayAuthMiddleware'
+import { EphemeralTokenRepositoryInterface } from '../Domain/Subscription/EphemeralTokenRepositoryInterface'
+import { RedisEphemeralTokenRepository } from '../Infra/Redis/RedisEphemeralTokenRepository'
 
 export class ContainerConfigLoader {
   async load(): Promise<Container> {
@@ -194,12 +198,14 @@ export class ContainerConfigLoader {
     container.bind<RedisEphemeralSessionRepository>(TYPES.EphemeralSessionRepository).to(RedisEphemeralSessionRepository)
     container.bind<LockRepository>(TYPES.LockRepository).to(LockRepository)
     container.bind<WebSocketsConnectionRepositoryInterface>(TYPES.WebSocketsConnectionRepository).to(RedisWebSocketsConnectionRepository)
+    container.bind<EphemeralTokenRepositoryInterface>(TYPES.EphemeralTokenRepository).to(RedisEphemeralTokenRepository)
 
     // Middleware
     container.bind<AuthMiddleware>(TYPES.AuthMiddleware).to(AuthMiddleware)
     container.bind<SessionMiddleware>(TYPES.SessionMiddleware).to(SessionMiddleware)
     container.bind<LockMiddleware>(TYPES.LockMiddleware).to(LockMiddleware)
     container.bind<AuthMiddlewareWithoutResponse>(TYPES.AuthMiddlewareWithoutResponse).to(AuthMiddlewareWithoutResponse)
+    container.bind<ApiGatewayAuthMiddleware>(TYPES.ApiGatewayAuthMiddleware).to(ApiGatewayAuthMiddleware)
 
     // Projectors
     container.bind<SessionProjector>(TYPES.SessionProjector).to(SessionProjector)
@@ -264,6 +270,7 @@ export class ContainerConfigLoader {
     container.bind<AddWebSocketsConnection>(TYPES.AddWebSocketsConnection).to(AddWebSocketsConnection)
     container.bind<RemoveWebSocketsConnection>(TYPES.RemoveWebSocketsConnection).to(RemoveWebSocketsConnection)
     container.bind<GetUserSubscription>(TYPES.GetUserSubscription).to(GetUserSubscription)
+    container.bind<CreateEphemeralToken>(TYPES.CreateEphemeralToken).to(CreateEphemeralToken)
 
     // Handlers
     container.bind<UserRegisteredEventHandler>(TYPES.UserRegisteredEventHandler).to(UserRegisteredEventHandler)

@@ -16,7 +16,7 @@ export class AuthenticationMethodResolver implements AuthenticationMethodResolve
   }
 
   async resolve(token: string): Promise<AuthenticationMethod | undefined> {
-    const decodedToken = this.tokenDecoder.decode(token)
+    const decodedToken = this.tokenDecoder.decodeSessionToken(token)
     if (decodedToken) {
       return {
         type: 'jwt',
