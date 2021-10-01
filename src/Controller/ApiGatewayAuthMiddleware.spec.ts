@@ -48,7 +48,7 @@ describe('ApiGatewayAuthMiddleware', () => {
   })
 
   it('should authorize user', async () => {
-    request.headers['X-Auth-Token'] = 'auth-jwt-token'
+    request.headers['x-auth-token'] = 'auth-jwt-token'
 
     await createMiddleware().handler(request, response, next)
 
@@ -74,7 +74,7 @@ describe('ApiGatewayAuthMiddleware', () => {
   })
 
   it('should not authorize if auth jwt token is malformed', async () => {
-    request.headers['X-Auth-Token'] = 'auth-jwt-token'
+    request.headers['x-auth-token'] = 'auth-jwt-token'
 
     tokenDecoder.decodeCrossServiceCommunicationToken = jest.fn().mockReturnValue(undefined)
 
@@ -85,7 +85,7 @@ describe('ApiGatewayAuthMiddleware', () => {
   })
 
   it('should pass the error to next middleware if one occurres', async () => {
-    request.headers['X-Auth-Token'] = 'auth-jwt-token'
+    request.headers['x-auth-token'] = 'auth-jwt-token'
 
     const error = new Error('Ooops')
 
