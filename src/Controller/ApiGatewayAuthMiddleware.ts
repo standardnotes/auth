@@ -16,6 +16,8 @@ export class ApiGatewayAuthMiddleware extends BaseMiddleware {
 
   async handler (request: Request, response: Response, next: NextFunction): Promise<void> {
     try {
+      this.logger.debug(`ApiGatewayAuthMiddleware request headers: ${JSON.stringify(request.headers)}`)
+
       if (!request.headers['X-Auth-Token']) {
         this.logger.debug('ApiGatewayAuthMiddleware missing X-Auth-Token header.')
 
