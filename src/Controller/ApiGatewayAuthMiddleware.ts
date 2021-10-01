@@ -16,10 +16,8 @@ export class ApiGatewayAuthMiddleware extends BaseMiddleware {
 
   async handler (request: Request, response: Response, next: NextFunction): Promise<void> {
     try {
-      this.logger.debug(`ApiGatewayAuthMiddleware request headers: ${JSON.stringify(request.headers)}`)
-
-      if (!request.headers['X-Auth-Token']) {
-        this.logger.debug('ApiGatewayAuthMiddleware missing X-Auth-Token header.')
+      if (!request.headers['x-auth-token']) {
+        this.logger.debug('ApiGatewayAuthMiddleware missing x-auth-token header.')
 
         response.status(401).send({
           error: {
@@ -31,7 +29,7 @@ export class ApiGatewayAuthMiddleware extends BaseMiddleware {
         return
       }
 
-      const token = this.tokenDecoder.decodeCrossServiceCommunicationToken(request.headers['X-Auth-Token'] as string)
+      const token = this.tokenDecoder.decodeCrossServiceCommunicationToken(request.headers['x-auth-token'] as string)
 
       if (token === undefined) {
         this.logger.debug('ApiGatewayAuthMiddleware authentication failure.')
