@@ -83,6 +83,7 @@ const TYPES = {
   RemoveWebSocketsConnection: Symbol.for('RemoveWebSocketsConnection'),
   GetUserSubscription: Symbol.for('GetUserSubscription'),
   CreateEphemeralToken: Symbol.for('CreateEphemeralToken'),
+  AuthenticateToken: Symbol.for('AuthenticateToken'),
   // Handlers
   UserRegisteredEventHandler: Symbol.for('UserRegisteredEventHandler'),
   AccountDeletionRequestedEventHandler: Symbol.for('AccountDeletionRequestedEventHandler'),

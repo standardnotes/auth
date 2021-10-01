@@ -105,6 +105,7 @@ import { CreateEphemeralToken } from '../Domain/UseCase/CreateEphemeralToken/Cre
 import { ApiGatewayAuthMiddleware } from '../Controller/ApiGatewayAuthMiddleware'
 import { EphemeralTokenRepositoryInterface } from '../Domain/Subscription/EphemeralTokenRepositoryInterface'
 import { RedisEphemeralTokenRepository } from '../Infra/Redis/RedisEphemeralTokenRepository'
+import { AuthenticateToken } from '../Domain/UseCase/AuthenticateToken/AuthenticateToken'
 
 export class ContainerConfigLoader {
   async load(): Promise<Container> {
@@ -271,6 +272,7 @@ export class ContainerConfigLoader {
     container.bind<RemoveWebSocketsConnection>(TYPES.RemoveWebSocketsConnection).to(RemoveWebSocketsConnection)
     container.bind<GetUserSubscription>(TYPES.GetUserSubscription).to(GetUserSubscription)
     container.bind<CreateEphemeralToken>(TYPES.CreateEphemeralToken).to(CreateEphemeralToken)
+    container.bind<AuthenticateToken>(TYPES.AuthenticateToken).to(AuthenticateToken)
 
     // Handlers
     container.bind<UserRegisteredEventHandler>(TYPES.UserRegisteredEventHandler).to(UserRegisteredEventHandler)
