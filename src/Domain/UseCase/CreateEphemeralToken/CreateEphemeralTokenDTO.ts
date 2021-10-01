@@ -1,4 +1,4 @@
 export type CreateEphemeralTokenDTO = {
   userUuid: string
-  userEmail: string
+  email: string
 }

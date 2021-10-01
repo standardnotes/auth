@@ -1,3 +1,4 @@
+import { SnCryptoNode } from '@standardnotes/sncrypto-node'
 import { TimerInterface } from '@standardnotes/time'
 import { inject, injectable } from 'inversify'
 
@@ -11,15 +12,21 @@ import { CreateEphemeralTokenResponse } from './CreateEphemeralTokenResponse'
 export class CreateEphemeralToken implements UseCaseInterface {
   constructor(
     @inject(TYPES.EphemeralTokenRepository) private ephemeralTokenRepository: EphemeralTokenRepositoryInterface,
+    @inject(TYPES.SnCryptoNode) private cryptoNode: SnCryptoNode,
     @inject(TYPES.Timer) private timer: TimerInterface,
   ) {
   }
 
   async execute(dto: CreateEphemeralTokenDTO): Promise<CreateEphemeralTokenResponse> {
+    const token = await this.cryptoNode.generateRandomKey(128)
+
     const ephemeralToken = {
       userUuid: dto.userUuid,
-      token: '',
-      expiresAt: 1, // change with timer
+      email: dto.email,
+      token,
+      expiresAt: this.timer.convertStringDateToMicroseconds(
+        this.timer.getUTCDateNDaysAhead(1).toString()
+      ),
     }
 
     await this.ephemeralTokenRepository.save(ephemeralToken)

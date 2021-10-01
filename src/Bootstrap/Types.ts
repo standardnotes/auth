@@ -17,6 +17,7 @@ const TYPES = {
   EphemeralTokenRepository: Symbol.for('EphemeralTokenRepository'),
   // Middleware
   AuthMiddleware: Symbol.for('AuthMiddleware'),
+  ApiGatewayAuthMiddleware: Symbol.for('ApiGatewayAuthMiddleware'),
   AuthMiddlewareWithoutResponse: Symbol.for('AuthMiddlewareWithoutResponse'),
   LockMiddleware: Symbol.for('LockMiddleware'),
   SessionMiddleware: Symbol.for('SessionMiddleware'),
@@ -81,6 +82,7 @@ const TYPES = {
   AddWebSocketsConnection: Symbol.for('AddWebSocketsConnection'),
   RemoveWebSocketsConnection: Symbol.for('RemoveWebSocketsConnection'),
   GetUserSubscription: Symbol.for('GetUserSubscription'),
+  CreateEphemeralToken: Symbol.for('CreateEphemeralToken'),
   // Handlers
   UserRegisteredEventHandler: Symbol.for('UserRegisteredEventHandler'),
   AccountDeletionRequestedEventHandler: Symbol.for('AccountDeletionRequestedEventHandler'),
