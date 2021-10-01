@@ -16,6 +16,15 @@ export class RedisEphemeralTokenRepository implements EphemeralTokenRepositoryIn
   ) {
   }
 
+  async getUserUuidByToken(token: string): Promise<string | undefined> {
+    const userUuid = await this.redisClient.get(`${this.PREFIX}:${token}`)
+    if (!userUuid) {
+      return undefined
+    }
+
+    return userUuid
+  }
+
   async save(ephemeralToken: EphemeralToken): Promise<void> {
     const key = `${this.PREFIX}:${ephemeralToken.token}`
     const expiresAtTimestampInSeconds = this.timer.convertMicrosecondsToSeconds(ephemeralToken.expiresAt)
