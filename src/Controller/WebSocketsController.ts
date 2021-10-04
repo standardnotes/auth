@@ -21,7 +21,7 @@ export class WebSocketsController extends BaseHttpController {
     super()
   }
 
-  @httpPost('/:connectionId', TYPES.AuthMiddleware)
+  @httpPost('/:connectionId', TYPES.ApiGatewayAuthMiddleware)
   async storeWebSocketsConnection(request: Request, response: Response): Promise<results.JsonResult | results.BadRequestErrorMessageResult> {
     await this.addWebSocketsConnection.execute({
       userUuid: response.locals.user.uuid,
