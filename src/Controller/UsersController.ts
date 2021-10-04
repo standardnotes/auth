@@ -33,7 +33,7 @@ export class UsersController extends BaseHttpController {
     super()
   }
 
-  @httpPatch('/:userId', TYPES.AuthMiddleware)
+  @httpPatch('/:userId', TYPES.ApiGatewayAuthMiddleware)
   async update(request: Request, response: Response): Promise<results.JsonResult> {
     if (request.params.userId !== response.locals.user.uuid) {
       return this.json({
@@ -100,7 +100,7 @@ export class UsersController extends BaseHttpController {
     return this.json({ message: result.message }, result.responseCode)
   }
 
-  @httpGet('/:userUuid/subscription', TYPES.AuthMiddleware)
+  @httpGet('/:userUuid/subscription', TYPES.ApiGatewayAuthMiddleware)
   async getSubscription(request: Request, response: Response): Promise<results.JsonResult> {
     if (request.params.userUuid !== response.locals.user.uuid) {
       return this.json({
