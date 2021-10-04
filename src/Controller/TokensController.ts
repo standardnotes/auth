@@ -34,7 +34,6 @@ export class TokensController extends BaseHttpController {
   async createToken(_request: Request, response: Response): Promise<results.JsonResult> {
     const result = await this.createEphemeralToken.execute({
       userUuid: response.locals.user.uuid,
-      email: response.locals.user.email,
     })
 
     return this.json(result.ephemeralToken)

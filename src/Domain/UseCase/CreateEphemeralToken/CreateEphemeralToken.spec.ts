@@ -32,12 +32,10 @@ describe('CreateEphemeralToken', () => {
   it('should create an ephemeral token and persist it', async () => {
     await createUseCase().execute({
       userUuid: '1-2-3',
-      email: 'test@test.te',
     })
 
     expect(ephemeralTokenRepository.save).toHaveBeenCalledWith({
       userUuid: '1-2-3',
-      email: 'test@test.te',
       token: 'random-string',
       expiresAt: 1,
     })

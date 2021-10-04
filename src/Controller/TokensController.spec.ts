@@ -67,7 +67,6 @@ describe('TokensController', () => {
   it('should create an ephemeral token for authenticated user', async () => {
     response.locals.user =  {
       uuid: '1-2-3',
-      email: 'test@test.te',
     }
 
     const httpResponse = <results.JsonResult> await createController().createToken(request, response)
@@ -75,7 +74,6 @@ describe('TokensController', () => {
 
     expect(createEphemeralToken.execute).toHaveBeenCalledWith({
       userUuid: '1-2-3',
-      email: 'test@test.te',
     })
 
     expect(result.statusCode).toEqual(200)

@@ -22,7 +22,6 @@ export class CreateEphemeralToken implements UseCaseInterface {
 
     const ephemeralToken = {
       userUuid: dto.userUuid,
-      email: dto.email,
       token,
       expiresAt: this.timer.convertStringDateToMicroseconds(
         this.timer.getUTCDateNDaysAhead(1).toString()
