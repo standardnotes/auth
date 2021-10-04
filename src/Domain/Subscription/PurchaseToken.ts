@@ -1,6 +1,5 @@
-export type EphemeralToken = {
+export type PurchaseToken = {
   userUuid: string
-  email: string
   token: string
   expiresAt: number
 }

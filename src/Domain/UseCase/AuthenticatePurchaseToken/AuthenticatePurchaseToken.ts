@@ -1,22 +1,22 @@
 import { inject, injectable } from 'inversify'
 
 import TYPES from '../../../Bootstrap/Types'
-import { EphemeralTokenRepositoryInterface } from '../../Subscription/EphemeralTokenRepositoryInterface'
+import { PurchaseTokenRepositoryInterface } from '../../Subscription/PurchaseTokenRepositoryInterface'
 import { UserRepositoryInterface } from '../../User/UserRepositoryInterface'
 import { UseCaseInterface } from '../UseCaseInterface'
-import { AuthenticateTokenDTO } from './AuthenticateTokenDTO'
-import { AuthenticateTokenResponse } from './AuthenticateTokenResponse'
+import { AuthenticatePurchaseTokenDTO } from './AuthenticatePurchaseTokenDTO'
+import { AuthenticatePurchaseTokenResponse } from './AuthenticatePurchaseTokenResponse'
 
 @injectable()
-export class AuthenticateToken implements UseCaseInterface {
+export class AuthenticatePurchaseToken implements UseCaseInterface {
   constructor(
-    @inject(TYPES.EphemeralTokenRepository) private ephemeralTokenRepository: EphemeralTokenRepositoryInterface,
+    @inject(TYPES.PurchaseTokenRepository) private purchaseTokenRepository: PurchaseTokenRepositoryInterface,
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
   ){
   }
 
-  async execute(dto: AuthenticateTokenDTO): Promise<AuthenticateTokenResponse> {
-    const userUuid = await this.ephemeralTokenRepository.getUserUuidByToken(dto.token)
+  async execute(dto: AuthenticatePurchaseTokenDTO): Promise<AuthenticatePurchaseTokenResponse> {
+    const userUuid = await this.purchaseTokenRepository.getUserUuidByToken(dto.token)
     if (userUuid === undefined) {
       return {
         success: false,

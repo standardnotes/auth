@@ -12,16 +12,16 @@ import { sign } from 'jsonwebtoken'
 
 import TYPES from '../Bootstrap/Types'
 import { Role } from '../Domain/Role/Role'
-import { AuthenticateToken } from '../Domain/UseCase/AuthenticateToken/AuthenticateToken'
-import { CreateEphemeralToken } from '../Domain/UseCase/CreateEphemeralToken/CreateEphemeralToken'
+import { AuthenticatePurchaseToken } from '../Domain/UseCase/AuthenticatePurchaseToken/AuthenticatePurchaseToken'
+import { CreatePurchaseToken } from '../Domain/UseCase/CreatePurchaseToken/CreatePurchaseToken'
 import { User } from '../Domain/User/User'
 import { ProjectorInterface } from '../Projection/ProjectorInterface'
 
-@controller('/tokens')
-export class TokensController extends BaseHttpController {
+@controller('/purchase-tokens')
+export class PurchaseTokensController extends BaseHttpController {
   constructor(
-    @inject(TYPES.CreateEphemeralToken) private createEphemeralToken: CreateEphemeralToken,
-    @inject(TYPES.AuthenticateToken) private authenticateToken: AuthenticateToken,
+    @inject(TYPES.CreatePurchaseToken) private createPurchaseToken: CreatePurchaseToken,
+    @inject(TYPES.AuthenticatePurchaseToken) private authenticateToken: AuthenticatePurchaseToken,
     @inject(TYPES.UserProjector) private userProjector: ProjectorInterface<User>,
     @inject(TYPES.RoleProjector) private roleProjector: ProjectorInterface<Role>,
     @inject(TYPES.AUTH_JWT_SECRET) private jwtSecret: string,
@@ -32,12 +32,13 @@ export class TokensController extends BaseHttpController {
 
   @httpPost('/', TYPES.ApiGatewayAuthMiddleware)
   async createToken(_request: Request, response: Response): Promise<results.JsonResult> {
-    const result = await this.createEphemeralToken.execute({
+    const result = await this.createPurchaseToken.execute({
       userUuid: response.locals.user.uuid,
-      email: response.locals.user.email,
     })
 
-    return this.json(result.ephemeralToken)
+    return this.json({
+      token: result.purchaseToken.token,
+    })
   }
 
   @httpPost('/:token/validate')

@@ -3,36 +3,35 @@ import { TimerInterface } from '@standardnotes/time'
 import { inject, injectable } from 'inversify'
 
 import TYPES from '../../../Bootstrap/Types'
-import { EphemeralTokenRepositoryInterface } from '../../Subscription/EphemeralTokenRepositoryInterface'
+import { PurchaseTokenRepositoryInterface } from '../../Subscription/PurchaseTokenRepositoryInterface'
 import { UseCaseInterface } from '../UseCaseInterface'
-import { CreateEphemeralTokenDTO } from './CreateEphemeralTokenDTO'
-import { CreateEphemeralTokenResponse } from './CreateEphemeralTokenResponse'
+import { CreatePurchaseTokenDTO } from './CreatePurchaseTokenDTO'
+import { CreatePurchaseTokenResponse } from './CreatePurchaseTokenResponse'
 
 @injectable()
-export class CreateEphemeralToken implements UseCaseInterface {
+export class CreatePurchaseToken implements UseCaseInterface {
   constructor(
-    @inject(TYPES.EphemeralTokenRepository) private ephemeralTokenRepository: EphemeralTokenRepositoryInterface,
+    @inject(TYPES.PurchaseTokenRepository) private purchaseTokenRepository: PurchaseTokenRepositoryInterface,
     @inject(TYPES.SnCryptoNode) private cryptoNode: SnCryptoNode,
     @inject(TYPES.Timer) private timer: TimerInterface,
   ) {
   }
 
-  async execute(dto: CreateEphemeralTokenDTO): Promise<CreateEphemeralTokenResponse> {
+  async execute(dto: CreatePurchaseTokenDTO): Promise<CreatePurchaseTokenResponse> {
     const token = await this.cryptoNode.generateRandomKey(128)
 
-    const ephemeralToken = {
+    const purchaseToken = {
       userUuid: dto.userUuid,
-      email: dto.email,
       token,
       expiresAt: this.timer.convertStringDateToMicroseconds(
         this.timer.getUTCDateNDaysAhead(1).toString()
       ),
     }
 
-    await this.ephemeralTokenRepository.save(ephemeralToken)
+    await this.purchaseTokenRepository.save(purchaseToken)
 
     return {
-      ephemeralToken,
+      purchaseToken,
     }
   }
 }

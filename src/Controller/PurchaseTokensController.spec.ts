@@ -3,17 +3,17 @@ import 'reflect-metadata'
 import * as express from 'express'
 import { results } from 'inversify-express-utils'
 
-import { TokensController } from './TokensController'
+import { PurchaseTokensController } from './PurchaseTokensController'
 import { User } from '../Domain/User/User'
-import { CreateEphemeralToken } from '../Domain/UseCase/CreateEphemeralToken/CreateEphemeralToken'
-import { CreateEphemeralTokenResponse } from '../Domain/UseCase/CreateEphemeralToken/CreateEphemeralTokenResponse'
-import { AuthenticateToken } from '../Domain/UseCase/AuthenticateToken/AuthenticateToken'
+import { CreatePurchaseToken } from '../Domain/UseCase/CreatePurchaseToken/CreatePurchaseToken'
+import { CreatePurchaseTokenResponse } from '../Domain/UseCase/CreatePurchaseToken/CreatePurchaseTokenResponse'
+import { AuthenticatePurchaseToken } from '../Domain/UseCase/AuthenticatePurchaseToken/AuthenticatePurchaseToken'
 import { ProjectorInterface } from '../Projection/ProjectorInterface'
 import { Role } from '../Domain/Role/Role'
 
-describe('TokensController', () => {
-  let createEphemeralToken: CreateEphemeralToken
-  let authenticateToken: AuthenticateToken
+describe('PurchaseTokensController', () => {
+  let createPurchaseToken: CreatePurchaseToken
+  let authenticateToken: AuthenticatePurchaseToken
   const jwtSecret = 'auth_jwt_secret'
   const jwtTTL = 60
   let userProjector: ProjectorInterface<User>
@@ -24,8 +24,8 @@ describe('TokensController', () => {
   let user: User
   let role: Role
 
-  const createController = () => new TokensController(
-    createEphemeralToken,
+  const createController = () => new PurchaseTokensController(
+    createPurchaseToken,
     authenticateToken,
     userProjector,
     roleProjector,
@@ -38,10 +38,14 @@ describe('TokensController', () => {
     user.uuid = '123'
     user.roles = Promise.resolve([ role ])
 
-    createEphemeralToken = {} as jest.Mocked<CreateEphemeralToken>
-    createEphemeralToken.execute = jest.fn().mockReturnValue({} as jest.Mocked<CreateEphemeralTokenResponse>)
+    createPurchaseToken = {} as jest.Mocked<CreatePurchaseToken>
+    createPurchaseToken.execute = jest.fn().mockReturnValue({
+      purchaseToken: {
+        token: 'test',
+      },
+    } as jest.Mocked<CreatePurchaseTokenResponse>)
 
-    authenticateToken = {} as jest.Mocked<AuthenticateToken>
+    authenticateToken = {} as jest.Mocked<AuthenticatePurchaseToken>
     authenticateToken.execute = jest.fn().mockReturnValue({
       success: true,
       user,
@@ -64,24 +68,22 @@ describe('TokensController', () => {
     } as jest.Mocked<express.Response>
   })
 
-  it('should create an ephemeral token for authenticated user', async () => {
+  it('should create an purchase token for authenticated user', async () => {
     response.locals.user =  {
       uuid: '1-2-3',
-      email: 'test@test.te',
     }
 
     const httpResponse = <results.JsonResult> await createController().createToken(request, response)
     const result = await httpResponse.executeAsync()
 
-    expect(createEphemeralToken.execute).toHaveBeenCalledWith({
+    expect(createPurchaseToken.execute).toHaveBeenCalledWith({
       userUuid: '1-2-3',
-      email: 'test@test.te',
     })
 
     expect(result.statusCode).toEqual(200)
   })
 
-  it('should validate an ephemeral token for user', async () => {
+  it('should validate an purchase token for user', async () => {
     request.params.token = 'test'
 
     const httpResponse = <results.JsonResult> await createController().validate(request)
@@ -94,7 +96,7 @@ describe('TokensController', () => {
     expect(result.statusCode).toEqual(200)
   })
 
-  it('should not validate an ephemeral token for user if it is invalid', async () => {
+  it('should not validate an purchase token for user if it is invalid', async () => {
     request.params.token = 'test'
 
     authenticateToken.execute = jest.fn().mockReturnValue({
