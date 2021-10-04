@@ -2,24 +2,24 @@ import 'reflect-metadata'
 
 import { SnCryptoNode } from '@standardnotes/sncrypto-node'
 import { TimerInterface } from '@standardnotes/time'
-import { EphemeralTokenRepositoryInterface } from '../../Subscription/EphemeralTokenRepositoryInterface'
+import { PurchaseTokenRepositoryInterface } from '../../Subscription/PurchaseTokenRepositoryInterface'
 
-import { CreateEphemeralToken } from './CreateEphemeralToken'
+import { CreatePurchaseToken } from './CreatePurchaseToken'
 
-describe('CreateEphemeralToken', () => {
-  let ephemeralTokenRepository: EphemeralTokenRepositoryInterface
+describe('CreatePurchaseToken', () => {
+  let purchaseTokenRepository: PurchaseTokenRepositoryInterface
   let cryptoNode: SnCryptoNode
   let timer: TimerInterface
 
-  const createUseCase = () => new CreateEphemeralToken(
-    ephemeralTokenRepository,
+  const createUseCase = () => new CreatePurchaseToken(
+    purchaseTokenRepository,
     cryptoNode,
     timer,
   )
 
   beforeEach(() => {
-    ephemeralTokenRepository = {} as jest.Mocked<EphemeralTokenRepositoryInterface>
-    ephemeralTokenRepository.save = jest.fn()
+    purchaseTokenRepository = {} as jest.Mocked<PurchaseTokenRepositoryInterface>
+    purchaseTokenRepository.save = jest.fn()
 
     cryptoNode = {} as jest.Mocked<SnCryptoNode>
     cryptoNode.generateRandomKey = jest.fn().mockReturnValueOnce('random-string')
@@ -29,12 +29,12 @@ describe('CreateEphemeralToken', () => {
     timer.getUTCDateNDaysAhead = jest.fn().mockReturnValue(new Date(1))
   })
 
-  it('should create an ephemeral token and persist it', async () => {
+  it('should create an purchase token and persist it', async () => {
     await createUseCase().execute({
       userUuid: '1-2-3',
     })
 
-    expect(ephemeralTokenRepository.save).toHaveBeenCalledWith({
+    expect(purchaseTokenRepository.save).toHaveBeenCalledWith({
       userUuid: '1-2-3',
       token: 'random-string',
       expiresAt: 1,

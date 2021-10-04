@@ -2,13 +2,13 @@ import * as IORedis from 'ioredis'
 import { inject, injectable } from 'inversify'
 
 import TYPES from '../../Bootstrap/Types'
-import { EphemeralToken } from '../../Domain/Subscription/EphemeralToken'
-import { EphemeralTokenRepositoryInterface } from '../../Domain/Subscription/EphemeralTokenRepositoryInterface'
+import { PurchaseToken } from '../../Domain/Subscription/PurchaseToken'
+import { PurchaseTokenRepositoryInterface } from '../../Domain/Subscription/PurchaseTokenRepositoryInterface'
 import { TimerInterface } from '@standardnotes/time'
 
 @injectable()
-export class RedisEphemeralTokenRepository implements EphemeralTokenRepositoryInterface {
-  private readonly PREFIX = 'token'
+export class RedisPurchaseTokenRepository implements PurchaseTokenRepositoryInterface {
+  private readonly PREFIX = 'purchase-token'
 
   constructor(
     @inject(TYPES.Redis) private redisClient: IORedis.Redis,
@@ -25,11 +25,11 @@ export class RedisEphemeralTokenRepository implements EphemeralTokenRepositoryIn
     return userUuid
   }
 
-  async save(ephemeralToken: EphemeralToken): Promise<void> {
-    const key = `${this.PREFIX}:${ephemeralToken.token}`
-    const expiresAtTimestampInSeconds = this.timer.convertMicrosecondsToSeconds(ephemeralToken.expiresAt)
+  async save(purchaseToken: PurchaseToken): Promise<void> {
+    const key = `${this.PREFIX}:${purchaseToken.token}`
+    const expiresAtTimestampInSeconds = this.timer.convertMicrosecondsToSeconds(purchaseToken.expiresAt)
 
-    await this.redisClient.set(key, ephemeralToken.userUuid)
+    await this.redisClient.set(key, purchaseToken.userUuid)
     await this.redisClient.expireat(key, expiresAtTimestampInSeconds)
   }
 }

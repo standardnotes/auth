@@ -1,6 +1,6 @@
 import { User } from '../../User/User'
 
-export type AuthenticateTokenResponse = {
+export type AuthenticatePurchaseTokenResponse = {
   success: boolean,
   user?: User,
 }

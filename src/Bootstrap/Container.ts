@@ -101,11 +101,11 @@ import { SubscriptionReassignedEventHandler } from '../Domain/Handler/Subscripti
 import { UserSubscriptionRepositoryInterface } from '../Domain/Subscription/UserSubscriptionRepositoryInterface'
 import { PaymentsHttpServiceInterface } from '../Domain/Subscription/PaymentsHttpServiceInterface'
 import { PaymentsHttpService } from '../Infra/HTTP/PaymentsHttpService'
-import { CreateEphemeralToken } from '../Domain/UseCase/CreateEphemeralToken/CreateEphemeralToken'
+import { CreatePurchaseToken } from '../Domain/UseCase/CreatePurchaseToken/CreatePurchaseToken'
 import { ApiGatewayAuthMiddleware } from '../Controller/ApiGatewayAuthMiddleware'
-import { EphemeralTokenRepositoryInterface } from '../Domain/Subscription/EphemeralTokenRepositoryInterface'
-import { RedisEphemeralTokenRepository } from '../Infra/Redis/RedisEphemeralTokenRepository'
-import { AuthenticateToken } from '../Domain/UseCase/AuthenticateToken/AuthenticateToken'
+import { PurchaseTokenRepositoryInterface } from '../Domain/Subscription/PurchaseTokenRepositoryInterface'
+import { RedisPurchaseTokenRepository } from '../Infra/Redis/RedisPurchaseTokenRepository'
+import { AuthenticatePurchaseToken } from '../Domain/UseCase/AuthenticatePurchaseToken/AuthenticatePurchaseToken'
 
 export class ContainerConfigLoader {
   async load(): Promise<Container> {
@@ -199,7 +199,7 @@ export class ContainerConfigLoader {
     container.bind<RedisEphemeralSessionRepository>(TYPES.EphemeralSessionRepository).to(RedisEphemeralSessionRepository)
     container.bind<LockRepository>(TYPES.LockRepository).to(LockRepository)
     container.bind<WebSocketsConnectionRepositoryInterface>(TYPES.WebSocketsConnectionRepository).to(RedisWebSocketsConnectionRepository)
-    container.bind<EphemeralTokenRepositoryInterface>(TYPES.EphemeralTokenRepository).to(RedisEphemeralTokenRepository)
+    container.bind<PurchaseTokenRepositoryInterface>(TYPES.PurchaseTokenRepository).to(RedisPurchaseTokenRepository)
 
     // Middleware
     container.bind<AuthMiddleware>(TYPES.AuthMiddleware).to(AuthMiddleware)
@@ -271,8 +271,8 @@ export class ContainerConfigLoader {
     container.bind<AddWebSocketsConnection>(TYPES.AddWebSocketsConnection).to(AddWebSocketsConnection)
     container.bind<RemoveWebSocketsConnection>(TYPES.RemoveWebSocketsConnection).to(RemoveWebSocketsConnection)
     container.bind<GetUserSubscription>(TYPES.GetUserSubscription).to(GetUserSubscription)
-    container.bind<CreateEphemeralToken>(TYPES.CreateEphemeralToken).to(CreateEphemeralToken)
-    container.bind<AuthenticateToken>(TYPES.AuthenticateToken).to(AuthenticateToken)
+    container.bind<CreatePurchaseToken>(TYPES.CreatePurchaseToken).to(CreatePurchaseToken)
+    container.bind<AuthenticatePurchaseToken>(TYPES.AuthenticatePurchaseToken).to(AuthenticatePurchaseToken)
 
     // Handlers
     container.bind<UserRegisteredEventHandler>(TYPES.UserRegisteredEventHandler).to(UserRegisteredEventHandler)
