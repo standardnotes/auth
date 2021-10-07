@@ -1,9 +1,9 @@
-import { FeatureDescription } from '@standardnotes/features'
+import { FeatureDescriptionProjection } from '../../Feature/FeatureDescriptionProjection'
 
 export type GetUserFeaturesResponse = {
   success: true,
   userUuid: string,
-  features: FeatureDescription[]
+  features: FeatureDescriptionProjection[]
 } | {
   success: false,
   error: {

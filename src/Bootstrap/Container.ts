@@ -106,6 +106,7 @@ import { ApiGatewayAuthMiddleware } from '../Controller/ApiGatewayAuthMiddleware
 import { PurchaseTokenRepositoryInterface } from '../Domain/Subscription/PurchaseTokenRepositoryInterface'
 import { RedisPurchaseTokenRepository } from '../Infra/Redis/RedisPurchaseTokenRepository'
 import { AuthenticatePurchaseToken } from '../Domain/UseCase/AuthenticatePurchaseToken/AuthenticatePurchaseToken'
+import { FeatureDescriptionProjector } from '../Projection/FeatureDescriptionProjector'
 
 export class ContainerConfigLoader {
   async load(): Promise<Container> {
@@ -215,6 +216,7 @@ export class ContainerConfigLoader {
     container.bind<RoleProjector>(TYPES.RoleProjector).to(RoleProjector)
     container.bind<PermissionProjector>(TYPES.PermissionProjector).to(PermissionProjector)
     container.bind<SettingProjector>(TYPES.SettingProjector).to(SettingProjector)
+    container.bind<FeatureDescriptionProjector>(TYPES.FeatureDescriptionProjector).to(FeatureDescriptionProjector)
 
     // Factories
     container.bind<SettingFactory>(TYPES.SettingFactory).to(SettingFactory)
