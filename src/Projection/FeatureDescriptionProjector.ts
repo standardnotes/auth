@@ -25,7 +25,7 @@ export class FeatureDescriptionProjector implements ProjectorInterface<FeatureDe
   projectFull(featureDescription: FeatureDescription): FeatureDescriptionProjection {
     return {
       ...featureDescription,
-      expires_at: featureDescription.expires_at ? this.timer.convertMicrosecondsToMilliseconds(featureDescription.expires_at) : undefined,
+      expires_at: featureDescription.expires_at ? this.timer.convertMicrosecondsToSeconds(featureDescription.expires_at) : undefined,
     }
   }
 }

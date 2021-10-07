@@ -25,7 +25,7 @@ describe('FeatureDescriptionProjector', () => {
     } as jest.Mocked<FeatureDescription>
 
     timer = {} as jest.Mocked<TimerInterface>
-    timer.convertMicrosecondsToMilliseconds = jest.fn().mockReturnValue(123)
+    timer.convertMicrosecondsToSeconds = jest.fn().mockReturnValue(123)
   })
 
   it('should create a full projection', () => {
