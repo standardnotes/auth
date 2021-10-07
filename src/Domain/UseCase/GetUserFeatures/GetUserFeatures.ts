@@ -5,14 +5,12 @@ import { GetUserFeaturesDto } from './GetUserFeaturesDto'
 import { UserRepositoryInterface } from '../../User/UserRepositoryInterface'
 import { GetUserFeaturesResponse } from './GetUserFeaturesResponse'
 import { FeatureServiceInterface } from '../../Feature/FeatureServiceInterface'
-import { FeatureDescriptionProjector } from '../../../Projection/FeatureDescriptionProjector'
 
 @injectable()
 export class GetUserFeatures implements UseCaseInterface {
   constructor(
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
     @inject(TYPES.FeatureService) private featureService: FeatureServiceInterface,
-    @inject(TYPES.FeatureDescriptionProjector) private featureDescriptionProjector: FeatureDescriptionProjector,
   ) {
   }
 
@@ -35,7 +33,7 @@ export class GetUserFeatures implements UseCaseInterface {
     return {
       success: true,
       userUuid,
-      features: userFeatures.map(userFeature => this.featureDescriptionProjector.projectFull(userFeature)),
+      features: userFeatures,
     }
   }
 }
