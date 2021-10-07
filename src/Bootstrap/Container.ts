@@ -134,7 +134,6 @@ export class ContainerConfigLoader {
           },
         ],
         removeNodeErrorCount: 10,
-        restoreNodeTimeout: 5,
       },
       entities: [
         User,
