@@ -25,7 +25,6 @@ const TYPES = {
   RoleProjector: Symbol.for('RoleProjector'),
   PermissionProjector: Symbol.for('PermissionProjector'),
   SettingProjector: Symbol.for('SettingProjector'),
-  FeatureDescriptionProjector: Symbol.for('FeatureDescriptionProjector'),
   // Factories
   SettingFactory: Symbol.for('SettingFactory'),
   // env vars
