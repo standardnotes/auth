@@ -101,6 +101,7 @@ import { SubscriptionReassignedEventHandler } from '../Domain/Handler/Subscripti
 import { UserSubscriptionRepositoryInterface } from '../Domain/Subscription/UserSubscriptionRepositoryInterface'
 import { PaymentsHttpServiceInterface } from '../Domain/Subscription/PaymentsHttpServiceInterface'
 import { PaymentsHttpService } from '../Infra/HTTP/PaymentsHttpService'
+import { FeatureDescriptionProjector } from '../Projection/FeatureDescriptionProjector'
 
 export class ContainerConfigLoader {
   async load(): Promise<Container> {
@@ -208,6 +209,7 @@ export class ContainerConfigLoader {
     container.bind<RoleProjector>(TYPES.RoleProjector).to(RoleProjector)
     container.bind<PermissionProjector>(TYPES.PermissionProjector).to(PermissionProjector)
     container.bind<SettingProjector>(TYPES.SettingProjector).to(SettingProjector)
+    container.bind<FeatureDescriptionProjector>(TYPES.FeatureDescriptionProjector).to(FeatureDescriptionProjector)
 
     // Factories
     container.bind<SettingFactory>(TYPES.SettingFactory).to(SettingFactory)
