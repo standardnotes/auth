@@ -9,7 +9,7 @@ import { GetSettings } from '../Domain/UseCase/GetSettings/GetSettings'
 import { GetSetting } from '../Domain/UseCase/GetSetting/GetSetting'
 import { UpdateSetting } from '../Domain/UseCase/UpdateSetting/UpdateSetting'
 import { DeleteSetting } from '../Domain/UseCase/DeleteSetting/DeleteSetting'
-import { Setting } from '../Domain/Setting/Setting'
+import { EncryptionVersion } from '../Domain/Encryption/EncryptionVersion'
 
 describe('SettingsController', () => {
   let deleteSetting: DeleteSetting
@@ -154,7 +154,7 @@ describe('SettingsController', () => {
       props: {
         createdAt: 123,
         name: 'MFA_SECRET',
-        serverEncryptionVersion: Setting.ENCRYPTION_VERSION_DEFAULT,
+        serverEncryptionVersion: EncryptionVersion.Default,
         sensitive: true,
         updatedAt: 234,
         uuid: '2-3-4',
@@ -172,7 +172,7 @@ describe('SettingsController', () => {
       uuid: '2-3-4',
       value: 'test',
       sensitive: true,
-      serverEncryptionVersion: Setting.ENCRYPTION_VERSION_DEFAULT,
+      serverEncryptionVersion: EncryptionVersion.Default,
       createdAt: 123,
       updatedAt: 234,
     }
@@ -203,7 +203,7 @@ describe('SettingsController', () => {
     request.body = {
       uuid: '2-3-4',
       value: 'test',
-      serverEncryptionVersion: Setting.ENCRYPTION_VERSION_DEFAULT,
+      serverEncryptionVersion: EncryptionVersion.Default,
       createdAt: 123,
       updatedAt: 234,
     }
@@ -318,7 +318,7 @@ describe('SettingsController', () => {
     request.body = {
       name: 'foo',
       value: 'bar',
-      serverEncryptionVersion: Setting.ENCRYPTION_VERSION_UNENCRYPTED,
+      serverEncryptionVersion: EncryptionVersion.Unencrypted,
     }
 
     updateSetting.execute = jest.fn().mockReturnValue({ success: true, statusCode: 200 })
@@ -348,7 +348,7 @@ describe('SettingsController', () => {
     request.body = {
       name: 'foo',
       value: 'bar',
-      serverEncryptionVersion: Setting.ENCRYPTION_VERSION_DEFAULT,
+      serverEncryptionVersion: EncryptionVersion.Default,
     }
 
     updateSetting.execute = jest.fn()
@@ -370,7 +370,7 @@ describe('SettingsController', () => {
     request.body = {
       name: 'foo',
       value: 'bar',
-      serverEncryptionVersion: Setting.ENCRYPTION_VERSION_DEFAULT,
+      serverEncryptionVersion: EncryptionVersion.Default,
     }
 
     updateSetting.execute = jest.fn().mockReturnValue({ success: false })

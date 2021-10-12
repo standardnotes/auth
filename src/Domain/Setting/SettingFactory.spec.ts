@@ -1,6 +1,7 @@
 import { TimerInterface } from '@standardnotes/time'
 import 'reflect-metadata'
 import { CrypterInterface } from '../Encryption/CrypterInterface'
+import { EncryptionVersion } from '../Encryption/EncryptionVersion'
 import { User } from '../User/User'
 import { Setting } from './Setting'
 import { SettingFactory } from './SettingFactory'
@@ -27,7 +28,7 @@ describe('SettingFactory', () => {
     const props: SettingProps = {
       name: 'name',
       value: 'value',
-      serverEncryptionVersion: Setting.ENCRYPTION_VERSION_UNENCRYPTED,
+      serverEncryptionVersion: EncryptionVersion.Unencrypted,
       sensitive: false,
     }
     const actual = await createFactory().create(props, user)
@@ -51,7 +52,7 @@ describe('SettingFactory', () => {
     const props: SettingProps = {
       name: 'name',
       value: 'value2',
-      serverEncryptionVersion: Setting.ENCRYPTION_VERSION_UNENCRYPTED,
+      serverEncryptionVersion: EncryptionVersion.Unencrypted,
       sensitive: true,
     }
 

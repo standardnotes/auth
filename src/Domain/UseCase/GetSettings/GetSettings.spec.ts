@@ -10,6 +10,7 @@ import { GetSettings } from './GetSettings'
 import { UserRepositoryInterface } from '../../User/UserRepositoryInterface'
 import { User } from '../../User/User'
 import { CrypterInterface } from '../../Encryption/CrypterInterface'
+import { EncryptionVersion } from '../../Encryption/EncryptionVersion'
 
 describe('GetSettings', () => {
   let settingRepository: SettingRepositoryInterface
@@ -76,7 +77,7 @@ describe('GetSettings', () => {
       name: 'test',
       updatedAt: 345,
       value: 'encrypted',
-      serverEncryptionVersion: Setting.ENCRYPTION_VERSION_DEFAULT,
+      serverEncryptionVersion: EncryptionVersion.Default,
     } as jest.Mocked<Setting>
     settingRepository.findAllByUserUuid = jest.fn().mockReturnValue([ setting ])
 

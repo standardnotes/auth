@@ -106,6 +106,7 @@ import { ApiGatewayAuthMiddleware } from '../Controller/ApiGatewayAuthMiddleware
 import { PurchaseTokenRepositoryInterface } from '../Domain/Subscription/PurchaseTokenRepositoryInterface'
 import { RedisPurchaseTokenRepository } from '../Infra/Redis/RedisPurchaseTokenRepository'
 import { AuthenticatePurchaseToken } from '../Domain/UseCase/AuthenticatePurchaseToken/AuthenticatePurchaseToken'
+import { OfflineSetting } from '../Domain/Setting/OfflineSetting'
 
 export class ContainerConfigLoader {
   async load(): Promise<Container> {
@@ -143,6 +144,7 @@ export class ContainerConfigLoader {
         Role,
         Permission,
         Setting,
+        OfflineSetting,
       ],
       migrations: [
         env.get('DB_MIGRATIONS_PATH'),

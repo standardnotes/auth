@@ -7,7 +7,7 @@ import { inject, injectable } from 'inversify'
 import { Logger } from 'winston'
 
 import TYPES from '../../Bootstrap/Types'
-import { Setting } from '../Setting/Setting'
+import { EncryptionVersion } from '../Encryption/EncryptionVersion'
 import { SettingServiceInterface } from '../Setting/SettingServiceInterface'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 
@@ -37,7 +37,7 @@ export class ExtensionKeyGrantedEventHandler implements DomainEventHandlerInterf
       props: {
         name: SettingName.ExtensionKey,
         value: event.payload.extensionKey,
-        serverEncryptionVersion: Setting.ENCRYPTION_VERSION_DEFAULT,
+        serverEncryptionVersion: EncryptionVersion.Default,
         sensitive: true,
       },
     })

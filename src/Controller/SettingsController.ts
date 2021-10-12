@@ -11,7 +11,7 @@ import {
   results,
 } from 'inversify-express-utils'
 import TYPES from '../Bootstrap/Types'
-import { Setting } from '../Domain/Setting/Setting'
+import { EncryptionVersion } from '../Domain/Encryption/EncryptionVersion'
 import { DeleteSetting } from '../Domain/UseCase/DeleteSetting/DeleteSetting'
 import { GetSetting } from '../Domain/UseCase/GetSetting/GetSetting'
 import { GetSettings } from '../Domain/UseCase/GetSettings/GetSettings'
@@ -85,7 +85,7 @@ export class SettingsController extends BaseHttpController {
     const {
       uuid,
       value,
-      serverEncryptionVersion = Setting.ENCRYPTION_VERSION_DEFAULT,
+      serverEncryptionVersion = EncryptionVersion.Default,
       createdAt,
       updatedAt,
     } = request.body
@@ -146,7 +146,7 @@ export class SettingsController extends BaseHttpController {
     const {
       name,
       value,
-      serverEncryptionVersion = Setting.ENCRYPTION_VERSION_DEFAULT,
+      serverEncryptionVersion = EncryptionVersion.Default,
       sensitive = false,
     } = request.body
 

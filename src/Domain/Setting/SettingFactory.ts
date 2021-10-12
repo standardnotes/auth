@@ -6,6 +6,7 @@ import { SettingProps } from './SettingProps'
 import { v4 as uuidv4 } from 'uuid'
 import { CrypterInterface } from '../Encryption/CrypterInterface'
 import { TimerInterface } from '@standardnotes/time'
+import { EncryptionVersion } from '../Encryption/EncryptionVersion'
 
 @injectable()
 export class SettingFactory {
@@ -23,7 +24,7 @@ export class SettingFactory {
     const {
       name,
       value,
-      serverEncryptionVersion = Setting.ENCRYPTION_VERSION_DEFAULT,
+      serverEncryptionVersion = EncryptionVersion.Default,
       sensitive,
     } = props
 
@@ -66,9 +67,9 @@ export class SettingFactory {
     user: User
   }): Promise<string | null> {
     switch(serverEncryptionVersion) {
-    case Setting.ENCRYPTION_VERSION_UNENCRYPTED:
+    case EncryptionVersion.Unencrypted:
       return value
-    case Setting.ENCRYPTION_VERSION_DEFAULT:
+    case EncryptionVersion.Default:
       return this.crypter.encryptForUser(value as string, user)
     default:
       throw Error(`Unrecognized encryption version: ${serverEncryptionVersion}!`)
