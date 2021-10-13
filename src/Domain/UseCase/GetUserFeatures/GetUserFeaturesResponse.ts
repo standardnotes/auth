@@ -2,8 +2,8 @@ import { FeatureDescription } from '@standardnotes/features'
 
 export type GetUserFeaturesResponse = {
   success: true,
-  userUuid: string,
-  features: FeatureDescription[]
+  features: FeatureDescription[],
+  userUuid?: string,
 } | {
   success: false,
   error: {

@@ -6,6 +6,19 @@ import { OfflineUserSubscriptionRepositoryInterface } from '../../Domain/Subscri
 @injectable()
 @EntityRepository(OfflineUserSubscription)
 export class MySQLOfflineUserSubscriptionRepository extends Repository<OfflineUserSubscription> implements OfflineUserSubscriptionRepositoryInterface {
+  async findByEmail(email: string, activeAfter: number): Promise<OfflineUserSubscription[]> {
+    return await this.createQueryBuilder()
+      .where(
+        'email = :email AND ends_at > :endsAt',
+        {
+          email,
+          endsAt: activeAfter,
+        }
+      )
+      .orderBy('ends_at', 'DESC')
+      .getMany()
+  }
+
   async findOneByEmail(email: string): Promise<OfflineUserSubscription | undefined> {
     return await this.createQueryBuilder()
       .where(

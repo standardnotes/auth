@@ -21,12 +21,13 @@ describe('GetUserFeatures', () => {
     feature1 = { name: 'foobar' }  as jest.Mocked<FeatureDescription>
     featureService = {} as jest.Mocked<FeatureServiceInterface>
     featureService.getFeaturesForUser = jest.fn().mockReturnValue([feature1])
+    featureService.getFeaturesForOfflineUser = jest.fn().mockReturnValue([feature1])
   })
 
   it('should fail if a user is not found', async () => {
     userRepository.findOneByUuid = jest.fn().mockReturnValue(undefined)
 
-    expect(await createUseCase().execute({ userUuid: 'user-1-1-1' })).toEqual({
+    expect(await createUseCase().execute({ userUuid: 'user-1-1-1', offline: false })).toEqual({
       success: false,
       error: {
         message: 'User user-1-1-1 not found.',
@@ -35,9 +36,18 @@ describe('GetUserFeatures', () => {
   })
 
   it('should return user features', async () => {
-    expect(await createUseCase().execute({ userUuid: 'user-1-1-1' })).toEqual({
+    expect(await createUseCase().execute({ userUuid: 'user-1-1-1', offline: false })).toEqual({
       success: true,
       userUuid: 'user-1-1-1',
+      features: [{
+        name: 'foobar',
+      }],
+    })
+  })
+
+  it('should return offline user features', async () => {
+    expect(await createUseCase().execute({ email: 'test@test.com', offline: true, offlineFeaturesToken: 'features-token' })).toEqual({
+      success: true,
       features: [{
         name: 'foobar',
       }],

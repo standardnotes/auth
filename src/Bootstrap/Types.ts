@@ -20,6 +20,7 @@ const TYPES = {
   // Middleware
   AuthMiddleware: Symbol.for('AuthMiddleware'),
   ApiGatewayAuthMiddleware: Symbol.for('ApiGatewayAuthMiddleware'),
+  OfflineUserAuthMiddleware: Symbol.for('OfflineUserAuthMiddleware'),
   AuthMiddlewareWithoutResponse: Symbol.for('AuthMiddlewareWithoutResponse'),
   LockMiddleware: Symbol.for('LockMiddleware'),
   SessionMiddleware: Symbol.for('SessionMiddleware'),

@@ -48,6 +48,29 @@ describe('MySQLOfflineUserSubscriptionRepository', () => {
     expect(result).toEqual(offlineSubscription)
   })
 
+  it('should find multiple by user email active after', async () => {
+    repository.createQueryBuilder = jest.fn().mockImplementation(() => selectQueryBuilder)
+
+    selectQueryBuilder.where = jest.fn().mockReturnThis()
+    selectQueryBuilder.orderBy = jest.fn().mockReturnThis()
+    selectQueryBuilder.getMany = jest.fn().mockReturnValue([offlineSubscription])
+
+    const result = await repository.findByEmail('test@test.com', 123)
+
+    expect(selectQueryBuilder.where).toHaveBeenCalledWith(
+      'email = :email AND ends_at > :endsAt',
+      {
+        email: 'test@test.com',
+        endsAt: 123,
+      },
+    )
+    expect(selectQueryBuilder.orderBy).toHaveBeenCalledWith(
+      'ends_at', 'DESC'
+    )
+    expect(selectQueryBuilder.getMany).toHaveBeenCalled()
+    expect(result).toEqual([offlineSubscription])
+  })
+
   it('should update cancelled by name and user email', async () => {
     repository.createQueryBuilder = jest.fn().mockImplementation(() => updateQueryBuilder)
 
