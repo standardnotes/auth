@@ -8,6 +8,7 @@ import { SettingProjector } from '../../../Projection/SettingProjector'
 import { Setting } from '../../Setting/Setting'
 import { UserRepositoryInterface } from '../../User/UserRepositoryInterface'
 import { CrypterInterface } from '../../Encryption/CrypterInterface'
+import { EncryptionVersion } from '../../Encryption/EncryptionVersion'
 
 @injectable()
 export class GetSettings implements UseCaseInterface {
@@ -48,7 +49,7 @@ export class GetSettings implements UseCaseInterface {
     }
 
     for (const setting of settings) {
-      if (setting.value !== null && setting.serverEncryptionVersion === Setting.ENCRYPTION_VERSION_DEFAULT) {
+      if (setting.value !== null && setting.serverEncryptionVersion === EncryptionVersion.Default) {
         setting.value = await this.crypter.decryptForUser(setting.value, user)
       }
     }

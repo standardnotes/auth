@@ -3,6 +3,7 @@ import { TimerInterface } from '@standardnotes/time'
 import 'reflect-metadata'
 import { Logger } from 'winston'
 import { SettingProjector } from '../../../Projection/SettingProjector'
+import { EncryptionVersion } from '../../Encryption/EncryptionVersion'
 import { RoleServiceInterface } from '../../Role/RoleServiceInterface'
 
 import { Setting } from '../../Setting/Setting'
@@ -85,7 +86,7 @@ describe('UpdateSetting', () => {
     const props = {
       name: 'test-setting-name',
       value: 'test-setting-value',
-      serverEncryptionVersion: Setting.ENCRYPTION_VERSION_UNENCRYPTED,
+      serverEncryptionVersion: EncryptionVersion.Unencrypted,
       sensitive: false,
     }
 
@@ -114,7 +115,7 @@ describe('UpdateSetting', () => {
     const props = {
       name: 'test-setting-name',
       value: 'test-setting-value',
-      serverEncryptionVersion: Setting.ENCRYPTION_VERSION_UNENCRYPTED,
+      serverEncryptionVersion: EncryptionVersion.Unencrypted,
       sensitive: false,
     }
 
@@ -134,7 +135,7 @@ describe('UpdateSetting', () => {
     const props = {
       name: SettingName.ExtensionKey,
       value: 'test-setting-value',
-      serverEncryptionVersion: Setting.ENCRYPTION_VERSION_UNENCRYPTED,
+      serverEncryptionVersion: EncryptionVersion.Unencrypted,
       sensitive: true,
     }
 
@@ -172,7 +173,7 @@ describe('UpdateSetting', () => {
     const props = {
       name: SettingName.ExtensionKey,
       value: 'test-setting-value',
-      serverEncryptionVersion: Setting.ENCRYPTION_VERSION_UNENCRYPTED,
+      serverEncryptionVersion: EncryptionVersion.Unencrypted,
       sensitive: true,
     }
 
@@ -205,7 +206,7 @@ describe('UpdateSetting', () => {
     const props = {
       name: SettingName.ExtensionKey,
       value: 'test-setting-value',
-      serverEncryptionVersion: Setting.ENCRYPTION_VERSION_UNENCRYPTED,
+      serverEncryptionVersion: EncryptionVersion.Unencrypted,
       sensitive: true,
     }
 
@@ -238,7 +239,7 @@ describe('UpdateSetting', () => {
     const props = {
       name: SettingName.ExtensionKey,
       value: 'test-setting-value',
-      serverEncryptionVersion: Setting.ENCRYPTION_VERSION_UNENCRYPTED,
+      serverEncryptionVersion: EncryptionVersion.Unencrypted,
       sensitive: true,
     }
 

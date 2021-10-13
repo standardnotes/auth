@@ -55,6 +55,7 @@ describe('SubscriptionExpiredEventHandler', () => {
       userEmail: 'test@test.com',
       subscriptionName: SubscriptionName.CorePlan,
       timestamp,
+      offline: false,
     }
 
     logger = {} as jest.Mocked<Logger>

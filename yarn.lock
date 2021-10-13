@@ -663,12 +663,12 @@
   resolved "https://registry.yarnpkg.com/@sqltools/formatter/-/formatter-1.2.2.tgz#9390a8127c0dcba61ebd7fdcc748655e191bdd68"
   integrity sha512-/5O7Fq6Vnv8L6ucmPjaWbVG1XkP4FO+w5glqfkIsq3Xw4oyNAdJddbnYodNDAfjVUvo/rrSCTom4kAND7T1o5Q==
 
-"@standardnotes/auth@3.7.0":
-  version "3.7.0"
-  resolved "https://registry.yarnpkg.com/@standardnotes/auth/-/auth-3.7.0.tgz#1193f0521bd3b1c3655685c27aff894b98c7f582"
-  integrity sha512-lHMRyVOxF9g11MH04wcbhpErPysL721Hgrzbi6slRDqIuA+2VpECIkbAhI5WpgP5K8RjO/kZB4l0tzcRI1Mg/g==
+"@standardnotes/auth@3.8.0":
+  version "3.8.0"
+  resolved "https://registry.yarnpkg.com/@standardnotes/auth/-/auth-3.8.0.tgz#6a18dd11dbf88fe79b56805808c5f1adcc403510"
+  integrity sha512-neAsWHRZ7AgHwv8mkXGXq+o36pv2PK09+8nqX8GUfwxCDO+nICGNY/Hr/sE+z+gSKSjVsl7n5vKt8vNCUV53XQ==
   dependencies:
-    "@standardnotes/common" "^1.0.0"
+    "@standardnotes/common" "^1.1.0"
 
 "@standardnotes/auth@^3.7.0":
   version "3.7.1"
@@ -677,7 +677,7 @@
   dependencies:
     "@standardnotes/common" "^1.1.0"
 
-"@standardnotes/common@1.0.0", "@standardnotes/common@^1.0.0":
+"@standardnotes/common@1.0.0":
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@standardnotes/common/-/common-1.0.0.tgz#5647ed068c5f022f1d2cc5fa9766d77115ff23bf"
   integrity sha512-4DFoBiaI3YgJY2AX/Yd8NeGC9J3IuqDl15xWNj/b54zrMx3M5OSvUts62PhQ7lByVgLMakY3v8gaYzZXA7ptLg==
@@ -708,10 +708,10 @@
     sqs-consumer "^5.5.0"
     winston "^3.3.3"
 
-"@standardnotes/domain-events@2.2.0":
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/@standardnotes/domain-events/-/domain-events-2.2.0.tgz#3676cb4cbb06d4de572bb065c18ab5b84aac26c1"
-  integrity sha512-acbO81p0QWy8evtTuGK5WDBxIMKVSu3wK7VAuj27HjLAklmFg8aSesWEtaGkAo1OnE0jj3wsaMcz9qsJpwBz3A==
+"@standardnotes/domain-events@2.2.2":
+  version "2.2.2"
+  resolved "https://registry.yarnpkg.com/@standardnotes/domain-events/-/domain-events-2.2.2.tgz#89d1a8c5ec71e8e244d62010b88ed2edaac9bdf9"
+  integrity sha512-Q38jkqK2RKM7NETAQLOjWT0UiOVsvsdaZTHGozN8J2WfWCdlmSX4mgNWX+WrwtprIdiT2uAyBwB6nY0Xpms8Pg==
   dependencies:
     "@standardnotes/auth" "^3.7.0"
 

@@ -1,12 +1,10 @@
 import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
+import { EncryptionVersion } from '../Encryption/EncryptionVersion'
 import { User } from '../User/User'
 
 @Entity({ name: 'settings' })
 @Index('index_settings_on_name_and_user_uuid', ['name', 'user'])
 export class Setting {
-  static readonly ENCRYPTION_VERSION_UNENCRYPTED = 0
-  static readonly ENCRYPTION_VERSION_DEFAULT = 1
-
   @PrimaryGeneratedColumn('uuid')
   uuid: string
 
@@ -24,7 +22,7 @@ export class Setting {
   @Column({
     name: 'server_encryption_version',
     type: 'tinyint',
-    default: Setting.ENCRYPTION_VERSION_UNENCRYPTED,
+    default: EncryptionVersion.Unencrypted,
   })
   serverEncryptionVersion: number
 
