@@ -1,4 +1,5 @@
-import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm'
+import { Column, Entity, Index, JoinTable, ManyToMany, PrimaryGeneratedColumn } from 'typeorm'
+import { Role } from '../Role/Role'
 
 @Entity({ name: 'offline_user_subscriptions' })
 export class OfflineUserSubscription {
@@ -43,4 +44,21 @@ export class OfflineUserSubscription {
     default: 0,
   })
   cancelled: boolean
+
+  @ManyToMany(
+    /* istanbul ignore next */
+    () => Role
+  )
+  @JoinTable({
+    name: 'offline_user_roles',
+    joinColumn: {
+      name: 'offline_user_subscription_uuid',
+      referencedColumnName: 'uuid',
+    },
+    inverseJoinColumn: {
+      name: 'role_uuid',
+      referencedColumnName: 'uuid',
+    },
+  })
+  roles: Promise<Array<Role>>
 }

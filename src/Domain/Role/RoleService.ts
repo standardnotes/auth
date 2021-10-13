@@ -9,12 +9,14 @@ import { ClientServiceInterface } from '../Client/ClientServiceInterface'
 import { RoleRepositoryInterface } from './RoleRepositoryInterface'
 import { RoleServiceInterface } from './RoleServiceInterface'
 import { RoleToSubscriptionMapInterface } from './RoleToSubscriptionMapInterface'
+import { OfflineUserSubscriptionRepositoryInterface } from '../Subscription/OfflineUserSubscriptionRepositoryInterface'
 
 @injectable()
 export class RoleService implements RoleServiceInterface {
   constructor(
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
     @inject(TYPES.RoleRepository) private roleRepository: RoleRepositoryInterface,
+    @inject(TYPES.OfflineUserSubscriptionRepository) private offlineUserSubscriptionRepositoryInterface: OfflineUserSubscriptionRepositoryInterface,
     @inject(TYPES.WebSocketsClientService) private webSocketsClientService: ClientServiceInterface,
     @inject(TYPES.RoleToSubscriptionMap) private roleToSubscriptionMap: RoleToSubscriptionMapInterface,
     @inject(TYPES.Logger) private logger: Logger
@@ -50,6 +52,41 @@ export class RoleService implements RoleServiceInterface {
     await this.webSocketsClientService.sendUserRolesChangedEvent(
       user,
     )
+  }
+
+  async addOfflineUserRole(
+    email: string,
+    subscriptionName: SubscriptionName,
+  ): Promise<void> {
+    const roleName = this.roleToSubscriptionMap.getRoleNameForSubscriptionName(subscriptionName)
+
+    if (roleName === undefined) {
+      this.logger.warn(`Could not find role name for subscription name: ${subscriptionName}`)
+
+      return
+    }
+
+    const role = await this.roleRepository.findOneByName(roleName)
+
+    if (role === undefined) {
+      this.logger.warn(`Could not find role for role name: ${roleName}`)
+
+      return
+    }
+
+    const currentSubscription = await this.offlineUserSubscriptionRepositoryInterface.findOneByEmail(email)
+    if (currentSubscription === undefined) {
+      this.logger.warn(`Could not find current subscription for email: ${email}`)
+
+      return
+    }
+
+    const currentRoles = await currentSubscription.roles
+    currentSubscription.roles = Promise.resolve([
+      ...currentRoles,
+      role,
+    ])
+    await this.offlineUserSubscriptionRepositoryInterface.save(currentSubscription)
   }
 
   async removeUserRole(
