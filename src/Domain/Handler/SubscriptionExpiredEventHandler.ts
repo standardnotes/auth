@@ -11,6 +11,7 @@ import { RoleServiceInterface } from '../Role/RoleServiceInterface'
 import { User } from '../User/User'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { UserSubscriptionRepositoryInterface } from '../Subscription/UserSubscriptionRepositoryInterface'
+import { OfflineUserSubscriptionRepositoryInterface } from '../Subscription/OfflineUserSubscriptionRepositoryInterface'
 
 @injectable()
 export class SubscriptionExpiredEventHandler
@@ -19,6 +20,7 @@ implements DomainEventHandlerInterface
   constructor(
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
     @inject(TYPES.UserSubscriptionRepository) private userSubscriptionRepository: UserSubscriptionRepositoryInterface,
+    @inject(TYPES.OfflineUserSubscriptionRepository) private offlineUserSubscriptionRepository: OfflineUserSubscriptionRepositoryInterface,
     @inject(TYPES.RoleService) private roleService: RoleServiceInterface,
     @inject(TYPES.Logger) private logger: Logger
   ) {}
@@ -26,6 +28,17 @@ implements DomainEventHandlerInterface
   async handle(
     event: SubscriptionExpiredEvent,
   ): Promise<void> {
+    if (event.payload.offline) {
+      await this.updateOfflineSubscriptionEndsAt(
+        event.payload.subscriptionName,
+        event.payload.userEmail,
+        event.payload.timestamp,
+      )
+      await this.removeOfflineUserRole(event.payload.userEmail, event.payload.subscriptionName)
+
+      return
+    }
+
     const user = await this.userRepository.findOneByEmail(
       event.payload.userEmail
     )
@@ -43,7 +56,6 @@ implements DomainEventHandlerInterface
       event.payload.timestamp,
     )
     await this.removeUserRole(user, event.payload.subscriptionName)
-
   }
 
   private async removeUserRole(
@@ -61,6 +73,26 @@ implements DomainEventHandlerInterface
     await this.userSubscriptionRepository.updateEndsAtByNameAndUserUuid(
       subscriptionName,
       userUuid,
+      timestamp,
+      timestamp,
+    )
+  }
+
+  private async removeOfflineUserRole(
+    email: string,
+    subscriptionName: SubscriptionName
+  ): Promise<void> {
+    await this.roleService.removeOfflineUserRole(email, subscriptionName)
+  }
+
+  private async updateOfflineSubscriptionEndsAt(
+    subscriptionName: string,
+    email: string,
+    timestamp: number,
+  ): Promise<void> {
+    await this.offlineUserSubscriptionRepository.updateEndsAtByNameAndEmail(
+      subscriptionName,
+      email,
       timestamp,
       timestamp,
     )

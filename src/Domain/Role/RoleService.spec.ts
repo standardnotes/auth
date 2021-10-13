@@ -171,10 +171,15 @@ describe('RoleService', () => {
     it('should remove role from user', async () => {
       await createService().removeUserRole(user, SubscriptionName.ProPlan)
 
-      user.roles = Promise.resolve([
-        basicRole,
-      ])
       expect(userRepository.save).toHaveBeenCalledWith(user)
+    })
+
+    it('should remove role from offline subscription', async () => {
+      await createService().removeOfflineUserRole('test@test.com', SubscriptionName.ProPlan)
+
+      expect(offlineUserSubscriptionRepository.save).toHaveBeenCalledWith({
+        roles: Promise.resolve([]),
+      })
     })
 
     it('should send websockets event', async () => {
@@ -185,12 +190,28 @@ describe('RoleService', () => {
       )
     })
 
-    it('should not add role if no role name exists for subscription name', async () => {
+    it('should not remove role if role name does not exist for subscription name', async () => {
       roleToSubscriptionMap.getRoleNameForSubscriptionName = jest.fn().mockReturnValue(undefined)
 
       await createService().removeUserRole(user, 'test' as SubscriptionName)
 
       expect(userRepository.save).not.toHaveBeenCalled()
+    })
+
+    it('should not remove offline role if role name does not exist for subscription name', async () => {
+      roleToSubscriptionMap.getRoleNameForSubscriptionName = jest.fn().mockReturnValue(undefined)
+
+      await createService().removeOfflineUserRole('test@test.com', 'test' as SubscriptionName)
+
+      expect(offlineUserSubscriptionRepository.save).not.toHaveBeenCalled()
+    })
+
+    it('should not remove offline role if no subscription exists for user email', async () => {
+      offlineUserSubscriptionRepository.findOneByEmail = jest.fn().mockReturnValue(undefined)
+
+      await createService().removeOfflineUserRole('test@test.com', SubscriptionName.ProPlan)
+
+      expect(offlineUserSubscriptionRepository.save).not.toHaveBeenCalled()
     })
   })
 })

@@ -34,4 +34,21 @@ export class MySQLOfflineUserSubscriptionRepository extends Repository<OfflineUs
       )
       .execute()
   }
+
+  async updateEndsAtByNameAndEmail(name: string, email: string, endsAt: number, updatedAt: number): Promise<void> {
+    await this.createQueryBuilder()
+      .update()
+      .set({
+        endsAt,
+        updatedAt,
+      })
+      .where(
+        'plan_name = :plan_name AND email = :email',
+        {
+          plan_name: name,
+          email: email,
+        }
+      )
+      .execute()
+  }
 }
