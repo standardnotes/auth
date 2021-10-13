@@ -10,10 +10,12 @@ import { User } from '../User/User'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { SubscriptionCancelledEventHandler } from './SubscriptionCancelledEventHandler'
 import { UserSubscriptionRepositoryInterface } from '../Subscription/UserSubscriptionRepositoryInterface'
+import { OfflineUserSubscriptionRepositoryInterface } from '../Subscription/OfflineUserSubscriptionRepositoryInterface'
 
 describe('SubscriptionCancelledEventHandler', () => {
   let userRepository: UserRepositoryInterface
   let userSubscriptionRepository: UserSubscriptionRepositoryInterface
+  let offlineUserSubscriptionRepository: OfflineUserSubscriptionRepositoryInterface
   let logger: Logger
   let user: User
   let event: SubscriptionCancelledEvent
@@ -22,6 +24,7 @@ describe('SubscriptionCancelledEventHandler', () => {
   const createHandler = () => new SubscriptionCancelledEventHandler(
     userRepository,
     userSubscriptionRepository,
+    offlineUserSubscriptionRepository,
     logger
   )
 
@@ -35,6 +38,9 @@ describe('SubscriptionCancelledEventHandler', () => {
 
     userSubscriptionRepository = {} as jest.Mocked<UserSubscriptionRepositoryInterface>
     userSubscriptionRepository.updateCancelled = jest.fn()
+
+    offlineUserSubscriptionRepository = {} as jest.Mocked<OfflineUserSubscriptionRepositoryInterface>
+    offlineUserSubscriptionRepository.updateCancelled = jest.fn()
 
     timestamp = dayjs.utc().valueOf()
 
@@ -61,6 +67,21 @@ describe('SubscriptionCancelledEventHandler', () => {
     ).toHaveBeenCalledWith(
       SubscriptionName.ProPlan,
       '123',
+      true,
+      timestamp,
+    )
+  })
+
+  it('should update offline subscription cancelled', async () => {
+    event.payload.offline = true
+
+    await createHandler().handle(event)
+
+    expect(
+      offlineUserSubscriptionRepository.updateCancelled
+    ).toHaveBeenCalledWith(
+      SubscriptionName.ProPlan,
+      'test@test.com',
       true,
       timestamp,
     )

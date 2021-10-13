@@ -2,7 +2,7 @@ import 'reflect-metadata'
 
 import { SubscriptionName } from '@standardnotes/auth'
 
-import { SelectQueryBuilder } from 'typeorm'
+import { SelectQueryBuilder, UpdateQueryBuilder } from 'typeorm'
 
 import { MySQLOfflineUserSubscriptionRepository } from './MySQLOfflineUserSubscriptionRepository'
 import { OfflineUserSubscription } from '../../Domain/Subscription/OfflineUserSubscription'
@@ -10,10 +10,12 @@ import { OfflineUserSubscription } from '../../Domain/Subscription/OfflineUserSu
 describe('MySQLOfflineUserSubscriptionRepository', () => {
   let repository: MySQLOfflineUserSubscriptionRepository
   let selectQueryBuilder: SelectQueryBuilder<OfflineUserSubscription>
+  let updateQueryBuilder: UpdateQueryBuilder<OfflineUserSubscription>
   let offlineSubscription: OfflineUserSubscription
 
   beforeEach(() => {
     selectQueryBuilder = {} as jest.Mocked<SelectQueryBuilder<OfflineUserSubscription>>
+    updateQueryBuilder = {} as jest.Mocked<UpdateQueryBuilder<OfflineUserSubscription>>
 
     offlineSubscription = {
       planName: SubscriptionName.ProPlan,
@@ -44,5 +46,32 @@ describe('MySQLOfflineUserSubscriptionRepository', () => {
     )
     expect(selectQueryBuilder.getOne).toHaveBeenCalled()
     expect(result).toEqual(offlineSubscription)
+  })
+
+  it('should update cancelled by name and user email', async () => {
+    repository.createQueryBuilder = jest.fn().mockImplementation(() => updateQueryBuilder)
+
+    updateQueryBuilder.update = jest.fn().mockReturnThis()
+    updateQueryBuilder.set = jest.fn().mockReturnThis()
+    updateQueryBuilder.where = jest.fn().mockReturnThis()
+    updateQueryBuilder.execute = jest.fn()
+
+    await repository.updateCancelled('test', 'test@test.com', true, 1000)
+
+    expect(updateQueryBuilder.update).toHaveBeenCalled()
+    expect(updateQueryBuilder.set).toHaveBeenCalledWith(
+      {
+        updatedAt: expect.any(Number),
+        cancelled: true,
+      }
+    )
+    expect(updateQueryBuilder.where).toHaveBeenCalledWith(
+      'plan_name = :plan_name AND email = :email',
+      {
+        plan_name: 'test',
+        email: 'test@test.com',
+      }
+    )
+    expect(updateQueryBuilder.execute).toHaveBeenCalled()
   })
 })
