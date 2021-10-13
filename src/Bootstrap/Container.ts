@@ -115,6 +115,7 @@ import { MySQLOfflineSettingRepository } from '../Infra/MySQL/MySQLOfflineSettin
 import { OfflineUserSubscription } from '../Domain/Subscription/OfflineUserSubscription'
 import { OfflineUserSubscriptionRepositoryInterface } from '../Domain/Subscription/OfflineUserSubscriptionRepositoryInterface'
 import { MySQLOfflineUserSubscriptionRepository } from '../Infra/MySQL/MySQLOfflineUserSubscriptionRepository'
+import { OfflineUserAuthMiddleware } from '../Controller/OfflineUserAuthMiddleware'
 
 export class ContainerConfigLoader {
   async load(): Promise<Container> {
@@ -220,6 +221,7 @@ export class ContainerConfigLoader {
     container.bind<LockMiddleware>(TYPES.LockMiddleware).to(LockMiddleware)
     container.bind<AuthMiddlewareWithoutResponse>(TYPES.AuthMiddlewareWithoutResponse).to(AuthMiddlewareWithoutResponse)
     container.bind<ApiGatewayAuthMiddleware>(TYPES.ApiGatewayAuthMiddleware).to(ApiGatewayAuthMiddleware)
+    container.bind<OfflineUserAuthMiddleware>(TYPES.OfflineUserAuthMiddleware).to(OfflineUserAuthMiddleware)
 
     // Projectors
     container.bind<SessionProjector>(TYPES.SessionProjector).to(SessionProjector)

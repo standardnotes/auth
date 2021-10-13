@@ -1,4 +1,4 @@
-import { Request } from 'express'
+import { Request, Response } from 'express'
 import { inject } from 'inversify'
 import {
   BaseHttpController,
@@ -10,19 +10,20 @@ import {
 import TYPES from '../Bootstrap/Types'
 import { GetUserFeatures } from '../Domain/UseCase/GetUserFeatures/GetUserFeatures'
 
-@controller('/internal')
-export class InternalController extends BaseHttpController {
+@controller('/offline')
+export class OfflineController extends BaseHttpController {
   constructor(
     @inject(TYPES.GetUserFeatures) private doGetUserFeatures: GetUserFeatures,
   ) {
     super()
   }
 
-  @httpGet('/users/:userUuid/features')
-  async getFeatures(request: Request): Promise<results.JsonResult> {
+  @httpGet('/features', TYPES.OfflineUserAuthMiddleware)
+  async getOfflineFeatures(_request: Request, response: Response): Promise<results.JsonResult> {
     const result = await this.doGetUserFeatures.execute({
-      userUuid: request.params.userUuid,
-      offline: false,
+      email: response.locals.offlineUserEmail,
+      offlineFeaturesToken: response.locals.offlineFeaturesToken,
+      offline: true,
     })
 
     if (result.success) {

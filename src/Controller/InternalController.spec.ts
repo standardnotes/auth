@@ -41,6 +41,7 @@ describe('InternalController', () => {
 
     expect(getUserFeatures.execute).toHaveBeenCalledWith({
       userUuid: '1-2-3',
+      offline: false,
     })
 
     expect(result.statusCode).toEqual(200)
@@ -54,7 +55,7 @@ describe('InternalController', () => {
     const httpResponse = <results.JsonResult> await createController().getFeatures(request)
     const result = await httpResponse.executeAsync()
 
-    expect(getUserFeatures.execute).toHaveBeenCalledWith({ userUuid: '1-2-3' })
+    expect(getUserFeatures.execute).toHaveBeenCalledWith({ userUuid: '1-2-3', offline: false })
 
     expect(result.statusCode).toEqual(400)
 

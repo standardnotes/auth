@@ -49,6 +49,7 @@ describe('FeaturesController', () => {
 
     expect(getUserFeatures.execute).toHaveBeenCalledWith({
       userUuid: '1-2-3',
+      offline: false,
     })
 
     expect(result.statusCode).toEqual(200)
@@ -65,7 +66,7 @@ describe('FeaturesController', () => {
     const httpResponse = <results.JsonResult> await createController().getFeatures(request, response)
     const result = await httpResponse.executeAsync()
 
-    expect(getUserFeatures.execute).toHaveBeenCalledWith({ userUuid: '1-2-3' })
+    expect(getUserFeatures.execute).toHaveBeenCalledWith({ userUuid: '1-2-3', offline: false })
 
     expect(result.statusCode).toEqual(400)
 

@@ -30,6 +30,7 @@ export class FeaturesController extends BaseHttpController {
 
     const result = await this.doGetUserFeatures.execute({
       userUuid: request.params.userUuid,
+      offline: false,
     })
 
     if (result.success) {
