@@ -15,6 +15,7 @@ const TYPES = {
   RoleRepository: Symbol.for('RoleRepository'),
   WebSocketsConnectionRepository: Symbol.for('WebSocketsConnectionRepository'),
   UserSubscriptionRepository: Symbol.for('UserSubscriptionRepository'),
+  OfflineUserSubscriptionRepository: Symbol.for('OfflineUserSubscriptionRepository'),
   PurchaseTokenRepository: Symbol.for('PurchaseTokenRepository'),
   // Middleware
   AuthMiddleware: Symbol.for('AuthMiddleware'),

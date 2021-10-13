@@ -112,6 +112,9 @@ import { OfflineSettingService } from '../Domain/Setting/OfflineSettingService'
 import { OfflineSettingRepositoryInterface } from '../Domain/Setting/OfflineSettingRepositoryInterface'
 import { SettingRepositoryInterface } from '../Domain/Setting/SettingRepositoryInterface'
 import { MySQLOfflineSettingRepository } from '../Infra/MySQL/MySQLOfflineSettingRepository'
+import { OfflineUserSubscription } from '../Domain/Subscription/OfflineUserSubscription'
+import { OfflineUserSubscriptionRepositoryInterface } from '../Domain/Subscription/OfflineUserSubscriptionRepositoryInterface'
+import { MySQLOfflineUserSubscriptionRepository } from '../Infra/MySQL/MySQLOfflineUserSubscriptionRepository'
 
 export class ContainerConfigLoader {
   async load(): Promise<Container> {
@@ -144,6 +147,7 @@ export class ContainerConfigLoader {
       entities: [
         User,
         UserSubscription,
+        OfflineUserSubscription,
         Session,
         RevokedSession,
         Role,
@@ -204,6 +208,7 @@ export class ContainerConfigLoader {
     container.bind<OfflineSettingRepositoryInterface>(TYPES.OfflineSettingRepository).toConstantValue(connection.getCustomRepository(MySQLOfflineSettingRepository))
     container.bind<MySQLRoleRepository>(TYPES.RoleRepository).toConstantValue(connection.getCustomRepository(MySQLRoleRepository))
     container.bind<UserSubscriptionRepositoryInterface>(TYPES.UserSubscriptionRepository).toConstantValue(connection.getCustomRepository(MySQLUserSubscriptionRepository))
+    container.bind<OfflineUserSubscriptionRepositoryInterface>(TYPES.OfflineUserSubscriptionRepository).toConstantValue(connection.getCustomRepository(MySQLOfflineUserSubscriptionRepository))
     container.bind<RedisEphemeralSessionRepository>(TYPES.EphemeralSessionRepository).to(RedisEphemeralSessionRepository)
     container.bind<LockRepository>(TYPES.LockRepository).to(LockRepository)
     container.bind<WebSocketsConnectionRepositoryInterface>(TYPES.WebSocketsConnectionRepository).to(RedisWebSocketsConnectionRepository)

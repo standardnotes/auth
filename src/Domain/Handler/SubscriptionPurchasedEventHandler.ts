@@ -12,6 +12,8 @@ import { User } from '../User/User'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { UserSubscription } from '../Subscription/UserSubscription'
 import { UserSubscriptionRepositoryInterface } from '../Subscription/UserSubscriptionRepositoryInterface'
+import { OfflineUserSubscription } from '../Subscription/OfflineUserSubscription'
+import { OfflineUserSubscriptionRepositoryInterface } from '../Subscription/OfflineUserSubscriptionRepositoryInterface'
 
 @injectable()
 export class SubscriptionPurchasedEventHandler
@@ -20,6 +22,7 @@ implements DomainEventHandlerInterface
   constructor(
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
     @inject(TYPES.UserSubscriptionRepository) private userSubscriptionRepository: UserSubscriptionRepositoryInterface,
+    @inject(TYPES.OfflineUserSubscriptionRepository) private offlineUserSubscriptionRepository: OfflineUserSubscriptionRepositoryInterface,
     @inject(TYPES.RoleService) private roleService: RoleServiceInterface,
     @inject(TYPES.Logger) private logger: Logger
   ) {}
@@ -27,6 +30,22 @@ implements DomainEventHandlerInterface
   async handle(
     event: SubscriptionPurchasedEvent
   ): Promise<void> {
+    if (event.payload.offline) {
+      await this.createOfflineSubscription(
+        event.payload.subscriptionName,
+        event.payload.userEmail,
+        event.payload.subscriptionExpiresAt,
+        event.payload.timestamp,
+      )
+
+      await this.addOfflineUserRole(
+        event.payload.userEmail,
+        event.payload.subscriptionName
+      )
+
+      return
+    }
+
     const user = await this.userRepository.findOneByEmail(
       event.payload.userEmail
     )
@@ -55,6 +74,13 @@ implements DomainEventHandlerInterface
     await this.roleService.addUserRole(user, subscriptionName)
   }
 
+  private async addOfflineUserRole(
+    email: string,
+    subscriptionName: SubscriptionName
+  ): Promise<void> {
+    await this.roleService.addOfflineUserRole(email, subscriptionName)
+  }
+
   private async createSubscription(
     subscriptionName: string,
     user: User,
@@ -70,5 +96,22 @@ implements DomainEventHandlerInterface
     subscription.cancelled = false
 
     await this.userSubscriptionRepository.save(subscription)
+  }
+
+  private async createOfflineSubscription(
+    subscriptionName: string,
+    email: string,
+    subscriptionExpiresAt: number,
+    timestamp: number,
+  ): Promise<void> {
+    const subscription = new OfflineUserSubscription()
+    subscription.planName = subscriptionName
+    subscription.email = email
+    subscription.createdAt = timestamp
+    subscription.updatedAt = timestamp
+    subscription.endsAt = subscriptionExpiresAt
+    subscription.cancelled = false
+
+    await this.offlineUserSubscriptionRepository.save(subscription)
   }
 }
