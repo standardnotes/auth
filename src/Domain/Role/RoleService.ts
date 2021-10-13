@@ -111,4 +111,31 @@ export class RoleService implements RoleServiceInterface {
       user,
     )
   }
+
+  async removeOfflineUserRole(
+    email: string,
+    subscriptionName: SubscriptionName,
+  ): Promise<void> {
+    const roleName = this.roleToSubscriptionMap.getRoleNameForSubscriptionName(subscriptionName)
+
+    if (roleName === undefined) {
+      this.logger.warn(
+        `Could not find role name for subscription name: ${subscriptionName}`
+      )
+      return
+    }
+
+    const currentSubscription = await this.offlineUserSubscriptionRepositoryInterface.findOneByEmail(email)
+    if (currentSubscription === undefined) {
+      this.logger.warn(`Could not find current subscription for email: ${email}`)
+
+      return
+    }
+
+    const currentRoles = await currentSubscription.roles
+    currentSubscription.roles = Promise.resolve(
+      currentRoles.filter(role => role.name !== roleName)
+    )
+    await this.offlineUserSubscriptionRepositoryInterface.save(currentSubscription)
+  }
 }

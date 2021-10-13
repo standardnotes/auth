@@ -10,10 +10,12 @@ import { User } from '../User/User'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { SubscriptionRenewedEventHandler } from './SubscriptionRenewedEventHandler'
 import { UserSubscriptionRepositoryInterface } from '../Subscription/UserSubscriptionRepositoryInterface'
+import { OfflineUserSubscriptionRepositoryInterface } from '../Subscription/OfflineUserSubscriptionRepositoryInterface'
 
 describe('SubscriptionRenewedEventHandler', () => {
   let userRepository: UserRepositoryInterface
   let userSubscriptionRepository: UserSubscriptionRepositoryInterface
+  let offlineUserSubscriptionRepository: OfflineUserSubscriptionRepositoryInterface
   let logger: Logger
   let user: User
   let event: SubscriptionRenewedEvent
@@ -23,6 +25,7 @@ describe('SubscriptionRenewedEventHandler', () => {
   const createHandler = () => new SubscriptionRenewedEventHandler(
     userRepository,
     userSubscriptionRepository,
+    offlineUserSubscriptionRepository,
     logger
   )
 
@@ -36,6 +39,9 @@ describe('SubscriptionRenewedEventHandler', () => {
 
     userSubscriptionRepository = {} as jest.Mocked<UserSubscriptionRepositoryInterface>
     userSubscriptionRepository.updateEndsAtByNameAndUserUuid = jest.fn()
+
+    offlineUserSubscriptionRepository = {} as jest.Mocked<OfflineUserSubscriptionRepositoryInterface>
+    offlineUserSubscriptionRepository.updateEndsAtByNameAndEmail = jest.fn()
 
     timestamp = dayjs.utc().valueOf()
     subscriptionExpirationDate = dayjs.utc().valueOf() + 365*1000
@@ -65,6 +71,21 @@ describe('SubscriptionRenewedEventHandler', () => {
       SubscriptionName.ProPlan,
       '123',
       subscriptionExpirationDate,
+      timestamp,
+    )
+  })
+
+  it('should update offline subscription ends at', async () => {
+    event.payload.offline = true
+
+    await createHandler().handle(event)
+
+    expect(
+      offlineUserSubscriptionRepository.updateEndsAtByNameAndEmail
+    ).toHaveBeenCalledWith(
+      SubscriptionName.ProPlan,
+      'test@test.com',
+      timestamp,
       timestamp,
     )
   })

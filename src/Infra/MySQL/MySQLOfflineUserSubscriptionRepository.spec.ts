@@ -74,4 +74,31 @@ describe('MySQLOfflineUserSubscriptionRepository', () => {
     )
     expect(updateQueryBuilder.execute).toHaveBeenCalled()
   })
+
+  it('should update ends at by name and user email', async () => {
+    repository.createQueryBuilder = jest.fn().mockImplementation(() => updateQueryBuilder)
+
+    updateQueryBuilder.update = jest.fn().mockReturnThis()
+    updateQueryBuilder.set = jest.fn().mockReturnThis()
+    updateQueryBuilder.where = jest.fn().mockReturnThis()
+    updateQueryBuilder.execute = jest.fn()
+
+    await repository.updateEndsAtByNameAndEmail('test', 'test@test.com', 1000, 1000)
+
+    expect(updateQueryBuilder.update).toHaveBeenCalled()
+    expect(updateQueryBuilder.set).toHaveBeenCalledWith(
+      {
+        updatedAt: expect.any(Number),
+        endsAt: 1000,
+      }
+    )
+    expect(updateQueryBuilder.where).toHaveBeenCalledWith(
+      'plan_name = :plan_name AND email = :email',
+      {
+        plan_name: 'test',
+        email: 'test@test.com',
+      }
+    )
+    expect(updateQueryBuilder.execute).toHaveBeenCalled()
+  })
 })
