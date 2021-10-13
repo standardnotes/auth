@@ -47,6 +47,7 @@ describe('SubscriptionRenewedEventHandler', () => {
       subscriptionName: SubscriptionName.ProPlan,
       subscriptionExpiresAt: subscriptionExpirationDate,
       timestamp,
+      offline: false,
     }
 
     logger = {} as jest.Mocked<Logger>

@@ -44,6 +44,7 @@ describe('SubscriptionCancelledEventHandler', () => {
       userEmail: 'test@test.com',
       subscriptionName: SubscriptionName.ProPlan,
       timestamp,
+      offline: false,
     }
 
     logger = {} as jest.Mocked<Logger>

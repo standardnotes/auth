@@ -60,6 +60,7 @@ describe('SubscriptionPurchasedEventHandler', () => {
       subscriptionName: SubscriptionName.ProPlan,
       subscriptionExpiresAt,
       timestamp: dayjs.utc().valueOf(),
+      offline: false,
     }
 
     logger = {} as jest.Mocked<Logger>

@@ -24,13 +24,18 @@ export class OfflineSettingService implements OfflineSettingServiceInterface {
       offlineSetting.name = dto.name
       offlineSetting.email = dto.email
       offlineSetting.serverEncryptionVersion = EncryptionVersion.Unencrypted
-      offlineSetting.value = dto.value
       offlineSetting.createdAt = this.timer.getTimestampInMicroseconds()
     }
 
+    offlineSetting.value = dto.value
     offlineSetting.updatedAt = this.timer.getTimestampInMicroseconds()
 
-    await this.offlineSettingRepository.save(offlineSetting)
+    offlineSetting = await this.offlineSettingRepository.save(offlineSetting)
+
+    return {
+      success: true,
+      offlineSetting,
+    }
   }
 
 }
