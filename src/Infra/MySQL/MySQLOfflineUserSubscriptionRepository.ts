@@ -17,4 +17,21 @@ export class MySQLOfflineUserSubscriptionRepository extends Repository<OfflineUs
       .orderBy('ends_at', 'DESC')
       .getOne()
   }
+
+  async updateCancelled(name: string, email: string, cancelled: boolean, updatedAt: number): Promise<void> {
+    await this.createQueryBuilder()
+      .update()
+      .set({
+        cancelled,
+        updatedAt,
+      })
+      .where(
+        'plan_name = :plan_name AND email = :email',
+        {
+          plan_name: name,
+          email,
+        }
+      )
+      .execute()
+  }
 }
