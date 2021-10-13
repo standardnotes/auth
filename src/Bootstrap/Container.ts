@@ -112,6 +112,7 @@ import { OfflineSettingService } from '../Domain/Setting/OfflineSettingService'
 import { OfflineSettingRepositoryInterface } from '../Domain/Setting/OfflineSettingRepositoryInterface'
 import { SettingRepositoryInterface } from '../Domain/Setting/SettingRepositoryInterface'
 import { MySQLOfflineSettingRepository } from '../Infra/MySQL/MySQLOfflineSettingRepository'
+import { OfflineUserSubscription } from '../Domain/Subscription/OfflineUserSubscription'
 
 export class ContainerConfigLoader {
   async load(): Promise<Container> {
@@ -144,6 +145,7 @@ export class ContainerConfigLoader {
       entities: [
         User,
         UserSubscription,
+        OfflineUserSubscription,
         Session,
         RevokedSession,
         Role,
