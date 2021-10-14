@@ -3,14 +3,14 @@ import 'reflect-metadata'
 import * as IORedis from 'ioredis'
 import { TimerInterface } from '@standardnotes/time'
 
-import { RedisPurchaseTokenRepository } from './RedisPurchaseTokenRepository'
-import { PurchaseToken } from '../../Domain/Subscription/PurchaseToken'
+import { RedisSubscriptionTokenRepository } from './RedisSubscriptionTokenRepository'
+import { SubscriptionToken } from '../../Domain/Subscription/SubscriptionToken'
 
-describe('RedisPurchaseTokenRepository', () => {
+describe('RedisSubscriptionTokenRepository', () => {
   let redisClient: IORedis.Redis
   let timer: TimerInterface
 
-  const createRepository = () => new RedisPurchaseTokenRepository(redisClient, timer)
+  const createRepository = () => new RedisSubscriptionTokenRepository(redisClient, timer)
 
   beforeEach(() => {
     redisClient = {} as jest.Mocked<IORedis.Redis>
@@ -22,42 +22,42 @@ describe('RedisPurchaseTokenRepository', () => {
     timer.convertMicrosecondsToSeconds = jest.fn().mockReturnValue(1)
   })
 
-  it('should get a user uuid in exchange for an purchase token', async () => {
+  it('should get a user uuid in exchange for an subscription token', async () => {
     redisClient.get = jest.fn().mockReturnValue('1-2-3')
 
     expect(await createRepository().getUserUuidByToken('random-string')).toEqual('1-2-3')
 
     expect(redisClient.get).toHaveBeenCalledWith(
-      'purchase-token:random-string',
+      'subscription-token:random-string',
     )
   })
 
-  it('should return undefined if a user uuid is not exchanged for an purchase token', async () => {
+  it('should return undefined if a user uuid is not exchanged for an subscription token', async () => {
     redisClient.get = jest.fn().mockReturnValue(null)
 
     expect(await createRepository().getUserUuidByToken('random-string')).toBeUndefined()
 
     expect(redisClient.get).toHaveBeenCalledWith(
-      'purchase-token:random-string',
+      'subscription-token:random-string',
     )
   })
 
-  it('should save an purchase token', async () => {
-    const purchaseToken: PurchaseToken = {
+  it('should save an subscription token', async () => {
+    const subscriptionToken: SubscriptionToken = {
       userUuid: '1-2-3',
       token: 'random-string',
       expiresAt: 123,
     }
 
-    await createRepository().save(purchaseToken)
+    await createRepository().save(subscriptionToken)
 
     expect(redisClient.set).toHaveBeenCalledWith(
-      'purchase-token:random-string',
+      'subscription-token:random-string',
       '1-2-3',
     )
 
     expect(redisClient.expireat).toHaveBeenCalledWith(
-      'purchase-token:random-string',
+      'subscription-token:random-string',
       1,
     )
   })

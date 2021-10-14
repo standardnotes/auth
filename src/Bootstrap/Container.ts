@@ -101,11 +101,11 @@ import { SubscriptionReassignedEventHandler } from '../Domain/Handler/Subscripti
 import { UserSubscriptionRepositoryInterface } from '../Domain/Subscription/UserSubscriptionRepositoryInterface'
 import { PaymentsHttpServiceInterface } from '../Domain/Subscription/PaymentsHttpServiceInterface'
 import { PaymentsHttpService } from '../Infra/HTTP/PaymentsHttpService'
-import { CreatePurchaseToken } from '../Domain/UseCase/CreatePurchaseToken/CreatePurchaseToken'
+import { CreateSubscriptionToken } from '../Domain/UseCase/CreateSubscriptionToken/CreateSubscriptionToken'
 import { ApiGatewayAuthMiddleware } from '../Controller/ApiGatewayAuthMiddleware'
-import { PurchaseTokenRepositoryInterface } from '../Domain/Subscription/PurchaseTokenRepositoryInterface'
-import { RedisPurchaseTokenRepository } from '../Infra/Redis/RedisPurchaseTokenRepository'
-import { AuthenticatePurchaseToken } from '../Domain/UseCase/AuthenticatePurchaseToken/AuthenticatePurchaseToken'
+import { SubscriptionTokenRepositoryInterface } from '../Domain/Subscription/SubscriptionTokenRepositoryInterface'
+import { RedisSubscriptionTokenRepository } from '../Infra/Redis/RedisSubscriptionTokenRepository'
+import { AuthenticateSubscriptionToken } from '../Domain/UseCase/AuthenticateSubscriptionToken/AuthenticateSubscriptionToken'
 import { OfflineSetting } from '../Domain/Setting/OfflineSetting'
 import { OfflineSettingServiceInterface } from '../Domain/Setting/OfflineSettingServiceInterface'
 import { OfflineSettingService } from '../Domain/Setting/OfflineSettingService'
@@ -213,7 +213,7 @@ export class ContainerConfigLoader {
     container.bind<RedisEphemeralSessionRepository>(TYPES.EphemeralSessionRepository).to(RedisEphemeralSessionRepository)
     container.bind<LockRepository>(TYPES.LockRepository).to(LockRepository)
     container.bind<WebSocketsConnectionRepositoryInterface>(TYPES.WebSocketsConnectionRepository).to(RedisWebSocketsConnectionRepository)
-    container.bind<PurchaseTokenRepositoryInterface>(TYPES.PurchaseTokenRepository).to(RedisPurchaseTokenRepository)
+    container.bind<SubscriptionTokenRepositoryInterface>(TYPES.SubscriptionTokenRepository).to(RedisSubscriptionTokenRepository)
 
     // Middleware
     container.bind<AuthMiddleware>(TYPES.AuthMiddleware).to(AuthMiddleware)
@@ -286,8 +286,8 @@ export class ContainerConfigLoader {
     container.bind<AddWebSocketsConnection>(TYPES.AddWebSocketsConnection).to(AddWebSocketsConnection)
     container.bind<RemoveWebSocketsConnection>(TYPES.RemoveWebSocketsConnection).to(RemoveWebSocketsConnection)
     container.bind<GetUserSubscription>(TYPES.GetUserSubscription).to(GetUserSubscription)
-    container.bind<CreatePurchaseToken>(TYPES.CreatePurchaseToken).to(CreatePurchaseToken)
-    container.bind<AuthenticatePurchaseToken>(TYPES.AuthenticatePurchaseToken).to(AuthenticatePurchaseToken)
+    container.bind<CreateSubscriptionToken>(TYPES.CreateSubscriptionToken).to(CreateSubscriptionToken)
+    container.bind<AuthenticateSubscriptionToken>(TYPES.AuthenticateSubscriptionToken).to(AuthenticateSubscriptionToken)
 
     // Handlers
     container.bind<UserRegisteredEventHandler>(TYPES.UserRegisteredEventHandler).to(UserRegisteredEventHandler)

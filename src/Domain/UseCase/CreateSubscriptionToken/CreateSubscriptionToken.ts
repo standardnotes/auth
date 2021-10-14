@@ -3,24 +3,24 @@ import { TimerInterface } from '@standardnotes/time'
 import { inject, injectable } from 'inversify'
 
 import TYPES from '../../../Bootstrap/Types'
-import { PurchaseTokenRepositoryInterface } from '../../Subscription/PurchaseTokenRepositoryInterface'
+import { SubscriptionTokenRepositoryInterface } from '../../Subscription/SubscriptionTokenRepositoryInterface'
 import { UseCaseInterface } from '../UseCaseInterface'
-import { CreatePurchaseTokenDTO } from './CreatePurchaseTokenDTO'
-import { CreatePurchaseTokenResponse } from './CreatePurchaseTokenResponse'
+import { CreateSubscriptionTokenDTO } from './CreateSubscriptionTokenDTO'
+import { CreateSubscriptionTokenResponse } from './CreateSubscriptionTokenResponse'
 
 @injectable()
-export class CreatePurchaseToken implements UseCaseInterface {
+export class CreateSubscriptionToken implements UseCaseInterface {
   constructor(
-    @inject(TYPES.PurchaseTokenRepository) private purchaseTokenRepository: PurchaseTokenRepositoryInterface,
+    @inject(TYPES.SubscriptionTokenRepository) private subscriptionTokenRepository: SubscriptionTokenRepositoryInterface,
     @inject(TYPES.SnCryptoNode) private cryptoNode: SnCryptoNode,
     @inject(TYPES.Timer) private timer: TimerInterface,
   ) {
   }
 
-  async execute(dto: CreatePurchaseTokenDTO): Promise<CreatePurchaseTokenResponse> {
+  async execute(dto: CreateSubscriptionTokenDTO): Promise<CreateSubscriptionTokenResponse> {
     const token = await this.cryptoNode.generateRandomKey(128)
 
-    const purchaseToken = {
+    const subscriptionToken = {
       userUuid: dto.userUuid,
       token,
       expiresAt: this.timer.convertStringDateToMicroseconds(
@@ -28,10 +28,10 @@ export class CreatePurchaseToken implements UseCaseInterface {
       ),
     }
 
-    await this.purchaseTokenRepository.save(purchaseToken)
+    await this.subscriptionTokenRepository.save(subscriptionToken)
 
     return {
-      purchaseToken,
+      subscriptionToken,
     }
   }
 }

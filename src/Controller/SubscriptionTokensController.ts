@@ -12,16 +12,16 @@ import { sign } from 'jsonwebtoken'
 
 import TYPES from '../Bootstrap/Types'
 import { Role } from '../Domain/Role/Role'
-import { AuthenticatePurchaseToken } from '../Domain/UseCase/AuthenticatePurchaseToken/AuthenticatePurchaseToken'
-import { CreatePurchaseToken } from '../Domain/UseCase/CreatePurchaseToken/CreatePurchaseToken'
+import { AuthenticateSubscriptionToken } from '../Domain/UseCase/AuthenticateSubscriptionToken/AuthenticateSubscriptionToken'
+import { CreateSubscriptionToken } from '../Domain/UseCase/CreateSubscriptionToken/CreateSubscriptionToken'
 import { User } from '../Domain/User/User'
 import { ProjectorInterface } from '../Projection/ProjectorInterface'
 
-@controller('/purchase-tokens')
-export class PurchaseTokensController extends BaseHttpController {
+@controller('/subscription-tokens')
+export class SubscriptionTokensController extends BaseHttpController {
   constructor(
-    @inject(TYPES.CreatePurchaseToken) private createPurchaseToken: CreatePurchaseToken,
-    @inject(TYPES.AuthenticatePurchaseToken) private authenticateToken: AuthenticatePurchaseToken,
+    @inject(TYPES.CreateSubscriptionToken) private createSubscriptionToken: CreateSubscriptionToken,
+    @inject(TYPES.AuthenticateSubscriptionToken) private authenticateToken: AuthenticateSubscriptionToken,
     @inject(TYPES.UserProjector) private userProjector: ProjectorInterface<User>,
     @inject(TYPES.RoleProjector) private roleProjector: ProjectorInterface<Role>,
     @inject(TYPES.AUTH_JWT_SECRET) private jwtSecret: string,
@@ -32,12 +32,12 @@ export class PurchaseTokensController extends BaseHttpController {
 
   @httpPost('/', TYPES.ApiGatewayAuthMiddleware)
   async createToken(_request: Request, response: Response): Promise<results.JsonResult> {
-    const result = await this.createPurchaseToken.execute({
+    const result = await this.createSubscriptionToken.execute({
       userUuid: response.locals.user.uuid,
     })
 
     return this.json({
-      token: result.purchaseToken.token,
+      token: result.subscriptionToken.token,
     })
   }
 
