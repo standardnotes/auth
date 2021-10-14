@@ -1,5 +1,5 @@
 import { RoleName } from '@standardnotes/auth'
-import { AccountDeletionRequestedEvent, UserEmailChangedEvent, UserRegisteredEvent, UserRolesChangedEvent } from '@standardnotes/domain-events'
+import { AccountDeletionRequestedEvent, UserEmailChangedEvent, UserRegisteredEvent, UserRolesChangedEvent, DashboardTokenCreatedEvent } from '@standardnotes/domain-events'
 import { TimerInterface } from '@standardnotes/time'
 import * as dayjs from 'dayjs'
 import { inject, injectable } from 'inversify'
@@ -19,6 +19,17 @@ export class DomainEventFactory implements DomainEventFactoryInterface {
       createdAt: dayjs.utc().toDate(),
       payload: {
         userUuid,
+      },
+    }
+  }
+
+  createDashboardTokenCreatedEvent(token: string, email: string): DashboardTokenCreatedEvent {
+    return {
+      type: 'DASHBOARD_TOKEN_CREATED',
+      createdAt: dayjs.utc().toDate(),
+      payload: {
+        token,
+        email,
       },
     }
   }

@@ -708,10 +708,10 @@
     sqs-consumer "^5.5.0"
     winston "^3.3.3"
 
-"@standardnotes/domain-events@2.2.2":
-  version "2.2.2"
-  resolved "https://registry.yarnpkg.com/@standardnotes/domain-events/-/domain-events-2.2.2.tgz#89d1a8c5ec71e8e244d62010b88ed2edaac9bdf9"
-  integrity sha512-Q38jkqK2RKM7NETAQLOjWT0UiOVsvsdaZTHGozN8J2WfWCdlmSX4mgNWX+WrwtprIdiT2uAyBwB6nY0Xpms8Pg==
+"@standardnotes/domain-events@2.3.0":
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/@standardnotes/domain-events/-/domain-events-2.3.0.tgz#534d51b0349aabb5dbd8b9fe44ac1ec4c9f1d238"
+  integrity sha512-QUyxnDhMpkB91WbgKLmgu6DmIAuROxEIZrZCO4ZXIiTjBOoDT7p+SVrx7OalaCLxY8dxw+gG+/FM/ExNNZ25ew==
   dependencies:
     "@standardnotes/auth" "^3.7.0"
 
