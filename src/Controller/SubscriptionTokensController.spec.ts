@@ -3,17 +3,17 @@ import 'reflect-metadata'
 import * as express from 'express'
 import { results } from 'inversify-express-utils'
 
-import { PurchaseTokensController } from './PurchaseTokensController'
+import { SubscriptionTokensController } from './SubscriptionTokensController'
 import { User } from '../Domain/User/User'
-import { CreatePurchaseToken } from '../Domain/UseCase/CreatePurchaseToken/CreatePurchaseToken'
-import { CreatePurchaseTokenResponse } from '../Domain/UseCase/CreatePurchaseToken/CreatePurchaseTokenResponse'
-import { AuthenticatePurchaseToken } from '../Domain/UseCase/AuthenticatePurchaseToken/AuthenticatePurchaseToken'
+import { CreateSubscriptionToken } from '../Domain/UseCase/CreateSubscriptionToken/CreateSubscriptionToken'
+import { CreateSubscriptionTokenResponse } from '../Domain/UseCase/CreateSubscriptionToken/CreateSubscriptionTokenResponse'
+import { AuthenticateSubscriptionToken } from '../Domain/UseCase/AuthenticateSubscriptionToken/AuthenticateSubscriptionToken'
 import { ProjectorInterface } from '../Projection/ProjectorInterface'
 import { Role } from '../Domain/Role/Role'
 
-describe('PurchaseTokensController', () => {
-  let createPurchaseToken: CreatePurchaseToken
-  let authenticateToken: AuthenticatePurchaseToken
+describe('SubscriptionTokensController', () => {
+  let createSubscriptionToken: CreateSubscriptionToken
+  let authenticateToken: AuthenticateSubscriptionToken
   const jwtSecret = 'auth_jwt_secret'
   const jwtTTL = 60
   let userProjector: ProjectorInterface<User>
@@ -24,8 +24,8 @@ describe('PurchaseTokensController', () => {
   let user: User
   let role: Role
 
-  const createController = () => new PurchaseTokensController(
-    createPurchaseToken,
+  const createController = () => new SubscriptionTokensController(
+    createSubscriptionToken,
     authenticateToken,
     userProjector,
     roleProjector,
@@ -38,14 +38,14 @@ describe('PurchaseTokensController', () => {
     user.uuid = '123'
     user.roles = Promise.resolve([ role ])
 
-    createPurchaseToken = {} as jest.Mocked<CreatePurchaseToken>
-    createPurchaseToken.execute = jest.fn().mockReturnValue({
-      purchaseToken: {
+    createSubscriptionToken = {} as jest.Mocked<CreateSubscriptionToken>
+    createSubscriptionToken.execute = jest.fn().mockReturnValue({
+      subscriptionToken: {
         token: 'test',
       },
-    } as jest.Mocked<CreatePurchaseTokenResponse>)
+    } as jest.Mocked<CreateSubscriptionTokenResponse>)
 
-    authenticateToken = {} as jest.Mocked<AuthenticatePurchaseToken>
+    authenticateToken = {} as jest.Mocked<AuthenticateSubscriptionToken>
     authenticateToken.execute = jest.fn().mockReturnValue({
       success: true,
       user,
@@ -68,7 +68,7 @@ describe('PurchaseTokensController', () => {
     } as jest.Mocked<express.Response>
   })
 
-  it('should create an purchase token for authenticated user', async () => {
+  it('should create an subscription token for authenticated user', async () => {
     response.locals.user =  {
       uuid: '1-2-3',
     }
@@ -76,14 +76,14 @@ describe('PurchaseTokensController', () => {
     const httpResponse = <results.JsonResult> await createController().createToken(request, response)
     const result = await httpResponse.executeAsync()
 
-    expect(createPurchaseToken.execute).toHaveBeenCalledWith({
+    expect(createSubscriptionToken.execute).toHaveBeenCalledWith({
       userUuid: '1-2-3',
     })
 
     expect(result.statusCode).toEqual(200)
   })
 
-  it('should validate an purchase token for user', async () => {
+  it('should validate an subscription token for user', async () => {
     request.params.token = 'test'
 
     const httpResponse = <results.JsonResult> await createController().validate(request)
@@ -96,7 +96,7 @@ describe('PurchaseTokensController', () => {
     expect(result.statusCode).toEqual(200)
   })
 
-  it('should not validate an purchase token for user if it is invalid', async () => {
+  it('should not validate an subscription token for user if it is invalid', async () => {
     request.params.token = 'test'
 
     authenticateToken.execute = jest.fn().mockReturnValue({

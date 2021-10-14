@@ -16,7 +16,7 @@ const TYPES = {
   WebSocketsConnectionRepository: Symbol.for('WebSocketsConnectionRepository'),
   UserSubscriptionRepository: Symbol.for('UserSubscriptionRepository'),
   OfflineUserSubscriptionRepository: Symbol.for('OfflineUserSubscriptionRepository'),
-  PurchaseTokenRepository: Symbol.for('PurchaseTokenRepository'),
+  SubscriptionTokenRepository: Symbol.for('SubscriptionTokenRepository'),
   // Middleware
   AuthMiddleware: Symbol.for('AuthMiddleware'),
   ApiGatewayAuthMiddleware: Symbol.for('ApiGatewayAuthMiddleware'),
@@ -85,8 +85,8 @@ const TYPES = {
   AddWebSocketsConnection: Symbol.for('AddWebSocketsConnection'),
   RemoveWebSocketsConnection: Symbol.for('RemoveWebSocketsConnection'),
   GetUserSubscription: Symbol.for('GetUserSubscription'),
-  CreatePurchaseToken: Symbol.for('CreatePurchaseToken'),
-  AuthenticatePurchaseToken: Symbol.for('AuthenticatePurchaseToken'),
+  CreateSubscriptionToken: Symbol.for('CreateSubscriptionToken'),
+  AuthenticateSubscriptionToken: Symbol.for('AuthenticateSubscriptionToken'),
   // Handlers
   UserRegisteredEventHandler: Symbol.for('UserRegisteredEventHandler'),
   AccountDeletionRequestedEventHandler: Symbol.for('AccountDeletionRequestedEventHandler'),

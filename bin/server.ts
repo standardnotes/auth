@@ -12,7 +12,7 @@ import '../src/Controller/FeaturesController'
 import '../src/Controller/WebSocketsController'
 import '../src/Controller/AdminController'
 import '../src/Controller/InternalController'
-import '../src/Controller/PurchaseTokensController'
+import '../src/Controller/SubscriptionTokensController'
 import '../src/Controller/OfflineController'
 
 import * as cors from 'cors'

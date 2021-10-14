@@ -2,24 +2,24 @@ import 'reflect-metadata'
 
 import { SnCryptoNode } from '@standardnotes/sncrypto-node'
 import { TimerInterface } from '@standardnotes/time'
-import { PurchaseTokenRepositoryInterface } from '../../Subscription/PurchaseTokenRepositoryInterface'
+import { SubscriptionTokenRepositoryInterface } from '../../Subscription/SubscriptionTokenRepositoryInterface'
 
-import { CreatePurchaseToken } from './CreatePurchaseToken'
+import { CreateSubscriptionToken } from './CreateSubscriptionToken'
 
-describe('CreatePurchaseToken', () => {
-  let purchaseTokenRepository: PurchaseTokenRepositoryInterface
+describe('CreateSubscriptionToken', () => {
+  let subscriptionTokenRepository: SubscriptionTokenRepositoryInterface
   let cryptoNode: SnCryptoNode
   let timer: TimerInterface
 
-  const createUseCase = () => new CreatePurchaseToken(
-    purchaseTokenRepository,
+  const createUseCase = () => new CreateSubscriptionToken(
+    subscriptionTokenRepository,
     cryptoNode,
     timer,
   )
 
   beforeEach(() => {
-    purchaseTokenRepository = {} as jest.Mocked<PurchaseTokenRepositoryInterface>
-    purchaseTokenRepository.save = jest.fn()
+    subscriptionTokenRepository = {} as jest.Mocked<SubscriptionTokenRepositoryInterface>
+    subscriptionTokenRepository.save = jest.fn()
 
     cryptoNode = {} as jest.Mocked<SnCryptoNode>
     cryptoNode.generateRandomKey = jest.fn().mockReturnValueOnce('random-string')
@@ -29,12 +29,12 @@ describe('CreatePurchaseToken', () => {
     timer.getUTCDateNDaysAhead = jest.fn().mockReturnValue(new Date(1))
   })
 
-  it('should create an purchase token and persist it', async () => {
+  it('should create an subscription token and persist it', async () => {
     await createUseCase().execute({
       userUuid: '1-2-3',
     })
 
-    expect(purchaseTokenRepository.save).toHaveBeenCalledWith({
+    expect(subscriptionTokenRepository.save).toHaveBeenCalledWith({
       userUuid: '1-2-3',
       token: 'random-string',
       expiresAt: 1,
