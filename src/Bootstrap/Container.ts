@@ -1,7 +1,6 @@
 import * as winston from 'winston'
 import * as IORedis from 'ioredis'
 import * as AWS from 'aws-sdk'
-import * as newrelic from 'newrelic'
 import { Container } from 'inversify'
 import {
   DomainEventHandlerInterface,
@@ -121,8 +120,6 @@ import { OfflineSubscriptionTokenRepositoryInterface } from '../Domain/Auth/Offl
 import { RedisOfflineSubscriptionTokenRepository } from '../Infra/Redis/RedisOfflineSubscriptionTokenRepository'
 import { CreateOfflineSubscriptionToken } from '../Domain/UseCase/CreateOfflineSubscriptionToken/CreateOfflineSubscriptionToken'
 import { AuthenticateOfflineSubscriptionToken } from '../Domain/UseCase/AuthenticateOfflineSubscriptionToken/AuthenticateOfflineSubscriptionToken'
-import { StatisticCollectorInterface } from '../Domain/Statistic/StatisticCollectorInterface'
-import { NewRelicStatisticCollector } from '../Infra/NewRelic/NewRelicStatisticCollector'
 
 export class ContainerConfigLoader {
   async load(): Promise<Container> {
@@ -332,7 +329,6 @@ export class ContainerConfigLoader {
     container.bind<RoleToSubscriptionMapInterface>(TYPES.RoleToSubscriptionMap).to(RoleToSubscriptionMap)
     container.bind<FeatureServiceInterface>(TYPES.FeatureService).to(FeatureService)
     container.bind<PaymentsHttpServiceInterface>(TYPES.PaymentsHttpService).to(PaymentsHttpService)
-    container.bind<StatisticCollectorInterface>(TYPES.StatisticCollector).to(NewRelicStatisticCollector)
 
     if (env.get('SNS_TOPIC_ARN', true)) {
       container.bind<SNSDomainEventPublisher>(TYPES.DomainEventPublisher).toConstantValue(
@@ -386,9 +382,6 @@ export class ContainerConfigLoader {
         )
       )
     }
-
-    // Functions
-    container.bind<(eventType: string, attributes: { [keys: string]: boolean | number | string }) => void>(TYPES.StatisticRecordingFunction).toConstantValue(newrelic.recordCustomEvent)
 
     return container
   }
