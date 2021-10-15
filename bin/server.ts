@@ -12,6 +12,8 @@ import '../src/Controller/FeaturesController'
 import '../src/Controller/WebSocketsController'
 import '../src/Controller/AdminController'
 import '../src/Controller/InternalController'
+import '../src/Controller/SubscriptionTokensController'
+import '../src/Controller/OfflineController'
 
 import * as cors from 'cors'
 import { urlencoded, json, Request, Response, NextFunction } from 'express'

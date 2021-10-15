@@ -1,4 +1,5 @@
 import 'reflect-metadata'
+
 import { RevokedSession } from '../Session/RevokedSession'
 import { Session } from '../Session/Session'
 import { SessionServiceInterace } from '../Session/SessionServiceInterface'
@@ -34,11 +35,11 @@ describe('AuthenticationMethodResolver', () => {
     sessionService.markRevokedSessionAsReceived = jest.fn().mockReturnValue(revokedSession)
 
     tokenDecoder = {} as jest.Mocked<TokenDecoderInterface>
-    tokenDecoder.decode = jest.fn()
+    tokenDecoder.decodeSessionToken = jest.fn()
   })
 
   it('should resolve jwt authentication method', async () => {
-    tokenDecoder.decode = jest.fn().mockReturnValue({ user_uuid: '123' })
+    tokenDecoder.decodeSessionToken = jest.fn().mockReturnValue({ user_uuid: '123' })
 
     expect(await createResolver().resolve('test')).toEqual({
       claims: {

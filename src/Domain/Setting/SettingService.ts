@@ -3,6 +3,7 @@ import { inject, injectable } from 'inversify'
 import { Logger } from 'winston'
 import TYPES from '../../Bootstrap/Types'
 import { CrypterInterface } from '../Encryption/CrypterInterface'
+import { EncryptionVersion } from '../Encryption/EncryptionVersion'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { CreateOrReplaceSettingDto } from './CreateOrReplaceSettingDto'
 import { CreateOrReplaceSettingResponse } from './CreateOrReplaceSettingResponse'
@@ -35,7 +36,7 @@ export class SettingService implements SettingServiceInterface {
       return undefined
     }
 
-    if (setting.value !== null && setting.serverEncryptionVersion === Setting.ENCRYPTION_VERSION_DEFAULT) {
+    if (setting.value !== null && setting.serverEncryptionVersion === EncryptionVersion.Default) {
       const user = await this.userRepository.findOneByUuid(dto.userUuid)
 
       if (user === undefined) {

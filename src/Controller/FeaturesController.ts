@@ -18,7 +18,7 @@ export class FeaturesController extends BaseHttpController {
     super()
   }
 
-  @httpGet('/', TYPES.AuthMiddleware)
+  @httpGet('/', TYPES.ApiGatewayAuthMiddleware)
   async getFeatures(request: Request, response: Response): Promise<results.JsonResult> {
     if (request.params.userUuid !== response.locals.user.uuid) {
       return this.json({
@@ -30,6 +30,7 @@ export class FeaturesController extends BaseHttpController {
 
     const result = await this.doGetUserFeatures.execute({
       userUuid: request.params.userUuid,
+      offline: false,
     })
 
     if (result.success) {

@@ -12,10 +12,14 @@ import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { UserSubscriptionRepositoryInterface } from '../Subscription/UserSubscriptionRepositoryInterface'
 import { SubscriptionPurchasedEventHandler } from './SubscriptionPurchasedEventHandler'
 import { UserSubscription } from '../Subscription/UserSubscription'
+import { OfflineUserSubscriptionRepositoryInterface } from '../Subscription/OfflineUserSubscriptionRepositoryInterface'
+import { OfflineUserSubscription } from '../Subscription/OfflineUserSubscription'
 
 describe('SubscriptionPurchasedEventHandler', () => {
   let userRepository: UserRepositoryInterface
   let userSubscriptionRepository: UserSubscriptionRepositoryInterface
+  let offlineUserSubscription: OfflineUserSubscription
+  let offlineUserSubscriptionRepository: OfflineUserSubscriptionRepositoryInterface
   let roleService: RoleServiceInterface
   let logger: Logger
   let user: User
@@ -27,6 +31,7 @@ describe('SubscriptionPurchasedEventHandler', () => {
   const createHandler = () => new SubscriptionPurchasedEventHandler(
     userRepository,
     userSubscriptionRepository,
+    offlineUserSubscriptionRepository,
     roleService,
     logger
   )
@@ -48,8 +53,14 @@ describe('SubscriptionPurchasedEventHandler', () => {
     userSubscriptionRepository = {} as jest.Mocked<UserSubscriptionRepositoryInterface>
     userSubscriptionRepository.save = jest.fn().mockReturnValue(subscription)
 
+    offlineUserSubscription = {} as jest.Mocked<OfflineUserSubscription>
+
+    offlineUserSubscriptionRepository = {} as jest.Mocked<OfflineUserSubscriptionRepositoryInterface>
+    offlineUserSubscriptionRepository.save = jest.fn().mockReturnValue(offlineUserSubscription)
+
     roleService = {} as jest.Mocked<RoleServiceInterface>
     roleService.addUserRole = jest.fn()
+    roleService.addOfflineUserRole = jest.fn()
 
     subscriptionExpiresAt = timestamp + 365*1000
 
@@ -60,6 +71,7 @@ describe('SubscriptionPurchasedEventHandler', () => {
       subscriptionName: SubscriptionName.ProPlan,
       subscriptionExpiresAt,
       timestamp: dayjs.utc().valueOf(),
+      offline: false,
     }
 
     logger = {} as jest.Mocked<Logger>
@@ -74,6 +86,14 @@ describe('SubscriptionPurchasedEventHandler', () => {
     expect(roleService.addUserRole).toHaveBeenCalledWith(user, SubscriptionName.ProPlan)
   })
 
+  it('should update the offline user role', async () => {
+    event.payload.offline = true
+
+    await createHandler().handle(event)
+
+    expect(roleService.addOfflineUserRole).toHaveBeenCalledWith('test@test.com', SubscriptionName.ProPlan)
+  })
+
   it('should create subscription', async () => {
     await createHandler().handle(event)
 
@@ -86,6 +106,23 @@ describe('SubscriptionPurchasedEventHandler', () => {
       userSubscriptionRepository.save
     ).toHaveBeenCalledWith({
       ...subscription,
+      createdAt: expect.any(Number),
+      updatedAt: expect.any(Number),
+      cancelled: false,
+    })
+  })
+
+  it('should create an offline subscription', async () => {
+    event.payload.offline = true
+
+    await createHandler().handle(event)
+
+    expect(
+      offlineUserSubscriptionRepository.save
+    ).toHaveBeenCalledWith({
+      endsAt: subscriptionExpiresAt,
+      planName: 'PRO_PLAN',
+      email: 'test@test.com',
       createdAt: expect.any(Number),
       updatedAt: expect.any(Number),
       cancelled: false,

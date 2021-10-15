@@ -101,6 +101,25 @@ import { SubscriptionReassignedEventHandler } from '../Domain/Handler/Subscripti
 import { UserSubscriptionRepositoryInterface } from '../Domain/Subscription/UserSubscriptionRepositoryInterface'
 import { PaymentsHttpServiceInterface } from '../Domain/Subscription/PaymentsHttpServiceInterface'
 import { PaymentsHttpService } from '../Infra/HTTP/PaymentsHttpService'
+import { CreateSubscriptionToken } from '../Domain/UseCase/CreateSubscriptionToken/CreateSubscriptionToken'
+import { ApiGatewayAuthMiddleware } from '../Controller/ApiGatewayAuthMiddleware'
+import { SubscriptionTokenRepositoryInterface } from '../Domain/Subscription/SubscriptionTokenRepositoryInterface'
+import { RedisSubscriptionTokenRepository } from '../Infra/Redis/RedisSubscriptionTokenRepository'
+import { AuthenticateSubscriptionToken } from '../Domain/UseCase/AuthenticateSubscriptionToken/AuthenticateSubscriptionToken'
+import { OfflineSetting } from '../Domain/Setting/OfflineSetting'
+import { OfflineSettingServiceInterface } from '../Domain/Setting/OfflineSettingServiceInterface'
+import { OfflineSettingService } from '../Domain/Setting/OfflineSettingService'
+import { OfflineSettingRepositoryInterface } from '../Domain/Setting/OfflineSettingRepositoryInterface'
+import { SettingRepositoryInterface } from '../Domain/Setting/SettingRepositoryInterface'
+import { MySQLOfflineSettingRepository } from '../Infra/MySQL/MySQLOfflineSettingRepository'
+import { OfflineUserSubscription } from '../Domain/Subscription/OfflineUserSubscription'
+import { OfflineUserSubscriptionRepositoryInterface } from '../Domain/Subscription/OfflineUserSubscriptionRepositoryInterface'
+import { MySQLOfflineUserSubscriptionRepository } from '../Infra/MySQL/MySQLOfflineUserSubscriptionRepository'
+import { OfflineUserAuthMiddleware } from '../Controller/OfflineUserAuthMiddleware'
+import { OfflineSubscriptionTokenRepositoryInterface } from '../Domain/Auth/OfflineSubscriptionTokenRepositoryInterface'
+import { RedisOfflineSubscriptionTokenRepository } from '../Infra/Redis/RedisOfflineSubscriptionTokenRepository'
+import { CreateOfflineSubscriptionToken } from '../Domain/UseCase/CreateOfflineSubscriptionToken/CreateOfflineSubscriptionToken'
+import { AuthenticateOfflineSubscriptionToken } from '../Domain/UseCase/AuthenticateOfflineSubscriptionToken/AuthenticateOfflineSubscriptionToken'
 
 export class ContainerConfigLoader {
   async load(): Promise<Container> {
@@ -133,11 +152,13 @@ export class ContainerConfigLoader {
       entities: [
         User,
         UserSubscription,
+        OfflineUserSubscription,
         Session,
         RevokedSession,
         Role,
         Permission,
         Setting,
+        OfflineSetting,
       ],
       migrations: [
         env.get('DB_MIGRATIONS_PATH'),
@@ -188,18 +209,24 @@ export class ContainerConfigLoader {
     container.bind<MySQLSessionRepository>(TYPES.SessionRepository).toConstantValue(connection.getCustomRepository(MySQLSessionRepository))
     container.bind<MySQLRevokedSessionRepository>(TYPES.RevokedSessionRepository).toConstantValue(connection.getCustomRepository(MySQLRevokedSessionRepository))
     container.bind<MySQLUserRepository>(TYPES.UserRepository).toConstantValue(connection.getCustomRepository(MySQLUserRepository))
-    container.bind<MySQLSettingRepository>(TYPES.SettingRepository).toConstantValue(connection.getCustomRepository(MySQLSettingRepository))
+    container.bind<SettingRepositoryInterface>(TYPES.SettingRepository).toConstantValue(connection.getCustomRepository(MySQLSettingRepository))
+    container.bind<OfflineSettingRepositoryInterface>(TYPES.OfflineSettingRepository).toConstantValue(connection.getCustomRepository(MySQLOfflineSettingRepository))
     container.bind<MySQLRoleRepository>(TYPES.RoleRepository).toConstantValue(connection.getCustomRepository(MySQLRoleRepository))
     container.bind<UserSubscriptionRepositoryInterface>(TYPES.UserSubscriptionRepository).toConstantValue(connection.getCustomRepository(MySQLUserSubscriptionRepository))
+    container.bind<OfflineUserSubscriptionRepositoryInterface>(TYPES.OfflineUserSubscriptionRepository).toConstantValue(connection.getCustomRepository(MySQLOfflineUserSubscriptionRepository))
     container.bind<RedisEphemeralSessionRepository>(TYPES.EphemeralSessionRepository).to(RedisEphemeralSessionRepository)
     container.bind<LockRepository>(TYPES.LockRepository).to(LockRepository)
     container.bind<WebSocketsConnectionRepositoryInterface>(TYPES.WebSocketsConnectionRepository).to(RedisWebSocketsConnectionRepository)
+    container.bind<SubscriptionTokenRepositoryInterface>(TYPES.SubscriptionTokenRepository).to(RedisSubscriptionTokenRepository)
+    container.bind<OfflineSubscriptionTokenRepositoryInterface>(TYPES.OfflineSubscriptionTokenRepository).to(RedisOfflineSubscriptionTokenRepository)
 
     // Middleware
     container.bind<AuthMiddleware>(TYPES.AuthMiddleware).to(AuthMiddleware)
     container.bind<SessionMiddleware>(TYPES.SessionMiddleware).to(SessionMiddleware)
     container.bind<LockMiddleware>(TYPES.LockMiddleware).to(LockMiddleware)
     container.bind<AuthMiddlewareWithoutResponse>(TYPES.AuthMiddlewareWithoutResponse).to(AuthMiddlewareWithoutResponse)
+    container.bind<ApiGatewayAuthMiddleware>(TYPES.ApiGatewayAuthMiddleware).to(ApiGatewayAuthMiddleware)
+    container.bind<OfflineUserAuthMiddleware>(TYPES.OfflineUserAuthMiddleware).to(OfflineUserAuthMiddleware)
 
     // Projectors
     container.bind<SessionProjector>(TYPES.SessionProjector).to(SessionProjector)
@@ -264,6 +291,10 @@ export class ContainerConfigLoader {
     container.bind<AddWebSocketsConnection>(TYPES.AddWebSocketsConnection).to(AddWebSocketsConnection)
     container.bind<RemoveWebSocketsConnection>(TYPES.RemoveWebSocketsConnection).to(RemoveWebSocketsConnection)
     container.bind<GetUserSubscription>(TYPES.GetUserSubscription).to(GetUserSubscription)
+    container.bind<CreateSubscriptionToken>(TYPES.CreateSubscriptionToken).to(CreateSubscriptionToken)
+    container.bind<AuthenticateSubscriptionToken>(TYPES.AuthenticateSubscriptionToken).to(AuthenticateSubscriptionToken)
+    container.bind<AuthenticateOfflineSubscriptionToken>(TYPES.AuthenticateOfflineSubscriptionToken).to(AuthenticateOfflineSubscriptionToken)
+    container.bind<CreateOfflineSubscriptionToken>(TYPES.CreateOfflineSubscriptionToken).to(CreateOfflineSubscriptionToken)
 
     // Handlers
     container.bind<UserRegisteredEventHandler>(TYPES.UserRegisteredEventHandler).to(UserRegisteredEventHandler)
@@ -289,6 +320,7 @@ export class ContainerConfigLoader {
     container.bind<AxiosInstance>(TYPES.HTTPClient).toConstantValue(axios.create())
     container.bind<CrypterInterface>(TYPES.Crypter).to(CrypterNode)
     container.bind<SettingServiceInterface>(TYPES.SettingService).to(SettingService)
+    container.bind<OfflineSettingServiceInterface>(TYPES.OfflineSettingService).to(OfflineSettingService)
     container.bind<SnCryptoNode>(TYPES.SnCryptoNode).toConstantValue(new SnCryptoNode())
     container.bind<TimerInterface>(TYPES.Timer).toConstantValue(new Timer())
     container.bind<ContentDecoderInterface>(TYPES.ContenDecoder).to(ContentDecoder)

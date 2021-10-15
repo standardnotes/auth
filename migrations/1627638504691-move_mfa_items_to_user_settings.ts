@@ -4,6 +4,7 @@ import { MigrationInterface, QueryRunner } from 'typeorm'
 
 import { Setting } from '../src/Domain/Setting/Setting'
 import { User } from '../src/Domain/User/User'
+import { EncryptionVersion } from '../src/Domain/Encryption/EncryptionVersion'
 
 export class moveMfaItemsToUserSettings1627638504691 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
@@ -35,7 +36,7 @@ export class moveMfaItemsToUserSettings1627638504691 implements MigrationInterfa
         setting.value = null
         usersMFAStatus.set(item['user_uuid'], 0)
       }
-      setting.serverEncryptionVersion = Setting.ENCRYPTION_VERSION_UNENCRYPTED
+      setting.serverEncryptionVersion = EncryptionVersion.Unencrypted
       setting.createdAt = item['created_at_timestamp']
       setting.updatedAt = item['updated_at_timestamp']
       setting.user = Promise.resolve(user)

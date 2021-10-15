@@ -15,15 +15,22 @@ export class GetUserFeatures implements UseCaseInterface {
   }
 
   async execute(dto: GetUserFeaturesDto): Promise<GetUserFeaturesResponse> {
-    const { userUuid } = dto
+    if (dto.offline) {
+      const userFeatures = await this.featureService.getFeaturesForOfflineUser(dto.email, dto.offlineFeaturesToken)
 
-    const user = await this.userRepository.findOneByUuid(userUuid)
+      return {
+        success: true,
+        features: userFeatures,
+      }
+    }
+
+    const user = await this.userRepository.findOneByUuid(dto.userUuid)
 
     if (user === undefined) {
       return {
         success: false,
         error: {
-          message: `User ${userUuid} not found.`,
+          message: `User ${dto.userUuid} not found.`,
         },
       }
     }
@@ -32,7 +39,7 @@ export class GetUserFeatures implements UseCaseInterface {
 
     return {
       success: true,
-      userUuid,
+      userUuid: dto.userUuid,
       features: userFeatures,
     }
   }

@@ -11,10 +11,12 @@ import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { SubscriptionRefundedEventHandler } from './SubscriptionRefundedEventHandler'
 import { UserSubscriptionRepositoryInterface } from '../Subscription/UserSubscriptionRepositoryInterface'
 import { RoleServiceInterface } from '../Role/RoleServiceInterface'
+import { OfflineUserSubscriptionRepositoryInterface } from '../Subscription/OfflineUserSubscriptionRepositoryInterface'
 
 describe('SubscriptionRefundedEventHandler', () => {
   let userRepository: UserRepositoryInterface
   let userSubscriptionRepository: UserSubscriptionRepositoryInterface
+  let offlineUserSubscriptionRepository: OfflineUserSubscriptionRepositoryInterface
   let roleService: RoleServiceInterface
   let logger: Logger
   let user: User
@@ -24,6 +26,7 @@ describe('SubscriptionRefundedEventHandler', () => {
   const createHandler = () => new SubscriptionRefundedEventHandler(
     userRepository,
     userSubscriptionRepository,
+    offlineUserSubscriptionRepository,
     roleService,
     logger
   )
@@ -44,8 +47,12 @@ describe('SubscriptionRefundedEventHandler', () => {
     userSubscriptionRepository = {} as jest.Mocked<UserSubscriptionRepositoryInterface>
     userSubscriptionRepository.updateEndsAtByNameAndUserUuid = jest.fn()
 
+    offlineUserSubscriptionRepository = {} as jest.Mocked<OfflineUserSubscriptionRepositoryInterface>
+    offlineUserSubscriptionRepository.updateEndsAtByNameAndEmail = jest.fn()
+
     roleService = {} as jest.Mocked<RoleServiceInterface>
     roleService.removeUserRole = jest.fn()
+    roleService.removeOfflineUserRole = jest.fn()
 
     timestamp = dayjs.utc().valueOf()
 
@@ -55,6 +62,7 @@ describe('SubscriptionRefundedEventHandler', () => {
       userEmail: 'test@test.com',
       subscriptionName: SubscriptionName.CorePlan,
       timestamp,
+      offline: false,
     }
 
     logger = {} as jest.Mocked<Logger>
@@ -69,6 +77,14 @@ describe('SubscriptionRefundedEventHandler', () => {
     expect(roleService.removeUserRole).toHaveBeenCalledWith(user, SubscriptionName.CorePlan)
   })
 
+  it('should update the offline user role', async () => {
+    event.payload.offline = true
+
+    await createHandler().handle(event)
+
+    expect(roleService.removeOfflineUserRole).toHaveBeenCalledWith('test@test.com', SubscriptionName.CorePlan)
+  })
+
   it('should update subscription ends at', async () => {
     await createHandler().handle(event)
 
@@ -78,6 +94,21 @@ describe('SubscriptionRefundedEventHandler', () => {
     ).toHaveBeenCalledWith(
       SubscriptionName.CorePlan,
       '123',
+      timestamp,
+      timestamp,
+    )
+  })
+
+  it('should update offline subscription ends at', async () => {
+    event.payload.offline = true
+
+    await createHandler().handle(event)
+
+    expect(
+      offlineUserSubscriptionRepository.updateEndsAtByNameAndEmail
+    ).toHaveBeenCalledWith(
+      SubscriptionName.CorePlan,
+      'test@test.com',
       timestamp,
       timestamp,
     )

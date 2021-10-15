@@ -11,7 +11,7 @@ import {
   results,
 } from 'inversify-express-utils'
 import TYPES from '../Bootstrap/Types'
-import { Setting } from '../Domain/Setting/Setting'
+import { EncryptionVersion } from '../Domain/Encryption/EncryptionVersion'
 import { DeleteSetting } from '../Domain/UseCase/DeleteSetting/DeleteSetting'
 import { GetSetting } from '../Domain/UseCase/GetSetting/GetSetting'
 import { GetSettings } from '../Domain/UseCase/GetSettings/GetSettings'
@@ -28,7 +28,7 @@ export class SettingsController extends BaseHttpController {
     super()
   }
 
-  @httpGet('/settings', TYPES.AuthMiddleware)
+  @httpGet('/settings', TYPES.ApiGatewayAuthMiddleware)
   async getSettings(request: Request, response: Response): Promise<results.JsonResult> {
     if (request.params.userUuid !== response.locals.user.uuid) {
       return this.json({
@@ -85,7 +85,7 @@ export class SettingsController extends BaseHttpController {
     const {
       uuid,
       value,
-      serverEncryptionVersion = Setting.ENCRYPTION_VERSION_DEFAULT,
+      serverEncryptionVersion = EncryptionVersion.Default,
       createdAt,
       updatedAt,
     } = request.body
@@ -113,7 +113,7 @@ export class SettingsController extends BaseHttpController {
     return this.json(result, 400)
   }
 
-  @httpGet('/settings/:settingName', TYPES.AuthMiddleware)
+  @httpGet('/settings/:settingName', TYPES.ApiGatewayAuthMiddleware)
   async getSetting(request: Request, response: Response): Promise<results.JsonResult> {
     if (request.params.userUuid !== response.locals.user.uuid) {
       return this.json({
@@ -133,7 +133,7 @@ export class SettingsController extends BaseHttpController {
     return this.json(result, 400)
   }
 
-  @httpPut('/settings', TYPES.AuthMiddleware)
+  @httpPut('/settings', TYPES.ApiGatewayAuthMiddleware)
   async updateSetting(request: Request, response: Response): Promise<results.JsonResult | results.StatusCodeResult> {
     if (request.params.userUuid !== response.locals.user.uuid) {
       return this.json({
@@ -146,7 +146,7 @@ export class SettingsController extends BaseHttpController {
     const {
       name,
       value,
-      serverEncryptionVersion = Setting.ENCRYPTION_VERSION_DEFAULT,
+      serverEncryptionVersion = EncryptionVersion.Default,
       sensitive = false,
     } = request.body
 
@@ -170,7 +170,7 @@ export class SettingsController extends BaseHttpController {
     return this.json(result, 400)
   }
 
-  @httpDelete('/settings/:settingName', TYPES.AuthMiddleware)
+  @httpDelete('/settings/:settingName', TYPES.ApiGatewayAuthMiddleware)
   async deleteSetting(request: Request, response: Response): Promise<results.JsonResult> {
     if (request.params.userUuid !== response.locals.user.uuid) {
       return this.json({

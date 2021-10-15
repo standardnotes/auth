@@ -22,6 +22,7 @@ export class InternalController extends BaseHttpController {
   async getFeatures(request: Request): Promise<results.JsonResult> {
     const result = await this.doGetUserFeatures.execute({
       userUuid: request.params.userUuid,
+      offline: false,
     })
 
     if (result.success) {

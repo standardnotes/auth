@@ -2,6 +2,7 @@ import { SettingName } from '@standardnotes/settings'
 import 'reflect-metadata'
 import { Logger } from 'winston'
 import { CrypterInterface } from '../Encryption/CrypterInterface'
+import { EncryptionVersion } from '../Encryption/EncryptionVersion'
 import { User } from '../User/User'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { Setting } from './Setting'
@@ -109,7 +110,7 @@ describe('SettingService', () => {
   it('should find and decrypt the value of a setting for user', async () => {
     setting = {
       value: 'encrypted',
-      serverEncryptionVersion: Setting.ENCRYPTION_VERSION_DEFAULT,
+      serverEncryptionVersion: EncryptionVersion.Default,
     } as jest.Mocked<Setting>
 
     settingRepository.findLastByNameAndUserUuid = jest.fn().mockReturnValue(setting)
@@ -123,7 +124,7 @@ describe('SettingService', () => {
   it('should not find a setting for user if the user does not exist', async () => {
     setting = {
       value: 'encrypted',
-      serverEncryptionVersion: Setting.ENCRYPTION_VERSION_DEFAULT,
+      serverEncryptionVersion: EncryptionVersion.Default,
     } as jest.Mocked<Setting>
 
     settingRepository.findLastByNameAndUserUuid = jest.fn().mockReturnValue(setting)

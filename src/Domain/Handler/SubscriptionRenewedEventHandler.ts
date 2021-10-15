@@ -8,6 +8,7 @@ import { Logger } from 'winston'
 import TYPES from '../../Bootstrap/Types'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { UserSubscriptionRepositoryInterface } from '../Subscription/UserSubscriptionRepositoryInterface'
+import { OfflineUserSubscriptionRepositoryInterface } from '../Subscription/OfflineUserSubscriptionRepositoryInterface'
 
 @injectable()
 export class SubscriptionRenewedEventHandler
@@ -16,11 +17,24 @@ implements DomainEventHandlerInterface
   constructor(
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
     @inject(TYPES.UserSubscriptionRepository) private userSubscriptionRepository: UserSubscriptionRepositoryInterface,
+    @inject(TYPES.OfflineUserSubscriptionRepository) private offlineUserSubscriptionRepository: OfflineUserSubscriptionRepositoryInterface,
     @inject(TYPES.Logger) private logger: Logger
-  ) {}
+  ) {
+  }
+
   async handle(
     event: SubscriptionRenewedEvent
   ): Promise<void> {
+    if (event.payload.offline) {
+      await this.updateOfflineSubscriptionEndsAt(
+        event.payload.subscriptionName,
+        event.payload.userEmail,
+        event.payload.timestamp,
+      )
+
+      return
+    }
+
     const user = await this.userRepository.findOneByEmail(
       event.payload.userEmail
     )
@@ -50,6 +64,19 @@ implements DomainEventHandlerInterface
       subscriptionName,
       userUuid,
       subscriptionExpiresAt,
+      timestamp,
+    )
+  }
+
+  private async updateOfflineSubscriptionEndsAt(
+    subscriptionName: string,
+    email: string,
+    timestamp: number,
+  ): Promise<void> {
+    await this.offlineUserSubscriptionRepository.updateEndsAtByNameAndEmail(
+      subscriptionName,
+      email,
+      timestamp,
       timestamp,
     )
   }
