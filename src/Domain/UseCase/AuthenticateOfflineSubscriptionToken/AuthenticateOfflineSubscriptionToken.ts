@@ -1,22 +1,22 @@
 import { inject, injectable } from 'inversify'
 
 import TYPES from '../../../Bootstrap/Types'
-import { DashboardTokenRepositoryInterface } from '../../Auth/DashboardTokenRepositoryInterface'
+import { OfflineSubscriptionTokenRepositoryInterface } from '../../Auth/OfflineSubscriptionTokenRepositoryInterface'
 import { OfflineUserSubscriptionRepositoryInterface } from '../../Subscription/OfflineUserSubscriptionRepositoryInterface'
 import { UseCaseInterface } from '../UseCaseInterface'
-import { AuthenticateDashboardTokenDTO } from './AuthenticateDashboardTokenDTO'
-import { AuthenticateDashboardTokenResponse } from './AuthenticateDashboardTokenResponse'
+import { AuthenticateOfflineSubscriptionTokenDTO } from './AuthenticateOfflineSubscriptionTokenDTO'
+import { AuthenticateOfflineSubscriptionTokenResponse } from './AuthenticateOfflineSubscriptionTokenResponse'
 
 @injectable()
-export class AuthenticateDashboardToken implements UseCaseInterface {
+export class AuthenticateOfflineSubscriptionToken implements UseCaseInterface {
   constructor(
-    @inject(TYPES.DashboardTokenRepository) private dashboardTokenRepository: DashboardTokenRepositoryInterface,
+    @inject(TYPES.OfflineSubscriptionTokenRepository) private offlineSubscriptionTokenRepository: OfflineSubscriptionTokenRepositoryInterface,
     @inject(TYPES.OfflineUserSubscriptionRepository) private offlineUserSubscriptionRepository: OfflineUserSubscriptionRepositoryInterface,
   ){
   }
 
-  async execute(dto: AuthenticateDashboardTokenDTO): Promise<AuthenticateDashboardTokenResponse> {
-    const userEmail = await this.dashboardTokenRepository.getUserEmailByToken(dto.token)
+  async execute(dto: AuthenticateOfflineSubscriptionTokenDTO): Promise<AuthenticateOfflineSubscriptionTokenResponse> {
+    const userEmail = await this.offlineSubscriptionTokenRepository.getUserEmailByToken(dto.token)
     if (userEmail === undefined || userEmail !== dto.userEmail) {
       return {
         success: false,

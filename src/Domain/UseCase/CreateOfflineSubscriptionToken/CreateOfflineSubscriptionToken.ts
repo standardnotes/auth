@@ -4,16 +4,16 @@ import { TimerInterface } from '@standardnotes/time'
 import { inject, injectable } from 'inversify'
 
 import TYPES from '../../../Bootstrap/Types'
-import { DashboardTokenRepositoryInterface } from '../../Auth/DashboardTokenRepositoryInterface'
+import { OfflineSubscriptionTokenRepositoryInterface } from '../../Auth/OfflineSubscriptionTokenRepositoryInterface'
 import { DomainEventFactoryInterface } from '../../Event/DomainEventFactoryInterface'
 import { UseCaseInterface } from '../UseCaseInterface'
-import { CreateDashboardTokenDTO } from './CreateDashboardTokenDTO'
-import { CreateDashboardTokenResponse } from './CreateDashboardTokenResponse'
+import { CreateOfflineSubscriptionTokenDTO } from './CreateOfflineSubscriptionTokenDTO'
+import { CreateOfflineSubscriptionTokenResponse } from './CreateOfflineSubscriptionTokenResponse'
 
 @injectable()
-export class CreateDashboardToken implements UseCaseInterface {
+export class CreateOfflineSubscriptionToken implements UseCaseInterface {
   constructor(
-    @inject(TYPES.DashboardTokenRepository) private dashboardTokenRepository: DashboardTokenRepositoryInterface,
+    @inject(TYPES.OfflineSubscriptionTokenRepository) private offlineSubscriptionTokenRepository: OfflineSubscriptionTokenRepositoryInterface,
     @inject(TYPES.SnCryptoNode) private cryptoNode: SnCryptoNode,
     @inject(TYPES.DomainEventPublisher) private domainEventPublisher: DomainEventPublisherInterface,
     @inject(TYPES.DomainEventFactory) private domainEventFactory: DomainEventFactoryInterface,
@@ -21,10 +21,10 @@ export class CreateDashboardToken implements UseCaseInterface {
   ) {
   }
 
-  async execute(dto: CreateDashboardTokenDTO): Promise<CreateDashboardTokenResponse> {
+  async execute(dto: CreateOfflineSubscriptionTokenDTO): Promise<CreateOfflineSubscriptionTokenResponse> {
     const token = await this.cryptoNode.generateRandomKey(128)
 
-    const dashboardToken = {
+    const offlineSubscriptionToken = {
       userEmail: dto.userEmail,
       token,
       expiresAt: this.timer.convertStringDateToMicroseconds(
@@ -32,14 +32,14 @@ export class CreateDashboardToken implements UseCaseInterface {
       ),
     }
 
-    await this.dashboardTokenRepository.save(dashboardToken)
+    await this.offlineSubscriptionTokenRepository.save(offlineSubscriptionToken)
 
     await this.domainEventPublisher.publish(
-      this.domainEventFactory.createDashboardTokenCreatedEvent(token, dto.userEmail)
+      this.domainEventFactory.createOfflineSubscriptionTokenCreatedEvent(token, dto.userEmail)
     )
 
     return {
-      dashboardToken,
+      offlineSubscriptionToken,
     }
   }
 }

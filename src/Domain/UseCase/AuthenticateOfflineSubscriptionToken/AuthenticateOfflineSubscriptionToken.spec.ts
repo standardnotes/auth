@@ -1,20 +1,20 @@
 import 'reflect-metadata'
 
-import { DashboardTokenRepositoryInterface } from '../../Auth/DashboardTokenRepositoryInterface'
+import { OfflineSubscriptionTokenRepositoryInterface } from '../../Auth/OfflineSubscriptionTokenRepositoryInterface'
 
-import { AuthenticateDashboardToken } from './AuthenticateDashboardToken'
+import { AuthenticateOfflineSubscriptionToken } from './AuthenticateOfflineSubscriptionToken'
 import { OfflineUserSubscriptionRepositoryInterface } from '../../Subscription/OfflineUserSubscriptionRepositoryInterface'
 import { OfflineUserSubscription } from '../../Subscription/OfflineUserSubscription'
 
-describe('AuthenticateDashboardToken', () => {
-  let dashboardTokenRepository: DashboardTokenRepositoryInterface
+describe('AuthenticateOfflineSubscriptionToken', () => {
+  let offlineSubscriptionTokenRepository: OfflineSubscriptionTokenRepositoryInterface
   let offlineUserSubscriptionRepository: OfflineUserSubscriptionRepositoryInterface
 
-  const createUseCase = () => new AuthenticateDashboardToken(dashboardTokenRepository, offlineUserSubscriptionRepository)
+  const createUseCase = () => new AuthenticateOfflineSubscriptionToken(offlineSubscriptionTokenRepository, offlineUserSubscriptionRepository)
 
   beforeEach(() => {
-    dashboardTokenRepository = {} as jest.Mocked<DashboardTokenRepositoryInterface>
-    dashboardTokenRepository.getUserEmailByToken = jest.fn().mockReturnValue('test@test.com')
+    offlineSubscriptionTokenRepository = {} as jest.Mocked<OfflineSubscriptionTokenRepositoryInterface>
+    offlineSubscriptionTokenRepository.getUserEmailByToken = jest.fn().mockReturnValue('test@test.com')
 
     offlineUserSubscriptionRepository = {} as jest.Mocked<OfflineUserSubscriptionRepositoryInterface>
     offlineUserSubscriptionRepository.findByEmail = jest.fn().mockReturnValue([{} as jest.Mocked<OfflineUserSubscription>])
@@ -31,7 +31,7 @@ describe('AuthenticateDashboardToken', () => {
   })
 
   it('should not authenticate an dashboard token if it is not found', async () => {
-    dashboardTokenRepository.getUserEmailByToken = jest.fn().mockReturnValue(undefined)
+    offlineSubscriptionTokenRepository.getUserEmailByToken = jest.fn().mockReturnValue(undefined)
 
     const response = await createUseCase().execute({ token: 'test', userEmail: 'test@test.com' })
 

@@ -28,15 +28,15 @@ describe('DomainEventFactory', () => {
       })
   })
 
-  it('should create a DASHBOARD_TOKEN_CREATED event', () => {
-    expect(createFactory().createDashboardTokenCreatedEvent('1-2-3', 'test@test.te'))
+  it('should create a OFFLINE_SUBSCRIPTION_TOKEN_CREATED event', () => {
+    expect(createFactory().createOfflineSubscriptionTokenCreatedEvent('1-2-3', 'test@test.te'))
       .toEqual({
         createdAt: expect.any(Date),
         payload: {
           token: '1-2-3',
           email: 'test@test.te',
         },
-        type: 'DASHBOARD_TOKEN_CREATED',
+        type: 'OFFLINE_SUBSCRIPTION_TOKEN_CREATED',
       })
   })
 

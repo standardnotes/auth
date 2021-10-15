@@ -17,7 +17,7 @@ const TYPES = {
   UserSubscriptionRepository: Symbol.for('UserSubscriptionRepository'),
   OfflineUserSubscriptionRepository: Symbol.for('OfflineUserSubscriptionRepository'),
   SubscriptionTokenRepository: Symbol.for('SubscriptionTokenRepository'),
-  DashboardTokenRepository: Symbol.for('DashboardTokenRepository'),
+  OfflineSubscriptionTokenRepository: Symbol.for('OfflineSubscriptionTokenRepository'),
   // Middleware
   AuthMiddleware: Symbol.for('AuthMiddleware'),
   ApiGatewayAuthMiddleware: Symbol.for('ApiGatewayAuthMiddleware'),
@@ -88,8 +88,8 @@ const TYPES = {
   GetUserSubscription: Symbol.for('GetUserSubscription'),
   CreateSubscriptionToken: Symbol.for('CreateSubscriptionToken'),
   AuthenticateSubscriptionToken: Symbol.for('AuthenticateSubscriptionToken'),
-  CreateDashboardToken: Symbol.for('CreateDashboardToken'),
-  AuthenticateDashboardToken: Symbol.for('AuthenticateDashboardToken'),
+  CreateOfflineSubscriptionToken: Symbol.for('CreateOfflineSubscriptionToken'),
+  AuthenticateOfflineSubscriptionToken: Symbol.for('AuthenticateOfflineSubscriptionToken'),
   // Handlers
   UserRegisteredEventHandler: Symbol.for('UserRegisteredEventHandler'),
   AccountDeletionRequestedEventHandler: Symbol.for('AccountDeletionRequestedEventHandler'),

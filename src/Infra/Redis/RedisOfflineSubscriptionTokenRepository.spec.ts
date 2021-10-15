@@ -3,14 +3,14 @@ import 'reflect-metadata'
 import * as IORedis from 'ioredis'
 import { TimerInterface } from '@standardnotes/time'
 
-import { RedisDashboardTokenRepository } from './RedisDashboardTokenRepository'
-import { DashboardToken } from '../../Domain/Auth/DashboardToken'
+import { RedisOfflineSubscriptionTokenRepository } from './RedisOfflineSubscriptionTokenRepository'
+import { OfflineSubscriptionToken } from '../../Domain/Auth/OfflineSubscriptionToken'
 
-describe('RedisDashboardTokenRepository', () => {
+describe('RedisOfflineSubscriptionTokenRepository', () => {
   let redisClient: IORedis.Redis
   let timer: TimerInterface
 
-  const createRepository = () => new RedisDashboardTokenRepository(redisClient, timer)
+  const createRepository = () => new RedisOfflineSubscriptionTokenRepository(redisClient, timer)
 
   beforeEach(() => {
     redisClient = {} as jest.Mocked<IORedis.Redis>
@@ -28,7 +28,7 @@ describe('RedisDashboardTokenRepository', () => {
     expect(await createRepository().getUserEmailByToken('random-string')).toEqual('test@test.com')
 
     expect(redisClient.get).toHaveBeenCalledWith(
-      'dashboard-token:random-string',
+      'offline-subscription-token:random-string',
     )
   })
 
@@ -38,26 +38,26 @@ describe('RedisDashboardTokenRepository', () => {
     expect(await createRepository().getUserEmailByToken('random-string')).toBeUndefined()
 
     expect(redisClient.get).toHaveBeenCalledWith(
-      'dashboard-token:random-string',
+      'offline-subscription-token:random-string',
     )
   })
 
   it('should save an dashboard token', async () => {
-    const dashboardToken: DashboardToken = {
+    const offlineSubscriptionToken: OfflineSubscriptionToken = {
       userEmail: 'test@test.com',
       token: 'random-string',
       expiresAt: 123,
     }
 
-    await createRepository().save(dashboardToken)
+    await createRepository().save(offlineSubscriptionToken)
 
     expect(redisClient.set).toHaveBeenCalledWith(
-      'dashboard-token:random-string',
+      'offline-subscription-token:random-string',
       'test@test.com',
     )
 
     expect(redisClient.expireat).toHaveBeenCalledWith(
-      'dashboard-token:random-string',
+      'offline-subscription-token:random-string',
       1,
     )
   })

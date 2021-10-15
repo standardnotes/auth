@@ -2,21 +2,21 @@ import 'reflect-metadata'
 
 import { SnCryptoNode } from '@standardnotes/sncrypto-node'
 import { TimerInterface } from '@standardnotes/time'
-import { DashboardTokenRepositoryInterface } from '../../Auth/DashboardTokenRepositoryInterface'
+import { OfflineSubscriptionTokenRepositoryInterface } from '../../Auth/OfflineSubscriptionTokenRepositoryInterface'
 
-import { CreateDashboardToken } from './CreateDashboardToken'
-import { DomainEventPublisherInterface, DashboardTokenCreatedEvent } from '@standardnotes/domain-events'
+import { CreateOfflineSubscriptionToken } from './CreateOfflineSubscriptionToken'
+import { DomainEventPublisherInterface, OfflineSubscriptionTokenCreatedEvent } from '@standardnotes/domain-events'
 import { DomainEventFactoryInterface } from '../../Event/DomainEventFactoryInterface'
 
-describe('CreateDashboardToken', () => {
-  let dashboardTokenRepository: DashboardTokenRepositoryInterface
+describe('CreateOfflineSubscriptionToken', () => {
+  let offlineSubscriptionTokenRepository: OfflineSubscriptionTokenRepositoryInterface
   let cryptoNode: SnCryptoNode
   let domainEventPublisher: DomainEventPublisherInterface
   let domainEventFactory: DomainEventFactoryInterface
   let timer: TimerInterface
 
-  const createUseCase = () => new CreateDashboardToken(
-    dashboardTokenRepository,
+  const createUseCase = () => new CreateOfflineSubscriptionToken(
+    offlineSubscriptionTokenRepository,
     cryptoNode,
     domainEventPublisher,
     domainEventFactory,
@@ -24,8 +24,8 @@ describe('CreateDashboardToken', () => {
   )
 
   beforeEach(() => {
-    dashboardTokenRepository = {} as jest.Mocked<DashboardTokenRepositoryInterface>
-    dashboardTokenRepository.save = jest.fn()
+    offlineSubscriptionTokenRepository = {} as jest.Mocked<OfflineSubscriptionTokenRepositoryInterface>
+    offlineSubscriptionTokenRepository.save = jest.fn()
 
     cryptoNode = {} as jest.Mocked<SnCryptoNode>
     cryptoNode.generateRandomKey = jest.fn().mockReturnValueOnce('random-string')
@@ -34,7 +34,7 @@ describe('CreateDashboardToken', () => {
     domainEventPublisher.publish = jest.fn()
 
     domainEventFactory = {} as jest.Mocked<DomainEventFactoryInterface>
-    domainEventFactory.createDashboardTokenCreatedEvent = jest.fn().mockReturnValue({} as jest.Mocked<DashboardTokenCreatedEvent>)
+    domainEventFactory.createOfflineSubscriptionTokenCreatedEvent = jest.fn().mockReturnValue({} as jest.Mocked<OfflineSubscriptionTokenCreatedEvent>)
 
     timer = {} as jest.Mocked<TimerInterface>
     timer.convertStringDateToMicroseconds = jest.fn().mockReturnValue(1)
@@ -46,13 +46,13 @@ describe('CreateDashboardToken', () => {
       userEmail: 'test@test.com',
     })
 
-    expect(dashboardTokenRepository.save).toHaveBeenCalledWith({
+    expect(offlineSubscriptionTokenRepository.save).toHaveBeenCalledWith({
       userEmail: 'test@test.com',
       token: 'random-string',
       expiresAt: 1,
     })
 
-    expect(domainEventFactory.createDashboardTokenCreatedEvent).toHaveBeenCalledWith('random-string', 'test@test.com')
+    expect(domainEventFactory.createOfflineSubscriptionTokenCreatedEvent).toHaveBeenCalledWith('random-string', 'test@test.com')
     expect(domainEventPublisher.publish).toHaveBeenCalled()
   })
 })

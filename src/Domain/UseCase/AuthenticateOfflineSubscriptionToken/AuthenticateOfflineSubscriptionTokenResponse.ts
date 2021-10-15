@@ -1,6 +1,6 @@
 import { OfflineUserSubscription } from '../../Subscription/OfflineUserSubscription'
 
-export type AuthenticateDashboardTokenResponse = {
+export type AuthenticateOfflineSubscriptionTokenResponse = {
   success: true,
   email: string,
   subscriptions: Array<OfflineUserSubscription>
