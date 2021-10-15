@@ -1,5 +1,5 @@
 import { RoleName } from '@standardnotes/auth'
-import { AccountDeletionRequestedEvent, UserEmailChangedEvent, UserRegisteredEvent, UserRolesChangedEvent } from '@standardnotes/domain-events'
+import { AccountDeletionRequestedEvent, UserEmailChangedEvent, UserRegisteredEvent, UserRolesChangedEvent, OfflineSubscriptionTokenCreatedEvent } from '@standardnotes/domain-events'
 import { TimerInterface } from '@standardnotes/time'
 import * as dayjs from 'dayjs'
 import { inject, injectable } from 'inversify'
@@ -19,6 +19,17 @@ export class DomainEventFactory implements DomainEventFactoryInterface {
       createdAt: dayjs.utc().toDate(),
       payload: {
         userUuid,
+      },
+    }
+  }
+
+  createOfflineSubscriptionTokenCreatedEvent(token: string, email: string): OfflineSubscriptionTokenCreatedEvent {
+    return {
+      type: 'OFFLINE_SUBSCRIPTION_TOKEN_CREATED',
+      createdAt: dayjs.utc().toDate(),
+      payload: {
+        token,
+        email,
       },
     }
   }

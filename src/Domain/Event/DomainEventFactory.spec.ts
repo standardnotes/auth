@@ -28,6 +28,18 @@ describe('DomainEventFactory', () => {
       })
   })
 
+  it('should create a OFFLINE_SUBSCRIPTION_TOKEN_CREATED event', () => {
+    expect(createFactory().createOfflineSubscriptionTokenCreatedEvent('1-2-3', 'test@test.te'))
+      .toEqual({
+        createdAt: expect.any(Date),
+        payload: {
+          token: '1-2-3',
+          email: 'test@test.te',
+        },
+        type: 'OFFLINE_SUBSCRIPTION_TOKEN_CREATED',
+      })
+  })
+
   it('should create a USER_CHANGED_EMAIL event', () => {
     expect(createFactory().createUserEmailChangedEvent('1-2-3', 'test@test.te', 'test2@test.te'))
       .toEqual({
