@@ -119,6 +119,7 @@ import { OfflineUserAuthMiddleware } from '../Controller/OfflineUserAuthMiddlewa
 import { OfflineSubscriptionTokenRepositoryInterface } from '../Domain/Auth/OfflineSubscriptionTokenRepositoryInterface'
 import { RedisOfflineSubscriptionTokenRepository } from '../Infra/Redis/RedisOfflineSubscriptionTokenRepository'
 import { CreateOfflineSubscriptionToken } from '../Domain/UseCase/CreateOfflineSubscriptionToken/CreateOfflineSubscriptionToken'
+import { AuthenticateOfflineSubscriptionToken } from '../Domain/UseCase/AuthenticateOfflineSubscriptionToken/AuthenticateOfflineSubscriptionToken'
 
 export class ContainerConfigLoader {
   async load(): Promise<Container> {
@@ -292,6 +293,7 @@ export class ContainerConfigLoader {
     container.bind<GetUserSubscription>(TYPES.GetUserSubscription).to(GetUserSubscription)
     container.bind<CreateSubscriptionToken>(TYPES.CreateSubscriptionToken).to(CreateSubscriptionToken)
     container.bind<AuthenticateSubscriptionToken>(TYPES.AuthenticateSubscriptionToken).to(AuthenticateSubscriptionToken)
+    container.bind<AuthenticateOfflineSubscriptionToken>(TYPES.AuthenticateOfflineSubscriptionToken).to(AuthenticateOfflineSubscriptionToken)
     container.bind<CreateOfflineSubscriptionToken>(TYPES.CreateOfflineSubscriptionToken).to(CreateOfflineSubscriptionToken)
 
     // Handlers
