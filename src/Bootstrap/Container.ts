@@ -133,6 +133,8 @@ export class ContainerConfigLoader {
 
     const connection: Connection = await createConnection({
       type: 'mysql',
+      supportBigNumbers: true,
+      bigNumberStrings: false,
       maxQueryExecutionTime,
       replication: {
         master: {
