@@ -128,8 +128,12 @@ export class ContainerConfigLoader {
 
     const container = new Container()
 
+    const maxQueryExecutionTime = env.get('DB_MAX_QUERY_EXECUTION_TIME', true) ?
+      +env.get('DB_MAX_QUERY_EXECUTION_TIME', true) : 45_000
+
     const connection: Connection = await createConnection({
       type: 'mysql',
+      maxQueryExecutionTime,
       replication: {
         master: {
           host: env.get('DB_HOST'),
