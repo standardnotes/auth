@@ -6,6 +6,7 @@ import { inject, injectable } from 'inversify'
 import TYPES from '../../../Bootstrap/Types'
 import { OfflineSubscriptionTokenRepositoryInterface } from '../../Auth/OfflineSubscriptionTokenRepositoryInterface'
 import { DomainEventFactoryInterface } from '../../Event/DomainEventFactoryInterface'
+import { OfflineUserSubscriptionRepositoryInterface } from '../../Subscription/OfflineUserSubscriptionRepositoryInterface'
 import { UseCaseInterface } from '../UseCaseInterface'
 import { CreateOfflineSubscriptionTokenDTO } from './CreateOfflineSubscriptionTokenDTO'
 import { CreateOfflineSubscriptionTokenResponse } from './CreateOfflineSubscriptionTokenResponse'
@@ -14,6 +15,7 @@ import { CreateOfflineSubscriptionTokenResponse } from './CreateOfflineSubscript
 export class CreateOfflineSubscriptionToken implements UseCaseInterface {
   constructor(
     @inject(TYPES.OfflineSubscriptionTokenRepository) private offlineSubscriptionTokenRepository: OfflineSubscriptionTokenRepositoryInterface,
+    @inject(TYPES.OfflineUserSubscriptionRepository) private offlineUserSubscriptionRepository: OfflineUserSubscriptionRepositoryInterface,
     @inject(TYPES.SnCryptoNode) private cryptoNode: SnCryptoNode,
     @inject(TYPES.DomainEventPublisher) private domainEventPublisher: DomainEventPublisherInterface,
     @inject(TYPES.DomainEventFactory) private domainEventFactory: DomainEventFactoryInterface,
@@ -22,6 +24,14 @@ export class CreateOfflineSubscriptionToken implements UseCaseInterface {
   }
 
   async execute(dto: CreateOfflineSubscriptionTokenDTO): Promise<CreateOfflineSubscriptionTokenResponse> {
+    const existingSubscription = await this.offlineUserSubscriptionRepository.findOneByEmail(dto.userEmail)
+    if (existingSubscription === undefined) {
+      return {
+        success: false,
+        error: 'no-subscription',
+      }
+    }
+
     const token = await this.cryptoNode.generateRandomKey(128)
 
     const offlineSubscriptionToken = {
@@ -39,6 +49,7 @@ export class CreateOfflineSubscriptionToken implements UseCaseInterface {
     )
 
     return {
+      success: true,
       offlineSubscriptionToken,
     }
   }

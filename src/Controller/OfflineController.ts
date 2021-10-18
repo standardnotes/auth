@@ -49,9 +49,13 @@ export class OfflineController extends BaseHttpController {
       }, 400)
     }
 
-    await this.createOfflineSubscriptionToken.execute({
+    const response = await this.createOfflineSubscriptionToken.execute({
       userEmail: request.body.email,
     })
+
+    if (!response.success) {
+      return this.json({ success: false }, response.error === 'no-subscription' ? 404 : 400)
+    }
 
     return this.json({ success: true })
   }
