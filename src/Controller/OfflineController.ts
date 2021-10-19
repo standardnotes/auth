@@ -54,7 +54,7 @@ export class OfflineController extends BaseHttpController {
     })
 
     if (!response.success) {
-      return this.json({ success: false }, response.error === 'no-subscription' ? 404 : 400)
+      return this.json({ success: false, error: { tag: response.error } })
     }
 
     return this.json({ success: true })

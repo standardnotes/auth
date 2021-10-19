@@ -132,25 +132,8 @@ describe('OfflineController', () => {
       userEmail: 'test@test.com',
     })
 
-    expect(result.statusCode).toEqual(404)
-  })
-
-  it('should not create a offline subscription token if the workflow fails', async () => {
-    request.body.email = 'test@test.com'
-
-    createOfflineSubscriptionToken.execute = jest.fn().mockReturnValue({
-      success: false,
-      error: 'foo-bar',
-    })
-
-    const httpResponse = <results.JsonResult> await createController().createToken(request)
-    const result = await httpResponse.executeAsync()
-
-    expect(createOfflineSubscriptionToken.execute).toHaveBeenCalledWith({
-      userEmail: 'test@test.com',
-    })
-
-    expect(result.statusCode).toEqual(400)
+    expect(httpResponse.json).toEqual({ success: false, error: { tag: 'no-subscription' } })
+    expect(result.statusCode).toEqual(200)
   })
 
   it('should validate a offline subscription token for user', async () => {
