@@ -38,7 +38,7 @@ export class CreateOfflineSubscriptionToken implements UseCaseInterface {
       userEmail: dto.userEmail,
       token,
       expiresAt: this.timer.convertStringDateToMicroseconds(
-        this.timer.getUTCDateNDaysAhead(1).toString()
+        this.timer.getUTCDateNHoursAhead(3).toString()
       ),
     }
 

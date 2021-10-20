@@ -45,7 +45,7 @@ describe('CreateOfflineSubscriptionToken', () => {
 
     timer = {} as jest.Mocked<TimerInterface>
     timer.convertStringDateToMicroseconds = jest.fn().mockReturnValue(1)
-    timer.getUTCDateNDaysAhead = jest.fn().mockReturnValue(new Date(1))
+    timer.getUTCDateNHoursAhead = jest.fn().mockReturnValue(new Date(1))
   })
 
   it('should create an offline subscription token and persist it', async () => {
