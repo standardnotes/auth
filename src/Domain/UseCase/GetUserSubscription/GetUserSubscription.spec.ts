@@ -15,7 +15,7 @@ describe('GetUserSubscription', () => {
   const createUseCase = () => new GetUserSubscription(userRepository, userSubscriptionRepository)
 
   beforeEach(() => {
-    user = {} as jest.Mocked<User>
+    user = { uuid: 'user-1-1-1', email: 'user-1-1-1@example.com' } as jest.Mocked<User>
     userRepository = {} as jest.Mocked<UserRepositoryInterface>
     userRepository.findOneByUuid = jest.fn().mockReturnValue(user)
 
@@ -40,7 +40,7 @@ describe('GetUserSubscription', () => {
   it('should return user subscription', async () => {
     expect(await createUseCase().execute({ userUuid: 'user-1-1-1' })).toEqual({
       success: true,
-      userUuid: 'user-1-1-1',
+      user: { uuid: 'user-1-1-1', email: 'user-1-1-1@example.com' },
       subscription: {
         planName: SubscriptionName.ProPlan,
       },
