@@ -56,6 +56,7 @@ describe('SubscriptionReassignedEventHandler', () => {
     event = {} as jest.Mocked<SubscriptionReassignedEvent>
     event.createdAt = new Date(1)
     event.payload = {
+      subscriptionId: 1,
       userEmail: 'test@test.com',
       subscriptionName: SubscriptionName.ProPlan,
       subscriptionExpiresAt,
@@ -79,6 +80,7 @@ describe('SubscriptionReassignedEventHandler', () => {
 
     subscription.planName = SubscriptionName.ProPlan
     subscription.endsAt = subscriptionExpiresAt
+    subscription.subscriptionId = 1
     subscription.user = Promise.resolve(user)
 
     expect(userRepository.findOneByEmail).toHaveBeenCalledWith('test@test.com')

@@ -32,6 +32,7 @@ implements DomainEventHandlerInterface
   ): Promise<void> {
     if (event.payload.offline) {
       await this.createOfflineSubscription(
+        event.payload.subscriptionId,
         event.payload.subscriptionName,
         event.payload.userEmail,
         event.payload.subscriptionExpiresAt,
@@ -58,6 +59,7 @@ implements DomainEventHandlerInterface
     }
 
     await this.createSubscription(
+      event.payload.subscriptionId,
       event.payload.subscriptionName,
       user,
       event.payload.subscriptionExpiresAt,
@@ -82,6 +84,7 @@ implements DomainEventHandlerInterface
   }
 
   private async createSubscription(
+    subscriptionId: number,
     subscriptionName: string,
     user: User,
     subscriptionExpiresAt: number,
@@ -94,11 +97,13 @@ implements DomainEventHandlerInterface
     subscription.updatedAt = timestamp
     subscription.endsAt = subscriptionExpiresAt
     subscription.cancelled = false
+    subscription.subscriptionId = subscriptionId
 
     await this.userSubscriptionRepository.save(subscription)
   }
 
   private async createOfflineSubscription(
+    subscriptionId: number,
     subscriptionName: string,
     email: string,
     subscriptionExpiresAt: number,
@@ -111,6 +116,7 @@ implements DomainEventHandlerInterface
     subscription.updatedAt = timestamp
     subscription.endsAt = subscriptionExpiresAt
     subscription.cancelled = false
+    subscription.subscriptionId = subscriptionId
 
     await this.offlineUserSubscriptionRepository.save(subscription)
   }

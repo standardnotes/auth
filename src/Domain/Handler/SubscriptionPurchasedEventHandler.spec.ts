@@ -67,6 +67,7 @@ describe('SubscriptionPurchasedEventHandler', () => {
     event = {} as jest.Mocked<SubscriptionPurchasedEvent>
     event.createdAt = new Date(1)
     event.payload = {
+      subscriptionId: 1,
       userEmail: 'test@test.com',
       subscriptionName: SubscriptionName.ProPlan,
       subscriptionExpiresAt,
@@ -99,6 +100,7 @@ describe('SubscriptionPurchasedEventHandler', () => {
 
     subscription.planName = SubscriptionName.ProPlan
     subscription.endsAt = subscriptionExpiresAt
+    subscription.subscriptionId = 1
     subscription.user = Promise.resolve(user)
 
     expect(userRepository.findOneByEmail).toHaveBeenCalledWith('test@test.com')
@@ -121,6 +123,7 @@ describe('SubscriptionPurchasedEventHandler', () => {
       offlineUserSubscriptionRepository.save
     ).toHaveBeenCalledWith({
       endsAt: subscriptionExpiresAt,
+      subscriptionId: 1,
       planName: 'PRO_PLAN',
       email: 'test@test.com',
       createdAt: expect.any(Number),
