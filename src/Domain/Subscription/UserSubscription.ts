@@ -40,6 +40,14 @@ export class UserSubscription {
   })
   cancelled: boolean
 
+  @Column({
+    name: 'subscription_id',
+    type: 'int',
+    width: 11,
+    nullable: true,
+  })
+  subscriptionId: number | null
+
   @ManyToOne(
     /* istanbul ignore next */
     () => User,
