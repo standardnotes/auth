@@ -45,10 +45,10 @@ describe('SubscriptionExpiredEventHandler', () => {
     userRepository.save = jest.fn().mockReturnValue(user)
 
     userSubscriptionRepository = {} as jest.Mocked<UserSubscriptionRepositoryInterface>
-    userSubscriptionRepository.updateEndsAtByNameAndUserUuid = jest.fn()
+    userSubscriptionRepository.updateEndsAt = jest.fn()
 
     offlineUserSubscriptionRepository = {} as jest.Mocked<OfflineUserSubscriptionRepositoryInterface>
-    offlineUserSubscriptionRepository.updateEndsAtByNameAndEmail = jest.fn()
+    offlineUserSubscriptionRepository.updateEndsAt = jest.fn()
 
     roleService = {} as jest.Mocked<RoleServiceInterface>
     roleService.removeUserRole = jest.fn()
@@ -59,6 +59,7 @@ describe('SubscriptionExpiredEventHandler', () => {
     event = {} as jest.Mocked<SubscriptionExpiredEvent>
     event.createdAt = new Date(1)
     event.payload = {
+      subscriptionId: 1,
       userEmail: 'test@test.com',
       subscriptionName: SubscriptionName.CorePlan,
       timestamp,
@@ -90,10 +91,9 @@ describe('SubscriptionExpiredEventHandler', () => {
 
     expect(userRepository.findOneByEmail).toHaveBeenCalledWith('test@test.com')
     expect(
-      userSubscriptionRepository.updateEndsAtByNameAndUserUuid
+      userSubscriptionRepository.updateEndsAt
     ).toHaveBeenCalledWith(
-      SubscriptionName.CorePlan,
-      '123',
+      1,
       timestamp,
       timestamp,
     )
@@ -105,10 +105,9 @@ describe('SubscriptionExpiredEventHandler', () => {
     await createHandler().handle(event)
 
     expect(
-      offlineUserSubscriptionRepository.updateEndsAtByNameAndEmail
+      offlineUserSubscriptionRepository.updateEndsAt
     ).toHaveBeenCalledWith(
-      SubscriptionName.CorePlan,
-      'test@test.com',
+      1,
       timestamp,
       timestamp,
     )
@@ -120,6 +119,6 @@ describe('SubscriptionExpiredEventHandler', () => {
     await createHandler().handle(event)
 
     expect(roleService.removeUserRole).not.toHaveBeenCalled()
-    expect(userSubscriptionRepository.updateEndsAtByNameAndUserUuid).not.toHaveBeenCalled()
+    expect(userSubscriptionRepository.updateEndsAt).not.toHaveBeenCalled()
   })
 })

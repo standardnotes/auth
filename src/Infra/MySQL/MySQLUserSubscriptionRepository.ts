@@ -19,7 +19,7 @@ export class MySQLUserSubscriptionRepository extends Repository<UserSubscription
       .getOne()
   }
 
-  async updateEndsAtByNameAndUserUuid(name: string, userUuid: string, endsAt: number, updatedAt: number): Promise<void> {
+  async updateEndsAt(subscriptionId: number, endsAt: number, updatedAt: number): Promise<void> {
     await this.createQueryBuilder()
       .update()
       .set({
@@ -27,16 +27,15 @@ export class MySQLUserSubscriptionRepository extends Repository<UserSubscription
         updatedAt,
       })
       .where(
-        'plan_name = :plan_name AND user_uuid = :user_uuid',
+        'subscription_id = :subscriptionId',
         {
-          plan_name: name,
-          user_uuid: userUuid,
+          subscriptionId,
         }
       )
       .execute()
   }
 
-  async updateCancelled(name: string, userUuid: string, cancelled: boolean, updatedAt: number): Promise<void> {
+  async updateCancelled(subscriptionId: number, cancelled: boolean, updatedAt: number): Promise<void> {
     await this.createQueryBuilder()
       .update()
       .set({
@@ -44,10 +43,9 @@ export class MySQLUserSubscriptionRepository extends Repository<UserSubscription
         updatedAt,
       })
       .where(
-        'plan_name = :plan_name AND user_uuid = :user_uuid',
+        'subscription_id = :subscriptionId',
         {
-          plan_name: name,
-          user_uuid: userUuid,
+          subscriptionId,
         }
       )
       .execute()

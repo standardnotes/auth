@@ -47,7 +47,7 @@ describe('MySQLUserSubscriptionRepository', () => {
     expect(result).toEqual(subscription)
   })
 
-  it('should update ends at by name and user uuid', async () => {
+  it('should update ends at by subscription id', async () => {
     repository.createQueryBuilder = jest.fn().mockImplementation(() => updateQueryBuilder)
 
     updateQueryBuilder.update = jest.fn().mockReturnThis()
@@ -55,7 +55,7 @@ describe('MySQLUserSubscriptionRepository', () => {
     updateQueryBuilder.where = jest.fn().mockReturnThis()
     updateQueryBuilder.execute = jest.fn()
 
-    await repository.updateEndsAtByNameAndUserUuid('test', '123', 1000, 1000)
+    await repository.updateEndsAt(1, 1000, 1000)
 
     expect(updateQueryBuilder.update).toHaveBeenCalled()
     expect(updateQueryBuilder.set).toHaveBeenCalledWith(
@@ -65,16 +65,15 @@ describe('MySQLUserSubscriptionRepository', () => {
       }
     )
     expect(updateQueryBuilder.where).toHaveBeenCalledWith(
-      'plan_name = :plan_name AND user_uuid = :user_uuid',
+      'subscription_id = :subscriptionId',
       {
-        plan_name: 'test',
-        user_uuid: '123',
+        subscriptionId: 1,
       }
     )
     expect(updateQueryBuilder.execute).toHaveBeenCalled()
   })
 
-  it('should update cancelled by name and user uuid', async () => {
+  it('should update cancelled by subscription id', async () => {
     repository.createQueryBuilder = jest.fn().mockImplementation(() => updateQueryBuilder)
 
     updateQueryBuilder.update = jest.fn().mockReturnThis()
@@ -82,7 +81,7 @@ describe('MySQLUserSubscriptionRepository', () => {
     updateQueryBuilder.where = jest.fn().mockReturnThis()
     updateQueryBuilder.execute = jest.fn()
 
-    await repository.updateCancelled('test', '123', true, 1000)
+    await repository.updateCancelled(1, true, 1000)
 
     expect(updateQueryBuilder.update).toHaveBeenCalled()
     expect(updateQueryBuilder.set).toHaveBeenCalledWith(
@@ -92,10 +91,9 @@ describe('MySQLUserSubscriptionRepository', () => {
       }
     )
     expect(updateQueryBuilder.where).toHaveBeenCalledWith(
-      'plan_name = :plan_name AND user_uuid = :user_uuid',
+      'subscription_id = :subscriptionId',
       {
-        plan_name: 'test',
-        user_uuid: '123',
+        subscriptionId: 1,
       }
     )
     expect(updateQueryBuilder.execute).toHaveBeenCalled()

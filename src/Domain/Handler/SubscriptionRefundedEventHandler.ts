@@ -31,8 +31,7 @@ implements DomainEventHandlerInterface
   ): Promise<void> {
     if (event.payload.offline) {
       await this.updateOfflineSubscriptionEndsAt(
-        event.payload.subscriptionName,
-        event.payload.userEmail,
+        event.payload.subscriptionId,
         event.payload.timestamp,
       )
       await this.removeOfflineUserRole(event.payload.userEmail, event.payload.subscriptionName)
@@ -52,8 +51,7 @@ implements DomainEventHandlerInterface
     }
 
     await this.updateSubscriptionEndsAt(
-      event.payload.subscriptionName,
-      user.uuid,
+      event.payload.subscriptionId,
       event.payload.timestamp,
     )
     await this.removeUserRole(user, event.payload.subscriptionName)
@@ -67,13 +65,11 @@ implements DomainEventHandlerInterface
   }
 
   private async updateSubscriptionEndsAt(
-    subscriptionName: string,
-    userUuid: string,
+    subscriptionId: number,
     timestamp: number,
   ): Promise<void> {
-    await this.userSubscriptionRepository.updateEndsAtByNameAndUserUuid(
-      subscriptionName,
-      userUuid,
+    await this.userSubscriptionRepository.updateEndsAt(
+      subscriptionId,
       timestamp,
       timestamp,
     )
@@ -87,13 +83,11 @@ implements DomainEventHandlerInterface
   }
 
   private async updateOfflineSubscriptionEndsAt(
-    subscriptionName: string,
-    email: string,
+    subscriptionId: number,
     timestamp: number,
   ): Promise<void> {
-    await this.offlineUserSubscriptionRepository.updateEndsAtByNameAndEmail(
-      subscriptionName,
-      email,
+    await this.offlineUserSubscriptionRepository.updateEndsAt(
+      subscriptionId,
       timestamp,
       timestamp,
     )
