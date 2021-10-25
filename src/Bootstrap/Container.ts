@@ -120,6 +120,7 @@ import { OfflineSubscriptionTokenRepositoryInterface } from '../Domain/Auth/Offl
 import { RedisOfflineSubscriptionTokenRepository } from '../Infra/Redis/RedisOfflineSubscriptionTokenRepository'
 import { CreateOfflineSubscriptionToken } from '../Domain/UseCase/CreateOfflineSubscriptionToken/CreateOfflineSubscriptionToken'
 import { AuthenticateOfflineSubscriptionToken } from '../Domain/UseCase/AuthenticateOfflineSubscriptionToken/AuthenticateOfflineSubscriptionToken'
+import { SubscriptionCancelledEventHandler } from '../Domain/Handler/SubscriptionCancelledEventHandler'
 
 export class ContainerConfigLoader {
   async load(): Promise<Container> {
@@ -306,6 +307,7 @@ export class ContainerConfigLoader {
     container.bind<UserRegisteredEventHandler>(TYPES.UserRegisteredEventHandler).to(UserRegisteredEventHandler)
     container.bind<AccountDeletionRequestedEventHandler>(TYPES.AccountDeletionRequestedEventHandler).to(AccountDeletionRequestedEventHandler)
     container.bind<SubscriptionPurchasedEventHandler>(TYPES.SubscriptionPurchasedEventHandler).to(SubscriptionPurchasedEventHandler)
+    container.bind<SubscriptionCancelledEventHandler>(TYPES.SubscriptionCancelledEventHandler).to(SubscriptionCancelledEventHandler)
     container.bind<SubscriptionRenewedEventHandler>(TYPES.SubscriptionRenewedEventHandler).to(SubscriptionRenewedEventHandler)
     container.bind<SubscriptionRefundedEventHandler>(TYPES.SubscriptionRefundedEventHandler).to(SubscriptionRefundedEventHandler)
     container.bind<SubscriptionExpiredEventHandler>(TYPES.SubscriptionExpiredEventHandler).to(SubscriptionExpiredEventHandler)
@@ -356,6 +358,7 @@ export class ContainerConfigLoader {
       ['USER_REGISTERED', container.get(TYPES.UserRegisteredEventHandler)],
       ['ACCOUNT_DELETION_REQUESTED', container.get(TYPES.AccountDeletionRequestedEventHandler)],
       ['SUBSCRIPTION_PURCHASED', container.get(TYPES.SubscriptionPurchasedEventHandler)],
+      ['SUBSCRIPTION_CANCELLED', container.get(TYPES.SubscriptionCancelledEventHandler)],
       ['SUBSCRIPTION_RENEWED', container.get(TYPES.SubscriptionRenewedEventHandler)],
       ['SUBSCRIPTION_REFUNDED', container.get(TYPES.SubscriptionRefundedEventHandler)],
       ['SUBSCRIPTION_EXPIRED', container.get(TYPES.SubscriptionExpiredEventHandler)],
