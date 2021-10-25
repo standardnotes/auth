@@ -94,6 +94,7 @@ const TYPES = {
   UserRegisteredEventHandler: Symbol.for('UserRegisteredEventHandler'),
   AccountDeletionRequestedEventHandler: Symbol.for('AccountDeletionRequestedEventHandler'),
   SubscriptionPurchasedEventHandler: Symbol.for('SubscriptionPurchasedEventHandler'),
+  SubscriptionCancelledEventHandler: Symbol.for('SubscriptionCancelledEventHandler'),
   SubscriptionReassignedEventHandler: Symbol.for('SubscriptionReassignedEventHandler'),
   SubscriptionRenewedEventHandler: Symbol.for('SubscriptionRenewedEventHandler'),
   SubscriptionRefundedEventHandler: Symbol.for('SubscriptionRefundedEventHandler'),
