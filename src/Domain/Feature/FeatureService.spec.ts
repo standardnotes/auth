@@ -75,6 +75,7 @@ describe('FeatureService', () => {
       endsAt: 555,
       user: Promise.resolve(user),
       cancelled: false,
+      subscriptionId: 1,
     }
 
     subscription2 = {
@@ -85,6 +86,7 @@ describe('FeatureService', () => {
       endsAt: 777,
       user: Promise.resolve(user),
       cancelled: false,
+      subscriptionId: 2,
     }
 
     user = {
