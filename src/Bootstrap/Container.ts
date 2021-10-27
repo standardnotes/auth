@@ -78,8 +78,6 @@ import { WebSocketsConnectionRepositoryInterface } from '../Domain/WebSockets/We
 import { RedisWebSocketsConnectionRepository } from '../Infra/Redis/RedisWebSocketsConnectionRepository'
 import { AddWebSocketsConnection } from '../Domain/UseCase/AddWebSocketsConnection/AddWebSocketsConnection'
 import { RemoveWebSocketsConnection } from '../Domain/UseCase/RemoveWebSocketsConnection/RemoveWebSocketsConnection'
-import { ContentDecoderInterface } from '../Domain/Encryption/ContentDecoderInterface'
-import { ContentDecoder } from '../Domain/Encryption/ContentDecoder'
 import axios, { AxiosInstance } from 'axios'
 import { UserSubscription } from '../Domain/Subscription/UserSubscription'
 import { MySQLUserSubscriptionRepository } from '../Infra/MySQL/MySQLUserSubscriptionRepository'
@@ -121,6 +119,7 @@ import { RedisOfflineSubscriptionTokenRepository } from '../Infra/Redis/RedisOff
 import { CreateOfflineSubscriptionToken } from '../Domain/UseCase/CreateOfflineSubscriptionToken/CreateOfflineSubscriptionToken'
 import { AuthenticateOfflineSubscriptionToken } from '../Domain/UseCase/AuthenticateOfflineSubscriptionToken/AuthenticateOfflineSubscriptionToken'
 import { SubscriptionCancelledEventHandler } from '../Domain/Handler/SubscriptionCancelledEventHandler'
+import { ContentDecoder, ContentDecoderInterface } from '@standardnotes/common'
 
 export class ContainerConfigLoader {
   async load(): Promise<Container> {
