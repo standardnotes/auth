@@ -11,7 +11,6 @@ import { Permission, PermissionName } from '@standardnotes/features'
 import { Setting } from '../Setting/Setting'
 import { SettingServiceInterface } from '../Setting/SettingServiceInterface'
 import { OfflineUserSubscriptionRepositoryInterface } from '../Subscription/OfflineUserSubscriptionRepositoryInterface'
-import { TokenDecoderInterface } from '../Auth/TokenDecoderInterface'
 import { TimerInterface } from '@standardnotes/time'
 import { OfflineUserSubscription } from '../Subscription/OfflineUserSubscription'
 
@@ -28,7 +27,6 @@ describe('FeatureService', () => {
   let settingService: SettingServiceInterface
   let extensionServerUrl: string
   let offlineUserSubscriptionRepository: OfflineUserSubscriptionRepositoryInterface
-  let tokenDecoder: TokenDecoderInterface
   let timer: TimerInterface
   let offlineUserSubscription: OfflineUserSubscription
 
@@ -36,7 +34,6 @@ describe('FeatureService', () => {
     roleToSubscriptionMap,
     settingService,
     offlineUserSubscriptionRepository,
-    tokenDecoder,
     timer,
     extensionServerUrl
   )
@@ -116,9 +113,6 @@ describe('FeatureService', () => {
     offlineUserSubscriptionRepository = {} as jest.Mocked<OfflineUserSubscriptionRepositoryInterface>
     offlineUserSubscriptionRepository.findByEmail = jest.fn().mockReturnValue([offlineUserSubscription])
 
-    tokenDecoder = {} as jest.Mocked<TokenDecoderInterface>
-    tokenDecoder.decodeOfflineToken = jest.fn().mockReturnValue({ extensionKey: 'test', featuresUrl: 'https://api.standardnotes.com/v1/offline/features' })
-
     timer = {} as jest.Mocked<TimerInterface>
     timer.getTimestampInMicroseconds = jest.fn().mockReturnValue(123)
   })
@@ -145,7 +139,7 @@ describe('FeatureService', () => {
           'marketing_url': '',
           'name': 'Autobiography',
           'thumbnail_url': 'https://s3.amazonaws.com/standard-notes/screenshots/models/themes/autobiography.jpg',
-          'url': 'https://extension-server/test/themes/autobiography',
+          'url': 'https://extension-server/features-token/themes/autobiography',
           'version': '1.0.0',
         },
       ])
@@ -153,12 +147,6 @@ describe('FeatureService', () => {
 
     it('should not return user features if a subscription could not be found', async () => {
       offlineUserSubscriptionRepository.findByEmail = jest.fn().mockReturnValue([])
-
-      expect(await createService().getFeaturesForOfflineUser('test@test.com', 'features-token')).toEqual([])
-    })
-
-    it('should not return user features if a features token could not be decoded', async () => {
-      tokenDecoder.decodeOfflineToken = jest.fn().mockReturnValue(undefined)
 
       expect(await createService().getFeaturesForOfflineUser('test@test.com', 'features-token')).toEqual([])
     })

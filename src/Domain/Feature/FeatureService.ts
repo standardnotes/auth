@@ -10,7 +10,6 @@ import { User } from '../User/User'
 import { UserSubscription } from '../Subscription/UserSubscription'
 import { FeatureServiceInterface } from './FeatureServiceInterface'
 import { OfflineUserSubscriptionRepositoryInterface } from '../Subscription/OfflineUserSubscriptionRepositoryInterface'
-import { TokenDecoderInterface } from '../Auth/TokenDecoderInterface'
 import { Role } from '../Role/Role'
 import { OfflineUserSubscription } from '../Subscription/OfflineUserSubscription'
 import { TimerInterface } from '@standardnotes/time'
@@ -21,18 +20,12 @@ export class FeatureService implements FeatureServiceInterface {
     @inject(TYPES.RoleToSubscriptionMap) private roleToSubscriptionMap: RoleToSubscriptionMapInterface,
     @inject(TYPES.SettingService) private settingService: SettingServiceInterface,
     @inject(TYPES.OfflineUserSubscriptionRepository) private offlineUserSubscriptionRepository: OfflineUserSubscriptionRepositoryInterface,
-    @inject(TYPES.TokenDecoder) private tokenDecoder: TokenDecoderInterface,
     @inject(TYPES.Timer) private timer: TimerInterface,
     @inject(TYPES.EXTENSION_SERVER_URL) private extensionServerUrl: string,
   ) {
   }
 
   async getFeaturesForOfflineUser(email: string, offlineFeaturesToken: string): Promise<FeatureDescription[]> {
-    const decodedFeaturesToken = this.tokenDecoder.decodeOfflineToken(offlineFeaturesToken)
-    if (decodedFeaturesToken === undefined) {
-      return []
-    }
-
     const userSubscriptions = await this.offlineUserSubscriptionRepository.findByEmail(email, this.timer.getTimestampInMicroseconds())
     const userRolesMap: Map<string, Role> = new Map()
     for (const userSubscription of userSubscriptions) {
@@ -43,7 +36,7 @@ export class FeatureService implements FeatureServiceInterface {
     }
     const userRoles = [...userRolesMap.values()]
 
-    return this.getFeaturesForRoles(userRoles, userSubscriptions, decodedFeaturesToken.extensionKey)
+    return this.getFeaturesForRoles(userRoles, userSubscriptions, offlineFeaturesToken)
   }
 
   async getFeaturesForUser(user: User): Promise<Array<FeatureDescription>> {
