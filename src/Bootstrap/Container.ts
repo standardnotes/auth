@@ -330,7 +330,7 @@ export class ContainerConfigLoader {
     container.bind<OfflineSettingServiceInterface>(TYPES.OfflineSettingService).to(OfflineSettingService)
     container.bind<SnCryptoNode>(TYPES.SnCryptoNode).toConstantValue(new SnCryptoNode())
     container.bind<TimerInterface>(TYPES.Timer).toConstantValue(new Timer())
-    container.bind<ContentDecoderInterface>(TYPES.ContenDecoder).to(ContentDecoder)
+    container.bind<ContentDecoderInterface>(TYPES.ContenDecoder).toConstantValue(new ContentDecoder())
     container.bind<ClientServiceInterface>(TYPES.WebSocketsClientService).to(WebSocketsClientService)
     container.bind<RoleServiceInterface>(TYPES.RoleService).to(RoleService)
     container.bind<RoleToSubscriptionMapInterface>(TYPES.RoleToSubscriptionMap).to(RoleToSubscriptionMap)
