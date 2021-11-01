@@ -2,6 +2,7 @@ import { DomainEventPublisherInterface } from '@standardnotes/domain-events'
 import { SnCryptoNode } from '@standardnotes/sncrypto-node'
 import { TimerInterface } from '@standardnotes/time'
 import { inject, injectable } from 'inversify'
+import { Logger } from 'winston'
 
 import TYPES from '../../../Bootstrap/Types'
 import { OfflineSubscriptionTokenRepositoryInterface } from '../../Auth/OfflineSubscriptionTokenRepositoryInterface'
@@ -20,6 +21,7 @@ export class CreateOfflineSubscriptionToken implements UseCaseInterface {
     @inject(TYPES.DomainEventPublisher) private domainEventPublisher: DomainEventPublisherInterface,
     @inject(TYPES.DomainEventFactory) private domainEventFactory: DomainEventFactoryInterface,
     @inject(TYPES.Timer) private timer: TimerInterface,
+    @inject(TYPES.Logger) private logger: Logger,
   ) {
   }
 
@@ -41,6 +43,8 @@ export class CreateOfflineSubscriptionToken implements UseCaseInterface {
         this.timer.getUTCDateNHoursAhead(3).toString()
       ),
     }
+
+    this.logger.debug('Created offline subscription token: %O', offlineSubscriptionToken)
 
     await this.offlineSubscriptionTokenRepository.save(offlineSubscriptionToken)
 

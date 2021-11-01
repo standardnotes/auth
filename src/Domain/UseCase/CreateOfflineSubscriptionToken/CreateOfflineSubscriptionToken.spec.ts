@@ -9,6 +9,7 @@ import { DomainEventPublisherInterface, OfflineSubscriptionTokenCreatedEvent } f
 import { DomainEventFactoryInterface } from '../../Event/DomainEventFactoryInterface'
 import { OfflineUserSubscriptionRepositoryInterface } from '../../Subscription/OfflineUserSubscriptionRepositoryInterface'
 import { OfflineUserSubscription } from '../../Subscription/OfflineUserSubscription'
+import { Logger } from 'winston'
 
 describe('CreateOfflineSubscriptionToken', () => {
   let offlineSubscriptionTokenRepository: OfflineSubscriptionTokenRepositoryInterface
@@ -17,6 +18,7 @@ describe('CreateOfflineSubscriptionToken', () => {
   let domainEventPublisher: DomainEventPublisherInterface
   let domainEventFactory: DomainEventFactoryInterface
   let timer: TimerInterface
+  let logger: Logger
 
   const createUseCase = () => new CreateOfflineSubscriptionToken(
     offlineSubscriptionTokenRepository,
@@ -25,6 +27,7 @@ describe('CreateOfflineSubscriptionToken', () => {
     domainEventPublisher,
     domainEventFactory,
     timer,
+    logger,
   )
 
   beforeEach(() => {
@@ -46,6 +49,9 @@ describe('CreateOfflineSubscriptionToken', () => {
     timer = {} as jest.Mocked<TimerInterface>
     timer.convertStringDateToMicroseconds = jest.fn().mockReturnValue(1)
     timer.getUTCDateNHoursAhead = jest.fn().mockReturnValue(new Date(1))
+
+    logger = {} as jest.Mocked<Logger>
+    logger.debug = jest.fn()
   })
 
   it('should create an offline subscription token and persist it', async () => {

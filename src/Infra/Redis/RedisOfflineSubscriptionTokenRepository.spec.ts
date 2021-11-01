@@ -5,12 +5,14 @@ import { TimerInterface } from '@standardnotes/time'
 
 import { RedisOfflineSubscriptionTokenRepository } from './RedisOfflineSubscriptionTokenRepository'
 import { OfflineSubscriptionToken } from '../../Domain/Auth/OfflineSubscriptionToken'
+import { Logger } from 'winston'
 
 describe('RedisOfflineSubscriptionTokenRepository', () => {
   let redisClient: IORedis.Redis
   let timer: TimerInterface
+  let logger: Logger
 
-  const createRepository = () => new RedisOfflineSubscriptionTokenRepository(redisClient, timer)
+  const createRepository = () => new RedisOfflineSubscriptionTokenRepository(redisClient, timer, logger)
 
   beforeEach(() => {
     redisClient = {} as jest.Mocked<IORedis.Redis>
@@ -20,6 +22,9 @@ describe('RedisOfflineSubscriptionTokenRepository', () => {
 
     timer = {} as jest.Mocked<TimerInterface>
     timer.convertMicrosecondsToSeconds = jest.fn().mockReturnValue(1)
+
+    logger = {} as jest.Mocked<Logger>
+    logger.debug = jest.fn()
   })
 
   it('should get a user uuid in exchange for an dashboard token', async () => {
