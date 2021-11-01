@@ -31,7 +31,7 @@ export class MySQLOfflineUserSubscriptionRepository extends Repository<OfflineUs
       .getOne()
   }
 
-  async updateCancelled(name: string, email: string, cancelled: boolean, updatedAt: number): Promise<void> {
+  async updateCancelled(subscriptionId: number, cancelled: boolean, updatedAt: number): Promise<void> {
     await this.createQueryBuilder()
       .update()
       .set({
@@ -39,16 +39,15 @@ export class MySQLOfflineUserSubscriptionRepository extends Repository<OfflineUs
         updatedAt,
       })
       .where(
-        'plan_name = :plan_name AND email = :email',
+        'subscription_id = :subscriptionId',
         {
-          plan_name: name,
-          email,
+          subscriptionId,
         }
       )
       .execute()
   }
 
-  async updateEndsAtByNameAndEmail(name: string, email: string, endsAt: number, updatedAt: number): Promise<void> {
+  async updateEndsAt(subscriptionId: number, endsAt: number, updatedAt: number): Promise<void> {
     await this.createQueryBuilder()
       .update()
       .set({
@@ -56,10 +55,9 @@ export class MySQLOfflineUserSubscriptionRepository extends Repository<OfflineUs
         updatedAt,
       })
       .where(
-        'plan_name = :plan_name AND email = :email',
+        'subscription_id = :subscriptionId',
         {
-          plan_name: name,
-          email: email,
+          subscriptionId,
         }
       )
       .execute()

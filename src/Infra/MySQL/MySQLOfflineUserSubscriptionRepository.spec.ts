@@ -71,7 +71,7 @@ describe('MySQLOfflineUserSubscriptionRepository', () => {
     expect(result).toEqual([offlineSubscription])
   })
 
-  it('should update cancelled by name and user email', async () => {
+  it('should update cancelled by subscription id', async () => {
     repository.createQueryBuilder = jest.fn().mockImplementation(() => updateQueryBuilder)
 
     updateQueryBuilder.update = jest.fn().mockReturnThis()
@@ -79,7 +79,7 @@ describe('MySQLOfflineUserSubscriptionRepository', () => {
     updateQueryBuilder.where = jest.fn().mockReturnThis()
     updateQueryBuilder.execute = jest.fn()
 
-    await repository.updateCancelled('test', 'test@test.com', true, 1000)
+    await repository.updateCancelled(1, true, 1000)
 
     expect(updateQueryBuilder.update).toHaveBeenCalled()
     expect(updateQueryBuilder.set).toHaveBeenCalledWith(
@@ -89,16 +89,15 @@ describe('MySQLOfflineUserSubscriptionRepository', () => {
       }
     )
     expect(updateQueryBuilder.where).toHaveBeenCalledWith(
-      'plan_name = :plan_name AND email = :email',
+      'subscription_id = :subscriptionId',
       {
-        plan_name: 'test',
-        email: 'test@test.com',
+        subscriptionId: 1,
       }
     )
     expect(updateQueryBuilder.execute).toHaveBeenCalled()
   })
 
-  it('should update ends at by name and user email', async () => {
+  it('should update ends at by subscription id', async () => {
     repository.createQueryBuilder = jest.fn().mockImplementation(() => updateQueryBuilder)
 
     updateQueryBuilder.update = jest.fn().mockReturnThis()
@@ -106,7 +105,7 @@ describe('MySQLOfflineUserSubscriptionRepository', () => {
     updateQueryBuilder.where = jest.fn().mockReturnThis()
     updateQueryBuilder.execute = jest.fn()
 
-    await repository.updateEndsAtByNameAndEmail('test', 'test@test.com', 1000, 1000)
+    await repository.updateEndsAt(1, 1000, 1000)
 
     expect(updateQueryBuilder.update).toHaveBeenCalled()
     expect(updateQueryBuilder.set).toHaveBeenCalledWith(
@@ -116,10 +115,9 @@ describe('MySQLOfflineUserSubscriptionRepository', () => {
       }
     )
     expect(updateQueryBuilder.where).toHaveBeenCalledWith(
-      'plan_name = :plan_name AND email = :email',
+      'subscription_id = :subscriptionId',
       {
-        plan_name: 'test',
-        email: 'test@test.com',
+        subscriptionId: 1,
       }
     )
     expect(updateQueryBuilder.execute).toHaveBeenCalled()
