@@ -2,6 +2,8 @@ import { inject, injectable } from 'inversify'
 
 import TYPES from '../../../Bootstrap/Types'
 import { OfflineSubscriptionTokenRepositoryInterface } from '../../Auth/OfflineSubscriptionTokenRepositoryInterface'
+import { OfflineSettingName } from '../../Setting/OfflineSettingName'
+import { OfflineSettingRepositoryInterface } from '../../Setting/OfflineSettingRepositoryInterface'
 import { OfflineUserSubscriptionRepositoryInterface } from '../../Subscription/OfflineUserSubscriptionRepositoryInterface'
 import { UseCaseInterface } from '../UseCaseInterface'
 import { AuthenticateOfflineSubscriptionTokenDTO } from './AuthenticateOfflineSubscriptionTokenDTO'
@@ -12,6 +14,7 @@ export class AuthenticateOfflineSubscriptionToken implements UseCaseInterface {
   constructor(
     @inject(TYPES.OfflineSubscriptionTokenRepository) private offlineSubscriptionTokenRepository: OfflineSubscriptionTokenRepositoryInterface,
     @inject(TYPES.OfflineUserSubscriptionRepository) private offlineUserSubscriptionRepository: OfflineUserSubscriptionRepositoryInterface,
+    @inject(TYPES.OfflineSettingRepository) private offlineSettingRepository: OfflineSettingRepositoryInterface,
   ){
   }
 
@@ -30,10 +33,21 @@ export class AuthenticateOfflineSubscriptionToken implements UseCaseInterface {
       }
     }
 
+    const offlineFeaturesTokenSetting = await this.offlineSettingRepository.findOneByNameAndEmail(
+      OfflineSettingName.FeaturesToken,
+      userEmail,
+    )
+    if (offlineFeaturesTokenSetting === undefined) {
+      return {
+        success: false,
+      }
+    }
+
     return {
       success: true,
       email: userEmail,
       subscriptions,
+      featuresToken: offlineFeaturesTokenSetting.value as string,
     }
   }
 }
