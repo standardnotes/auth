@@ -12,6 +12,7 @@ import TYPES from '../Bootstrap/Types'
 import { GetUserFeatures } from '../Domain/UseCase/GetUserFeatures/GetUserFeatures'
 import { AuthenticateOfflineSubscriptionToken } from '../Domain/UseCase/AuthenticateOfflineSubscriptionToken/AuthenticateOfflineSubscriptionToken'
 import { CreateOfflineSubscriptionToken } from '../Domain/UseCase/CreateOfflineSubscriptionToken/CreateOfflineSubscriptionToken'
+import { sign } from 'jsonwebtoken'
 
 @controller('/offline')
 export class OfflineController extends BaseHttpController {
@@ -19,6 +20,8 @@ export class OfflineController extends BaseHttpController {
     @inject(TYPES.GetUserFeatures) private doGetUserFeatures: GetUserFeatures,
     @inject(TYPES.CreateOfflineSubscriptionToken) private createOfflineSubscriptionToken: CreateOfflineSubscriptionToken,
     @inject(TYPES.AuthenticateOfflineSubscriptionToken) private authenticateToken: AuthenticateOfflineSubscriptionToken,
+    @inject(TYPES.AUTH_JWT_SECRET) private jwtSecret: string,
+    @inject(TYPES.AUTH_JWT_TTL) private jwtTTL: number,
   ) {
     super()
   }
@@ -85,6 +88,13 @@ export class OfflineController extends BaseHttpController {
       }, 401)
     }
 
-    return this.json(authenticateTokenResponse)
+    const offlineAuthTokenData = {
+      userEmail: authenticateTokenResponse.email,
+      featuresToken: authenticateTokenResponse.featuresToken,
+    }
+
+    const authToken = sign(offlineAuthTokenData, this.jwtSecret, { algorithm: 'HS256', expiresIn: this.jwtTTL })
+
+    return this.json({ authToken })
   }
 }

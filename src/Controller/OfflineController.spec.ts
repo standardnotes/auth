@@ -15,6 +15,8 @@ describe('OfflineController', () => {
   let getUserFeatures: GetUserFeatures
   let createOfflineSubscriptionToken: CreateOfflineSubscriptionToken
   let authenticateToken: AuthenticateOfflineSubscriptionToken
+  const jwtSecret = 'auth_jwt_secret'
+  const jwtTTL = 60
 
   let request: express.Request
   let response: express.Response
@@ -24,6 +26,8 @@ describe('OfflineController', () => {
     getUserFeatures,
     createOfflineSubscriptionToken,
     authenticateToken,
+    jwtSecret,
+    jwtTTL
   )
 
   beforeEach(() => {
