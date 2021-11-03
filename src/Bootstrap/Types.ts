@@ -86,6 +86,7 @@ const TYPES = {
   AddWebSocketsConnection: Symbol.for('AddWebSocketsConnection'),
   RemoveWebSocketsConnection: Symbol.for('RemoveWebSocketsConnection'),
   GetUserSubscription: Symbol.for('GetUserSubscription'),
+  GetUserOfflineSubscription: Symbol.for('GetUserOfflineSubscription'),
   CreateSubscriptionToken: Symbol.for('CreateSubscriptionToken'),
   AuthenticateSubscriptionToken: Symbol.for('AuthenticateSubscriptionToken'),
   CreateOfflineSubscriptionToken: Symbol.for('CreateOfflineSubscriptionToken'),
