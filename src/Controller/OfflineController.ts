@@ -13,11 +13,13 @@ import { GetUserFeatures } from '../Domain/UseCase/GetUserFeatures/GetUserFeatur
 import { AuthenticateOfflineSubscriptionToken } from '../Domain/UseCase/AuthenticateOfflineSubscriptionToken/AuthenticateOfflineSubscriptionToken'
 import { CreateOfflineSubscriptionToken } from '../Domain/UseCase/CreateOfflineSubscriptionToken/CreateOfflineSubscriptionToken'
 import { sign } from 'jsonwebtoken'
+import { GetUserOfflineSubscription } from '../Domain/UseCase/GetUserOfflineSubscription/GetUserOfflineSubscription'
 
 @controller('/offline')
 export class OfflineController extends BaseHttpController {
   constructor(
     @inject(TYPES.GetUserFeatures) private doGetUserFeatures: GetUserFeatures,
+    @inject(TYPES.GetUserOfflineSubscription) private getUserOfflineSubscription: GetUserOfflineSubscription,
     @inject(TYPES.CreateOfflineSubscriptionToken) private createOfflineSubscriptionToken: CreateOfflineSubscriptionToken,
     @inject(TYPES.AuthenticateOfflineSubscriptionToken) private authenticateToken: AuthenticateOfflineSubscriptionToken,
     @inject(TYPES.AUTH_JWT_SECRET) private jwtSecret: string,
@@ -96,5 +98,18 @@ export class OfflineController extends BaseHttpController {
     const authToken = sign(offlineAuthTokenData, this.jwtSecret, { algorithm: 'HS256', expiresIn: this.jwtTTL })
 
     return this.json({ authToken })
+  }
+
+  @httpGet('/users/subscription', TYPES.ApiGatewayOfflineAuthMiddleware)
+  async getSubscription(_request: Request, response: Response): Promise<results.JsonResult> {
+    const result = await this.getUserOfflineSubscription.execute({
+      userEmail: response.locals.userEmail,
+    })
+
+    if (result.success) {
+      return this.json(result)
+    }
+
+    return this.json(result, 400)
   }
 }

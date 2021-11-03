@@ -121,6 +121,7 @@ import { AuthenticateOfflineSubscriptionToken } from '../Domain/UseCase/Authenti
 import { SubscriptionCancelledEventHandler } from '../Domain/Handler/SubscriptionCancelledEventHandler'
 import { ContentDecoder, ContentDecoderInterface } from '@standardnotes/common'
 import { GetUserOfflineSubscription } from '../Domain/UseCase/GetUserOfflineSubscription/GetUserOfflineSubscription'
+import { ApiGatewayOfflineAuthMiddleware } from '../Controller/ApiGatewayOfflineAuthMiddleware'
 
 export class ContainerConfigLoader {
   async load(): Promise<Container> {
@@ -233,6 +234,7 @@ export class ContainerConfigLoader {
     container.bind<LockMiddleware>(TYPES.LockMiddleware).to(LockMiddleware)
     container.bind<AuthMiddlewareWithoutResponse>(TYPES.AuthMiddlewareWithoutResponse).to(AuthMiddlewareWithoutResponse)
     container.bind<ApiGatewayAuthMiddleware>(TYPES.ApiGatewayAuthMiddleware).to(ApiGatewayAuthMiddleware)
+    container.bind<ApiGatewayOfflineAuthMiddleware>(TYPES.ApiGatewayOfflineAuthMiddleware).to(ApiGatewayOfflineAuthMiddleware)
     container.bind<OfflineUserAuthMiddleware>(TYPES.OfflineUserAuthMiddleware).to(OfflineUserAuthMiddleware)
 
     // Projectors

@@ -10,9 +10,12 @@ import { CreateOfflineSubscriptionToken } from '../Domain/UseCase/CreateOfflineS
 import { CreateOfflineSubscriptionTokenResponse } from '../Domain/UseCase/CreateOfflineSubscriptionToken/CreateOfflineSubscriptionTokenResponse'
 import { AuthenticateOfflineSubscriptionToken } from '../Domain/UseCase/AuthenticateOfflineSubscriptionToken/AuthenticateOfflineSubscriptionToken'
 import { OfflineUserSubscription } from '../Domain/Subscription/OfflineUserSubscription'
+import { GetUserOfflineSubscription } from '../Domain/UseCase/GetUserOfflineSubscription/GetUserOfflineSubscription'
+import { SubscriptionName } from '@standardnotes/auth'
 
 describe('OfflineController', () => {
   let getUserFeatures: GetUserFeatures
+  let getUserOfflineSubscription: GetUserOfflineSubscription
   let createOfflineSubscriptionToken: CreateOfflineSubscriptionToken
   let authenticateToken: AuthenticateOfflineSubscriptionToken
   const jwtSecret = 'auth_jwt_secret'
@@ -24,6 +27,7 @@ describe('OfflineController', () => {
 
   const createController = () => new OfflineController(
     getUserFeatures,
+    getUserOfflineSubscription,
     createOfflineSubscriptionToken,
     authenticateToken,
     jwtSecret,
@@ -44,6 +48,14 @@ describe('OfflineController', () => {
         token: 'test',
       },
     } as jest.Mocked<CreateOfflineSubscriptionTokenResponse>)
+
+    getUserOfflineSubscription = {} as jest.Mocked<GetUserOfflineSubscription>
+    getUserOfflineSubscription.execute = jest.fn().mockReturnValue({
+      success: true,
+      subscription: {
+        planName: SubscriptionName.ProPlan,
+      },
+    })
 
     authenticateToken = {} as jest.Mocked<AuthenticateOfflineSubscriptionToken>
     authenticateToken.execute = jest.fn().mockReturnValue({
@@ -79,6 +91,34 @@ describe('OfflineController', () => {
     })
 
     expect(result.statusCode).toEqual(200)
+  })
+
+  it('should get offline user subscription', async () => {
+    response.locals.userEmail = 'test@test.com'
+
+    const httpResponse = <results.JsonResult> await createController().getSubscription(request, response)
+    const result = await httpResponse.executeAsync()
+
+    expect(getUserOfflineSubscription.execute).toHaveBeenCalledWith({
+      userEmail: 'test@test.com',
+    })
+
+    expect(result.statusCode).toEqual(200)
+  })
+
+  it('should not get offline user subscription if the procedure fails', async () => {
+    response.locals.userEmail = 'test@test.com'
+
+    getUserOfflineSubscription.execute = jest.fn().mockReturnValue({ success: false })
+
+    const httpResponse = <results.JsonResult> await createController().getSubscription(request, response)
+    const result = await httpResponse.executeAsync()
+
+    expect(getUserOfflineSubscription.execute).toHaveBeenCalledWith({
+      userEmail: 'test@test.com',
+    })
+
+    expect(result.statusCode).toEqual(400)
   })
 
   it('should not get offline user features if the procedure fails', async () => {
