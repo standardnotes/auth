@@ -46,7 +46,6 @@ export class AuthenticateOfflineSubscriptionToken implements UseCaseInterface {
     return {
       success: true,
       email: userEmail,
-      subscriptions,
       featuresToken: offlineFeaturesTokenSetting.value as string,
     }
   }
