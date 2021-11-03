@@ -3,7 +3,7 @@ import { verify } from 'jsonwebtoken'
 import { inject, injectable } from 'inversify'
 import TYPES from '../../Bootstrap/Types'
 import { TokenDecoderInterface } from './TokenDecoderInterface'
-import { Token } from '@standardnotes/auth'
+import { OfflineUserTokenData, Token } from '@standardnotes/auth'
 
 @injectable()
 export class TokenDecoder implements TokenDecoderInterface {
@@ -17,6 +17,16 @@ export class TokenDecoder implements TokenDecoderInterface {
   decodeCrossServiceCommunicationToken(token: string): Token | undefined {
     try {
       return <Token> verify(token, this.authJwtSecret, {
+        algorithms: [ 'HS256' ],
+      })
+    } catch (error) {
+      return undefined
+    }
+  }
+
+  decodeCrossServiceCommunicationOfflineToken(token: string): OfflineUserTokenData | undefined {
+    try {
+      return <OfflineUserTokenData> verify(token, this.authJwtSecret, {
         algorithms: [ 'HS256' ],
       })
     } catch (error) {

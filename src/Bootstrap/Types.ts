@@ -21,6 +21,7 @@ const TYPES = {
   // Middleware
   AuthMiddleware: Symbol.for('AuthMiddleware'),
   ApiGatewayAuthMiddleware: Symbol.for('ApiGatewayAuthMiddleware'),
+  ApiGatewayOfflineAuthMiddleware: Symbol.for('ApiGatewayOfflineAuthMiddleware'),
   OfflineUserAuthMiddleware: Symbol.for('OfflineUserAuthMiddleware'),
   AuthMiddlewareWithoutResponse: Symbol.for('AuthMiddlewareWithoutResponse'),
   LockMiddleware: Symbol.for('LockMiddleware'),
@@ -86,6 +87,7 @@ const TYPES = {
   AddWebSocketsConnection: Symbol.for('AddWebSocketsConnection'),
   RemoveWebSocketsConnection: Symbol.for('RemoveWebSocketsConnection'),
   GetUserSubscription: Symbol.for('GetUserSubscription'),
+  GetUserOfflineSubscription: Symbol.for('GetUserOfflineSubscription'),
   CreateSubscriptionToken: Symbol.for('CreateSubscriptionToken'),
   AuthenticateSubscriptionToken: Symbol.for('AuthenticateSubscriptionToken'),
   CreateOfflineSubscriptionToken: Symbol.for('CreateOfflineSubscriptionToken'),

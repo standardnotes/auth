@@ -120,6 +120,8 @@ import { CreateOfflineSubscriptionToken } from '../Domain/UseCase/CreateOfflineS
 import { AuthenticateOfflineSubscriptionToken } from '../Domain/UseCase/AuthenticateOfflineSubscriptionToken/AuthenticateOfflineSubscriptionToken'
 import { SubscriptionCancelledEventHandler } from '../Domain/Handler/SubscriptionCancelledEventHandler'
 import { ContentDecoder, ContentDecoderInterface } from '@standardnotes/common'
+import { GetUserOfflineSubscription } from '../Domain/UseCase/GetUserOfflineSubscription/GetUserOfflineSubscription'
+import { ApiGatewayOfflineAuthMiddleware } from '../Controller/ApiGatewayOfflineAuthMiddleware'
 
 export class ContainerConfigLoader {
   async load(): Promise<Container> {
@@ -232,6 +234,7 @@ export class ContainerConfigLoader {
     container.bind<LockMiddleware>(TYPES.LockMiddleware).to(LockMiddleware)
     container.bind<AuthMiddlewareWithoutResponse>(TYPES.AuthMiddlewareWithoutResponse).to(AuthMiddlewareWithoutResponse)
     container.bind<ApiGatewayAuthMiddleware>(TYPES.ApiGatewayAuthMiddleware).to(ApiGatewayAuthMiddleware)
+    container.bind<ApiGatewayOfflineAuthMiddleware>(TYPES.ApiGatewayOfflineAuthMiddleware).to(ApiGatewayOfflineAuthMiddleware)
     container.bind<OfflineUserAuthMiddleware>(TYPES.OfflineUserAuthMiddleware).to(OfflineUserAuthMiddleware)
 
     // Projectors
@@ -297,6 +300,7 @@ export class ContainerConfigLoader {
     container.bind<AddWebSocketsConnection>(TYPES.AddWebSocketsConnection).to(AddWebSocketsConnection)
     container.bind<RemoveWebSocketsConnection>(TYPES.RemoveWebSocketsConnection).to(RemoveWebSocketsConnection)
     container.bind<GetUserSubscription>(TYPES.GetUserSubscription).to(GetUserSubscription)
+    container.bind<GetUserOfflineSubscription>(TYPES.GetUserOfflineSubscription).to(GetUserOfflineSubscription)
     container.bind<CreateSubscriptionToken>(TYPES.CreateSubscriptionToken).to(CreateSubscriptionToken)
     container.bind<AuthenticateSubscriptionToken>(TYPES.AuthenticateSubscriptionToken).to(AuthenticateSubscriptionToken)
     container.bind<AuthenticateOfflineSubscriptionToken>(TYPES.AuthenticateOfflineSubscriptionToken).to(AuthenticateOfflineSubscriptionToken)
