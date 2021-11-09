@@ -703,10 +703,10 @@
   dependencies:
     "@standardnotes/auth" "^3.8.1"
 
-"@standardnotes/features@1.8.0":
-  version "1.8.0"
-  resolved "https://registry.yarnpkg.com/@standardnotes/features/-/features-1.8.0.tgz#1414350108714e376c57600b74437b9ae58cf343"
-  integrity sha512-gkBM82kEeKj4tve25WFsvPMb7MLqK2C3HcjKxk4RfoGouLAGjnSAVqs4AKZsDqdOrDZr5cAv55Uychr5qZMJTw==
+"@standardnotes/features@1.8.1":
+  version "1.8.1"
+  resolved "https://registry.yarnpkg.com/@standardnotes/features/-/features-1.8.1.tgz#addea86a8a4288a0046bc674a8e76f1bac3c2f89"
+  integrity sha512-yDbMLu9SnwR4cmjsIMgpxBOK9kIbWVQ7WezfJ5MN0FAwD2IbfKCMaWBMUJStCtSqkKE4dkL3BC+sIxik/4RwdQ==
   dependencies:
     "@standardnotes/common" "^1.2.1"
 
