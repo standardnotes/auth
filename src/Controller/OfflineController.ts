@@ -14,6 +14,7 @@ import { AuthenticateOfflineSubscriptionToken } from '../Domain/UseCase/Authenti
 import { CreateOfflineSubscriptionToken } from '../Domain/UseCase/CreateOfflineSubscriptionToken/CreateOfflineSubscriptionToken'
 import { sign } from 'jsonwebtoken'
 import { GetUserOfflineSubscription } from '../Domain/UseCase/GetUserOfflineSubscription/GetUserOfflineSubscription'
+import { Logger } from 'winston'
 
 @controller('/offline')
 export class OfflineController extends BaseHttpController {
@@ -24,6 +25,7 @@ export class OfflineController extends BaseHttpController {
     @inject(TYPES.AuthenticateOfflineSubscriptionToken) private authenticateToken: AuthenticateOfflineSubscriptionToken,
     @inject(TYPES.AUTH_JWT_SECRET) private jwtSecret: string,
     @inject(TYPES.AUTH_JWT_TTL) private jwtTTL: number,
+    @inject(TYPES.Logger) private logger: Logger,
   ) {
     super()
   }
@@ -68,6 +70,8 @@ export class OfflineController extends BaseHttpController {
   @httpPost('/subscription-tokens/:token/validate')
   async validate(request: Request): Promise<results.JsonResult> {
     if (!request.body.email) {
+      this.logger.debug('[Offline Subscription Token Validation] Missing email')
+
       return this.json({
         error: {
           tag: 'invalid-request',
@@ -82,6 +86,8 @@ export class OfflineController extends BaseHttpController {
     })
 
     if (!authenticateTokenResponse.success) {
+      this.logger.debug('[Offline Subscription Token Validation] invalid token')
+
       return this.json({
         error: {
           tag: 'invalid-auth',
@@ -96,6 +102,8 @@ export class OfflineController extends BaseHttpController {
     }
 
     const authToken = sign(offlineAuthTokenData, this.jwtSecret, { algorithm: 'HS256', expiresIn: this.jwtTTL })
+
+    this.logger.debug(`[Offline Subscription Token Validation] authenticated token for user ${authenticateTokenResponse.email}`)
 
     return this.json({ authToken })
   }

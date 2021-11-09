@@ -12,12 +12,14 @@ import { AuthenticateOfflineSubscriptionToken } from '../Domain/UseCase/Authenti
 import { OfflineUserSubscription } from '../Domain/Subscription/OfflineUserSubscription'
 import { GetUserOfflineSubscription } from '../Domain/UseCase/GetUserOfflineSubscription/GetUserOfflineSubscription'
 import { SubscriptionName } from '@standardnotes/auth'
+import { Logger } from 'winston'
 
 describe('OfflineController', () => {
   let getUserFeatures: GetUserFeatures
   let getUserOfflineSubscription: GetUserOfflineSubscription
   let createOfflineSubscriptionToken: CreateOfflineSubscriptionToken
   let authenticateToken: AuthenticateOfflineSubscriptionToken
+  let logger: Logger
   const jwtSecret = 'auth_jwt_secret'
   const jwtTTL = 60
 
@@ -31,7 +33,8 @@ describe('OfflineController', () => {
     createOfflineSubscriptionToken,
     authenticateToken,
     jwtSecret,
-    jwtTTL
+    jwtTTL,
+    logger
   )
 
   beforeEach(() => {
@@ -63,6 +66,9 @@ describe('OfflineController', () => {
       email: 'test@test.com',
       subscriptions: [ {} as jest.Mocked<OfflineUserSubscription> ],
     })
+
+    logger = {} as jest.Mocked<Logger>
+    logger.debug = jest.fn()
 
     request = {
       headers: {},
