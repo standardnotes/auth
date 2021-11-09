@@ -30,6 +30,7 @@ export class ApiGatewayOfflineAuthMiddleware extends BaseMiddleware {
       }
 
       const token = this.tokenDecoder.decodeCrossServiceCommunicationOfflineToken(request.headers['x-auth-offline-token'] as string)
+      this.logger.debug('ApiGatewayOfflineAuthMiddleware decoded token %O', token)
 
       if (token === undefined) {
         this.logger.debug('ApiGatewayOfflineAuthMiddleware authentication failure.')
