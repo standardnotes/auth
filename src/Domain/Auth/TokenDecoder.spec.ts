@@ -49,21 +49,18 @@ describe('TokenDecoder', () => {
       .toBeUndefined()
   })
 
-  it('should decode an offline token', () => {
-    expect(createDecoder().decodeOfflineToken('ewogICJleHRlbnNpb25LZXkiOiAidGVzdCIsCiAgImZlYXR1cmVzVXJsIjogImh0dHBzOi8vYXBpLnN0YW5kYXJkbm90ZXMuY29tL3YxL29mZmxpbmUvZmVhdHVyZXMiCn0='))
+  it('should decode a cross service communication offline token', () => {
+    expect(createDecoder().decodeCrossServiceCommunicationOfflineToken('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwidXNlckVtYWlsIjoidGVzdEB0ZXN0LmNvbSIsImZlYXR1cmVzVG9rZW4iOiJhYmMiLCJpYXQiOjE1MTYyMzkwMjJ9._AmaPMZhXWhROMLpHoCsyjrQ0m8pHx2JCGhCVhatsuA'))
       .toEqual({
-        extensionKey: 'test',
-        featuresUrl: 'https://api.standardnotes.com/v1/offline/features',
+        featuresToken: 'abc',
+        iat: 1516239022,
+        sub: '1234567890',
+        userEmail: 'test@test.com',
       })
   })
 
-  it('should not decode a malformed offline token', () => {
-    expect(createDecoder().decodeOfflineToken('ewogICJmZWF0dXJlc1VybCI6ICJodHRwczovL2FwaS5zdGFuZGFyZG5vdGVzLmNvbS92MS9vZmZsaW5lL2ZlYXR1cmVzIgp9'))
-      .toBeUndefined()
-  })
-
-  it('should not decode and offline token that causes parsing error', () => {
-    expect(createDecoder().decodeOfflineToken('ewogICJmZWF0dXJlc1VybDogImh0dHBzOi8vYXBpLnN0YW5kYXJkbm90ZXMuY29tL3YxL29mZmxpbmUvZmVhdHVyZXMiCn0='))
+  it('should not decode a cross service communication offline token with wrong encoding', () => {
+    expect(createDecoder().decodeCrossServiceCommunicationOfflineToken('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyqeqwJzdWIiOiIxMjM0NTY3ODkwIiwidXNlcl91dWlkIjoiMTIzIiwicHdfaGFzaCI6IjlmODZkMDgxODg0YzdkNjU5YTJmZWFhMGM1NWFkMDE1YTNiZjRmMWIyYjBiODIyY2QxNWQ2YzE1YjBmMDBhMDgiLCJpYXQiOjE1MTYyMzkwMjJ9.g32nbZ046pRwSe1iHwWEfsNNBRnAKqXshQKRtCuX1Zw'))
       .toBeUndefined()
   })
 })

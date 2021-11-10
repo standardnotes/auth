@@ -24,7 +24,7 @@ export class CreateSubscriptionToken implements UseCaseInterface {
       userUuid: dto.userUuid,
       token,
       expiresAt: this.timer.convertStringDateToMicroseconds(
-        this.timer.getUTCDateNDaysAhead(1).toString()
+        this.timer.getUTCDateNHoursAhead(3).toString()
       ),
     }
 

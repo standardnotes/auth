@@ -32,7 +32,7 @@ export class GetUserSubscription implements UseCaseInterface {
 
     return {
       success: true,
-      userUuid,
+      user: { uuid: user.uuid, email: user.email },
       subscription: userSubscription,
     }
   }

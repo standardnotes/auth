@@ -11,6 +11,7 @@ import { ExtensionKeyGrantedEventHandler } from './ExtensionKeyGrantedEventHandl
 import { SettingServiceInterface } from '../Setting/SettingServiceInterface'
 import { OfflineSettingServiceInterface } from '../Setting/OfflineSettingServiceInterface'
 import { SubscriptionName } from '@standardnotes/auth'
+import { ContentDecoderInterface } from '@standardnotes/common'
 
 describe('ExtensionKeyGrantedEventHandler', () => {
   let userRepository: UserRepositoryInterface
@@ -19,12 +20,14 @@ describe('ExtensionKeyGrantedEventHandler', () => {
   let event: ExtensionKeyGrantedEvent
   let settingService: SettingServiceInterface
   let offlineSettingService: OfflineSettingServiceInterface
+  let contentDecoder: ContentDecoderInterface
   let timestamp: number
 
   const createHandler = () => new ExtensionKeyGrantedEventHandler(
     userRepository,
     settingService,
     offlineSettingService,
+    contentDecoder,
     logger
   )
 
@@ -56,12 +59,18 @@ describe('ExtensionKeyGrantedEventHandler', () => {
       timestamp,
     }
 
+    contentDecoder = {} as jest.Mocked<ContentDecoderInterface>
+    contentDecoder.decode = jest.fn().mockReturnValue({
+      featuresUrl: 'http://features-url',
+      extensionKey: 'key',
+    })
+
     logger = {} as jest.Mocked<Logger>
     logger.info = jest.fn()
     logger.warn = jest.fn()
   })
 
-  it('should add offline features token as an user offline user setting', async () => {
+  it('should add extension key as an user offline features token for offline user setting', async () => {
     event.payload.offline = true
 
     await createHandler().handle(event)
@@ -69,8 +78,18 @@ describe('ExtensionKeyGrantedEventHandler', () => {
     expect(offlineSettingService.createOrUpdate).toHaveBeenCalledWith({
       email: 'test@test.com',
       name: 'FEATURES_TOKEN',
-      value: 'test',
+      value: 'key',
     })
+  })
+
+  it('should add extension key as an user offline features token if not possible to decode', async () => {
+    event.payload.offline = true
+
+    contentDecoder.decode = jest.fn().mockReturnValue({})
+
+    await createHandler().handle(event)
+
+    expect(offlineSettingService.createOrUpdate).not.toHaveBeenCalled()
   })
 
   it('should add extension key as user setting', async () => {

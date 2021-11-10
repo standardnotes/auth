@@ -3,7 +3,7 @@ import { verify } from 'jsonwebtoken'
 import { inject, injectable } from 'inversify'
 import TYPES from '../../Bootstrap/Types'
 import { TokenDecoderInterface } from './TokenDecoderInterface'
-import { OfflineFeaturesTokenData, Token } from '@standardnotes/auth'
+import { OfflineUserTokenData, Token } from '@standardnotes/auth'
 
 @injectable()
 export class TokenDecoder implements TokenDecoderInterface {
@@ -14,26 +14,19 @@ export class TokenDecoder implements TokenDecoderInterface {
   ) {
   }
 
-  decodeOfflineToken(token: string): OfflineFeaturesTokenData | undefined {
+  decodeCrossServiceCommunicationToken(token: string): Token | undefined {
     try {
-      const valueBuffer = Buffer.from(token, 'base64')
-      const decodedValue = valueBuffer.toString()
-
-      const tokenObject = JSON.parse(decodedValue)
-
-      if ('extensionKey' in tokenObject && tokenObject.extensionKey) {
-        return tokenObject
-      }
-
-      return undefined
+      return <Token> verify(token, this.authJwtSecret, {
+        algorithms: [ 'HS256' ],
+      })
     } catch (error) {
       return undefined
     }
   }
 
-  decodeCrossServiceCommunicationToken(token: string): Token | undefined {
+  decodeCrossServiceCommunicationOfflineToken(token: string): OfflineUserTokenData | undefined {
     try {
-      return <Token> verify(token, this.authJwtSecret, {
+      return <OfflineUserTokenData> verify(token, this.authJwtSecret, {
         algorithms: [ 'HS256' ],
       })
     } catch (error) {

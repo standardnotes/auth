@@ -12,13 +12,20 @@ import TYPES from '../Bootstrap/Types'
 import { GetUserFeatures } from '../Domain/UseCase/GetUserFeatures/GetUserFeatures'
 import { AuthenticateOfflineSubscriptionToken } from '../Domain/UseCase/AuthenticateOfflineSubscriptionToken/AuthenticateOfflineSubscriptionToken'
 import { CreateOfflineSubscriptionToken } from '../Domain/UseCase/CreateOfflineSubscriptionToken/CreateOfflineSubscriptionToken'
+import { sign } from 'jsonwebtoken'
+import { GetUserOfflineSubscription } from '../Domain/UseCase/GetUserOfflineSubscription/GetUserOfflineSubscription'
+import { Logger } from 'winston'
 
 @controller('/offline')
 export class OfflineController extends BaseHttpController {
   constructor(
     @inject(TYPES.GetUserFeatures) private doGetUserFeatures: GetUserFeatures,
+    @inject(TYPES.GetUserOfflineSubscription) private getUserOfflineSubscription: GetUserOfflineSubscription,
     @inject(TYPES.CreateOfflineSubscriptionToken) private createOfflineSubscriptionToken: CreateOfflineSubscriptionToken,
     @inject(TYPES.AuthenticateOfflineSubscriptionToken) private authenticateToken: AuthenticateOfflineSubscriptionToken,
+    @inject(TYPES.AUTH_JWT_SECRET) private jwtSecret: string,
+    @inject(TYPES.AUTH_JWT_TTL) private jwtTTL: number,
+    @inject(TYPES.Logger) private logger: Logger,
   ) {
     super()
   }
@@ -49,9 +56,13 @@ export class OfflineController extends BaseHttpController {
       }, 400)
     }
 
-    await this.createOfflineSubscriptionToken.execute({
+    const response = await this.createOfflineSubscriptionToken.execute({
       userEmail: request.body.email,
     })
+
+    if (!response.success) {
+      return this.json({ success: false, error: { tag: response.error } })
+    }
 
     return this.json({ success: true })
   }
@@ -59,6 +70,8 @@ export class OfflineController extends BaseHttpController {
   @httpPost('/subscription-tokens/:token/validate')
   async validate(request: Request): Promise<results.JsonResult> {
     if (!request.body.email) {
+      this.logger.debug('[Offline Subscription Token Validation] Missing email')
+
       return this.json({
         error: {
           tag: 'invalid-request',
@@ -73,6 +86,8 @@ export class OfflineController extends BaseHttpController {
     })
 
     if (!authenticateTokenResponse.success) {
+      this.logger.debug('[Offline Subscription Token Validation] invalid token')
+
       return this.json({
         error: {
           tag: 'invalid-auth',
@@ -81,6 +96,28 @@ export class OfflineController extends BaseHttpController {
       }, 401)
     }
 
-    return this.json(authenticateTokenResponse)
+    const offlineAuthTokenData = {
+      userEmail: authenticateTokenResponse.email,
+      featuresToken: authenticateTokenResponse.featuresToken,
+    }
+
+    const authToken = sign(offlineAuthTokenData, this.jwtSecret, { algorithm: 'HS256', expiresIn: this.jwtTTL })
+
+    this.logger.debug(`[Offline Subscription Token Validation] authenticated token for user ${authenticateTokenResponse.email}`)
+
+    return this.json({ authToken })
+  }
+
+  @httpGet('/users/subscription', TYPES.ApiGatewayOfflineAuthMiddleware)
+  async getSubscription(_request: Request, response: Response): Promise<results.JsonResult> {
+    const result = await this.getUserOfflineSubscription.execute({
+      userEmail: response.locals.userEmail,
+    })
+
+    if (result.success) {
+      return this.json(result)
+    }
+
+    return this.json(result, 400)
   }
 }

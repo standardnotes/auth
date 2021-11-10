@@ -11,7 +11,6 @@ import { Permission, PermissionName } from '@standardnotes/features'
 import { Setting } from '../Setting/Setting'
 import { SettingServiceInterface } from '../Setting/SettingServiceInterface'
 import { OfflineUserSubscriptionRepositoryInterface } from '../Subscription/OfflineUserSubscriptionRepositoryInterface'
-import { TokenDecoderInterface } from '../Auth/TokenDecoderInterface'
 import { TimerInterface } from '@standardnotes/time'
 import { OfflineUserSubscription } from '../Subscription/OfflineUserSubscription'
 
@@ -28,7 +27,6 @@ describe('FeatureService', () => {
   let settingService: SettingServiceInterface
   let extensionServerUrl: string
   let offlineUserSubscriptionRepository: OfflineUserSubscriptionRepositoryInterface
-  let tokenDecoder: TokenDecoderInterface
   let timer: TimerInterface
   let offlineUserSubscription: OfflineUserSubscription
 
@@ -36,7 +34,6 @@ describe('FeatureService', () => {
     roleToSubscriptionMap,
     settingService,
     offlineUserSubscriptionRepository,
-    tokenDecoder,
     timer,
     extensionServerUrl
   )
@@ -116,39 +113,23 @@ describe('FeatureService', () => {
     offlineUserSubscriptionRepository = {} as jest.Mocked<OfflineUserSubscriptionRepositoryInterface>
     offlineUserSubscriptionRepository.findByEmail = jest.fn().mockReturnValue([offlineUserSubscription])
 
-    tokenDecoder = {} as jest.Mocked<TokenDecoderInterface>
-    tokenDecoder.decodeOfflineToken = jest.fn().mockReturnValue({ extensionKey: 'test', featuresUrl: 'https://api.standardnotes.com/v1/offline/features' })
-
     timer = {} as jest.Mocked<TimerInterface>
     timer.getTimestampInMicroseconds = jest.fn().mockReturnValue(123)
   })
 
   describe('offline subscribers', () => {
     it('should return user features with `expires_at` field', async () => {
-      expect(await createService().getFeaturesForOfflineUser('test@test.com', 'features-token')).toEqual([
-        {
-          'content_type': 'SN|Theme',
-          'description': 'A theme for writers and readers.',
-          'dock_icon': {
-            'background_color': '#9D7441',
-            'border_color': '#9D7441',
-            'foreground_color': '#ECE4DB',
-            'type': 'circle',
-          },
-          'download_url': 'https://github.com/standardnotes/autobiography-theme/archive/1.0.0.zip',
-          'expires_at': 555,
-          'flags': [
-            'New',
-          ],
-          'identifier': 'org.standardnotes.theme-autobiography',
-          'permission_name': 'theme:autobiography',
-          'marketing_url': '',
-          'name': 'Autobiography',
-          'thumbnail_url': 'https://s3.amazonaws.com/standard-notes/screenshots/models/themes/autobiography.jpg',
-          'url': 'https://extension-server/test/themes/autobiography',
-          'version': '1.0.0',
-        },
-      ])
+      const features = await createService()
+        .getFeaturesForOfflineUser('test@test.com', 'features-token')
+
+      expect(features).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            identifier: 'org.standardnotes.theme-autobiography',
+            expires_at: 555,
+          }),
+        ])
+      )
     })
 
     it('should not return user features if a subscription could not be found', async () => {
@@ -156,40 +137,19 @@ describe('FeatureService', () => {
 
       expect(await createService().getFeaturesForOfflineUser('test@test.com', 'features-token')).toEqual([])
     })
-
-    it('should not return user features if a features token could not be decoded', async () => {
-      tokenDecoder.decodeOfflineToken = jest.fn().mockReturnValue(undefined)
-
-      expect(await createService().getFeaturesForOfflineUser('test@test.com', 'features-token')).toEqual([])
-    })
   })
 
   describe('online subscribers', () => {
     it('should return user features with `expires_at` field', async () => {
-      expect(await createService().getFeaturesForUser(user)).toEqual([
-        {
-          'content_type': 'SN|Theme',
-          'description': 'A theme for writers and readers.',
-          'dock_icon': {
-            'background_color': '#9D7441',
-            'border_color': '#9D7441',
-            'foreground_color': '#ECE4DB',
-            'type': 'circle',
-          },
-          'download_url': 'https://github.com/standardnotes/autobiography-theme/archive/1.0.0.zip',
-          'expires_at': 555,
-          'flags': [
-            'New',
-          ],
-          'identifier': 'org.standardnotes.theme-autobiography',
-          'permission_name': 'theme:autobiography',
-          'marketing_url': '',
-          'name': 'Autobiography',
-          'thumbnail_url': 'https://s3.amazonaws.com/standard-notes/screenshots/models/themes/autobiography.jpg',
-          'url': 'https://extension-server/abc123/themes/autobiography',
-          'version': '1.0.0',
-        },
-      ])
+      const features = await createService().getFeaturesForUser(user)
+      expect(features).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            identifier: 'org.standardnotes.theme-autobiography',
+            expires_at: 555,
+          }),
+        ])
+      )
     })
 
     it('should not return user features if a subscription could not be found', async () => {
@@ -207,59 +167,29 @@ describe('FeatureService', () => {
     it('should return user features without dedicated url if the extension server url is missing', async () => {
       extensionServerUrl = ''
 
-      expect(await createService().getFeaturesForUser(user)).toEqual([
-        {
-          'content_type': 'SN|Theme',
-          'description': 'A theme for writers and readers.',
-          'dock_icon': {
-            'background_color': '#9D7441',
-            'border_color': '#9D7441',
-            'foreground_color': '#ECE4DB',
-            'type': 'circle',
-          },
-          'download_url': 'https://github.com/standardnotes/autobiography-theme/archive/1.0.0.zip',
-          'expires_at': 555,
-          'flags': [
-            'New',
-          ],
-          'identifier': 'org.standardnotes.theme-autobiography',
-          'permission_name': 'theme:autobiography',
-          'marketing_url': '',
-          'name': 'Autobiography',
-          'thumbnail_url': 'https://s3.amazonaws.com/standard-notes/screenshots/models/themes/autobiography.jpg',
-          'url': '#{url_prefix}/themes/autobiography',
-          'version': '1.0.0',
-        },
-      ])
+      const features = await createService().getFeaturesForUser(user)
+      expect(features).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            identifier: 'org.standardnotes.theme-autobiography',
+            url: '#{url_prefix}/themes/autobiography',
+          }),
+        ])
+      )
     })
 
     it('should return user features without dedicated url if the extension key setting is missing', async () => {
       settingService.findSetting = jest.fn().mockReturnValue(undefined)
 
-      expect(await createService().getFeaturesForUser(user)).toEqual([
-        {
-          'content_type': 'SN|Theme',
-          'description': 'A theme for writers and readers.',
-          'dock_icon': {
-            'background_color': '#9D7441',
-            'border_color': '#9D7441',
-            'foreground_color': '#ECE4DB',
-            'type': 'circle',
-          },
-          'download_url': 'https://github.com/standardnotes/autobiography-theme/archive/1.0.0.zip',
-          'expires_at': 555,
-          'flags': [
-            'New',
-          ],
-          'identifier': 'org.standardnotes.theme-autobiography',
-          'permission_name': 'theme:autobiography',
-          'marketing_url': '',
-          'name': 'Autobiography',
-          'thumbnail_url': 'https://s3.amazonaws.com/standard-notes/screenshots/models/themes/autobiography.jpg',
-          'url': '#{url_prefix}/themes/autobiography',
-          'version': '1.0.0',
-        },
-      ])
+      const features = await createService().getFeaturesForUser(user)
+      expect(features).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            identifier: 'org.standardnotes.theme-autobiography',
+            url: '#{url_prefix}/themes/autobiography',
+          }),
+        ])
+      )
     })
 
     it('should return user features with `expires_at` field when user has more than 1 role & subscription', async () => {
@@ -273,43 +203,19 @@ describe('FeatureService', () => {
         subscriptions: Promise.resolve([subscription1, subscription2]),
       } as jest.Mocked<User>
 
-      expect(await createService().getFeaturesForUser(user)).toEqual([
-        {
-          'content_type': 'SN|Theme',
-          'description': 'A theme for writers and readers.',
-          'dock_icon': {
-            'background_color': '#9D7441',
-            'border_color': '#9D7441',
-            'foreground_color': '#ECE4DB',
-            'type': 'circle',
-          },
-          'download_url': 'https://github.com/standardnotes/autobiography-theme/archive/1.0.0.zip',
-          'expires_at': 555,
-          'flags': [
-            'New',
-          ],
-          'identifier': 'org.standardnotes.theme-autobiography',
-          'permission_name': 'theme:autobiography',
-          'marketing_url': '',
-          'name': 'Autobiography',
-          'thumbnail_url': 'https://s3.amazonaws.com/standard-notes/screenshots/models/themes/autobiography.jpg',
-          'url': 'https://extension-server/abc123/themes/autobiography',
-          'version': '1.0.0',
-        },
-        {
-          'area': 'modal',
-          'content_type': 'SN|Component',
-          'description': 'Manage and install cloud backups, including Note History, Dropbox, Google Drive, OneDrive, and Daily Email Backups.',
-          'download_url': '',
-          'expires_at': 777,
-          'identifier': 'org.standardnotes.cloudlink',
-          'permission_name': 'component:cloud-link',
-          'marketing_url': '',
-          'name': 'CloudLink',
-          'url': 'https://extension-server/abc123/components/cloudlink',
-          'version': '1.2.3',
-        },
-      ])
+      const features = await createService().getFeaturesForUser(user)
+      expect(features).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            identifier: 'org.standardnotes.theme-autobiography',
+            expires_at: 555,
+          }),
+          expect.objectContaining({
+            identifier: 'org.standardnotes.cloudlink',
+            expires_at: 777,
+          }),
+        ])
+      )
     })
 
     it('should set the longest expiration date for feature that matches duplicated permissions', async () => {
@@ -327,43 +233,21 @@ describe('FeatureService', () => {
         subscriptions: Promise.resolve([subscription1, subscription2]),
       } as jest.Mocked<User>
 
-      expect(await createService().getFeaturesForUser(user)).toEqual([
-        {
-          'content_type': 'SN|Theme',
-          'description': 'A theme for writers and readers.',
-          'dock_icon': {
-            'background_color': '#9D7441',
-            'border_color': '#9D7441',
-            'foreground_color': '#ECE4DB',
-            'type': 'circle',
-          },
-          'download_url': 'https://github.com/standardnotes/autobiography-theme/archive/1.0.0.zip',
-          'expires_at': 777,
-          'flags': [
-            'New',
-          ],
-          'identifier': 'org.standardnotes.theme-autobiography',
-          'permission_name': 'theme:autobiography',
-          'marketing_url': '',
-          'name': 'Autobiography',
-          'thumbnail_url': 'https://s3.amazonaws.com/standard-notes/screenshots/models/themes/autobiography.jpg',
-          'url': 'https://extension-server/abc123/themes/autobiography',
-          'version': '1.0.0',
-        },
-        {
-          'area': 'modal',
-          'content_type': 'SN|Component',
-          'description': 'Manage and install cloud backups, including Note History, Dropbox, Google Drive, OneDrive, and Daily Email Backups.',
-          'download_url': '',
-          'expires_at': 777,
-          'identifier': 'org.standardnotes.cloudlink',
-          'permission_name': 'component:cloud-link',
-          'marketing_url': '',
-          'name': 'CloudLink',
-          'url': 'https://extension-server/abc123/components/cloudlink',
-          'version': '1.2.3',
-        },
-      ])
+      const longestExpireAt = 777
+
+      const features = await createService().getFeaturesForUser(user)
+      expect(features).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            identifier: 'org.standardnotes.theme-autobiography',
+            expires_at: longestExpireAt,
+          }),
+          expect.objectContaining({
+            identifier: 'org.standardnotes.cloudlink',
+            expires_at: longestExpireAt,
+          }),
+        ])
+      )
     })
 
     it('should not set the lesser expiration date for feature that matches duplicated permissions', async () => {
@@ -371,7 +255,8 @@ describe('FeatureService', () => {
         .mockReturnValueOnce(SubscriptionName.CorePlan)
         .mockReturnValueOnce(SubscriptionName.ProPlan)
 
-      subscription2.endsAt = 111
+      const lesserExpireAt = 111
+      subscription2.endsAt = lesserExpireAt
 
       role2 = {
         name: RoleName.ProUser, uuid: 'role-2-2-2',
@@ -383,43 +268,19 @@ describe('FeatureService', () => {
         subscriptions: Promise.resolve([subscription1, subscription2]),
       } as jest.Mocked<User>
 
-      expect(await createService().getFeaturesForUser(user)).toEqual([
-        {
-          'content_type': 'SN|Theme',
-          'description': 'A theme for writers and readers.',
-          'dock_icon': {
-            'background_color': '#9D7441',
-            'border_color': '#9D7441',
-            'foreground_color': '#ECE4DB',
-            'type': 'circle',
-          },
-          'download_url': 'https://github.com/standardnotes/autobiography-theme/archive/1.0.0.zip',
-          'expires_at': 555,
-          'flags': [
-            'New',
-          ],
-          'identifier': 'org.standardnotes.theme-autobiography',
-          'permission_name': 'theme:autobiography',
-          'marketing_url': '',
-          'name': 'Autobiography',
-          'thumbnail_url': 'https://s3.amazonaws.com/standard-notes/screenshots/models/themes/autobiography.jpg',
-          'url': 'https://extension-server/abc123/themes/autobiography',
-          'version': '1.0.0',
-        },
-        {
-          'area': 'modal',
-          'content_type': 'SN|Component',
-          'description': 'Manage and install cloud backups, including Note History, Dropbox, Google Drive, OneDrive, and Daily Email Backups.',
-          'download_url': '',
-          'expires_at': 111,
-          'identifier': 'org.standardnotes.cloudlink',
-          'permission_name': 'component:cloud-link',
-          'marketing_url': '',
-          'name': 'CloudLink',
-          'url': 'https://extension-server/abc123/components/cloudlink',
-          'version': '1.2.3',
-        },
-      ])
+      const features = await createService().getFeaturesForUser(user)
+      expect(features).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            identifier: 'org.standardnotes.theme-autobiography',
+            expires_at: 555,
+          }),
+          expect.objectContaining({
+            identifier: 'org.standardnotes.cloudlink',
+            expires_at: lesserExpireAt,
+          }),
+        ])
+      )
     })
   })
 })

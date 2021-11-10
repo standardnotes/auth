@@ -3,6 +3,8 @@ import {
   ExtensionKeyGrantedEvent,
 } from '@standardnotes/domain-events'
 import { SettingName } from '@standardnotes/settings'
+import { OfflineFeaturesTokenData } from '@standardnotes/auth'
+import { ContentDecoderInterface } from '@standardnotes/common'
 import { inject, injectable } from 'inversify'
 import { Logger } from 'winston'
 
@@ -19,16 +21,26 @@ export class ExtensionKeyGrantedEventHandler implements DomainEventHandlerInterf
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
     @inject(TYPES.SettingService) private settingService: SettingServiceInterface,
     @inject(TYPES.OfflineSettingService) private offlineSettingService: OfflineSettingServiceInterface,
+    @inject(TYPES.ContenDecoder) private contentDecoder: ContentDecoderInterface,
     @inject(TYPES.Logger) private logger: Logger
   ) {
   }
 
   async handle(event: ExtensionKeyGrantedEvent): Promise<void> {
     if (event.payload.offline) {
+      const offlineFeaturesTokenDecoded =
+        this.contentDecoder.decode(event.payload.offlineFeaturesToken, 0) as OfflineFeaturesTokenData
+
+      if (!offlineFeaturesTokenDecoded.extensionKey) {
+        this.logger.warn('Could not decode offline features token')
+
+        return
+      }
+
       await this.offlineSettingService.createOrUpdate({
         email: event.payload.userEmail,
         name: OfflineSettingName.FeaturesToken,
-        value: event.payload.offlineFeaturesToken,
+        value: offlineFeaturesTokenDecoded.extensionKey,
       })
 
       return

@@ -78,8 +78,6 @@ import { WebSocketsConnectionRepositoryInterface } from '../Domain/WebSockets/We
 import { RedisWebSocketsConnectionRepository } from '../Infra/Redis/RedisWebSocketsConnectionRepository'
 import { AddWebSocketsConnection } from '../Domain/UseCase/AddWebSocketsConnection/AddWebSocketsConnection'
 import { RemoveWebSocketsConnection } from '../Domain/UseCase/RemoveWebSocketsConnection/RemoveWebSocketsConnection'
-import { ContentDecoderInterface } from '../Domain/Encryption/ContentDecoderInterface'
-import { ContentDecoder } from '../Domain/Encryption/ContentDecoder'
 import axios, { AxiosInstance } from 'axios'
 import { UserSubscription } from '../Domain/Subscription/UserSubscription'
 import { MySQLUserSubscriptionRepository } from '../Infra/MySQL/MySQLUserSubscriptionRepository'
@@ -121,6 +119,10 @@ import { RedisOfflineSubscriptionTokenRepository } from '../Infra/Redis/RedisOff
 import { CreateOfflineSubscriptionToken } from '../Domain/UseCase/CreateOfflineSubscriptionToken/CreateOfflineSubscriptionToken'
 import { AuthenticateOfflineSubscriptionToken } from '../Domain/UseCase/AuthenticateOfflineSubscriptionToken/AuthenticateOfflineSubscriptionToken'
 import { SubscriptionCancelledEventHandler } from '../Domain/Handler/SubscriptionCancelledEventHandler'
+import { ContentDecoder, ContentDecoderInterface } from '@standardnotes/common'
+import { GetUserOfflineSubscription } from '../Domain/UseCase/GetUserOfflineSubscription/GetUserOfflineSubscription'
+import { ApiGatewayOfflineAuthMiddleware } from '../Controller/ApiGatewayOfflineAuthMiddleware'
+import { UserEmailChangedEventHandler } from '../Domain/Handler/UserEmailChangedEventHandler'
 
 export class ContainerConfigLoader {
   async load(): Promise<Container> {
@@ -233,6 +235,7 @@ export class ContainerConfigLoader {
     container.bind<LockMiddleware>(TYPES.LockMiddleware).to(LockMiddleware)
     container.bind<AuthMiddlewareWithoutResponse>(TYPES.AuthMiddlewareWithoutResponse).to(AuthMiddlewareWithoutResponse)
     container.bind<ApiGatewayAuthMiddleware>(TYPES.ApiGatewayAuthMiddleware).to(ApiGatewayAuthMiddleware)
+    container.bind<ApiGatewayOfflineAuthMiddleware>(TYPES.ApiGatewayOfflineAuthMiddleware).to(ApiGatewayOfflineAuthMiddleware)
     container.bind<OfflineUserAuthMiddleware>(TYPES.OfflineUserAuthMiddleware).to(OfflineUserAuthMiddleware)
 
     // Projectors
@@ -298,6 +301,7 @@ export class ContainerConfigLoader {
     container.bind<AddWebSocketsConnection>(TYPES.AddWebSocketsConnection).to(AddWebSocketsConnection)
     container.bind<RemoveWebSocketsConnection>(TYPES.RemoveWebSocketsConnection).to(RemoveWebSocketsConnection)
     container.bind<GetUserSubscription>(TYPES.GetUserSubscription).to(GetUserSubscription)
+    container.bind<GetUserOfflineSubscription>(TYPES.GetUserOfflineSubscription).to(GetUserOfflineSubscription)
     container.bind<CreateSubscriptionToken>(TYPES.CreateSubscriptionToken).to(CreateSubscriptionToken)
     container.bind<AuthenticateSubscriptionToken>(TYPES.AuthenticateSubscriptionToken).to(AuthenticateSubscriptionToken)
     container.bind<AuthenticateOfflineSubscriptionToken>(TYPES.AuthenticateOfflineSubscriptionToken).to(AuthenticateOfflineSubscriptionToken)
@@ -313,6 +317,7 @@ export class ContainerConfigLoader {
     container.bind<SubscriptionExpiredEventHandler>(TYPES.SubscriptionExpiredEventHandler).to(SubscriptionExpiredEventHandler)
     container.bind<ExtensionKeyGrantedEventHandler>(TYPES.ExtensionKeyGrantedEventHandler).to(ExtensionKeyGrantedEventHandler)
     container.bind<SubscriptionReassignedEventHandler>(TYPES.SubscriptionReassignedEventHandler).to(SubscriptionReassignedEventHandler)
+    container.bind<UserEmailChangedEventHandler>(TYPES.UserEmailChangedEventHandler).to(UserEmailChangedEventHandler)
 
     // Services
     container.bind<UAParser>(TYPES.DeviceDetector).toConstantValue(new UAParser())
@@ -331,7 +336,7 @@ export class ContainerConfigLoader {
     container.bind<OfflineSettingServiceInterface>(TYPES.OfflineSettingService).to(OfflineSettingService)
     container.bind<SnCryptoNode>(TYPES.SnCryptoNode).toConstantValue(new SnCryptoNode())
     container.bind<TimerInterface>(TYPES.Timer).toConstantValue(new Timer())
-    container.bind<ContentDecoderInterface>(TYPES.ContenDecoder).to(ContentDecoder)
+    container.bind<ContentDecoderInterface>(TYPES.ContenDecoder).toConstantValue(new ContentDecoder())
     container.bind<ClientServiceInterface>(TYPES.WebSocketsClientService).to(WebSocketsClientService)
     container.bind<RoleServiceInterface>(TYPES.RoleService).to(RoleService)
     container.bind<RoleToSubscriptionMapInterface>(TYPES.RoleToSubscriptionMap).to(RoleToSubscriptionMap)
@@ -364,6 +369,7 @@ export class ContainerConfigLoader {
       ['SUBSCRIPTION_EXPIRED', container.get(TYPES.SubscriptionExpiredEventHandler)],
       ['EXTENSION_KEY_GRANTED', container.get(TYPES.ExtensionKeyGrantedEventHandler)],
       ['SUBSCRIPTION_REASSIGNED', container.get(TYPES.SubscriptionReassignedEventHandler)],
+      ['USER_EMAIL_CHANGED', container.get(TYPES.UserEmailChangedEventHandler)],
     ])
 
     if (env.get('SQS_QUEUE_URL', true)) {
