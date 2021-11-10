@@ -5,5 +5,5 @@ export type CreateOfflineSubscriptionTokenResponse = {
   offlineSubscriptionToken: OfflineSubscriptionToken
 } | {
   success: false
-  error: 'no-subscription'
+  error: 'no-subscription' | 'subscription-canceled' | 'subscription-expired'
 }

@@ -35,7 +35,7 @@ describe('CreateOfflineSubscriptionToken', () => {
     offlineSubscriptionTokenRepository.save = jest.fn()
 
     offlineUserSubscriptionRepository = {} as jest.Mocked<OfflineUserSubscriptionRepositoryInterface>
-    offlineUserSubscriptionRepository.findOneByEmail = jest.fn().mockReturnValue({} as jest.Mocked<OfflineUserSubscription>)
+    offlineUserSubscriptionRepository.findOneByEmail = jest.fn().mockReturnValue({ cancelled: false, endsAt: 100 } as jest.Mocked<OfflineUserSubscription>)
 
     cryptoNode = {} as jest.Mocked<SnCryptoNode>
     cryptoNode.generateRandomKey = jest.fn().mockReturnValueOnce('random-string')
@@ -49,6 +49,7 @@ describe('CreateOfflineSubscriptionToken', () => {
     timer = {} as jest.Mocked<TimerInterface>
     timer.convertStringDateToMicroseconds = jest.fn().mockReturnValue(1)
     timer.getUTCDateNHoursAhead = jest.fn().mockReturnValue(new Date(1))
+    timer.getTimestampInMicroseconds = jest.fn().mockReturnValue(3)
 
     logger = {} as jest.Mocked<Logger>
     logger.debug = jest.fn()
@@ -77,6 +78,36 @@ describe('CreateOfflineSubscriptionToken', () => {
     })).toEqual({
       success: false,
       error: 'no-subscription',
+    })
+
+    expect(offlineSubscriptionTokenRepository.save).not.toHaveBeenCalled()
+    expect(domainEventFactory.createOfflineSubscriptionTokenCreatedEvent).not.toHaveBeenCalled()
+    expect(domainEventPublisher.publish).not.toHaveBeenCalled()
+  })
+
+  it('should not create an offline subscription token if email has a cancelled subscription', async () => {
+    offlineUserSubscriptionRepository.findOneByEmail = jest.fn().mockReturnValue({ cancelled: true, endsAt: 100 } as jest.Mocked<OfflineUserSubscription>)
+
+    expect(await createUseCase().execute({
+      userEmail: 'test@test.com',
+    })).toEqual({
+      success: false,
+      error: 'subscription-canceled',
+    })
+
+    expect(offlineSubscriptionTokenRepository.save).not.toHaveBeenCalled()
+    expect(domainEventFactory.createOfflineSubscriptionTokenCreatedEvent).not.toHaveBeenCalled()
+    expect(domainEventPublisher.publish).not.toHaveBeenCalled()
+  })
+
+  it('should not create an offline subscription token if email has an outdated subscription', async () => {
+    offlineUserSubscriptionRepository.findOneByEmail = jest.fn().mockReturnValue({ cancelled: false, endsAt: 2 } as jest.Mocked<OfflineUserSubscription>)
+
+    expect(await createUseCase().execute({
+      userEmail: 'test@test.com',
+    })).toEqual({
+      success: false,
+      error: 'subscription-expired',
     })
 
     expect(offlineSubscriptionTokenRepository.save).not.toHaveBeenCalled()

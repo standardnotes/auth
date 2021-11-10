@@ -10,6 +10,7 @@ import { RoleRepositoryInterface } from './RoleRepositoryInterface'
 import { RoleServiceInterface } from './RoleServiceInterface'
 import { RoleToSubscriptionMapInterface } from './RoleToSubscriptionMapInterface'
 import { OfflineUserSubscriptionRepositoryInterface } from '../Subscription/OfflineUserSubscriptionRepositoryInterface'
+import { TimerInterface } from '@standardnotes/time'
 
 @injectable()
 export class RoleService implements RoleServiceInterface {
@@ -19,7 +20,8 @@ export class RoleService implements RoleServiceInterface {
     @inject(TYPES.OfflineUserSubscriptionRepository) private offlineUserSubscriptionRepository: OfflineUserSubscriptionRepositoryInterface,
     @inject(TYPES.WebSocketsClientService) private webSocketsClientService: ClientServiceInterface,
     @inject(TYPES.RoleToSubscriptionMap) private roleToSubscriptionMap: RoleToSubscriptionMapInterface,
-    @inject(TYPES.Logger) private logger: Logger
+    @inject(TYPES.Logger) private logger: Logger,
+    @inject(TYPES.Timer) private timer: TimerInterface,
   ) {
   }
 
@@ -75,8 +77,8 @@ export class RoleService implements RoleServiceInterface {
     }
 
     const currentSubscription = await this.offlineUserSubscriptionRepository.findOneByEmail(email)
-    if (currentSubscription === undefined) {
-      this.logger.warn(`Could not find current subscription for email: ${email}`)
+    if (currentSubscription === undefined || currentSubscription.endsAt < this.timer.getTimestampInMicroseconds()) {
+      this.logger.warn(`Could not find a current active subscription for email: ${email}`)
 
       return
     }
