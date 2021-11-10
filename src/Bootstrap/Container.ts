@@ -122,6 +122,7 @@ import { SubscriptionCancelledEventHandler } from '../Domain/Handler/Subscriptio
 import { ContentDecoder, ContentDecoderInterface } from '@standardnotes/common'
 import { GetUserOfflineSubscription } from '../Domain/UseCase/GetUserOfflineSubscription/GetUserOfflineSubscription'
 import { ApiGatewayOfflineAuthMiddleware } from '../Controller/ApiGatewayOfflineAuthMiddleware'
+import { UserEmailChangedEventHandler } from '../Domain/Handler/UserEmailChangedEventHandler'
 
 export class ContainerConfigLoader {
   async load(): Promise<Container> {
@@ -316,6 +317,7 @@ export class ContainerConfigLoader {
     container.bind<SubscriptionExpiredEventHandler>(TYPES.SubscriptionExpiredEventHandler).to(SubscriptionExpiredEventHandler)
     container.bind<ExtensionKeyGrantedEventHandler>(TYPES.ExtensionKeyGrantedEventHandler).to(ExtensionKeyGrantedEventHandler)
     container.bind<SubscriptionReassignedEventHandler>(TYPES.SubscriptionReassignedEventHandler).to(SubscriptionReassignedEventHandler)
+    container.bind<UserEmailChangedEventHandler>(TYPES.UserEmailChangedEventHandler).to(UserEmailChangedEventHandler)
 
     // Services
     container.bind<UAParser>(TYPES.DeviceDetector).toConstantValue(new UAParser())
@@ -367,6 +369,7 @@ export class ContainerConfigLoader {
       ['SUBSCRIPTION_EXPIRED', container.get(TYPES.SubscriptionExpiredEventHandler)],
       ['EXTENSION_KEY_GRANTED', container.get(TYPES.ExtensionKeyGrantedEventHandler)],
       ['SUBSCRIPTION_REASSIGNED', container.get(TYPES.SubscriptionReassignedEventHandler)],
+      ['USER_EMAIL_CHANGED', container.get(TYPES.UserEmailChangedEventHandler)],
     ])
 
     if (env.get('SQS_QUEUE_URL', true)) {
