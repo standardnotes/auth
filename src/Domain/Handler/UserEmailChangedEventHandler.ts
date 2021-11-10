@@ -22,6 +22,8 @@ export class UserEmailChangedEventHandler implements DomainEventHandlerInterface
       return
     }
 
+    this.logger.debug(`Changing user email from ${event.payload.fromEmail} to ${event.payload.toEmail}`)
+
     await this.httpClient
       .request({
         method: 'POST',
@@ -42,5 +44,7 @@ export class UserEmailChangedEventHandler implements DomainEventHandlerInterface
           /* istanbul ignore next */
           (status: number) => status >= 200 && status < 500,
       })
+
+    this.logger.debug(`Successfully changed user email to ${event.payload.toEmail}`)
   }
 }
