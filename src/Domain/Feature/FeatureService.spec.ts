@@ -178,18 +178,11 @@ describe('FeatureService', () => {
       )
     })
 
-    it('should return user features without dedicated url if the extension key setting is missing', async () => {
+    it('should skip features without dedicated url if the extension key setting is missing', async () => {
       settingService.findSetting = jest.fn().mockReturnValue(undefined)
 
       const features = await createService().getFeaturesForUser(user)
-      expect(features).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            identifier: 'org.standardnotes.theme-autobiography',
-            url: '#{url_prefix}/themes/autobiography',
-          }),
-        ])
-      )
+      expect(features.find((f) => f.identifier === 'org.standardnotes.theme-autobiography')).toBeUndefined
     })
 
     it('should return user features with `expires_at` field when user has more than 1 role & subscription', async () => {
