@@ -77,7 +77,7 @@ export class FeatureService implements FeatureServiceInterface {
 
       for (const rolePermission of rolePermissions) {
         let featureForPermission = Features.find(feature => feature.permission_name === rolePermission.name) as FeatureDescription
-        const needsUrlReplace = featureForPermission.url.includes('#{url_prefix}')
+        const needsUrlReplace = featureForPermission.url?.includes('#{url_prefix}')
         if (needsUrlReplace && !extensionKey) {
           continue
         }
