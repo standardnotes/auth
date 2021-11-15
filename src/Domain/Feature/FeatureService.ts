@@ -56,10 +56,6 @@ export class FeatureService implements FeatureServiceInterface {
   }
 
   private injectExtensionKeyIntoUrl(url: string, extensionKey: string): string {
-    if (!this.extensionServerUrl) {
-      return url
-    }
-
     return url.replace('#{url_prefix}', `${this.extensionServerUrl}/${extensionKey}`)
   }
 
@@ -77,6 +73,10 @@ export class FeatureService implements FeatureServiceInterface {
 
       for (const rolePermission of rolePermissions) {
         let featureForPermission = Features.find(feature => feature.permission_name === rolePermission.name) as FeatureDescription
+        const needsUrlReplace = featureForPermission.url?.includes('#{url_prefix}')
+        if (needsUrlReplace && (!this.extensionServerUrl || !extensionKey)) {
+          continue
+        }
 
         if (extensionKey !== undefined) {
           featureForPermission = {
