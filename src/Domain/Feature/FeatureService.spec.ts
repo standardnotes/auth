@@ -23,6 +23,7 @@ describe('FeatureService', () => {
   let subscription2: UserSubscription
   let permission1: Permission
   let permission2: Permission
+  let permission3: Permission
   let extensionKeySetting: Setting
   let settingService: SettingServiceInterface
   let extensionServerUrl: string
@@ -52,11 +53,15 @@ describe('FeatureService', () => {
       uuid: 'permission-2-2-2',
       name: PermissionName.CloudLink,
     }
+    permission3 = {
+      uuid: 'permission-3-3-3',
+      name: PermissionName.TwoFactorAuth,
+    }
 
     role1 = {
       name: RoleName.CoreUser,
       uuid: 'role-1-1-1',
-      permissions: Promise.resolve([permission1]),
+      permissions: Promise.resolve([permission1, permission3]),
     } as jest.Mocked<Role>
 
     role2 = {
@@ -164,32 +169,33 @@ describe('FeatureService', () => {
       expect(await createService().getFeaturesForUser(user)).toEqual([])
     })
 
-    it('should return user features without dedicated url if the extension server url is missing', async () => {
-      extensionServerUrl = ''
-
-      const features = await createService().getFeaturesForUser(user)
-      expect(features).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            identifier: 'org.standardnotes.theme-autobiography',
-            url: '#{url_prefix}/themes/autobiography',
-          }),
-        ])
-      )
-    })
-
-    it('should return user features without dedicated url if the extension key setting is missing', async () => {
+    it('should return user features without dedicated urls if extension key is missing', async () => {
       settingService.findSetting = jest.fn().mockReturnValue(undefined)
 
       const features = await createService().getFeaturesForUser(user)
       expect(features).toEqual(
         expect.arrayContaining([
           expect.objectContaining({
-            identifier: 'org.standardnotes.theme-autobiography',
-            url: '#{url_prefix}/themes/autobiography',
+            identifier: 'org.standardnotes.two-factor-auth',
+            expires_at: 555,
           }),
         ])
       )
+    })
+
+    it('should skip features with dedicated url if the extension server url is missing', async () => {
+      extensionServerUrl = ''
+
+      const features = await createService().getFeaturesForUser(user)
+
+      expect(features.find((f) => f.identifier === 'org.standardnotes.theme-autobiography')).toBeUndefined
+    })
+
+    it('should skip features with dedicated url if the extension key setting is missing', async () => {
+      settingService.findSetting = jest.fn().mockReturnValue(undefined)
+
+      const features = await createService().getFeaturesForUser(user)
+      expect(features.find((f) => f.identifier === 'org.standardnotes.theme-autobiography')).toBeUndefined
     })
 
     it('should return user features with `expires_at` field when user has more than 1 role & subscription', async () => {
