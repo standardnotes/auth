@@ -63,7 +63,13 @@ export class FeatureService implements FeatureServiceInterface {
     const userFeatures: Map<string, FeatureDescription> = new Map()
     for (const role of userRoles) {
       const subscriptionName = this.roleToSubscriptionMap.getSubscriptionNameForRoleName(role.name as RoleName)
-      const userSubscription = userSubscriptions.find(subscription => subscription.planName === subscriptionName)
+      const userSubscription = userSubscriptions
+        .filter(subscription => subscription.planName === subscriptionName)
+        .sort((a, b) => {
+          if (a.endsAt < b.endsAt) { return 1 }
+          if (a.endsAt > b.endsAt) { return -1 }
+          return 0
+        })[0]
       if (userSubscription === undefined) {
         continue
       }
