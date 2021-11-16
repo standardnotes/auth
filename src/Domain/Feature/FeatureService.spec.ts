@@ -21,6 +21,8 @@ describe('FeatureService', () => {
   let role2: Role
   let subscription1: UserSubscription
   let subscription2: UserSubscription
+  let subscription3: UserSubscription
+  let subscription4: UserSubscription
   let permission1: Permission
   let permission2: Permission
   let permission3: Permission
@@ -91,6 +93,28 @@ describe('FeatureService', () => {
       subscriptionId: 2,
     }
 
+    subscription3 = {
+      uuid: 'subscription-3-3-3-canceled',
+      createdAt: 111,
+      updatedAt: 222,
+      planName: SubscriptionName.CorePlan,
+      endsAt: 333,
+      user: Promise.resolve(user),
+      cancelled: true,
+      subscriptionId: 3,
+    }
+
+    subscription4 = {
+      uuid: 'subscription-4-4-4-canceled',
+      createdAt: 111,
+      updatedAt: 222,
+      planName: SubscriptionName.CorePlan,
+      endsAt: 333,
+      user: Promise.resolve(user),
+      cancelled: true,
+      subscriptionId: 4,
+    }
+
     user = {
       uuid: 'user-1-1-1',
       roles: Promise.resolve([role1]),
@@ -146,6 +170,24 @@ describe('FeatureService', () => {
 
   describe('online subscribers', () => {
     it('should return user features with `expires_at` field', async () => {
+      const features = await createService().getFeaturesForUser(user)
+      expect(features).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            identifier: 'org.standardnotes.theme-autobiography',
+            expires_at: 555,
+          }),
+        ])
+      )
+    })
+
+    it('should return user features based on longest lasting subscription', async () => {
+      user = {
+        uuid: 'user-1-1-1',
+        roles: Promise.resolve([role1]),
+        subscriptions: Promise.resolve([subscription3, subscription1, subscription4]),
+      } as jest.Mocked<User>
+
       const features = await createService().getFeaturesForUser(user)
       expect(features).toEqual(
         expect.arrayContaining([
