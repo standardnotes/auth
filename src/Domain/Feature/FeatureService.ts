@@ -1,4 +1,4 @@
-import { RoleName } from '@standardnotes/auth'
+import { RoleName, SubscriptionName } from '@standardnotes/auth'
 import { FeatureDescription, Features } from '@standardnotes/features'
 import { SettingName } from '@standardnotes/settings'
 import { inject, injectable } from 'inversify'
@@ -63,13 +63,7 @@ export class FeatureService implements FeatureServiceInterface {
     const userFeatures: Map<string, FeatureDescription> = new Map()
     for (const role of userRoles) {
       const subscriptionName = this.roleToSubscriptionMap.getSubscriptionNameForRoleName(role.name as RoleName)
-      const userSubscription = userSubscriptions
-        .filter(subscription => subscription.planName === subscriptionName)
-        .sort((a, b) => {
-          if (a.endsAt < b.endsAt) { return 1 }
-          if (a.endsAt > b.endsAt) { return -1 }
-          return 0
-        })[0]
+      const userSubscription = this.getLongestLastingSubscription(userSubscriptions, subscriptionName)
       if (userSubscription === undefined) {
         continue
       }
@@ -107,5 +101,15 @@ export class FeatureService implements FeatureServiceInterface {
     }
 
     return [...userFeatures.values()]
+  }
+
+  private getLongestLastingSubscription(userSubscriptions: Array<UserSubscription | OfflineUserSubscription>, subscriptionName?: SubscriptionName) {
+    return userSubscriptions
+      .filter(subscription => subscription.planName === subscriptionName)
+      .sort((a, b) => {
+        if (a.endsAt < b.endsAt) { return 1 }
+        if (a.endsAt > b.endsAt) { return -1 }
+        return 0
+      })[0]
   }
 }
