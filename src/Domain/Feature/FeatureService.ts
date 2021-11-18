@@ -61,17 +61,10 @@ export class FeatureService implements FeatureServiceInterface {
 
   private async getFeaturesForSubscriptions(userSubscriptions: Array<UserSubscription | OfflineUserSubscription>, extensionKey?: string): Promise<Array<FeatureDescription>> {
     const userFeatures: Map<string, FeatureDescription> = new Map()
-    const userSubscriptionNames: Array<SubscriptionName> = []
 
-    userSubscriptions.map((userSubscription: UserSubscription) => {
+    for (const userSubscription of userSubscriptions) {
       const subscriptionName = userSubscription.planName as SubscriptionName
-      if (!userSubscriptionNames.includes(subscriptionName)) {
-        userSubscriptionNames.push(subscriptionName)
-      }
-    })
-
-    for (const userSubscriptionName of userSubscriptionNames) {
-      const roleName = this.roleToSubscriptionMap.getRoleNameForSubscriptionName(userSubscriptionName)
+      const roleName = this.roleToSubscriptionMap.getRoleNameForSubscriptionName(subscriptionName)
       if (roleName === undefined) {
         continue
       }
@@ -80,7 +73,8 @@ export class FeatureService implements FeatureServiceInterface {
         continue
       }
 
-      const longestLastingSubscription = this.getLongestLastingSubscription(userSubscriptions, userSubscriptionName)
+      const longestLastingSubscription = this.getLongestLastingSubscription(userSubscriptions, subscriptionName)
+      const isSubscriptionLatest = userSubscription.subscriptionId === longestLastingSubscription.subscriptionId
 
       const rolePermissions = await role.permissions
 
@@ -99,18 +93,14 @@ export class FeatureService implements FeatureServiceInterface {
         }
 
         const alreadyAddedFeature = userFeatures.get(rolePermission.name)
-        if (alreadyAddedFeature === undefined) {
+        if (alreadyAddedFeature === undefined || isSubscriptionLatest) {
           userFeatures.set(rolePermission.name, {
             ...featureForPermission,
-            expires_at: longestLastingSubscription.endsAt,
+            expires_at: userSubscription.endsAt,
             role_name: roleName,
           })
 
           continue
-        }
-
-        if (longestLastingSubscription.endsAt > (alreadyAddedFeature.expires_at as number)) {
-          alreadyAddedFeature.expires_at = longestLastingSubscription.endsAt
         }
       }
     }
