@@ -1,4 +1,5 @@
 import { RoleName, Token } from '@standardnotes/auth'
+import { SettingName } from '@standardnotes/settings'
 import { Request, Response } from 'express'
 import { inject } from 'inversify'
 import {
@@ -12,6 +13,7 @@ import { sign } from 'jsonwebtoken'
 
 import TYPES from '../Bootstrap/Types'
 import { Role } from '../Domain/Role/Role'
+import { SettingServiceInterface } from '../Domain/Setting/SettingServiceInterface'
 import { AuthenticateSubscriptionToken } from '../Domain/UseCase/AuthenticateSubscriptionToken/AuthenticateSubscriptionToken'
 import { CreateSubscriptionToken } from '../Domain/UseCase/CreateSubscriptionToken/CreateSubscriptionToken'
 import { User } from '../Domain/User/User'
@@ -22,6 +24,7 @@ export class SubscriptionTokensController extends BaseHttpController {
   constructor(
     @inject(TYPES.CreateSubscriptionToken) private createSubscriptionToken: CreateSubscriptionToken,
     @inject(TYPES.AuthenticateSubscriptionToken) private authenticateToken: AuthenticateSubscriptionToken,
+    @inject(TYPES.SettingService) private settingService: SettingServiceInterface,
     @inject(TYPES.UserProjector) private userProjector: ProjectorInterface<User>,
     @inject(TYPES.RoleProjector) private roleProjector: ProjectorInterface<Role>,
     @inject(TYPES.AUTH_JWT_SECRET) private jwtSecret: string,
@@ -56,11 +59,22 @@ export class SubscriptionTokensController extends BaseHttpController {
       }, 401)
     }
 
-    const roles = await (authenticateTokenResponse.user as User).roles
+    const user = authenticateTokenResponse.user as User
+    let extensionKey = undefined
+    const extensionKeySetting = await this.settingService.findSetting({
+      settingName: SettingName.ExtensionKey,
+      userUuid: user.uuid,
+    })
+    if (extensionKeySetting !== undefined) {
+      extensionKey = extensionKeySetting.value as string
+    }
+
+    const roles = await user.roles
 
     const authTokenData: Token = {
-      user: await this.projectUser(authenticateTokenResponse.user as User),
+      user: await this.projectUser(user),
       roles: await this.projectRoles(roles),
+      extensionKey,
     }
 
     const authToken = sign(authTokenData, this.jwtSecret, { algorithm: 'HS256', expiresIn: this.jwtTTL })
