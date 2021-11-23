@@ -19,18 +19,24 @@ describe('MySQLUserSubscriptionRepository', () => {
 
     subscription = {
       planName: SubscriptionName.ProPlan,
+      cancelled: false,
     } as jest.Mocked<UserSubscription>
 
     repository = new MySQLUserSubscriptionRepository()
     jest.spyOn(repository, 'createQueryBuilder')
   })
 
-  it('should find one by user uuid', async () => {
+  it('should find one longest lasting uncanceled subscription by user uuid if there are canceled ones', async () => {
+    const canceledSubscription = {
+      planName: SubscriptionName.ProPlan,
+      cancelled: true,
+    } as jest.Mocked<UserSubscription>
+
     repository.createQueryBuilder = jest.fn().mockImplementation(() => selectQueryBuilder)
 
     selectQueryBuilder.where = jest.fn().mockReturnThis()
     selectQueryBuilder.orderBy = jest.fn().mockReturnThis()
-    selectQueryBuilder.getOne = jest.fn().mockReturnValue(subscription)
+    selectQueryBuilder.getMany = jest.fn().mockReturnValue([canceledSubscription, subscription])
 
     const result = await repository.findOneByUserUuid('123')
 
@@ -43,8 +49,52 @@ describe('MySQLUserSubscriptionRepository', () => {
     expect(selectQueryBuilder.orderBy).toHaveBeenCalledWith(
       'ends_at', 'DESC'
     )
-    expect(selectQueryBuilder.getOne).toHaveBeenCalled()
+    expect(selectQueryBuilder.getMany).toHaveBeenCalled()
     expect(result).toEqual(subscription)
+  })
+
+  it('should find one, longest lasting subscription by user uuid if there are no canceled ones', async () => {
+    repository.createQueryBuilder = jest.fn().mockImplementation(() => selectQueryBuilder)
+
+    selectQueryBuilder.where = jest.fn().mockReturnThis()
+    selectQueryBuilder.orderBy = jest.fn().mockReturnThis()
+    selectQueryBuilder.getMany = jest.fn().mockReturnValue([subscription])
+
+    const result = await repository.findOneByUserUuid('123')
+
+    expect(selectQueryBuilder.where).toHaveBeenCalledWith(
+      'user_uuid = :user_uuid',
+      {
+        user_uuid: '123',
+      },
+    )
+    expect(selectQueryBuilder.orderBy).toHaveBeenCalledWith(
+      'ends_at', 'DESC'
+    )
+    expect(selectQueryBuilder.getMany).toHaveBeenCalled()
+    expect(result).toEqual(subscription)
+  })
+
+  it('should find none if there are no subscriptions for the user', async () => {
+    repository.createQueryBuilder = jest.fn().mockImplementation(() => selectQueryBuilder)
+
+    selectQueryBuilder.where = jest.fn().mockReturnThis()
+    selectQueryBuilder.orderBy = jest.fn().mockReturnThis()
+    selectQueryBuilder.getMany = jest.fn().mockReturnValue([])
+
+    const result = await repository.findOneByUserUuid('123')
+
+    expect(selectQueryBuilder.where).toHaveBeenCalledWith(
+      'user_uuid = :user_uuid',
+      {
+        user_uuid: '123',
+      },
+    )
+    expect(selectQueryBuilder.orderBy).toHaveBeenCalledWith(
+      'ends_at', 'DESC'
+    )
+    expect(selectQueryBuilder.getMany).toHaveBeenCalled()
+    expect(result).toBeUndefined()
   })
 
   it('should update ends at by subscription id', async () => {
