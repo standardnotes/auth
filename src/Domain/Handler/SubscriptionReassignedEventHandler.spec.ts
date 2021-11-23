@@ -12,6 +12,7 @@ import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { UserSubscriptionRepositoryInterface } from '../Subscription/UserSubscriptionRepositoryInterface'
 import { SubscriptionReassignedEventHandler } from './SubscriptionReassignedEventHandler'
 import { UserSubscription } from '../Subscription/UserSubscription'
+import { SettingServiceInterface } from '../Setting/SettingServiceInterface'
 
 describe('SubscriptionReassignedEventHandler', () => {
   let userRepository: UserRepositoryInterface
@@ -23,11 +24,13 @@ describe('SubscriptionReassignedEventHandler', () => {
   let event: SubscriptionReassignedEvent
   let subscriptionExpiresAt: number
   let timestamp: number
+  let settingService: SettingServiceInterface
 
   const createHandler = () => new SubscriptionReassignedEventHandler(
     userRepository,
     userSubscriptionRepository,
     roleService,
+    settingService,
     logger
   )
 
@@ -57,11 +60,16 @@ describe('SubscriptionReassignedEventHandler', () => {
     event.createdAt = new Date(1)
     event.payload = {
       subscriptionId: 1,
+      offline: false,
+      extensionKey: 'abc123',
       userEmail: 'test@test.com',
       subscriptionName: SubscriptionName.ProPlan,
       subscriptionExpiresAt,
       timestamp: dayjs.utc().valueOf(),
     }
+
+    settingService = {} as jest.Mocked<SettingServiceInterface>
+    settingService.createOrReplace = jest.fn()
 
     logger = {} as jest.Mocked<Logger>
     logger.info = jest.fn()
@@ -91,6 +99,26 @@ describe('SubscriptionReassignedEventHandler', () => {
       createdAt: expect.any(Number),
       updatedAt: expect.any(Number),
       cancelled: false,
+    })
+  })
+
+  it('should create an extension key setting for the user', async () => {
+    await createHandler().handle(event)
+
+    expect(settingService.createOrReplace).toHaveBeenCalledWith({
+      props: {
+        name: 'EXTENSION_KEY',
+        serverEncryptionVersion: 1,
+        value: 'abc123',
+        sensitive: true,
+      },
+      user: {
+        uuid: '123',
+        email: 'test@test.com',
+        roles: Promise.resolve([{
+          name: RoleName.CoreUser,
+        }]),
+      },
     })
   })
 
