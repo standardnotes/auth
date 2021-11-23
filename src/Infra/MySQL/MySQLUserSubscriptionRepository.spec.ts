@@ -19,6 +19,7 @@ describe('MySQLUserSubscriptionRepository', () => {
 
     subscription = {
       planName: SubscriptionName.ProPlan,
+      cancelled: false,
     } as jest.Mocked<UserSubscription>
 
     repository = new MySQLUserSubscriptionRepository()
@@ -26,11 +27,16 @@ describe('MySQLUserSubscriptionRepository', () => {
   })
 
   it('should find one by user uuid', async () => {
+    const canceledSubscription = {
+      planName: SubscriptionName.ProPlan,
+      cancelled: true,
+    } as jest.Mocked<UserSubscription>
+
     repository.createQueryBuilder = jest.fn().mockImplementation(() => selectQueryBuilder)
 
     selectQueryBuilder.where = jest.fn().mockReturnThis()
     selectQueryBuilder.orderBy = jest.fn().mockReturnThis()
-    selectQueryBuilder.getOne = jest.fn().mockReturnValue(subscription)
+    selectQueryBuilder.getMany = jest.fn().mockReturnValue([canceledSubscription, subscription])
 
     const result = await repository.findOneByUserUuid('123')
 
@@ -43,7 +49,7 @@ describe('MySQLUserSubscriptionRepository', () => {
     expect(selectQueryBuilder.orderBy).toHaveBeenCalledWith(
       'ends_at', 'DESC'
     )
-    expect(selectQueryBuilder.getOne).toHaveBeenCalled()
+    expect(selectQueryBuilder.getMany).toHaveBeenCalled()
     expect(result).toEqual(subscription)
   })
 

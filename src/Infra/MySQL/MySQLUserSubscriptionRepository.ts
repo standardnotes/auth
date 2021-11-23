@@ -8,7 +8,7 @@ import { UserSubscriptionRepositoryInterface } from '../../Domain/Subscription/U
 @EntityRepository(UserSubscription)
 export class MySQLUserSubscriptionRepository extends Repository<UserSubscription> implements UserSubscriptionRepositoryInterface {
   async findOneByUserUuid(userUuid: string): Promise<UserSubscription | undefined> {
-    return await this.createQueryBuilder()
+    const subscriptions = await this.createQueryBuilder()
       .where(
         'user_uuid = :user_uuid',
         {
@@ -16,7 +16,10 @@ export class MySQLUserSubscriptionRepository extends Repository<UserSubscription
         }
       )
       .orderBy('ends_at', 'DESC')
-      .getOne()
+      .getMany()
+
+    const uncanceled = subscriptions.find((subscription) => !subscription.cancelled)
+    return uncanceled || subscriptions[0]
   }
 
   async updateEndsAt(subscriptionId: number, endsAt: number, updatedAt: number): Promise<void> {
