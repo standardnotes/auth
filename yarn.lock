@@ -696,18 +696,26 @@
     sqs-consumer "^5.5.0"
     winston "^3.3.3"
 
-"@standardnotes/domain-events@2.5.1", "@standardnotes/domain-events@^2.5.1":
+"@standardnotes/domain-events@2.5.5":
+  version "2.5.5"
+  resolved "https://registry.yarnpkg.com/@standardnotes/domain-events/-/domain-events-2.5.5.tgz#08eb52a582f8999ecb72faf008cc4d6eb27a8aba"
+  integrity sha512-WvZutlZ8aqV7HRHTeqbLFwIs0zhdZKd7/LHzROmWd0wH9bNqrlvU7iXfR67WD9CTYB00bK1nBBG8zn6qxT7JjA==
+  dependencies:
+    "@standardnotes/auth" "^3.8.1"
+
+"@standardnotes/domain-events@^2.5.1":
   version "2.5.1"
   resolved "https://registry.yarnpkg.com/@standardnotes/domain-events/-/domain-events-2.5.1.tgz#e6433e940ae616683d1c24f76133c70755504c44"
   integrity sha512-p0VB4Al/ZcVqcj9ztU7TNqzc3jjjG6/U7x9lBW/QURHxpB+PnwJq3kFU5V5JA9QpCOYlXLT71CMERMf/O5QX6g==
   dependencies:
     "@standardnotes/auth" "^3.8.1"
 
-"@standardnotes/features@1.8.2":
-  version "1.8.2"
-  resolved "https://registry.yarnpkg.com/@standardnotes/features/-/features-1.8.2.tgz#ecc8162ca80ee3740468aa55a64c23b519c13505"
-  integrity sha512-EYeYYT/WBIh7fMVTVhsy0INjVdyHVtnH90pbZQHNPpsUkLdj05DzuyxUKjsc0oxiskmZjPOVSfXt8l3RL5Av4g==
+"@standardnotes/features@1.9.0":
+  version "1.9.0"
+  resolved "https://registry.yarnpkg.com/@standardnotes/features/-/features-1.9.0.tgz#6b563dbc177592a6c0741abc7794b0cd6f1989e0"
+  integrity sha512-fuRfLrnKEq43ti7FpYZhZu9SLk6j8ruuLcDygoS8gDKB3LU3yuAbKfumqnt0NDF/hXg5/y5FhxxjYQX2GxykoA==
   dependencies:
+    "@standardnotes/auth" "3.8.3"
     "@standardnotes/common" "^1.2.1"
 
 "@standardnotes/settings@1.2.1":

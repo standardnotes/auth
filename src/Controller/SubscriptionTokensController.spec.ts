@@ -1,6 +1,7 @@
 import 'reflect-metadata'
 
 import * as express from 'express'
+import { decode } from 'jsonwebtoken'
 import { results } from 'inversify-express-utils'
 
 import { SubscriptionTokensController } from './SubscriptionTokensController'
@@ -10,6 +11,9 @@ import { CreateSubscriptionTokenResponse } from '../Domain/UseCase/CreateSubscri
 import { AuthenticateSubscriptionToken } from '../Domain/UseCase/AuthenticateSubscriptionToken/AuthenticateSubscriptionToken'
 import { ProjectorInterface } from '../Projection/ProjectorInterface'
 import { Role } from '../Domain/Role/Role'
+import { SettingServiceInterface } from '../Domain/Setting/SettingServiceInterface'
+import { Setting } from '../Domain/Setting/Setting'
+import { Token } from '@standardnotes/auth'
 
 describe('SubscriptionTokensController', () => {
   let createSubscriptionToken: CreateSubscriptionToken
@@ -18,6 +22,8 @@ describe('SubscriptionTokensController', () => {
   const jwtTTL = 60
   let userProjector: ProjectorInterface<User>
   let roleProjector: ProjectorInterface<Role>
+  let settingService: SettingServiceInterface
+  let extensionKeySetting: Setting
 
   let request: express.Request
   let response: express.Response
@@ -27,6 +33,7 @@ describe('SubscriptionTokensController', () => {
   const createController = () => new SubscriptionTokensController(
     createSubscriptionToken,
     authenticateToken,
+    settingService,
     userProjector,
     roleProjector,
     jwtSecret,
@@ -56,6 +63,14 @@ describe('SubscriptionTokensController', () => {
 
     roleProjector = {} as jest.Mocked<ProjectorInterface<Role>>
     roleProjector.projectSimple = jest.fn().mockReturnValue({ name: 'role1', uuid: '1-3-4' })
+
+    extensionKeySetting = {
+      name: 'EXTENSION_KEY',
+      value: 'abc123',
+    } as jest.Mocked<Setting>
+
+    settingService = {} as jest.Mocked<SettingServiceInterface>
+    settingService.findSetting = jest.fn().mockReturnValue(extensionKeySetting)
 
     request = {
       headers: {},
@@ -93,6 +108,31 @@ describe('SubscriptionTokensController', () => {
       token: 'test',
     })
 
+    const responseBody = JSON.parse(await result.content.readAsStringAsync())
+    const decodedToken = decode(responseBody.authToken as string)
+
+    expect((decodedToken as Token).roles).toHaveLength(1)
+    expect((decodedToken as Token).extensionKey).toEqual('abc123')
+    expect(result.statusCode).toEqual(200)
+  })
+
+  it('should validate an subscription token for user without an extension key setting', async () => {
+    request.params.token = 'test'
+
+    settingService.findSetting = jest.fn().mockReturnValue(undefined)
+
+    const httpResponse = <results.JsonResult> await createController().validate(request)
+    const result = await httpResponse.executeAsync()
+
+    expect(authenticateToken.execute).toHaveBeenCalledWith({
+      token: 'test',
+    })
+
+    const responseBody = JSON.parse(await result.content.readAsStringAsync())
+    const decodedToken = decode(responseBody.authToken as string)
+
+    expect((decodedToken as Token).roles).toHaveLength(1)
+    expect((decodedToken as Token).extensionKey).toBeUndefined()
     expect(result.statusCode).toEqual(200)
   })
 

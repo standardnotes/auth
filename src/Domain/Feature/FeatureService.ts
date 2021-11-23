@@ -1,4 +1,4 @@
-import { RoleName } from '@standardnotes/auth'
+import { SubscriptionName } from '@standardnotes/auth'
 import { FeatureDescription, Features } from '@standardnotes/features'
 import { SettingName } from '@standardnotes/settings'
 import { inject, injectable } from 'inversify'
@@ -13,12 +13,14 @@ import { OfflineUserSubscriptionRepositoryInterface } from '../Subscription/Offl
 import { Role } from '../Role/Role'
 import { OfflineUserSubscription } from '../Subscription/OfflineUserSubscription'
 import { TimerInterface } from '@standardnotes/time'
+import { RoleRepositoryInterface } from '../Role/RoleRepositoryInterface'
 
 @injectable()
 export class FeatureService implements FeatureServiceInterface {
   constructor(
     @inject(TYPES.RoleToSubscriptionMap) private roleToSubscriptionMap: RoleToSubscriptionMapInterface,
     @inject(TYPES.SettingService) private settingService: SettingServiceInterface,
+    @inject(TYPES.RoleRepository) private roleRepository: RoleRepositoryInterface,
     @inject(TYPES.OfflineUserSubscriptionRepository) private offlineUserSubscriptionRepository: OfflineUserSubscriptionRepositoryInterface,
     @inject(TYPES.Timer) private timer: TimerInterface,
     @inject(TYPES.EXTENSION_SERVER_URL) private extensionServerUrl: string,
@@ -34,13 +36,11 @@ export class FeatureService implements FeatureServiceInterface {
         userRolesMap.set(subscriptionRole.name, subscriptionRole)
       }
     }
-    const userRoles = [...userRolesMap.values()]
 
-    return this.getFeaturesForRoles(userRoles, userSubscriptions, offlineFeaturesToken)
+    return this.getFeaturesForSubscriptions(userSubscriptions, offlineFeaturesToken)
   }
 
   async getFeaturesForUser(user: User): Promise<Array<FeatureDescription>> {
-    const userRoles = await user.roles
     const userSubscriptions = await user.subscriptions
 
     let extensionKey = undefined
@@ -52,28 +52,35 @@ export class FeatureService implements FeatureServiceInterface {
       extensionKey = extensionKeySetting.value as string
     }
 
-    return this.getFeaturesForRoles(userRoles, userSubscriptions, extensionKey)
+    return this.getFeaturesForSubscriptions(userSubscriptions, extensionKey)
   }
 
   private injectExtensionKeyIntoUrl(url: string, extensionKey: string): string {
     return url.replace('#{url_prefix}', `${this.extensionServerUrl}/${extensionKey}`)
   }
 
-  private async getFeaturesForRoles(userRoles: Array<Role>, userSubscriptions: Array<UserSubscription | OfflineUserSubscription>, extensionKey?: string): Promise<Array<FeatureDescription>> {
+  private async getFeaturesForSubscriptions(userSubscriptions: Array<UserSubscription | OfflineUserSubscription>, extensionKey?: string): Promise<Array<FeatureDescription>> {
     const userFeatures: Map<string, FeatureDescription> = new Map()
-    for (const role of userRoles) {
-      const subscriptionName = this.roleToSubscriptionMap.getSubscriptionNameForRoleName(role.name as RoleName)
-      const userSubscription = userSubscriptions
-        .filter(subscription => subscription.planName === subscriptionName)
-        .sort((a, b) => {
-          if (a.endsAt < b.endsAt) { return 1 }
-          if (a.endsAt > b.endsAt) { return -1 }
-          return 0
-        })[0]
-      if (userSubscription === undefined) {
+    const userSubscriptionNames: Array<SubscriptionName> = []
+
+    userSubscriptions.map((userSubscription: UserSubscription) => {
+      const subscriptionName = userSubscription.planName as SubscriptionName
+      if (!userSubscriptionNames.includes(subscriptionName)) {
+        userSubscriptionNames.push(subscriptionName)
+      }
+    })
+
+    for (const userSubscriptionName of userSubscriptionNames) {
+      const roleName = this.roleToSubscriptionMap.getRoleNameForSubscriptionName(userSubscriptionName)
+      if (roleName === undefined) {
         continue
       }
-      const expiresAt = userSubscription.endsAt
+      const role = await this.roleRepository.findOneByName(roleName)
+      if (role === undefined) {
+        continue
+      }
+
+      const longestLastingSubscription = this.getLongestLastingSubscription(userSubscriptions, userSubscriptionName)
 
       const rolePermissions = await role.permissions
 
@@ -95,17 +102,29 @@ export class FeatureService implements FeatureServiceInterface {
         if (alreadyAddedFeature === undefined) {
           userFeatures.set(rolePermission.name, {
             ...featureForPermission,
-            expires_at: expiresAt,
+            expires_at: longestLastingSubscription.endsAt,
+            role_name: roleName,
           })
+
           continue
         }
 
-        if (expiresAt > (alreadyAddedFeature.expires_at as number)) {
-          alreadyAddedFeature.expires_at = expiresAt
+        if (longestLastingSubscription.endsAt > (alreadyAddedFeature.expires_at as number)) {
+          alreadyAddedFeature.expires_at = longestLastingSubscription.endsAt
         }
       }
     }
 
     return [...userFeatures.values()]
+  }
+
+  private getLongestLastingSubscription(userSubscriptions: Array<UserSubscription | OfflineUserSubscription>, subscriptionName?: SubscriptionName) {
+    return userSubscriptions
+      .filter(subscription => subscription.planName === subscriptionName)
+      .sort((a, b) => {
+        if (a.endsAt < b.endsAt) { return 1 }
+        if (a.endsAt > b.endsAt) { return -1 }
+        return 0
+      })[0]
   }
 }

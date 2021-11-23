@@ -12,6 +12,9 @@ import { User } from '../User/User'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { UserSubscription } from '../Subscription/UserSubscription'
 import { UserSubscriptionRepositoryInterface } from '../Subscription/UserSubscriptionRepositoryInterface'
+import { SettingServiceInterface } from '../Setting/SettingServiceInterface'
+import { SettingName } from '@standardnotes/settings'
+import { EncryptionVersion } from '../Encryption/EncryptionVersion'
 
 @injectable()
 export class SubscriptionReassignedEventHandler
@@ -21,8 +24,10 @@ implements DomainEventHandlerInterface
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
     @inject(TYPES.UserSubscriptionRepository) private userSubscriptionRepository: UserSubscriptionRepositoryInterface,
     @inject(TYPES.RoleService) private roleService: RoleServiceInterface,
+    @inject(TYPES.SettingService) private settingService: SettingServiceInterface,
     @inject(TYPES.Logger) private logger: Logger
-  ) {}
+  ) {
+  }
 
   async handle(
     event: SubscriptionReassignedEvent
@@ -46,6 +51,16 @@ implements DomainEventHandlerInterface
     )
 
     await this.addUserRole(user, event.payload.subscriptionName)
+
+    await this.settingService.createOrReplace({
+      user,
+      props: {
+        name: SettingName.ExtensionKey,
+        value: event.payload.extensionKey,
+        serverEncryptionVersion: EncryptionVersion.Default,
+        sensitive: true,
+      },
+    })
   }
 
   private async addUserRole(

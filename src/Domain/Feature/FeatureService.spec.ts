@@ -13,14 +13,18 @@ import { SettingServiceInterface } from '../Setting/SettingServiceInterface'
 import { OfflineUserSubscriptionRepositoryInterface } from '../Subscription/OfflineUserSubscriptionRepositoryInterface'
 import { TimerInterface } from '@standardnotes/time'
 import { OfflineUserSubscription } from '../Subscription/OfflineUserSubscription'
+import { RoleRepositoryInterface } from '../Role/RoleRepositoryInterface'
 
 describe('FeatureService', () => {
   let roleToSubscriptionMap: RoleToSubscriptionMapInterface
+  let roleRepository: RoleRepositoryInterface
   let user: User
   let role1: Role
   let role2: Role
   let subscription1: UserSubscription
   let subscription2: UserSubscription
+  let subscription3: UserSubscription
+  let subscription4: UserSubscription
   let permission1: Permission
   let permission2: Permission
   let permission3: Permission
@@ -34,6 +38,7 @@ describe('FeatureService', () => {
   const createService = () => new FeatureService(
     roleToSubscriptionMap,
     settingService,
+    roleRepository,
     offlineUserSubscriptionRepository,
     timer,
     extensionServerUrl
@@ -43,7 +48,19 @@ describe('FeatureService', () => {
     extensionServerUrl = 'https://extension-server'
 
     roleToSubscriptionMap = {} as jest.Mocked<RoleToSubscriptionMapInterface>
-    roleToSubscriptionMap.getSubscriptionNameForRoleName = jest.fn().mockReturnValue(SubscriptionName.CorePlan)
+    roleToSubscriptionMap.getRoleNameForSubscriptionName = jest.fn().mockImplementation((subscriptionName: SubscriptionName) => {
+      if (subscriptionName === SubscriptionName.CorePlan) {
+        return RoleName.CoreUser
+      }
+      if (subscriptionName === SubscriptionName.PlusPlan) {
+        return RoleName.PlusUser
+      }
+      if (subscriptionName === SubscriptionName.ProPlan) {
+        return RoleName.ProUser
+      }
+
+      return undefined
+    })
 
     permission1 = {
       uuid: 'permission-1-1-1',
@@ -69,6 +86,18 @@ describe('FeatureService', () => {
       permissions: Promise.resolve([permission2]),
     } as jest.Mocked<Role>
 
+    roleRepository = {} as jest.Mocked<RoleRepositoryInterface>
+    roleRepository.findOneByName = jest.fn().mockImplementation((roleName: RoleName) => {
+      if (roleName === RoleName.CoreUser) {
+        return role1
+      }
+      if (roleName === RoleName.ProUser) {
+        return role2
+      }
+
+      return undefined
+    })
+
     subscription1 = {
       uuid: 'subscription-1-1-1',
       createdAt: 111,
@@ -89,6 +118,28 @@ describe('FeatureService', () => {
       user: Promise.resolve(user),
       cancelled: false,
       subscriptionId: 2,
+    }
+
+    subscription3 = {
+      uuid: 'subscription-3-3-3-canceled',
+      createdAt: 111,
+      updatedAt: 222,
+      planName: SubscriptionName.CorePlan,
+      endsAt: 333,
+      user: Promise.resolve(user),
+      cancelled: true,
+      subscriptionId: 3,
+    }
+
+    subscription4 = {
+      uuid: 'subscription-4-4-4-canceled',
+      createdAt: 111,
+      updatedAt: 222,
+      planName: SubscriptionName.CorePlan,
+      endsAt: 333,
+      user: Promise.resolve(user),
+      cancelled: true,
+      subscriptionId: 4,
     }
 
     user = {
@@ -157,6 +208,24 @@ describe('FeatureService', () => {
       )
     })
 
+    it('should return user features based on longest lasting subscription', async () => {
+      user = {
+        uuid: 'user-1-1-1',
+        roles: Promise.resolve([role1]),
+        subscriptions: Promise.resolve([subscription3, subscription1, subscription4]),
+      } as jest.Mocked<User>
+
+      const features = await createService().getFeaturesForUser(user)
+      expect(features).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            identifier: 'org.standardnotes.theme-autobiography',
+            expires_at: 555,
+          }),
+        ])
+      )
+    })
+
     it('should not return user features if a subscription could not be found', async () => {
       const subscriptions: Array<UserSubscription> = []
 
@@ -165,6 +234,33 @@ describe('FeatureService', () => {
         roles: Promise.resolve([role1]),
         subscriptions: Promise.resolve(subscriptions),
       } as jest.Mocked<User>
+
+      expect(await createService().getFeaturesForUser(user)).toEqual([])
+    })
+
+    it('should not return user features if a role name could not be found', async () => {
+      subscription1 = {
+        uuid: 'subscription-1-1-1',
+        createdAt: 111,
+        updatedAt: 222,
+        planName: 'non existing plan name' as SubscriptionName,
+        endsAt: 555,
+        user: Promise.resolve(user),
+        cancelled: false,
+        subscriptionId: 1,
+      }
+
+      user = {
+        uuid: 'user-1-1-1',
+        roles: Promise.resolve([role1]),
+        subscriptions: Promise.resolve([subscription1]),
+      } as jest.Mocked<User>
+
+      expect(await createService().getFeaturesForUser(user)).toEqual([])
+    })
+
+    it('should not return user features if a role could not be found', async () => {
+      roleRepository.findOneByName = jest.fn().mockReturnValue(undefined)
 
       expect(await createService().getFeaturesForUser(user)).toEqual([])
     })
