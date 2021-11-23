@@ -19,6 +19,7 @@ export class MySQLUserSubscriptionRepository extends Repository<UserSubscription
       .getMany()
 
     const uncanceled = subscriptions.find((subscription) => !subscription.cancelled)
+
     return uncanceled || subscriptions[0]
   }
 
