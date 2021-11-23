@@ -19,6 +19,7 @@ describe('MySQLOfflineUserSubscriptionRepository', () => {
 
     offlineSubscription = {
       planName: SubscriptionName.ProPlan,
+      cancelled: false,
       email: 'test@test.com',
     } as jest.Mocked<OfflineUserSubscription>
 
@@ -26,12 +27,18 @@ describe('MySQLOfflineUserSubscriptionRepository', () => {
     jest.spyOn(repository, 'createQueryBuilder')
   })
 
-  it('should find one by user email', async () => {
+  it('should find one longest lasting uncanceled subscription by user email if there are canceled ones', async () => {
+    const canceledSubscription = {
+      planName: SubscriptionName.ProPlan,
+      cancelled: true,
+      email: 'test@test.com',
+    } as jest.Mocked<OfflineUserSubscription>
+
     repository.createQueryBuilder = jest.fn().mockImplementation(() => selectQueryBuilder)
 
     selectQueryBuilder.where = jest.fn().mockReturnThis()
     selectQueryBuilder.orderBy = jest.fn().mockReturnThis()
-    selectQueryBuilder.getOne = jest.fn().mockReturnValue(offlineSubscription)
+    selectQueryBuilder.getMany = jest.fn().mockReturnValue([canceledSubscription, offlineSubscription])
 
     const result = await repository.findOneByEmail('test@test.com')
 
@@ -44,8 +51,52 @@ describe('MySQLOfflineUserSubscriptionRepository', () => {
     expect(selectQueryBuilder.orderBy).toHaveBeenCalledWith(
       'ends_at', 'DESC'
     )
-    expect(selectQueryBuilder.getOne).toHaveBeenCalled()
+    expect(selectQueryBuilder.getMany).toHaveBeenCalled()
     expect(result).toEqual(offlineSubscription)
+  })
+
+  it('should find one, longest lasting subscription by user email if there are no canceled ones', async () => {
+    repository.createQueryBuilder = jest.fn().mockImplementation(() => selectQueryBuilder)
+
+    selectQueryBuilder.where = jest.fn().mockReturnThis()
+    selectQueryBuilder.orderBy = jest.fn().mockReturnThis()
+    selectQueryBuilder.getMany = jest.fn().mockReturnValue([offlineSubscription])
+
+    const result = await repository.findOneByEmail('test@test.com')
+
+    expect(selectQueryBuilder.where).toHaveBeenCalledWith(
+      'email = :email',
+      {
+        email: 'test@test.com',
+      },
+    )
+    expect(selectQueryBuilder.orderBy).toHaveBeenCalledWith(
+      'ends_at', 'DESC'
+    )
+    expect(selectQueryBuilder.getMany).toHaveBeenCalled()
+    expect(result).toEqual(offlineSubscription)
+  })
+
+  it('should find none if there are no subscriptions for the user', async () => {
+    repository.createQueryBuilder = jest.fn().mockImplementation(() => selectQueryBuilder)
+
+    selectQueryBuilder.where = jest.fn().mockReturnThis()
+    selectQueryBuilder.orderBy = jest.fn().mockReturnThis()
+    selectQueryBuilder.getMany = jest.fn().mockReturnValue([])
+
+    const result = await repository.findOneByEmail('test@test.com')
+
+    expect(selectQueryBuilder.where).toHaveBeenCalledWith(
+      'email = :email',
+      {
+        email: 'test@test.com',
+      },
+    )
+    expect(selectQueryBuilder.orderBy).toHaveBeenCalledWith(
+      'ends_at', 'DESC'
+    )
+    expect(selectQueryBuilder.getMany).toHaveBeenCalled()
+    expect(result).toBeUndefined()
   })
 
   it('should find multiple by user email active after', async () => {

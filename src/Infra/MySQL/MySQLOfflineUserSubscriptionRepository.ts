@@ -20,7 +20,7 @@ export class MySQLOfflineUserSubscriptionRepository extends Repository<OfflineUs
   }
 
   async findOneByEmail(email: string): Promise<OfflineUserSubscription | undefined> {
-    return await this.createQueryBuilder()
+    const subscriptions = await this.createQueryBuilder()
       .where(
         'email = :email',
         {
@@ -28,7 +28,11 @@ export class MySQLOfflineUserSubscriptionRepository extends Repository<OfflineUs
         }
       )
       .orderBy('ends_at', 'DESC')
-      .getOne()
+      .getMany()
+
+    const uncanceled = subscriptions.find((subscription) => !subscription.cancelled)
+
+    return uncanceled || subscriptions[0]
   }
 
   async updateCancelled(subscriptionId: number, cancelled: boolean, updatedAt: number): Promise<void> {
