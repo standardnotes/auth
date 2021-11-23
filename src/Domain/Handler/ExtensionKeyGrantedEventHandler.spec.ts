@@ -57,6 +57,9 @@ describe('ExtensionKeyGrantedEventHandler', () => {
       subscriptionName: SubscriptionName.ProPlan,
       origin: 'update-subscription',
       timestamp,
+      payAmount: 1000,
+      billingEveryNMonths: 1,
+      activeUntil: new Date(10).toString(),
     }
 
     contentDecoder = {} as jest.Mocked<ContentDecoderInterface>
