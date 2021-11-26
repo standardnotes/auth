@@ -19,12 +19,14 @@ const initializeRecalculationProcedure = async (
   userRepository: UserRepositoryInterface,
   domainEventFactory: DomainEventFactoryInterface,
   domainEventPublisher: DomainEventPublisherInterface,
+  logger: Logger
 ): Promise<void> => {
   const stream = await userRepository.streamAll()
   return new Promise((resolve, reject) => {
     stream.pipe(new Stream.Transform({
       objectMode: true,
       transform: async (user, _encoding, callback) => {
+        logger.info('initializeRecalculationProcedure: %O', user)
         await domainEventPublisher.publish(
           domainEventFactory.createItemsContentSizeRecalculationRequestedEvent(user.uuid)
         )
@@ -56,6 +58,7 @@ void container.load().then(container => {
       userRepository,
       domainEventFactory,
       domainEventPublisher,
+      logger
     ))
     .then(() => {
       logger.info('Recalculation initialization complete')
