@@ -1,3 +1,4 @@
+import { ReadStream } from 'fs'
 import { injectable } from 'inversify'
 import { EntityRepository, Repository } from 'typeorm'
 
@@ -7,6 +8,10 @@ import { UserRepositoryInterface } from '../../Domain/User/UserRepositoryInterfa
 @injectable()
 @EntityRepository(User)
 export class MySQLUserRepository extends Repository<User> implements UserRepositoryInterface {
+  async streamAll(): Promise<ReadStream> {
+    return this.createQueryBuilder('user').stream()
+  }
+
   async findOneByUuid(uuid: string): Promise<User | undefined> {
     return this.createQueryBuilder('user')
       .where('user.uuid = :uuid', { uuid })

@@ -21,6 +21,11 @@ case "$COMMAND" in
     yarn worker
     ;;
 
+  'recalculate-users' )
+    echo "Starting user based recalculation..."
+    yarn recalculate-users
+    ;;
+
    * )
     echo "Unknown command"
     ;;

@@ -1,5 +1,5 @@
 import { RoleName } from '@standardnotes/auth'
-import { AccountDeletionRequestedEvent, UserEmailChangedEvent, UserRegisteredEvent, UserRolesChangedEvent, OfflineSubscriptionTokenCreatedEvent } from '@standardnotes/domain-events'
+import { AccountDeletionRequestedEvent, UserEmailChangedEvent, UserRegisteredEvent, UserRolesChangedEvent, OfflineSubscriptionTokenCreatedEvent, ItemsContentSizeRecalculationRequestedEvent } from '@standardnotes/domain-events'
 import { TimerInterface } from '@standardnotes/time'
 import * as dayjs from 'dayjs'
 import { inject, injectable } from 'inversify'
@@ -11,6 +11,16 @@ export class DomainEventFactory implements DomainEventFactoryInterface {
   constructor (
     @inject(TYPES.Timer) private timer: TimerInterface,
   ) {
+  }
+
+  createItemsContentSizeRecalculationRequestedEvent(userUuid: string): ItemsContentSizeRecalculationRequestedEvent {
+    return {
+      type: 'ITEMS_CONTENT_SIZE_RECALCULATION_REQUESTED',
+      createdAt: dayjs.utc().toDate(),
+      payload: {
+        userUuid,
+      },
+    }
   }
 
   createAccountDeletionRequestedEvent(userUuid: string): AccountDeletionRequestedEvent {

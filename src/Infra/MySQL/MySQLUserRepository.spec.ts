@@ -1,5 +1,7 @@
 import 'reflect-metadata'
 
+import { ReadStream } from 'fs'
+
 import { SelectQueryBuilder } from 'typeorm'
 import { User } from '../../Domain/User/User'
 
@@ -29,6 +31,15 @@ describe('MySQLUserRepository', () => {
 
     expect(queryBuilder.where).toHaveBeenCalledWith('user.uuid = :uuid', { uuid: '123' })
     expect(result).toEqual(user)
+  })
+
+  it('should stream all users', async () => {
+    const stream = {} as jest.Mocked<ReadStream>
+    queryBuilder.stream = jest.fn().mockReturnValue(stream)
+
+    const result = await repository.streamAll()
+
+    expect(result).toEqual(stream)
   })
 
   it('should find one user by email', async () => {
