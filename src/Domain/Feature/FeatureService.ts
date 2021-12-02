@@ -94,7 +94,7 @@ export class FeatureService implements FeatureServiceInterface {
           continue
         }
 
-        if (extensionKey !== undefined) {
+        if (extensionKey !== undefined && featureForPermission.url !== undefined) {
           featureForPermission = {
             ...featureForPermission,
             url: this.injectExtensionKeyIntoUrl(featureForPermission.url, extensionKey),
