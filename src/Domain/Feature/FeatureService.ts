@@ -89,7 +89,7 @@ export class FeatureService implements FeatureServiceInterface {
         if (featureForPermission === undefined) {
           continue
         }
-        const needsUrlReplace = featureForPermission.url.includes('#{url_prefix}')
+        const needsUrlReplace = featureForPermission.url && featureForPermission.url.includes('#{url_prefix}')
         if (needsUrlReplace && (!this.extensionServerUrl || !extensionKey)) {
           continue
         }
