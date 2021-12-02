@@ -28,6 +28,7 @@ describe('FeatureService', () => {
   let permission1: Permission
   let permission2: Permission
   let permission3: Permission
+  let permission4: Permission
   let extensionKeySetting: Setting
   let settingService: SettingServiceInterface
   let extensionServerUrl: string
@@ -73,6 +74,10 @@ describe('FeatureService', () => {
     permission3 = {
       uuid: 'permission-3-3-3',
       name: PermissionName.TwoFactorAuth,
+    }
+    permission4 = {
+      uuid: 'permission-4-4-4',
+      name: 'Not existing' as PermissionName,
     }
 
     role1 = {
@@ -233,6 +238,22 @@ describe('FeatureService', () => {
         uuid: 'user-1-1-1',
         roles: Promise.resolve([role1]),
         subscriptions: Promise.resolve(subscriptions),
+      } as jest.Mocked<User>
+
+      expect(await createService().getFeaturesForUser(user)).toEqual([])
+    })
+
+    it('should not return user features if those cannot be find for permissions', async () => {
+      role1 = {
+        name: RoleName.CoreUser,
+        uuid: 'role-1-1-1',
+        permissions: Promise.resolve([permission4]),
+      } as jest.Mocked<Role>
+
+      user = {
+        uuid: 'user-1-1-1',
+        roles: Promise.resolve([role1]),
+        subscriptions: Promise.resolve([subscription3, subscription1, subscription4]),
       } as jest.Mocked<User>
 
       expect(await createService().getFeaturesForUser(user)).toEqual([])
