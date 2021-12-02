@@ -163,7 +163,7 @@ jobs:
           description: "Automated Deployment via Github Actions"
           user: "${{ github.actor }}"
 
-  notify_slack:
+  notify_discord:
     needs: [ deploy-web, deploy-worker ]
 
     runs-on: ubuntu-latest
