@@ -18,6 +18,7 @@
     "coverage": "jest --coverage",
     "pretest": "yarn lint && yarn build",
     "test": "jest spec",
+    "recalculate-users": "node dist/bin/recalculate_users.js",
     "start": "node dist/bin/server.js",
     "worker": "node dist/bin/worker.js"
   },
@@ -25,7 +26,7 @@
     "@newrelic/native-metrics": "6.0.0",
     "@standardnotes/auth": "3.8.3",
     "@standardnotes/common": "1.3.0",
-    "@standardnotes/domain-events": "2.5.5",
+    "@standardnotes/domain-events": "2.5.8",
     "@standardnotes/domain-events-infra": "1.0.2",
     "@standardnotes/features": "1.10.1",
     "@standardnotes/settings": "1.2.1",
