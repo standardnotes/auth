@@ -64,17 +64,6 @@ describe('DomainEventFactory', () => {
       })
   })
 
-  it('should create a ITEMS_CONTENT_SIZE_RECALCULATION_REQUESTED event', () => {
-    expect(createFactory().createItemsContentSizeRecalculationRequestedEvent('1-2-3'))
-      .toEqual({
-        createdAt: expect.any(Date),
-        payload: {
-          userUuid: '1-2-3',
-        },
-        type: 'ITEMS_CONTENT_SIZE_RECALCULATION_REQUESTED',
-      })
-  })
-
   it('should create a USER_ROLE_CHANGED event', () => {
     expect(createFactory().createUserRolesChangedEvent('1-2-3', 'test@test.com', [RoleName.ProUser]))
       .toEqual({
