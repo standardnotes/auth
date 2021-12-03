@@ -13,16 +13,6 @@ export class DomainEventFactory implements DomainEventFactoryInterface {
   ) {
   }
 
-  createItemsContentSizeRecalculationRequestedEvent(userUuid: string): ItemsContentSizeRecalculationRequestedEvent {
-    return {
-      type: 'ITEMS_CONTENT_SIZE_RECALCULATION_REQUESTED',
-      createdAt: dayjs.utc().toDate(),
-      payload: {
-        userUuid,
-      },
-    }
-  }
-
   createAccountDeletionRequestedEvent(userUuid: string): AccountDeletionRequestedEvent {
     return {
       type: 'ACCOUNT_DELETION_REQUESTED',
