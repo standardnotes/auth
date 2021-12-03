@@ -1,5 +1,5 @@
 import { RoleName } from '@standardnotes/auth'
-import { AccountDeletionRequestedEvent, UserRegisteredEvent, UserRolesChangedEvent, UserEmailChangedEvent, OfflineSubscriptionTokenCreatedEvent, ItemsContentSizeRecalculationRequestedEvent } from '@standardnotes/domain-events'
+import { AccountDeletionRequestedEvent, UserRegisteredEvent, UserRolesChangedEvent, UserEmailChangedEvent, OfflineSubscriptionTokenCreatedEvent } from '@standardnotes/domain-events'
 
 export interface DomainEventFactoryInterface {
   createUserRegisteredEvent(userUuid: string, email: string): UserRegisteredEvent
