@@ -1,4 +1,3 @@
-import { SettingName } from '@standardnotes/settings'
 import { Request, Response } from 'express'
 import { inject } from 'inversify'
 import {
@@ -42,75 +41,6 @@ export class SettingsController extends BaseHttpController {
     const result = await this.doGetSettings.execute({ userUuid })
 
     return this.json(result)
-  }
-
-  @httpGet('/mfa')
-  async getMFASettings(request: Request): Promise<results.JsonResult> {
-    const result = await this.doGetSettings.execute({
-      userUuid: request.params.userUuid,
-      settingName: SettingName.MfaSecret,
-      allowSensitiveRetrieval: true,
-      updatedAfter: request.body.lastSyncTime,
-    })
-
-    if (result.success) {
-      return this.json(result)
-    }
-
-    return this.json(result, 400)
-  }
-
-  @httpDelete('/mfa',)
-  async deleteMFASetting(request: Request): Promise<results.JsonResult> {
-    const { userUuid } = request.params
-    const { uuid, updatedAt } = request.body
-
-    const result = await this.doDeleteSetting.execute({
-      uuid,
-      userUuid,
-      settingName: SettingName.MfaSecret,
-      timestamp: updatedAt,
-      softDelete: true,
-    })
-
-    if (result.success) {
-      return this.json(result)
-    }
-
-    return this.json(result, 400)
-  }
-
-  @httpPut('/mfa')
-  async updateMFASetting(request: Request): Promise<results.JsonResult | results.StatusCodeResult> {
-    const {
-      uuid,
-      value,
-      serverEncryptionVersion = EncryptionVersion.Default,
-      createdAt,
-      updatedAt,
-    } = request.body
-
-    const props = {
-      uuid,
-      value,
-      serverEncryptionVersion,
-      name: SettingName.MfaSecret,
-      createdAt,
-      updatedAt,
-      sensitive: true,
-    }
-
-    const { userUuid } = request.params
-    const result = await this.doUpdateSetting.execute({
-      userUuid,
-      props,
-    })
-
-    if (result.success) {
-      return this.json({ setting: result.setting }, result.statusCode)
-    }
-
-    return this.json(result, 400)
   }
 
   @httpGet('/settings/:settingName', TYPES.ApiGatewayAuthMiddleware)
