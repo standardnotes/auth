@@ -1,9 +1,11 @@
 import 'reflect-metadata'
 
+import { ReadStream } from 'fs'
 import { SelectQueryBuilder } from 'typeorm'
 import { Setting } from '../../Domain/Setting/Setting'
 
 import { MySQLSettingRepository } from './MySQLSettingRepository'
+import { EmailBackupFrequency, SettingName } from '@standardnotes/settings'
 
 describe('MySQLSettingRepository', () => {
   let repository: MySQLSettingRepository
@@ -22,6 +24,17 @@ describe('MySQLSettingRepository', () => {
     repository = makeSubject()
     jest.spyOn(repository, 'createQueryBuilder')
     repository.createQueryBuilder = jest.fn().mockImplementation(() => queryBuilder)
+  })
+
+  it('should stream all settings by name and value', async () => {
+    const stream = {} as jest.Mocked<ReadStream>
+    queryBuilder.where = jest.fn().mockReturnThis()
+    queryBuilder.orderBy = jest.fn().mockReturnThis()
+    queryBuilder.stream = jest.fn().mockReturnValue(stream)
+
+    const result = await repository.streamAllByNameAndValue(SettingName.EmailBackup, EmailBackupFrequency.Daily)
+
+    expect(result).toEqual(stream)
   })
 
   it('should find one setting by uuid', async () => {
