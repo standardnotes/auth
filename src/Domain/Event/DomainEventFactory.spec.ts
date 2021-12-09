@@ -53,6 +53,18 @@ describe('DomainEventFactory', () => {
       })
   })
 
+  it('should create a EMAIL_BACKUP_REQUESTED event', () => {
+    expect(createFactory().createEmailBackupRequestedEvent('1-2-3', true))
+      .toEqual({
+        createdAt: expect.any(Date),
+        payload: {
+          userUuid: '1-2-3',
+          userHasEmailsMuted: true,
+        },
+        type: 'EMAIL_BACKUP_REQUESTED',
+      })
+  })
+
   it('should create a ACCOUNT_DELETION_REQUESTED event', () => {
     expect(createFactory().createAccountDeletionRequestedEvent('1-2-3'))
       .toEqual({
