@@ -15,9 +15,8 @@
     "prebuild": "yarn clean",
     "build": "tsc --rootDir ./",
     "lint": "eslint . --ext .ts",
-    "coverage": "jest --coverage",
     "pretest": "yarn lint && yarn build",
-    "test": "jest spec",
+    "test": "jest --coverage",
     "start": "node dist/bin/server.js",
     "worker": "node dist/bin/worker.js"
   },

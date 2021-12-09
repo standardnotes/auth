@@ -105,6 +105,25 @@ describe('RoleService', () => {
       expect(userRepository.save).toHaveBeenCalledWith(user)
     })
 
+    it('should not add duplicate role to user', async () => {
+      user = {
+        uuid: '123',
+        email: 'test@test.com',
+        roles: Promise.resolve([
+          basicRole,
+          proRole,
+        ]),
+      } as jest.Mocked<User>
+
+      userRepository.findOneByEmail = jest.fn().mockReturnValue(user)
+
+      await createService().addUserRole(user, SubscriptionName.ProPlan)
+
+      expect(roleRepository.findOneByName).toHaveBeenCalledWith(RoleName.ProUser)
+      expect(userRepository.save).toHaveBeenCalledWith(user)
+      expect(await user.roles).toHaveLength(2)
+    })
+
     it('should send websockets event', async () => {
       await createService().addUserRole(user, SubscriptionName.ProPlan)
 
@@ -137,6 +156,16 @@ describe('RoleService', () => {
         cancelled: false,
         roles: Promise.resolve([ coreRole, proRole ]),
       })
+    })
+
+    it('should not add duplicate offline role to offline subscription', async () => {
+      roleToSubscriptionMap.getRoleNameForSubscriptionName = jest.fn().mockReturnValue(RoleName.CoreUser)
+      roleRepository.findOneByName = jest.fn().mockReturnValue(coreRole)
+
+      await createService().addOfflineUserRole('test@test.com', SubscriptionName.CorePlan)
+
+      expect(roleRepository.findOneByName).toHaveBeenCalledWith(RoleName.CoreUser)
+      expect(await offlineUserSubscription.roles).toHaveLength(1)
     })
 
     it('should not add offline role if no role name exists for subscription name', async () => {
