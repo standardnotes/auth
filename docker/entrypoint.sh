@@ -21,6 +21,16 @@ case "$COMMAND" in
     yarn worker
     ;;
 
+  'daily-backup' )
+    echo "Starting Daily Backup..."
+    yarn daily-backup
+    ;;
+
+  'weekly-backup' )
+    echo "Starting Weekly Backup..."
+    yarn weekly-backup
+    ;;
+
    * )
     echo "Unknown command"
     ;;

@@ -1,3 +1,5 @@
+import { SettingName } from '@standardnotes/settings'
+import { ReadStream } from 'fs'
 import { injectable } from 'inversify'
 import { EntityRepository, Repository } from 'typeorm'
 import { Setting } from '../../Domain/Setting/Setting'
@@ -7,6 +9,19 @@ import { DeleteSettingDto } from '../../Domain/UseCase/DeleteSetting/DeleteSetti
 @injectable()
 @EntityRepository(Setting)
 export class MySQLSettingRepository extends Repository<Setting> implements SettingRepositoryInterface {
+  async streamAllByNameAndValue(name: SettingName, value: string): Promise<ReadStream> {
+    return this.createQueryBuilder('setting')
+      .where(
+        'setting.name = :name AND setting.value = :value',
+        {
+          name,
+          value,
+        }
+      )
+      .orderBy('updated_at', 'ASC')
+      .stream()
+  }
+
   async findOneByUuid(uuid: string): Promise<Setting | undefined> {
     return this.createQueryBuilder('setting')
       .where(
