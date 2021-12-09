@@ -11,6 +11,7 @@ import { RoleServiceInterface } from './RoleServiceInterface'
 import { RoleToSubscriptionMapInterface } from './RoleToSubscriptionMapInterface'
 import { OfflineUserSubscriptionRepositoryInterface } from '../Subscription/OfflineUserSubscriptionRepositoryInterface'
 import { TimerInterface } from '@standardnotes/time'
+import { Role } from './Role'
 
 @injectable()
 export class RoleService implements RoleServiceInterface {
@@ -45,11 +46,16 @@ export class RoleService implements RoleServiceInterface {
       return
     }
 
+    const rolesMap = new Map<string, Role>()
     const currentRoles = await user.roles
-    user.roles = Promise.resolve([
-      ...currentRoles,
-      role,
-    ])
+    for (const currentRole of currentRoles) {
+      rolesMap.set(currentRole.name, currentRole)
+    }
+    if (!rolesMap.has(role.name)) {
+      rolesMap.set(role.name, role)
+    }
+
+    user.roles = Promise.resolve([...rolesMap.values()])
     await this.userRepository.save(user)
     await this.webSocketsClientService.sendUserRolesChangedEvent(
       user,
@@ -83,11 +89,16 @@ export class RoleService implements RoleServiceInterface {
       return
     }
 
+    const rolesMap = new Map<string, Role>()
     const currentRoles = await currentSubscription.roles
-    currentSubscription.roles = Promise.resolve([
-      ...currentRoles,
-      role,
-    ])
+    for (const currentRole of currentRoles) {
+      rolesMap.set(currentRole.name, currentRole)
+    }
+    if (!rolesMap.has(role.name)) {
+      rolesMap.set(role.name, role)
+    }
+    currentSubscription.roles = Promise.resolve([...rolesMap.values()])
+
     await this.offlineUserSubscriptionRepository.save(currentSubscription)
   }
 
