@@ -17,6 +17,12 @@ export class DomainEventFactory implements DomainEventFactoryInterface {
     return {
       type: 'EMAIL_BACKUP_REQUESTED',
       createdAt: dayjs.utc().toDate(),
+      meta: {
+        correlation: {
+          userIdentifier: userUuid,
+          userIdentifierType: 'uuid',
+        },
+      },
       payload: {
         userUuid,
         userHasEmailsMuted,
@@ -28,6 +34,12 @@ export class DomainEventFactory implements DomainEventFactoryInterface {
     return {
       type: 'ACCOUNT_DELETION_REQUESTED',
       createdAt: dayjs.utc().toDate(),
+      meta: {
+        correlation: {
+          userIdentifier: userUuid,
+          userIdentifierType: 'uuid',
+        },
+      },
       payload: {
         userUuid,
       },
@@ -38,6 +50,12 @@ export class DomainEventFactory implements DomainEventFactoryInterface {
     return {
       type: 'OFFLINE_SUBSCRIPTION_TOKEN_CREATED',
       createdAt: dayjs.utc().toDate(),
+      meta: {
+        correlation: {
+          userIdentifier: email,
+          userIdentifierType: 'email',
+        },
+      },
       payload: {
         token,
         email,
@@ -49,6 +67,12 @@ export class DomainEventFactory implements DomainEventFactoryInterface {
     return {
       type: 'USER_REGISTERED',
       createdAt: dayjs.utc().toDate(),
+      meta: {
+        correlation: {
+          userIdentifier: userUuid,
+          userIdentifierType: 'uuid',
+        },
+      },
       payload: {
         userUuid,
         email,
@@ -60,6 +84,12 @@ export class DomainEventFactory implements DomainEventFactoryInterface {
     return {
       type: 'USER_EMAIL_CHANGED',
       createdAt: dayjs.utc().toDate(),
+      meta: {
+        correlation: {
+          userIdentifier: userUuid,
+          userIdentifierType: 'uuid',
+        },
+      },
       payload: {
         userUuid,
         fromEmail,
@@ -72,6 +102,12 @@ export class DomainEventFactory implements DomainEventFactoryInterface {
     return {
       type: 'USER_ROLES_CHANGED',
       createdAt: dayjs.utc().toDate(),
+      meta: {
+        correlation: {
+          userIdentifier: userUuid,
+          userIdentifierType: 'uuid',
+        },
+      },
       payload: {
         userUuid,
         email,
