@@ -706,12 +706,12 @@
     "@typescript-eslint/eslint-plugin" "^4.14.0"
     "@typescript-eslint/parser" "^4.14.0"
 
-"@standardnotes/domain-events-infra@1.0.2":
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/@standardnotes/domain-events-infra/-/domain-events-infra-1.0.2.tgz#0b2e9c280599a68e8fc8a8bb00a1f39dbb520e87"
-  integrity sha512-+26Kb423j/QnCVlyuzuArSiubcfCFiO5UF6BuMBLJkVdYkQinYAdsO9FZcYrxTfI2YG1UFSy96gLuSvXgK0X5w==
+"@standardnotes/domain-events-infra@1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@standardnotes/domain-events-infra/-/domain-events-infra-1.1.0.tgz#b24570e65156397d635aa3fe21d8248b69a2d7ab"
+  integrity sha512-rrOxninREfXRL3+tqDbr34VUgBEdY4dz91LgCVMOPjSn6mmg+5RGT/Kn36doErJWy51iFrRlWEpqJKHFcE1rRQ==
   dependencies:
-    "@standardnotes/domain-events" "^2.5.1"
+    "@standardnotes/domain-events" "^2.8.0"
     aws-sdk "^2.824.0"
     ioredis "^4.19.4"
     newrelic "^7.4.0"
@@ -719,17 +719,10 @@
     sqs-consumer "^5.5.0"
     winston "^3.3.3"
 
-"@standardnotes/domain-events@2.6.2":
-  version "2.6.2"
-  resolved "https://registry.yarnpkg.com/@standardnotes/domain-events/-/domain-events-2.6.2.tgz#d14c1a7100ccbb54ea41fc704024ae705f46c593"
-  integrity sha512-Bjb5RZPXqegwuLL7d+RISCwN59vho1Z6pwphgxDXrdhAlLFNGv8Zvb5g1ww8YTdwskCmT8XdT161URv/P3adhg==
-  dependencies:
-    "@standardnotes/auth" "^3.8.1"
-
-"@standardnotes/domain-events@^2.5.1":
-  version "2.5.1"
-  resolved "https://registry.yarnpkg.com/@standardnotes/domain-events/-/domain-events-2.5.1.tgz#e6433e940ae616683d1c24f76133c70755504c44"
-  integrity sha512-p0VB4Al/ZcVqcj9ztU7TNqzc3jjjG6/U7x9lBW/QURHxpB+PnwJq3kFU5V5JA9QpCOYlXLT71CMERMf/O5QX6g==
+"@standardnotes/domain-events@2.8.0", "@standardnotes/domain-events@^2.8.0":
+  version "2.8.0"
+  resolved "https://registry.yarnpkg.com/@standardnotes/domain-events/-/domain-events-2.8.0.tgz#8ffcea8d4302d09f2494601053a41085dba4765b"
+  integrity sha512-9B3GhLNrq9rvbCL3/LKcVqCea/ykgmmkxIgPoZ1hQq0Vfa/GpPCNy9Wvyl0IV5rWJSRaunfKLQrm35QBIQFYxA==
   dependencies:
     "@standardnotes/auth" "^3.8.1"
 

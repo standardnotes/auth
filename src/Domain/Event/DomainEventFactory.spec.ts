@@ -20,6 +20,12 @@ describe('DomainEventFactory', () => {
     expect(createFactory().createUserRegisteredEvent('1-2-3', 'test@test.te'))
       .toEqual({
         createdAt: expect.any(Date),
+        meta: {
+          correlation: {
+            userIdentifier: '1-2-3',
+            userIdentifierType: 'uuid',
+          },
+        },
         payload: {
           userUuid: '1-2-3',
           email: 'test@test.te',
@@ -32,6 +38,12 @@ describe('DomainEventFactory', () => {
     expect(createFactory().createOfflineSubscriptionTokenCreatedEvent('1-2-3', 'test@test.te'))
       .toEqual({
         createdAt: expect.any(Date),
+        meta: {
+          correlation: {
+            userIdentifier: 'test@test.te',
+            userIdentifierType: 'email',
+          },
+        },
         payload: {
           token: '1-2-3',
           email: 'test@test.te',
@@ -44,6 +56,12 @@ describe('DomainEventFactory', () => {
     expect(createFactory().createUserEmailChangedEvent('1-2-3', 'test@test.te', 'test2@test.te'))
       .toEqual({
         createdAt: expect.any(Date),
+        meta: {
+          correlation: {
+            userIdentifier: '1-2-3',
+            userIdentifierType: 'uuid',
+          },
+        },
         payload: {
           userUuid: '1-2-3',
           fromEmail: 'test@test.te',
@@ -57,6 +75,12 @@ describe('DomainEventFactory', () => {
     expect(createFactory().createEmailBackupRequestedEvent('1-2-3', true))
       .toEqual({
         createdAt: expect.any(Date),
+        meta: {
+          correlation: {
+            userIdentifier: '1-2-3',
+            userIdentifierType: 'uuid',
+          },
+        },
         payload: {
           userUuid: '1-2-3',
           userHasEmailsMuted: true,
@@ -69,6 +93,12 @@ describe('DomainEventFactory', () => {
     expect(createFactory().createAccountDeletionRequestedEvent('1-2-3'))
       .toEqual({
         createdAt: expect.any(Date),
+        meta: {
+          correlation: {
+            userIdentifier: '1-2-3',
+            userIdentifierType: 'uuid',
+          },
+        },
         payload: {
           userUuid: '1-2-3',
         },
@@ -80,6 +110,12 @@ describe('DomainEventFactory', () => {
     expect(createFactory().createUserRolesChangedEvent('1-2-3', 'test@test.com', [RoleName.ProUser]))
       .toEqual({
         createdAt: expect.any(Date),
+        meta: {
+          correlation: {
+            userIdentifier: '1-2-3',
+            userIdentifierType: 'uuid',
+          },
+        },
         payload: {
           userUuid: '1-2-3',
           email: 'test@test.com',
