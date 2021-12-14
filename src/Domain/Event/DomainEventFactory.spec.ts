@@ -1,6 +1,7 @@
+import 'reflect-metadata'
+
 import { RoleName } from '@standardnotes/auth'
 import { TimerInterface } from '@standardnotes/time'
-import 'reflect-metadata'
 
 import { DomainEventFactory } from './DomainEventFactory'
 
@@ -72,7 +73,7 @@ describe('DomainEventFactory', () => {
   })
 
   it('should create a EMAIL_BACKUP_REQUESTED event', () => {
-    expect(createFactory().createEmailBackupRequestedEvent('1-2-3', true))
+    expect(createFactory().createEmailBackupRequestedEvent('1-2-3', '2-3-4', true))
       .toEqual({
         createdAt: expect.any(Date),
         meta: {
@@ -84,6 +85,7 @@ describe('DomainEventFactory', () => {
         payload: {
           userUuid: '1-2-3',
           userHasEmailsMuted: true,
+          muteEmailsSettingUuid: '2-3-4',
         },
         type: 'EMAIL_BACKUP_REQUESTED',
       })
