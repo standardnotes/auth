@@ -14,7 +14,7 @@ import { Env } from '../src/Bootstrap/Env'
 import { DomainEventPublisherInterface } from '@standardnotes/domain-events'
 import { DomainEventFactoryInterface } from '../src/Domain/Event/DomainEventFactoryInterface'
 import { SettingRepositoryInterface } from '../src/Domain/Setting/SettingRepositoryInterface'
-import { EmailBackupFrequency, MuteEmailsOption, SettingName } from '@standardnotes/settings'
+import { EmailBackupFrequency, MuteFailedBackupsEmailsOption, SettingName } from '@standardnotes/settings'
 
 const inputArgs = process.argv.slice(2)
 const emailBackupFrequency = inputArgs[0] as EmailBackupFrequency
@@ -30,9 +30,9 @@ const requestEmailBackups = async (
       objectMode: true,
       transform: async (setting, _encoding, callback) => {
         let userHasEmailsMuted = false
-        const emailsMutedSetting = await settingRepository.findOneByNameAndUserUuid(SettingName.MuteEmails, setting.setting_user_uuid)
+        const emailsMutedSetting = await settingRepository.findOneByNameAndUserUuid(SettingName.MuteFailedBackupsEmails, setting.setting_user_uuid)
         if (emailsMutedSetting !== undefined && emailsMutedSetting.value !== null) {
-          userHasEmailsMuted = emailsMutedSetting.value === MuteEmailsOption.Muted
+          userHasEmailsMuted = emailsMutedSetting.value === MuteFailedBackupsEmailsOption.Muted
         }
 
         await domainEventPublisher.publish(
