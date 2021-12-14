@@ -8,12 +8,14 @@ import {
   results,
 } from 'inversify-express-utils'
 import TYPES from '../Bootstrap/Types'
+import { GetSetting } from '../Domain/UseCase/GetSetting/GetSetting'
 import { GetUserFeatures } from '../Domain/UseCase/GetUserFeatures/GetUserFeatures'
 
 @controller('/internal')
 export class InternalController extends BaseHttpController {
   constructor(
     @inject(TYPES.GetUserFeatures) private doGetUserFeatures: GetUserFeatures,
+    @inject(TYPES.GetSetting) private doGetSetting: GetSetting,
   ) {
     super()
   }
@@ -23,6 +25,21 @@ export class InternalController extends BaseHttpController {
     const result = await this.doGetUserFeatures.execute({
       userUuid: request.params.userUuid,
       offline: false,
+    })
+
+    if (result.success) {
+      return this.json(result)
+    }
+
+    return this.json(result, 400)
+  }
+
+  @httpGet('/users/:userUuid/settings/:settingName')
+  async getSetting(request: Request): Promise<results.JsonResult> {
+    const result = await this.doGetSetting.execute({
+      userUuid: request.params.userUuid,
+      settingName: request.params.settingName,
+      allowSensitiveRetrieval: true,
     })
 
     if (result.success) {
