@@ -734,10 +734,10 @@
     "@standardnotes/auth" "3.8.3"
     "@standardnotes/common" "^1.2.1"
 
-"@standardnotes/settings@1.3.3":
-  version "1.3.3"
-  resolved "https://registry.yarnpkg.com/@standardnotes/settings/-/settings-1.3.3.tgz#86fbb9d564273591530a039491c73defc60471ba"
-  integrity sha512-ar7vpgi7GNQh46sibrEJnGkyNezpH+alE9qM3/0Q3E+P+xUF9nS3umaJWtYbUf1vZYN5TwRNrDqjRf2R3roDzQ==
+"@standardnotes/settings@1.4.0":
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/@standardnotes/settings/-/settings-1.4.0.tgz#b8f43383fa1b469d609f5ac6c2ce571efb8bfe71"
+  integrity sha512-mGptrIaM/3UWOkc9xmzuRRM2A75caX6vyqCeKhyqPdM3ZR/YpYH7I6qYDsO6wpkoF3soD2nRJ6pLV7HBjGdGag==
 
 "@standardnotes/sncrypto-common@1.3.0", "@standardnotes/sncrypto-common@^1.3.0":
   version "1.3.0"
