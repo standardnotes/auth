@@ -83,8 +83,20 @@ export class RoleService implements RoleServiceInterface {
     }
 
     const currentSubscription = await this.offlineUserSubscriptionRepository.findOneByEmail(email)
-    if (currentSubscription === undefined || currentSubscription.endsAt < this.timer.getTimestampInMicroseconds()) {
-      this.logger.warn(`Could not find a current active subscription for email: ${email}`)
+    if (currentSubscription === undefined) {
+      this.logger.warn(`Unable to add offline roles due to no offline subscription for email: ${email}`)
+
+      return
+    }
+
+    const now = this.timer.getTimestampInMicroseconds()
+
+    if (currentSubscription.endsAt < now) {
+      this.logger.warn(
+        `Unable to add offline roles due to expired subscription for email ${email}.
+        The subscription endsAt ${currentSubscription.endsAt} compared to
+        the current timestamp of ${now}`
+      )
 
       return
     }
