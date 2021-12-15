@@ -14,6 +14,7 @@ import { UserSubscription } from '../Subscription/UserSubscription'
 import { UserSubscriptionRepositoryInterface } from '../Subscription/UserSubscriptionRepositoryInterface'
 import { OfflineUserSubscription } from '../Subscription/OfflineUserSubscription'
 import { OfflineUserSubscriptionRepositoryInterface } from '../Subscription/OfflineUserSubscriptionRepositoryInterface'
+import { SettingServiceInterface } from '../Setting/SettingServiceInterface'
 
 @injectable()
 export class SubscriptionPurchasedEventHandler
@@ -24,8 +25,10 @@ implements DomainEventHandlerInterface
     @inject(TYPES.UserSubscriptionRepository) private userSubscriptionRepository: UserSubscriptionRepositoryInterface,
     @inject(TYPES.OfflineUserSubscriptionRepository) private offlineUserSubscriptionRepository: OfflineUserSubscriptionRepositoryInterface,
     @inject(TYPES.RoleService) private roleService: RoleServiceInterface,
+    @inject(TYPES.SettingService) private settingService: SettingServiceInterface,
     @inject(TYPES.Logger) private logger: Logger
-  ) {}
+  ) {
+  }
 
   async handle(
     event: SubscriptionPurchasedEvent
@@ -67,6 +70,8 @@ implements DomainEventHandlerInterface
     )
 
     await this.addUserRole(user, event.payload.subscriptionName)
+
+    await this.settingService.applyDefaultSettingsForSubscription(user, event.payload.subscriptionName)
   }
 
   private async addUserRole(

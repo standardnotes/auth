@@ -1,9 +1,11 @@
+import { SubscriptionName } from '@standardnotes/auth'
 import { SettingName } from '@standardnotes/settings'
 import { inject, injectable } from 'inversify'
 import { Logger } from 'winston'
 import TYPES from '../../Bootstrap/Types'
 import { CrypterInterface } from '../Encryption/CrypterInterface'
 import { EncryptionVersion } from '../Encryption/EncryptionVersion'
+import { User } from '../User/User'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { CreateOrReplaceSettingDto } from './CreateOrReplaceSettingDto'
 import { CreateOrReplaceSettingResponse } from './CreateOrReplaceSettingResponse'
@@ -12,6 +14,7 @@ import { Setting } from './Setting'
 import { SettingFactory } from './SettingFactory'
 import { SettingRepositoryInterface } from './SettingRepositoryInterface'
 import { SettingServiceInterface } from './SettingServiceInterface'
+import { SettingToSubscriptionMapInterface } from './SettingToSubscriptionMapInterface'
 
 @injectable()
 export class SettingService implements SettingServiceInterface {
@@ -20,8 +23,32 @@ export class SettingService implements SettingServiceInterface {
     @inject(TYPES.SettingRepository) private settingRepository: SettingRepositoryInterface,
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
     @inject(TYPES.Crypter) private crypter: CrypterInterface,
+    @inject(TYPES.SettingToSubscriptionMap) private settingToSubscriptionMap: SettingToSubscriptionMapInterface,
     @inject(TYPES.Logger) private logger: Logger,
   ) {
+  }
+
+  async applyDefaultSettingsForSubscription(user: User, subscriptionName: SubscriptionName): Promise<void> {
+    const defaultSettingsWithValues = this.settingToSubscriptionMap.getDefaultSettingsAndValuesForSubscriptionName(subscriptionName)
+    if (defaultSettingsWithValues === undefined) {
+      this.logger.warn(`Could not find settings for subscription: ${subscriptionName}`)
+
+      return
+    }
+
+    for (const settingName of defaultSettingsWithValues.keys()) {
+      const setting = defaultSettingsWithValues.get(settingName) as { value: string, sensitive: boolean, serverEncryptionVersion: number }
+
+      await this.createOrReplace({
+        user,
+        props: {
+          name: settingName,
+          value: setting.value,
+          serverEncryptionVersion: setting.serverEncryptionVersion,
+          sensitive: setting.sensitive,
+        },
+      })
+    }
   }
 
   async findSetting(dto: FindSettingDTO): Promise<Setting | undefined> {
