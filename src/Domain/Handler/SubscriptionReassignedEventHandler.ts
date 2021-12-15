@@ -61,6 +61,8 @@ implements DomainEventHandlerInterface
         sensitive: true,
       },
     })
+
+    await this.settingService.applyDefaultSettingsForSubscription(user, event.payload.subscriptionName)
   }
 
   private async addUserRole(

@@ -12,6 +12,7 @@ import { SubscriptionName } from '@standardnotes/auth'
 import { RoleServiceInterface } from '../Role/RoleServiceInterface'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { Logger } from 'winston'
+import { SettingServiceInterface } from '../Setting/SettingServiceInterface'
 
 @injectable()
 export class SubscriptionRenewedEventHandler
@@ -22,6 +23,7 @@ implements DomainEventHandlerInterface
     @inject(TYPES.UserSubscriptionRepository) private userSubscriptionRepository: UserSubscriptionRepositoryInterface,
     @inject(TYPES.OfflineUserSubscriptionRepository) private offlineUserSubscriptionRepository: OfflineUserSubscriptionRepositoryInterface,
     @inject(TYPES.RoleService) private roleService: RoleServiceInterface,
+    @inject(TYPES.SettingService) private settingService: SettingServiceInterface,
     @inject(TYPES.Logger) private logger: Logger
   ) {
   }
@@ -58,6 +60,8 @@ implements DomainEventHandlerInterface
     }
 
     await this.addUserRole(user, event.payload.subscriptionName)
+
+    await this.settingService.applyDefaultSettingsForSubscription(user, event.payload.subscriptionName)
   }
 
   private async addUserRole(

@@ -1,4 +1,5 @@
-import { SettingName } from '@standardnotes/settings'
+import { SubscriptionName } from '@standardnotes/auth'
+import { EmailBackupFrequency, SettingName } from '@standardnotes/settings'
 import 'reflect-metadata'
 import { Logger } from 'winston'
 import { CrypterInterface } from '../Encryption/CrypterInterface'
@@ -10,6 +11,7 @@ import { SettingFactory } from './SettingFactory'
 import { SettingRepositoryInterface } from './SettingRepositoryInterface'
 
 import { SettingService } from './SettingService'
+import { SettingToSubscriptionMapInterface } from './SettingToSubscriptionMapInterface'
 
 describe('SettingService', () => {
   let setting: Setting
@@ -18,9 +20,10 @@ describe('SettingService', () => {
   let settingRepository: SettingRepositoryInterface
   let userRepository: UserRepositoryInterface
   let crypter: CrypterInterface
+  let settingToSubscriptionMap: SettingToSubscriptionMapInterface
   let logger: Logger
 
-  const createService = () => new SettingService(factory, settingRepository, userRepository, crypter, logger)
+  const createService = () => new SettingService(factory, settingRepository, userRepository, crypter, settingToSubscriptionMap, logger)
 
   beforeEach(() => {
     user = {} as jest.Mocked<User>
@@ -35,6 +38,16 @@ describe('SettingService', () => {
     settingRepository.findLastByNameAndUserUuid = jest.fn().mockReturnValue(undefined)
     settingRepository.save = jest.fn()
 
+    settingToSubscriptionMap = {} as jest.Mocked<SettingToSubscriptionMapInterface>
+    settingToSubscriptionMap.getDefaultSettingsAndValuesForSubscriptionName = jest.fn().mockReturnValue(new Map([
+      [SettingName.EmailBackup,
+        {
+          value: EmailBackupFrequency.Weekly,
+          sensitive: 0,
+          serverEncryptionVersion: EncryptionVersion.Unencrypted,
+        }],
+    ]))
+
     userRepository = {} as jest.Mocked<UserRepositoryInterface>
     userRepository.findOneByUuid = jest.fn().mockReturnValue(user)
 
@@ -43,6 +56,21 @@ describe('SettingService', () => {
 
     logger = {} as jest.Mocked<Logger>
     logger.debug = jest.fn()
+    logger.warn = jest.fn()
+  })
+
+  it ('should create default settings for a subscription', async () => {
+    await createService().applyDefaultSettingsForSubscription(user, SubscriptionName.PlusPlan)
+
+    expect(settingRepository.save).toHaveBeenCalledWith(setting)
+  })
+
+  it ('should not create default settings for a subscription if subscription has no defaults', async () => {
+    settingToSubscriptionMap.getDefaultSettingsAndValuesForSubscriptionName = jest.fn().mockReturnValue(undefined)
+
+    await createService().applyDefaultSettingsForSubscription(user, SubscriptionName.PlusPlan)
+
+    expect(settingRepository.save).not.toHaveBeenCalled()
   })
 
   it ('should create setting if it doesn\'t exist', async () => {
