@@ -13,12 +13,12 @@ describe('MuteFailedBackupsEmails', () => {
     const setting = {} as jest.Mocked<Setting>
 
     settingRepository = {} as jest.Mocked<SettingRepositoryInterface>
-    settingRepository.findOneByUuidAndName = jest.fn().mockReturnValue(setting)
+    settingRepository.findOneByUuidAndNames = jest.fn().mockReturnValue(setting)
     settingRepository.save = jest.fn()
   })
 
   it('should not succeed if extension setting is not found', async () => {
-    settingRepository.findOneByUuidAndName = jest.fn().mockReturnValue(undefined)
+    settingRepository.findOneByUuidAndNames = jest.fn().mockReturnValue(undefined)
 
     expect(await createUseCase().execute({ settingUuid: '1-2-3' }))
       .toEqual({ success: false, message: 'Could not find setting setting.' })

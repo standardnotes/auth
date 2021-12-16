@@ -14,7 +14,10 @@ export class MuteFailedBackupsEmails implements UseCaseInterface {
   }
 
   async execute(dto: MuteFailedBackupsEmailsDTO): Promise<MuteFailedBackupsEmailsResponse> {
-    const setting = await this.settingRepository.findOneByUuidAndName(dto.settingUuid, SettingName.MuteFailedBackupsEmails)
+    const setting = await this.settingRepository.findOneByUuidAndNames(dto.settingUuid, [
+      SettingName.MuteFailedBackupsEmails,
+      SettingName.MuteFailedCloudBackupsEmails,
+    ])
 
     if (setting === undefined) {
       return {
