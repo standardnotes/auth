@@ -24,7 +24,7 @@ describe('SettingToSubscriptionMap', () => {
     expect(settings).not.toBeUndefined()
 
     const flatSettings = [...(settings as Map<SettingName, { value: string, sensitive: boolean, serverEncryptionVersion: number }>).keys()]
-    expect(flatSettings).toEqual(['EMAIL_BACKUP'])
+    expect(flatSettings).toEqual([])
   })
 
   it('should return the default set of setting values for a pro subscription', () => {
@@ -33,7 +33,7 @@ describe('SettingToSubscriptionMap', () => {
     expect(settings).not.toBeUndefined()
 
     const flatSettings = [...(settings as Map<SettingName, { value: string, sensitive: boolean, serverEncryptionVersion: number }>).keys()]
-    expect(flatSettings).toEqual(['EMAIL_BACKUP'])
+    expect(flatSettings).toEqual([])
   })
 
   it('should return undefined set of setting values for an undefined subscription', () => {

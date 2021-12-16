@@ -1,8 +1,7 @@
 import { SubscriptionName } from '@standardnotes/auth'
 import { PermissionName } from '@standardnotes/features'
-import { EmailBackupFrequency, SettingName } from '@standardnotes/settings'
+import { SettingName } from '@standardnotes/settings'
 import { injectable } from 'inversify'
-import { EncryptionVersion } from '../Encryption/EncryptionVersion'
 
 import { SettingToSubscriptionMapInterface } from './SettingToSubscriptionMapInterface'
 
@@ -14,26 +13,8 @@ export class SettingToSubscriptionMap implements SettingToSubscriptionMapInterfa
 
   private readonly settingsToSubscriptionNameMap = new Map<SubscriptionName, Map<SettingName, { value: string, sensitive: boolean, serverEncryptionVersion: number }>>([
     [SubscriptionName.CorePlan, new Map([])],
-    [SubscriptionName.PlusPlan, new Map([
-      [
-        SettingName.EmailBackup,
-        {
-          value: EmailBackupFrequency.Weekly,
-          sensitive: false,
-          serverEncryptionVersion: EncryptionVersion.Unencrypted,
-        },
-      ],
-    ])],
-    [SubscriptionName.ProPlan, new Map([
-      [
-        SettingName.EmailBackup,
-        {
-          value: EmailBackupFrequency.Weekly,
-          sensitive: false,
-          serverEncryptionVersion: EncryptionVersion.Unencrypted,
-        },
-      ],
-    ])],
+    [SubscriptionName.PlusPlan, new Map([])],
+    [SubscriptionName.ProPlan, new Map([])],
   ])
 
   getPermissionAssociatedWithSetting(settingName: SettingName): PermissionName | undefined {
