@@ -10,12 +10,14 @@ import { GetSetting } from '../Domain/UseCase/GetSetting/GetSetting'
 import { UpdateSetting } from '../Domain/UseCase/UpdateSetting/UpdateSetting'
 import { DeleteSetting } from '../Domain/UseCase/DeleteSetting/DeleteSetting'
 import { EncryptionVersion } from '../Domain/Encryption/EncryptionVersion'
+import { MuteFailedBackupsEmails } from '../Domain/UseCase/MuteFailedBackupsEmails/MuteFailedBackupsEmails'
 
 describe('SettingsController', () => {
   let deleteSetting: DeleteSetting
   let getSettings: GetSettings
   let getSetting: GetSetting
   let updateSetting: UpdateSetting
+  let muteFailedBackupsEmails: MuteFailedBackupsEmails
 
   let request: express.Request
   let response: express.Response
@@ -26,6 +28,7 @@ describe('SettingsController', () => {
     getSetting,
     updateSetting,
     deleteSetting,
+    muteFailedBackupsEmails,
   )
 
   beforeEach(() => {
@@ -43,6 +46,9 @@ describe('SettingsController', () => {
 
     updateSetting = {} as jest.Mocked<UpdateSetting>
     updateSetting.execute = jest.fn()
+
+    muteFailedBackupsEmails = {} as jest.Mocked<MuteFailedBackupsEmails>
+    muteFailedBackupsEmails.execute = jest.fn()
 
     request = {
       headers: {},
@@ -294,5 +300,31 @@ describe('SettingsController', () => {
     expect(deleteSetting.execute).toHaveBeenCalledWith({ userUuid: '1-2-3', settingName: 'foo' })
 
     expect(result.statusCode).toEqual(400)
+  })
+
+  it('should mute failed backup emails user setting', async () => {
+    request.params.settingUuid = '1-2-3'
+
+    muteFailedBackupsEmails.execute = jest.fn().mockReturnValue({ success: true })
+
+    const httpResponse = <results.JsonResult> await createController().muteFailedBackupsEmails(request)
+    const result = await httpResponse.executeAsync()
+
+    expect(muteFailedBackupsEmails.execute).toHaveBeenCalledWith({ settingUuid: '1-2-3' })
+
+    expect(result.statusCode).toEqual(200)
+  })
+
+  it('should not mute failed backup emails user setting if it does not exist', async () => {
+    request.params.settingUuid = '1-2-3'
+
+    muteFailedBackupsEmails.execute = jest.fn().mockReturnValue({ success: false })
+
+    const httpResponse = <results.JsonResult> await createController().muteFailedBackupsEmails(request)
+    const result = await httpResponse.executeAsync()
+
+    expect(muteFailedBackupsEmails.execute).toHaveBeenCalledWith({ settingUuid: '1-2-3' })
+
+    expect(result.statusCode).toEqual(404)
   })
 })
