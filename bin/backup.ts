@@ -15,12 +15,15 @@ import { DomainEventPublisherInterface } from '@standardnotes/domain-events'
 import { DomainEventFactoryInterface } from '../src/Domain/Event/DomainEventFactoryInterface'
 import { SettingRepositoryInterface } from '../src/Domain/Setting/SettingRepositoryInterface'
 import { EmailBackupFrequency, MuteFailedBackupsEmailsOption, SettingName } from '@standardnotes/settings'
+import { RoleServiceInterface } from '../src/Domain/Role/RoleServiceInterface'
+import { PermissionName } from '@standardnotes/features'
 
 const inputArgs = process.argv.slice(2)
 const emailBackupFrequency = inputArgs[0] as EmailBackupFrequency
 
 const requestEmailBackups = async (
   settingRepository: SettingRepositoryInterface,
+  roleService: RoleServiceInterface,
   domainEventFactory: DomainEventFactoryInterface,
   domainEventPublisher: DomainEventPublisherInterface,
 ): Promise<void> => {
@@ -29,6 +32,13 @@ const requestEmailBackups = async (
     stream.pipe(new Stream.Transform({
       objectMode: true,
       transform: async (setting, _encoding, callback) => {
+        const userIsPermittedForEmailBackups = await roleService.userHasPermission(setting.setting_user_uuid, PermissionName.DailyEmailBackup)
+        if (!userIsPermittedForEmailBackups) {
+          callback()
+
+          return
+        }
+
         let userHasEmailsMuted = false
         const emailsMutedSetting = await settingRepository.findOneByNameAndUserUuid(SettingName.MuteFailedBackupsEmails, setting.setting_user_uuid)
         if (emailsMutedSetting !== undefined && emailsMutedSetting.value !== null) {
@@ -62,12 +72,14 @@ void container.load().then(container => {
   logger.info(`Starting ${emailBackupFrequency} email backup requesting...`)
 
   const settingRepository: SettingRepositoryInterface = container.get(TYPES.SettingRepository)
+  const roleService: RoleServiceInterface = container.get(TYPES.RoleService)
   const domainEventFactory: DomainEventFactoryInterface = container.get(TYPES.DomainEventFactory)
   const domainEventPublisher: DomainEventPublisherInterface = container.get(TYPES.DomainEventPublisher)
 
   Promise
     .resolve(requestEmailBackups(
       settingRepository,
+      roleService,
       domainEventFactory,
       domainEventPublisher,
     ))
