@@ -4,6 +4,7 @@ import { SubscriptionName } from '@standardnotes/auth'
 import { SettingName } from '@standardnotes/settings'
 
 import { SettingToSubscriptionMap } from './SettingToSubscriptionMap'
+import { PermissionName } from '@standardnotes/features'
 
 describe('SettingToSubscriptionMap', () => {
   const createMap = () => new SettingToSubscriptionMap()
@@ -39,5 +40,13 @@ describe('SettingToSubscriptionMap', () => {
     const settings = createMap().getDefaultSettingsAndValuesForSubscriptionName('foobar' as SubscriptionName)
 
     expect(settings).toBeUndefined()
+  })
+
+  it('should return a permission name associated to a given setting', () => {
+    expect(createMap().getPermissionAssociatedWithSetting(SettingName.EmailBackup)).toEqual(PermissionName.DailyEmailBackup)
+  })
+
+  it('should not return a permission name if not associated to a given setting', () => {
+    expect(createMap().getPermissionAssociatedWithSetting(SettingName.ExtensionKey)).toBeUndefined()
   })
 })

@@ -9,4 +9,5 @@ export type UpdateSettingResponse = {
   error: {
     message: string,
   },
+  statusCode: number,
 }

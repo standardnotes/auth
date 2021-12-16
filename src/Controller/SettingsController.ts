@@ -97,7 +97,7 @@ export class SettingsController extends BaseHttpController {
       return this.json({ setting: result.setting }, result.statusCode)
     }
 
-    return this.json(result, 400)
+    return this.json(result, result.statusCode)
   }
 
   @httpDelete('/settings/:settingName', TYPES.ApiGatewayAuthMiddleware)
