@@ -57,6 +57,16 @@ describe('MySQLSettingRepository', () => {
     expect(result).toEqual(setting)
   })
 
+  it('should find one setting by name and uuid', async () => {
+    queryBuilder.where = jest.fn().mockReturnThis()
+    queryBuilder.getOne = jest.fn().mockReturnValue(setting)
+
+    const result = await repository.findOneByUuidAndName('1-2-3', 'test' as SettingName)
+
+    expect(queryBuilder.where).toHaveBeenCalledWith('setting.name = :name AND setting.uuid = :uuid', { name: 'test', uuid: '1-2-3' })
+    expect(result).toEqual(setting)
+  })
+
   it('should find last setting by name and user uuid', async () => {
     queryBuilder.where = jest.fn().mockReturnThis()
     queryBuilder.orderBy = jest.fn().mockReturnThis()

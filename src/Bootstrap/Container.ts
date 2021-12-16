@@ -125,6 +125,7 @@ import { ApiGatewayOfflineAuthMiddleware } from '../Controller/ApiGatewayOffline
 import { UserEmailChangedEventHandler } from '../Domain/Handler/UserEmailChangedEventHandler'
 import { SettingToSubscriptionMapInterface } from '../Domain/Setting/SettingToSubscriptionMapInterface'
 import { SettingToSubscriptionMap } from '../Domain/Setting/SettingToSubscriptionMap'
+import { MuteFailedBackupsEmails } from '../Domain/UseCase/MuteFailedBackupsEmails/MuteFailedBackupsEmails'
 
 export class ContainerConfigLoader {
   async load(): Promise<Container> {
@@ -308,6 +309,7 @@ export class ContainerConfigLoader {
     container.bind<AuthenticateSubscriptionToken>(TYPES.AuthenticateSubscriptionToken).to(AuthenticateSubscriptionToken)
     container.bind<AuthenticateOfflineSubscriptionToken>(TYPES.AuthenticateOfflineSubscriptionToken).to(AuthenticateOfflineSubscriptionToken)
     container.bind<CreateOfflineSubscriptionToken>(TYPES.CreateOfflineSubscriptionToken).to(CreateOfflineSubscriptionToken)
+    container.bind<MuteFailedBackupsEmails>(TYPES.MuteFailedBackupsEmails).to(MuteFailedBackupsEmails)
 
     // Handlers
     container.bind<UserRegisteredEventHandler>(TYPES.UserRegisteredEventHandler).to(UserRegisteredEventHandler)
