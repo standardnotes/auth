@@ -227,7 +227,7 @@ describe('SettingsController', () => {
       serverEncryptionVersion: EncryptionVersion.Default,
     }
 
-    updateSetting.execute = jest.fn().mockReturnValue({ success: false })
+    updateSetting.execute = jest.fn().mockReturnValue({ success: false, statusCode: 404 })
 
     const httpResponse = <results.JsonResult> await createController().updateSetting(request, response)
     const result = await httpResponse.executeAsync()
@@ -242,7 +242,7 @@ describe('SettingsController', () => {
       userUuid: '1-2-3',
     })
 
-    expect(result.statusCode).toEqual(400)
+    expect(result.statusCode).toEqual(404)
   })
 
   it('should delete user setting', async () => {

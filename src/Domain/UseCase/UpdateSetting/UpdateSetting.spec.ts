@@ -1,3 +1,4 @@
+import { PermissionName } from '@standardnotes/features'
 import { SettingName } from '@standardnotes/settings'
 import { TimerInterface } from '@standardnotes/time'
 import 'reflect-metadata'
@@ -8,6 +9,7 @@ import { RoleServiceInterface } from '../../Role/RoleServiceInterface'
 
 import { Setting } from '../../Setting/Setting'
 import { SettingServiceInterface } from '../../Setting/SettingServiceInterface'
+import { SettingToSubscriptionMapInterface } from '../../Setting/SettingToSubscriptionMapInterface'
 import { SimpleSetting } from '../../Setting/SimpleSetting'
 import { PaymentsHttpServiceInterface } from '../../Subscription/PaymentsHttpServiceInterface'
 import { UserSubscription } from '../../Subscription/UserSubscription'
@@ -20,6 +22,7 @@ describe('UpdateSetting', () => {
   let settingService: SettingServiceInterface
   let settingProjection: SimpleSetting
   let settingProjector: SettingProjector
+  let settingToSubscriptionMap: SettingToSubscriptionMapInterface
   let setting: Setting
   let user: User
   let userRepository: UserRepositoryInterface
@@ -32,6 +35,7 @@ describe('UpdateSetting', () => {
   const createUseCase = () => new UpdateSetting(
     settingService,
     settingProjector,
+    settingToSubscriptionMap,
     userRepository,
     userSubscriptionRepository,
     roleService,
@@ -57,6 +61,9 @@ describe('UpdateSetting', () => {
     userSubscriptionRepository = {} as jest.Mocked<UserSubscriptionRepositoryInterface>
     userSubscriptionRepository.findOneByUserUuid = jest.fn().mockReturnValue(undefined)
     userSubscriptionRepository.save = jest.fn()
+
+    settingToSubscriptionMap = {} as jest.Mocked<SettingToSubscriptionMapInterface>
+    settingToSubscriptionMap.getPermissionAssociatedWithSetting = jest.fn().mockReturnValue(undefined)
 
     roleService = {} as jest.Mocked<RoleServiceInterface>
     roleService.addUserRole = jest.fn()
@@ -128,6 +135,32 @@ describe('UpdateSetting', () => {
       error: {
         message: 'User 1-2-3 not found.',
       },
+      statusCode: 404,
+    })
+  })
+
+  it('should not create a setting if user is not permitted to', async () => {
+    settingToSubscriptionMap.getPermissionAssociatedWithSetting = jest.fn().mockReturnValue(PermissionName.DailyEmailBackup)
+
+    roleService.userHasPermission = jest.fn().mockReturnValue(false)
+
+    const props = {
+      name: 'test-setting-name',
+      value: 'test-setting-value',
+      serverEncryptionVersion: EncryptionVersion.Unencrypted,
+      sensitive: false,
+    }
+
+    const response = await createUseCase().execute({ props, userUuid: '1-2-3' })
+
+    expect(settingService.createOrReplace).not.toHaveBeenCalled()
+
+    expect(response).toEqual({
+      success: false,
+      error: {
+        message: 'User 1-2-3 is not permitted to change the setting.',
+      },
+      statusCode: 401,
     })
   })
 

@@ -17,12 +17,14 @@ import { SubscriptionName } from '@standardnotes/auth'
 import { PaymentsHttpServiceInterface } from '../../Subscription/PaymentsHttpServiceInterface'
 import { UserSubscription } from '../../Subscription/UserSubscription'
 import { TimerInterface } from '@standardnotes/time'
+import { SettingToSubscriptionMapInterface } from '../../Setting/SettingToSubscriptionMapInterface'
 
 @injectable()
 export class UpdateSetting implements UseCaseInterface {
   constructor (
     @inject(TYPES.SettingService) private settingService: SettingServiceInterface,
     @inject(TYPES.SettingProjector) private settingProjector: SettingProjector,
+    @inject(TYPES.SettingToSubscriptionMap) private settingToSubscriptionMap: SettingToSubscriptionMapInterface,
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
     @inject(TYPES.UserSubscriptionRepository) private userSubscriptionRepository: UserSubscriptionRepositoryInterface,
     @inject(TYPES.RoleService) private roleService: RoleServiceInterface,
@@ -45,6 +47,17 @@ export class UpdateSetting implements UseCaseInterface {
         error: {
           message: `User ${userUuid} not found.`,
         },
+        statusCode: 404,
+      }
+    }
+
+    if (!await this.userHasPermissionToUpdateSetting(user, props.name as SettingName)) {
+      return {
+        success: false,
+        error: {
+          message: `User ${userUuid} is not permitted to change the setting.`,
+        },
+        statusCode: 401,
       }
     }
 
@@ -77,6 +90,15 @@ export class UpdateSetting implements UseCaseInterface {
 
     const exhaustiveCheck: never = response.status
     throw new Error(`Unrecognized status: ${exhaustiveCheck}!`)
+  }
+
+  private async userHasPermissionToUpdateSetting(user: User, settingName: SettingName): Promise<boolean> {
+    const permissionAssociatedWithSetting = await this.settingToSubscriptionMap.getPermissionAssociatedWithSetting(settingName)
+    if (permissionAssociatedWithSetting === undefined) {
+      return true
+    }
+
+    return this.roleService.userHasPermission(user.uuid, permissionAssociatedWithSetting)
   }
 
   private async handleClientSideMigrationOfExtensionKeyToFillSubscriptionData(
