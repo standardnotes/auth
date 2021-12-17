@@ -8,15 +8,9 @@ import { CreateOrReplaceSettingResponse } from '../../Setting/CreateOrReplaceSet
 import { SettingProjector } from '../../../Projection/SettingProjector'
 import { Logger } from 'winston'
 import { SettingServiceInterface } from '../../Setting/SettingServiceInterface'
-import { UserSubscriptionRepositoryInterface } from '../../Subscription/UserSubscriptionRepositoryInterface'
 import { User } from '../../User/User'
-import { SettingProps } from '../../Setting/SettingProps'
 import { SettingName } from '@standardnotes/settings'
 import { RoleServiceInterface } from '../../Role/RoleServiceInterface'
-import { SubscriptionName } from '@standardnotes/auth'
-import { PaymentsHttpServiceInterface } from '../../Subscription/PaymentsHttpServiceInterface'
-import { UserSubscription } from '../../Subscription/UserSubscription'
-import { TimerInterface } from '@standardnotes/time'
 import { SettingToSubscriptionMapInterface } from '../../Setting/SettingToSubscriptionMapInterface'
 
 @injectable()
@@ -26,10 +20,7 @@ export class UpdateSetting implements UseCaseInterface {
     @inject(TYPES.SettingProjector) private settingProjector: SettingProjector,
     @inject(TYPES.SettingToSubscriptionMap) private settingToSubscriptionMap: SettingToSubscriptionMapInterface,
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
-    @inject(TYPES.UserSubscriptionRepository) private userSubscriptionRepository: UserSubscriptionRepositoryInterface,
     @inject(TYPES.RoleService) private roleService: RoleServiceInterface,
-    @inject(TYPES.PaymentsHttpService) private paymentsHttpService: PaymentsHttpServiceInterface,
-    @inject(TYPES.Timer) private timer: TimerInterface,
     @inject(TYPES.Logger) private logger: Logger,
   ) {
   }
@@ -59,12 +50,6 @@ export class UpdateSetting implements UseCaseInterface {
         },
         statusCode: 401,
       }
-    }
-
-    try {
-      await this.handleClientSideMigrationOfExtensionKeyToFillSubscriptionData(user, props)
-    } catch (error) {
-      this.logger.error(`[${user.uuid}] Could not handle client side migration of extension key to fill subscription data: ${error.message}`)
     }
 
     const response = await this.settingService.createOrReplace({
@@ -99,42 +84,5 @@ export class UpdateSetting implements UseCaseInterface {
     }
 
     return this.roleService.userHasPermission(user.uuid, permissionAssociatedWithSetting)
-  }
-
-  private async handleClientSideMigrationOfExtensionKeyToFillSubscriptionData(
-    user: User,
-    props: SettingProps
-  ): Promise<void> {
-    if (props.name !== SettingName.ExtensionKey) {
-      return
-    }
-
-    this.logger.debug(`[${user.uuid}] Handling client side migration of extension key to fill sync subscription data`)
-
-    const existingSubscription = await this.userSubscriptionRepository.findOneByUserUuid(user.uuid)
-    if (existingSubscription !== undefined) {
-      this.logger.debug(`[${user.uuid}] User has an existing subscription already`)
-
-      return
-    }
-
-    const userWithSubscriptionDataFromPaymentsServer = await this.paymentsHttpService.getUser(props.value as string)
-    if (userWithSubscriptionDataFromPaymentsServer === undefined) {
-      this.logger.debug(`[${user.uuid}] No user with subscription data retrieved from payments server`)
-
-      return
-    }
-
-    await this.roleService.addUserRole(user, SubscriptionName.ProPlan)
-
-    const subscription = new UserSubscription()
-    subscription.planName = SubscriptionName.ProPlan
-    subscription.user = Promise.resolve(user)
-    subscription.createdAt = this.timer.convertStringDateToMicroseconds(userWithSubscriptionDataFromPaymentsServer.subscription.created_at)
-    subscription.updatedAt = this.timer.convertStringDateToMicroseconds(userWithSubscriptionDataFromPaymentsServer.subscription.updated_at)
-    subscription.endsAt = this.timer.convertStringDateToMicroseconds(userWithSubscriptionDataFromPaymentsServer.subscription.active_until)
-    subscription.cancelled = userWithSubscriptionDataFromPaymentsServer.subscription.canceled
-
-    await this.userSubscriptionRepository.save(subscription)
   }
 }
