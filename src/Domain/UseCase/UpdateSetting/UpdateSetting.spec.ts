@@ -1,7 +1,6 @@
-import { PermissionName } from '@standardnotes/features'
-import { SettingName } from '@standardnotes/settings'
-import { TimerInterface } from '@standardnotes/time'
 import 'reflect-metadata'
+
+import { PermissionName } from '@standardnotes/features'
 import { Logger } from 'winston'
 import { SettingProjector } from '../../../Projection/SettingProjector'
 import { EncryptionVersion } from '../../Encryption/EncryptionVersion'
@@ -11,9 +10,6 @@ import { Setting } from '../../Setting/Setting'
 import { SettingServiceInterface } from '../../Setting/SettingServiceInterface'
 import { SettingToSubscriptionMapInterface } from '../../Setting/SettingToSubscriptionMapInterface'
 import { SimpleSetting } from '../../Setting/SimpleSetting'
-import { PaymentsHttpServiceInterface } from '../../Subscription/PaymentsHttpServiceInterface'
-import { UserSubscription } from '../../Subscription/UserSubscription'
-import { UserSubscriptionRepositoryInterface } from '../../Subscription/UserSubscriptionRepositoryInterface'
 import { User } from '../../User/User'
 import { UserRepositoryInterface } from '../../User/UserRepositoryInterface'
 import { UpdateSetting } from './UpdateSetting'
@@ -26,10 +22,7 @@ describe('UpdateSetting', () => {
   let setting: Setting
   let user: User
   let userRepository: UserRepositoryInterface
-  let userSubscriptionRepository: UserSubscriptionRepositoryInterface
   let roleService: RoleServiceInterface
-  let paymentsHttpService: PaymentsHttpServiceInterface
-  let timer: TimerInterface
   let logger: Logger
 
   const createUseCase = () => new UpdateSetting(
@@ -37,10 +30,7 @@ describe('UpdateSetting', () => {
     settingProjector,
     settingToSubscriptionMap,
     userRepository,
-    userSubscriptionRepository,
     roleService,
-    paymentsHttpService,
-    timer,
     logger
   )
 
@@ -58,31 +48,11 @@ describe('UpdateSetting', () => {
     userRepository = {} as jest.Mocked<UserRepositoryInterface>
     userRepository.findOneByUuid = jest.fn().mockReturnValue(user)
 
-    userSubscriptionRepository = {} as jest.Mocked<UserSubscriptionRepositoryInterface>
-    userSubscriptionRepository.findOneByUserUuid = jest.fn().mockReturnValue(undefined)
-    userSubscriptionRepository.save = jest.fn()
-
     settingToSubscriptionMap = {} as jest.Mocked<SettingToSubscriptionMapInterface>
     settingToSubscriptionMap.getPermissionAssociatedWithSetting = jest.fn().mockReturnValue(undefined)
 
     roleService = {} as jest.Mocked<RoleServiceInterface>
     roleService.addUserRole = jest.fn()
-
-    paymentsHttpService = {} as jest.Mocked<PaymentsHttpServiceInterface>
-    paymentsHttpService.getUser = jest.fn().mockReturnValue({
-      id: 1,
-      email: 'test@test.te',
-      extension_server_key: 'a-b-c',
-      subscription: {
-        canceled: false,
-        created_at: new Date(1).toString(),
-        updated_at: new Date(2).toString(),
-        active_until: new Date(3).toString(),
-      },
-    })
-
-    timer = {} as jest.Mocked<TimerInterface>
-    timer.convertStringDateToMicroseconds = jest.fn().mockReturnValue(1)
 
     logger = {} as jest.Mocked<Logger>
     logger.debug = jest.fn()
@@ -161,145 +131,6 @@ describe('UpdateSetting', () => {
         message: 'User 1-2-3 is not permitted to change the setting.',
       },
       statusCode: 401,
-    })
-  })
-
-  it('should handle client side migration of extension key to fill in the subscription data', async () => {
-    const props = {
-      name: SettingName.ExtensionKey,
-      value: 'test-setting-value',
-      serverEncryptionVersion: EncryptionVersion.Unencrypted,
-      sensitive: true,
-    }
-
-    const response = await createUseCase().execute({ props, userUuid: '1-2-3' })
-
-    expect(settingService.createOrReplace).toHaveBeenCalledWith({
-      props: {
-        name: 'EXTENSION_KEY',
-        value: 'test-setting-value',
-        serverEncryptionVersion: 0,
-        sensitive: true,
-      },
-      user,
-    })
-
-    expect(roleService.addUserRole).toHaveBeenCalledWith({}, 'PRO_PLAN')
-
-    expect(userSubscriptionRepository.save).toHaveBeenCalledWith({
-      cancelled: false,
-      createdAt: 1,
-      endsAt: 1,
-      planName: 'PRO_PLAN',
-      updatedAt: 1,
-      user: Promise.resolve(user),
-    })
-
-    expect(response).toEqual({
-      success: true,
-      setting: settingProjection,
-      statusCode: 201,
-    })
-  })
-
-  it('should skip client side migration of extension key to fill in the subscription data - existing subscription', async () => {
-    const props = {
-      name: SettingName.ExtensionKey,
-      value: 'test-setting-value',
-      serverEncryptionVersion: EncryptionVersion.Unencrypted,
-      sensitive: true,
-    }
-
-    userSubscriptionRepository.findOneByUserUuid = jest.fn().mockReturnValue({} as jest.Mocked<UserSubscription>)
-
-    const response = await createUseCase().execute({ props, userUuid: '1-2-3' })
-
-    expect(settingService.createOrReplace).toHaveBeenCalledWith({
-      props: {
-        name: 'EXTENSION_KEY',
-        value: 'test-setting-value',
-        serverEncryptionVersion: 0,
-        sensitive: true,
-      },
-      user,
-    })
-
-    expect(roleService.addUserRole).not.toHaveBeenCalled()
-
-    expect(userSubscriptionRepository.save).not.toHaveBeenCalled()
-
-    expect(response).toEqual({
-      success: true,
-      setting: settingProjection,
-      statusCode: 201,
-    })
-  })
-
-  it('should skip client side migration of extension key to fill in the subscription data - missing data from payments', async () => {
-    const props = {
-      name: SettingName.ExtensionKey,
-      value: 'test-setting-value',
-      serverEncryptionVersion: EncryptionVersion.Unencrypted,
-      sensitive: true,
-    }
-
-    paymentsHttpService.getUser = jest.fn().mockReturnValue(undefined)
-
-    const response = await createUseCase().execute({ props, userUuid: '1-2-3' })
-
-    expect(settingService.createOrReplace).toHaveBeenCalledWith({
-      props: {
-        name: 'EXTENSION_KEY',
-        value: 'test-setting-value',
-        serverEncryptionVersion: 0,
-        sensitive: true,
-      },
-      user,
-    })
-
-    expect(roleService.addUserRole).not.toHaveBeenCalled()
-
-    expect(userSubscriptionRepository.save).not.toHaveBeenCalled()
-
-    expect(response).toEqual({
-      success: true,
-      setting: settingProjection,
-      statusCode: 201,
-    })
-  })
-
-  it('should skip client side migration of extension key to fill in the subscription data - error occurred', async () => {
-    const props = {
-      name: SettingName.ExtensionKey,
-      value: 'test-setting-value',
-      serverEncryptionVersion: EncryptionVersion.Unencrypted,
-      sensitive: true,
-    }
-
-    paymentsHttpService.getUser = jest.fn().mockImplementation(() => {
-      throw new Error('Oops')
-    })
-
-    const response = await createUseCase().execute({ props, userUuid: '1-2-3' })
-
-    expect(settingService.createOrReplace).toHaveBeenCalledWith({
-      props: {
-        name: 'EXTENSION_KEY',
-        value: 'test-setting-value',
-        serverEncryptionVersion: 0,
-        sensitive: true,
-      },
-      user,
-    })
-
-    expect(roleService.addUserRole).not.toHaveBeenCalled()
-
-    expect(userSubscriptionRepository.save).not.toHaveBeenCalled()
-
-    expect(response).toEqual({
-      success: true,
-      setting: settingProjection,
-      statusCode: 201,
     })
   })
 })
