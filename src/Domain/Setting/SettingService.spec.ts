@@ -1,9 +1,12 @@
-import { SubscriptionName } from '@standardnotes/auth'
-import { EmailBackupFrequency, SettingName } from '@standardnotes/settings'
 import 'reflect-metadata'
+
+import { SubscriptionName } from '@standardnotes/auth'
+import { DomainEventPublisherInterface, EmailBackupRequestedEvent } from '@standardnotes/domain-events'
+import { EmailBackupFrequency, SettingName } from '@standardnotes/settings'
 import { Logger } from 'winston'
 import { CrypterInterface } from '../Encryption/CrypterInterface'
 import { EncryptionVersion } from '../Encryption/EncryptionVersion'
+import { DomainEventFactoryInterface } from '../Event/DomainEventFactoryInterface'
 import { User } from '../User/User'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { Setting } from './Setting'
@@ -21,12 +24,25 @@ describe('SettingService', () => {
   let userRepository: UserRepositoryInterface
   let crypter: CrypterInterface
   let settingToSubscriptionMap: SettingToSubscriptionMapInterface
+  let domainEventPublisher: DomainEventPublisherInterface
+  let domainEventFactory: DomainEventFactoryInterface
   let logger: Logger
 
-  const createService = () => new SettingService(factory, settingRepository, userRepository, crypter, settingToSubscriptionMap, logger)
+  const createService = () => new SettingService(
+    factory,
+    settingRepository,
+    userRepository,
+    crypter,
+    settingToSubscriptionMap,
+    domainEventPublisher,
+    domainEventFactory,
+    logger
+  )
 
   beforeEach(() => {
-    user = {} as jest.Mocked<User>
+    user = {
+      uuid: '4-5-6',
+    } as jest.Mocked<User>
 
     setting = {} as jest.Mocked<Setting>
 
@@ -36,7 +52,7 @@ describe('SettingService', () => {
 
     settingRepository = {} as jest.Mocked<SettingRepositoryInterface>
     settingRepository.findLastByNameAndUserUuid = jest.fn().mockReturnValue(undefined)
-    settingRepository.save = jest.fn()
+    settingRepository.save = jest.fn().mockImplementation(setting => setting)
 
     settingToSubscriptionMap = {} as jest.Mocked<SettingToSubscriptionMapInterface>
     settingToSubscriptionMap.getDefaultSettingsAndValuesForSubscriptionName = jest.fn().mockReturnValue(new Map([
@@ -53,6 +69,12 @@ describe('SettingService', () => {
 
     crypter = {} as jest.Mocked<CrypterInterface>
     crypter.decryptForUser = jest.fn().mockReturnValue('decrypted')
+
+    domainEventPublisher = {} as jest.Mocked<DomainEventPublisherInterface>
+    domainEventPublisher.publish = jest.fn()
+
+    domainEventFactory = {} as jest.Mocked<DomainEventFactoryInterface>
+    domainEventFactory.createEmailBackupRequestedEvent = jest.fn().mockReturnValue({} as jest.Mocked<EmailBackupRequestedEvent>)
 
     logger = {} as jest.Mocked<Logger>
     logger.debug = jest.fn()
@@ -83,6 +105,56 @@ describe('SettingService', () => {
         sensitive: false,
       },
     })
+
+    expect(result.status).toEqual('created')
+  })
+
+  it ('should trigger backup if email backup setting is created - emails not muted', async () => {
+    factory.create = jest.fn().mockReturnValue({
+      name: SettingName.EmailBackup,
+      value: EmailBackupFrequency.Daily,
+    } as jest.Mocked<Setting>)
+    settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue(undefined)
+
+    const result = await createService().createOrReplace({
+      user,
+      props: {
+        name: SettingName.EmailBackup,
+        value: 'value',
+        serverEncryptionVersion: 1,
+        sensitive: false,
+      },
+    })
+
+    expect(domainEventPublisher.publish).toHaveBeenCalled()
+    expect(domainEventFactory.createEmailBackupRequestedEvent).toHaveBeenCalledWith('4-5-6', '', false)
+
+    expect(result.status).toEqual('created')
+  })
+
+  it ('should trigger backup if email backup setting is created - emails muted', async () => {
+    factory.create = jest.fn().mockReturnValue({
+      name: SettingName.EmailBackup,
+      value: EmailBackupFrequency.Daily,
+    } as jest.Mocked<Setting>)
+    settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue({
+      name: SettingName.MuteFailedBackupsEmails,
+      uuid: '6-7-8',
+      value: 'muted',
+    } as jest.Mocked<Setting>)
+
+    const result = await createService().createOrReplace({
+      user,
+      props: {
+        name: SettingName.EmailBackup,
+        value: 'value',
+        serverEncryptionVersion: 1,
+        sensitive: false,
+      },
+    })
+
+    expect(domainEventPublisher.publish).toHaveBeenCalled()
+    expect(domainEventFactory.createEmailBackupRequestedEvent).toHaveBeenCalledWith('4-5-6', '6-7-8', true)
 
     expect(result.status).toEqual('created')
   })

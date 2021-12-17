@@ -1,10 +1,12 @@
 import { SubscriptionName } from '@standardnotes/auth'
-import { SettingName } from '@standardnotes/settings'
+import { DomainEventPublisherInterface } from '@standardnotes/domain-events'
+import { MuteFailedBackupsEmailsOption, SettingName } from '@standardnotes/settings'
 import { inject, injectable } from 'inversify'
 import { Logger } from 'winston'
 import TYPES from '../../Bootstrap/Types'
 import { CrypterInterface } from '../Encryption/CrypterInterface'
 import { EncryptionVersion } from '../Encryption/EncryptionVersion'
+import { DomainEventFactoryInterface } from '../Event/DomainEventFactoryInterface'
 import { User } from '../User/User'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { CreateOrReplaceSettingDto } from './CreateOrReplaceSettingDto'
@@ -24,6 +26,8 @@ export class SettingService implements SettingServiceInterface {
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
     @inject(TYPES.Crypter) private crypter: CrypterInterface,
     @inject(TYPES.SettingToSubscriptionMap) private settingToSubscriptionMap: SettingToSubscriptionMapInterface,
+    @inject(TYPES.DomainEventPublisher) private domainEventPublisher: DomainEventPublisherInterface,
+    @inject(TYPES.DomainEventFactory) private domainEventFactory: DomainEventFactoryInterface,
     @inject(TYPES.Logger) private logger: Logger,
   ) {
   }
@@ -90,6 +94,8 @@ export class SettingService implements SettingServiceInterface {
 
       this.logger.debug('[%s] Created setting %s: %O', user.uuid, props.name, setting)
 
+      await this.triggerDefaultActionsUponSettingCreated(setting, user)
+
       return {
         status: 'created',
         setting,
@@ -103,6 +109,26 @@ export class SettingService implements SettingServiceInterface {
     return {
       status: 'replaced',
       setting,
+    }
+  }
+
+  private async triggerDefaultActionsUponSettingCreated(setting: Setting, user: User) {
+    if (setting.name === SettingName.EmailBackup) {
+      let userHasEmailsMuted = false
+      let muteEmailsSettingUuid = ''
+      const muteFailedEmailsBackupSetting = await this.settingRepository.findOneByNameAndUserUuid(SettingName.MuteFailedBackupsEmails, user.uuid)
+      if (muteFailedEmailsBackupSetting !== undefined) {
+        userHasEmailsMuted = muteFailedEmailsBackupSetting.value === MuteFailedBackupsEmailsOption.Muted
+        muteEmailsSettingUuid = muteFailedEmailsBackupSetting.uuid
+      }
+
+      await this.domainEventPublisher.publish(
+        this.domainEventFactory.createEmailBackupRequestedEvent(
+          user.uuid,
+          muteEmailsSettingUuid,
+          userHasEmailsMuted
+        )
+      )
     }
   }
 }
