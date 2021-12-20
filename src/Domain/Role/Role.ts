@@ -4,6 +4,7 @@ import { OfflineUserSubscription } from '../Subscription/OfflineUserSubscription
 import { User } from '../User/User'
 
 @Entity({ name: 'roles' })
+@Index('name_and_version', ['name', 'version'], { unique: true })
 export class Role {
   @PrimaryGeneratedColumn('uuid')
   uuid: string
@@ -11,8 +12,12 @@ export class Role {
   @Column({
     length: 255,
   })
-  @Index('index_roles_on_name', { unique: true })
   name: string
+
+  @Column({
+    type: 'smallint',
+  })
+  version: number
 
   @Column({
     name: 'created_at',

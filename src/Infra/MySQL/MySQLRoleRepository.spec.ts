@@ -21,13 +21,17 @@ describe('MySQLRoleRepository', () => {
     repository.createQueryBuilder = jest.fn().mockImplementation(() => queryBuilder)
   })
 
-  it('should find one role by name', async () => {
+  it('should find latest version of a role by name', async () => {
     queryBuilder.where = jest.fn().mockReturnThis()
-    queryBuilder.getOne = jest.fn().mockReturnValue(role)
+    queryBuilder.take = jest.fn().mockReturnThis()
+    queryBuilder.orderBy = jest.fn().mockReturnThis()
+    queryBuilder.getMany = jest.fn().mockReturnValue([role])
 
     const result = await repository.findOneByName('test')
 
     expect(queryBuilder.where).toHaveBeenCalledWith('role.name = :name', { name: 'test' })
+    expect(queryBuilder.take).toHaveBeenCalledWith(1)
+    expect(queryBuilder.orderBy).toHaveBeenCalledWith('version', 'DESC')
     expect(result).toEqual(role)
   })
 })
