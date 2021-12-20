@@ -10,59 +10,59 @@ import { SessionRepositoryInterface } from '../../Domain/Session/SessionReposito
 @EntityRepository(Session)
 export class MySQLSessionRepository extends Repository<Session> implements SessionRepositoryInterface {
   async updateHashedTokens(uuid: string, hashedAccessToken: string, hashedRefreshToken: string): Promise<void> {
-    await this.createQueryBuilder('session')
+    await this.createQueryBuilder('s')
       .update()
       .set({
         hashedAccessToken,
         hashedRefreshToken,
       })
-      .where('session.uuid = :uuid', { uuid })
+      .where('s.uuid = :uuid', { uuid })
       .execute()
   }
 
   async updatedTokenExpirationDates(uuid: string, accessExpiration: Date, refreshExpiration: Date): Promise<void> {
-    await this.createQueryBuilder('session')
+    await this.createQueryBuilder('s')
       .update()
       .set({
         accessExpiration,
         refreshExpiration,
       })
-      .where('session.uuid = :uuid', { uuid })
+      .where('s.uuid = :uuid', { uuid })
       .execute()
   }
 
   async findAllByRefreshExpirationAndUserUuid(userUuid: string): Promise<Session[]> {
-    return this.createQueryBuilder('session')
+    return this.createQueryBuilder('s')
       .where(
-        'session.refresh_expiration > :refresh_expiration AND session.user_uuid = :user_uuid',
+        's.refresh_expiration > :refresh_expiration AND s.user_uuid = :user_uuid',
         { refresh_expiration: dayjs.utc().toDate(), user_uuid: userUuid }
       )
       .getMany()
   }
 
   async findOneByUuidAndUserUuid(uuid: string, userUuid: string): Promise<Session | undefined> {
-    return this.createQueryBuilder('session')
-      .where('session.uuid = :uuid AND session.user_uuid = :user_uuid', { uuid, user_uuid: userUuid })
+    return this.createQueryBuilder('s')
+      .where('s.uuid = :uuid AND s.user_uuid = :user_uuid', { uuid, user_uuid: userUuid })
       .getOne()
   }
 
   async deleteOneByUuid(uuid: string): Promise<void> {
-    await this.createQueryBuilder('session')
+    await this.createQueryBuilder('s')
       .delete()
-      .where('session.uuid = :uuid', { uuid })
+      .where('s.uuid = :uuid', { uuid })
       .execute()
   }
 
   async findOneByUuid(uuid: string): Promise<Session | undefined> {
-    return this.createQueryBuilder('session')
-      .where('session.uuid = :uuid', { uuid })
+    return this.createQueryBuilder('s')
+      .where('s.uuid = :uuid', { uuid })
       .getOne()
   }
 
   async findAllByUserUuid(userUuid: string): Promise<Array<Session>> {
-    return this.createQueryBuilder('session')
+    return this.createQueryBuilder('s')
       .where(
-        'session.user_uuid = :user_uuid',
+        's.user_uuid = :user_uuid',
         {
           user_uuid: userUuid,
         }
@@ -71,10 +71,10 @@ export class MySQLSessionRepository extends Repository<Session> implements Sessi
   }
 
   async deleteAllByUserUuid(userUuid: string, currentSessionUuid: string): Promise<void> {
-    await this.createQueryBuilder('session')
+    await this.createQueryBuilder('s')
       .delete()
       .where(
-        'session.user_uuid = :user_uuid AND session.uuid != :current_session_uuid',
+        's.user_uuid = :user_uuid AND s.uuid != :current_session_uuid',
         {
           user_uuid: userUuid,
           current_session_uuid: currentSessionUuid,
