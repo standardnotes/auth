@@ -42,7 +42,7 @@ describe('MySQLSessionRepository', () => {
       }
     )
     expect(updateQueryBuilder.where).toHaveBeenCalledWith(
-      's.uuid = :uuid',
+      'uuid = :uuid',
       { uuid: '123' }
     )
     expect(updateQueryBuilder.execute).toHaveBeenCalled()
@@ -70,7 +70,7 @@ describe('MySQLSessionRepository', () => {
       }
     )
     expect(updateQueryBuilder.where).toHaveBeenCalledWith(
-      's.uuid = :uuid',
+      'uuid = :uuid',
       { uuid: '123' }
     )
     expect(updateQueryBuilder.execute).toHaveBeenCalled()
@@ -83,7 +83,7 @@ describe('MySQLSessionRepository', () => {
     const result = await repository.findAllByRefreshExpirationAndUserUuid('123')
 
     expect(queryBuilder.where).toHaveBeenCalledWith(
-      's.refresh_expiration > :refresh_expiration AND s.user_uuid = :user_uuid',
+      'refresh_expiration > :refresh_expiration AND user_uuid = :user_uuid',
       { refresh_expiration: expect.any(Date), user_uuid: '123' }
     )
     expect(result).toEqual([session])
@@ -96,7 +96,7 @@ describe('MySQLSessionRepository', () => {
     const result = await repository.findAllByUserUuid('123')
 
     expect(queryBuilder.where).toHaveBeenCalledWith(
-      's.user_uuid = :user_uuid',
+      'user_uuid = :user_uuid',
       { user_uuid: '123' }
     )
     expect(result).toEqual([session])
@@ -108,7 +108,7 @@ describe('MySQLSessionRepository', () => {
 
     const result = await repository.findOneByUuid('123')
 
-    expect(queryBuilder.where).toHaveBeenCalledWith('s.uuid = :uuid', { uuid: '123' })
+    expect(queryBuilder.where).toHaveBeenCalledWith('uuid = :uuid', { uuid: '123' })
     expect(result).toEqual(session)
   })
 
@@ -118,7 +118,7 @@ describe('MySQLSessionRepository', () => {
 
     const result = await repository.findOneByUuidAndUserUuid('123', '234')
 
-    expect(queryBuilder.where).toHaveBeenCalledWith('s.uuid = :uuid AND s.user_uuid = :user_uuid', { uuid: '123', user_uuid: '234' })
+    expect(queryBuilder.where).toHaveBeenCalledWith('uuid = :uuid AND user_uuid = :user_uuid', { uuid: '123', user_uuid: '234' })
     expect(result).toEqual(session)
   })
 
@@ -131,7 +131,7 @@ describe('MySQLSessionRepository', () => {
 
     expect(queryBuilder.delete).toHaveBeenCalled()
     expect(queryBuilder.where).toHaveBeenCalledWith(
-      's.user_uuid = :user_uuid AND s.uuid != :current_session_uuid',
+      'user_uuid = :user_uuid AND uuid != :current_session_uuid',
       {
         user_uuid: '123',
         current_session_uuid: '234',
@@ -148,7 +148,7 @@ describe('MySQLSessionRepository', () => {
     await repository.deleteOneByUuid('123')
 
     expect(queryBuilder.delete).toHaveBeenCalled()
-    expect(queryBuilder.where).toHaveBeenCalledWith('s.uuid = :uuid', { uuid: '123' })
+    expect(queryBuilder.where).toHaveBeenCalledWith('uuid = :uuid', { uuid: '123' })
     expect(queryBuilder.execute).toHaveBeenCalled()
   })
 })
