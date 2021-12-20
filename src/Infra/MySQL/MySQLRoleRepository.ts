@@ -9,7 +9,7 @@ export class MySQLRoleRepository extends Repository<Role> implements RoleReposit
   async findOneByName(name: string): Promise<Role | undefined> {
     const roles = await this.createQueryBuilder('role')
       .where('role.name = :name', { name })
-      .orderBy('version', 'DESC')
+      .orderBy('role.version', 'DESC')
       .cache(`role_${name}`, 600000)
       .take(1)
       .getMany()

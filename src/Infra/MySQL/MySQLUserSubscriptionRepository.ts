@@ -8,14 +8,14 @@ import { UserSubscriptionRepositoryInterface } from '../../Domain/Subscription/U
 @EntityRepository(UserSubscription)
 export class MySQLUserSubscriptionRepository extends Repository<UserSubscription> implements UserSubscriptionRepositoryInterface {
   async findOneByUserUuid(userUuid: string): Promise<UserSubscription | undefined> {
-    const subscriptions = await this.createQueryBuilder()
+    const subscriptions = await this.createQueryBuilder('user_subscription')
       .where(
-        'user_uuid = :user_uuid',
+        'user_subscription.user_uuid = :user_uuid',
         {
           user_uuid: userUuid,
         }
       )
-      .orderBy('ends_at', 'DESC')
+      .orderBy('user_subscription.ends_at', 'DESC')
       .getMany()
 
     const uncanceled = subscriptions.find((subscription) => !subscription.cancelled)
@@ -24,14 +24,14 @@ export class MySQLUserSubscriptionRepository extends Repository<UserSubscription
   }
 
   async updateEndsAt(subscriptionId: number, endsAt: number, updatedAt: number): Promise<void> {
-    await this.createQueryBuilder()
+    await this.createQueryBuilder('user_subscription')
       .update()
       .set({
         endsAt,
         updatedAt,
       })
       .where(
-        'subscription_id = :subscriptionId',
+        'user_subscription.subscription_id = :subscriptionId',
         {
           subscriptionId,
         }
@@ -40,14 +40,14 @@ export class MySQLUserSubscriptionRepository extends Repository<UserSubscription
   }
 
   async updateCancelled(subscriptionId: number, cancelled: boolean, updatedAt: number): Promise<void> {
-    await this.createQueryBuilder()
+    await this.createQueryBuilder('user_subscription')
       .update()
       .set({
         cancelled,
         updatedAt,
       })
       .where(
-        'subscription_id = :subscriptionId',
+        'user_subscription.subscription_id = :subscriptionId',
         {
           subscriptionId,
         }
