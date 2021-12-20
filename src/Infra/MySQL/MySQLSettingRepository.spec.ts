@@ -66,7 +66,7 @@ describe('MySQLSettingRepository', () => {
     const result = await repository.findLastByNameAndUserUuid('test', '1-2-3')
 
     expect(queryBuilder.where).toHaveBeenCalledWith('setting.name = :name AND setting.user_uuid = :user_uuid', { name: 'test', user_uuid: '1-2-3' })
-    expect(queryBuilder.orderBy).toHaveBeenCalledWith('updated_at', 'DESC')
+    expect(queryBuilder.orderBy).toHaveBeenCalledWith('setting.updated_at', 'DESC')
     expect(queryBuilder.limit).toHaveBeenCalledWith(1)
     expect(result).toEqual(setting)
   })

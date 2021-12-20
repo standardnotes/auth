@@ -16,7 +16,7 @@ export class MySQLSessionRepository extends Repository<Session> implements Sessi
         hashedAccessToken,
         hashedRefreshToken,
       })
-      .where('uuid = :uuid', { uuid })
+      .where('session.uuid = :uuid', { uuid })
       .execute()
   }
 
@@ -27,7 +27,7 @@ export class MySQLSessionRepository extends Repository<Session> implements Sessi
         accessExpiration,
         refreshExpiration,
       })
-      .where('uuid = :uuid', { uuid })
+      .where('session.uuid = :uuid', { uuid })
       .execute()
   }
 
@@ -49,7 +49,7 @@ export class MySQLSessionRepository extends Repository<Session> implements Sessi
   async deleteOneByUuid(uuid: string): Promise<void> {
     await this.createQueryBuilder('session')
       .delete()
-      .where('uuid = :uuid', { uuid })
+      .where('session.uuid = :uuid', { uuid })
       .execute()
   }
 
@@ -74,7 +74,7 @@ export class MySQLSessionRepository extends Repository<Session> implements Sessi
     await this.createQueryBuilder('session')
       .delete()
       .where(
-        'user_uuid = :user_uuid AND uuid != :current_session_uuid',
+        'session.user_uuid = :user_uuid AND session.uuid != :current_session_uuid',
         {
           user_uuid: userUuid,
           current_session_uuid: currentSessionUuid,
