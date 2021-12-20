@@ -88,7 +88,11 @@ export class RoleService implements RoleServiceInterface {
     email: string,
     subscriptionName: SubscriptionName,
   ): Promise<void> {
+    this.logger.info(`Adding offline user ${email} a role for subscription ${subscriptionName}`)
+
     const roleName = this.roleToSubscriptionMap.getRoleNameForSubscriptionName(subscriptionName)
+
+    this.logger.info(`Found role ${roleName} for subscription name ${subscriptionName}`)
 
     if (roleName === undefined) {
       this.logger.warn(`Could not find role name for subscription name: ${subscriptionName}`)

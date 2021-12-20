@@ -30,7 +30,13 @@ export class MySQLOfflineUserSubscriptionRepository extends Repository<OfflineUs
       .orderBy('offline_user_subscription.ends_at', 'DESC')
       .getMany()
 
+    /* istanbul ignore next */
+    console.log(`Found ${subscriptions.length} offline user subscriptions`)
+
     const uncanceled = subscriptions.find((subscription) => !subscription.cancelled)
+
+    /* istanbul ignore next */
+    console.log(`Uncanceled subscription: ${uncanceled}`)
 
     return uncanceled || subscriptions[0]
   }
