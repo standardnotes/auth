@@ -41,13 +41,13 @@ describe('MySQLUserSubscriptionRepository', () => {
     const result = await repository.findOneByUserUuid('123')
 
     expect(selectQueryBuilder.where).toHaveBeenCalledWith(
-      'user_uuid = :user_uuid',
+      'user_subscription.user_uuid = :user_uuid',
       {
         user_uuid: '123',
       },
     )
     expect(selectQueryBuilder.orderBy).toHaveBeenCalledWith(
-      'ends_at', 'DESC'
+      'user_subscription.ends_at', 'DESC'
     )
     expect(selectQueryBuilder.getMany).toHaveBeenCalled()
     expect(result).toEqual(subscription)
@@ -63,13 +63,13 @@ describe('MySQLUserSubscriptionRepository', () => {
     const result = await repository.findOneByUserUuid('123')
 
     expect(selectQueryBuilder.where).toHaveBeenCalledWith(
-      'user_uuid = :user_uuid',
+      'user_subscription.user_uuid = :user_uuid',
       {
         user_uuid: '123',
       },
     )
     expect(selectQueryBuilder.orderBy).toHaveBeenCalledWith(
-      'ends_at', 'DESC'
+      'user_subscription.ends_at', 'DESC'
     )
     expect(selectQueryBuilder.getMany).toHaveBeenCalled()
     expect(result).toEqual(subscription)
@@ -85,13 +85,13 @@ describe('MySQLUserSubscriptionRepository', () => {
     const result = await repository.findOneByUserUuid('123')
 
     expect(selectQueryBuilder.where).toHaveBeenCalledWith(
-      'user_uuid = :user_uuid',
+      'user_subscription.user_uuid = :user_uuid',
       {
         user_uuid: '123',
       },
     )
     expect(selectQueryBuilder.orderBy).toHaveBeenCalledWith(
-      'ends_at', 'DESC'
+      'user_subscription.ends_at', 'DESC'
     )
     expect(selectQueryBuilder.getMany).toHaveBeenCalled()
     expect(result).toBeUndefined()
@@ -115,7 +115,7 @@ describe('MySQLUserSubscriptionRepository', () => {
       }
     )
     expect(updateQueryBuilder.where).toHaveBeenCalledWith(
-      'subscription_id = :subscriptionId',
+      'user_subscription.subscription_id = :subscriptionId',
       {
         subscriptionId: 1,
       }
@@ -141,7 +141,7 @@ describe('MySQLUserSubscriptionRepository', () => {
       }
     )
     expect(updateQueryBuilder.where).toHaveBeenCalledWith(
-      'subscription_id = :subscriptionId',
+      'user_subscription.subscription_id = :subscriptionId',
       {
         subscriptionId: 1,
       }
