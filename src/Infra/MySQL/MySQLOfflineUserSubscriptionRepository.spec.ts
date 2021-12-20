@@ -43,13 +43,13 @@ describe('MySQLOfflineUserSubscriptionRepository', () => {
     const result = await repository.findOneByEmail('test@test.com')
 
     expect(selectQueryBuilder.where).toHaveBeenCalledWith(
-      'email = :email',
+      'offline_user_subscription.email = :email',
       {
         email: 'test@test.com',
       },
     )
     expect(selectQueryBuilder.orderBy).toHaveBeenCalledWith(
-      'ends_at', 'DESC'
+      'offline_user_subscription.ends_at', 'DESC'
     )
     expect(selectQueryBuilder.getMany).toHaveBeenCalled()
     expect(result).toEqual(offlineSubscription)
@@ -65,13 +65,13 @@ describe('MySQLOfflineUserSubscriptionRepository', () => {
     const result = await repository.findOneByEmail('test@test.com')
 
     expect(selectQueryBuilder.where).toHaveBeenCalledWith(
-      'email = :email',
+      'offline_user_subscription.email = :email',
       {
         email: 'test@test.com',
       },
     )
     expect(selectQueryBuilder.orderBy).toHaveBeenCalledWith(
-      'ends_at', 'DESC'
+      'offline_user_subscription.ends_at', 'DESC'
     )
     expect(selectQueryBuilder.getMany).toHaveBeenCalled()
     expect(result).toEqual(offlineSubscription)
@@ -87,13 +87,13 @@ describe('MySQLOfflineUserSubscriptionRepository', () => {
     const result = await repository.findOneByEmail('test@test.com')
 
     expect(selectQueryBuilder.where).toHaveBeenCalledWith(
-      'email = :email',
+      'offline_user_subscription.email = :email',
       {
         email: 'test@test.com',
       },
     )
     expect(selectQueryBuilder.orderBy).toHaveBeenCalledWith(
-      'ends_at', 'DESC'
+      'offline_user_subscription.ends_at', 'DESC'
     )
     expect(selectQueryBuilder.getMany).toHaveBeenCalled()
     expect(result).toBeUndefined()
@@ -109,14 +109,14 @@ describe('MySQLOfflineUserSubscriptionRepository', () => {
     const result = await repository.findByEmail('test@test.com', 123)
 
     expect(selectQueryBuilder.where).toHaveBeenCalledWith(
-      'email = :email AND ends_at > :endsAt',
+      'offline_user_subscription.email = :email AND offline_user_subscription.ends_at > :endsAt',
       {
         email: 'test@test.com',
         endsAt: 123,
       },
     )
     expect(selectQueryBuilder.orderBy).toHaveBeenCalledWith(
-      'ends_at', 'DESC'
+      'offline_user_subscription.ends_at', 'DESC'
     )
     expect(selectQueryBuilder.getMany).toHaveBeenCalled()
     expect(result).toEqual([offlineSubscription])
@@ -140,7 +140,7 @@ describe('MySQLOfflineUserSubscriptionRepository', () => {
       }
     )
     expect(updateQueryBuilder.where).toHaveBeenCalledWith(
-      'subscription_id = :subscriptionId',
+      'offline_user_subscription.subscription_id = :subscriptionId',
       {
         subscriptionId: 1,
       }
@@ -166,7 +166,7 @@ describe('MySQLOfflineUserSubscriptionRepository', () => {
       }
     )
     expect(updateQueryBuilder.where).toHaveBeenCalledWith(
-      'subscription_id = :subscriptionId',
+      'offline_user_subscription.subscription_id = :subscriptionId',
       {
         subscriptionId: 1,
       }

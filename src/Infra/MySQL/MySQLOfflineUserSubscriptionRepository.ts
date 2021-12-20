@@ -7,27 +7,27 @@ import { OfflineUserSubscriptionRepositoryInterface } from '../../Domain/Subscri
 @EntityRepository(OfflineUserSubscription)
 export class MySQLOfflineUserSubscriptionRepository extends Repository<OfflineUserSubscription> implements OfflineUserSubscriptionRepositoryInterface {
   async findByEmail(email: string, activeAfter: number): Promise<OfflineUserSubscription[]> {
-    return await this.createQueryBuilder()
+    return await this.createQueryBuilder('offline_user_subscription')
       .where(
-        'email = :email AND ends_at > :endsAt',
+        'offline_user_subscription.email = :email AND offline_user_subscription.ends_at > :endsAt',
         {
           email,
           endsAt: activeAfter,
         }
       )
-      .orderBy('ends_at', 'DESC')
+      .orderBy('offline_user_subscription.ends_at', 'DESC')
       .getMany()
   }
 
   async findOneByEmail(email: string): Promise<OfflineUserSubscription | undefined> {
-    const subscriptions = await this.createQueryBuilder()
+    const subscriptions = await this.createQueryBuilder('offline_user_subscription')
       .where(
-        'email = :email',
+        'offline_user_subscription.email = :email',
         {
           email,
         }
       )
-      .orderBy('ends_at', 'DESC')
+      .orderBy('offline_user_subscription.ends_at', 'DESC')
       .getMany()
 
     const uncanceled = subscriptions.find((subscription) => !subscription.cancelled)
@@ -36,14 +36,14 @@ export class MySQLOfflineUserSubscriptionRepository extends Repository<OfflineUs
   }
 
   async updateCancelled(subscriptionId: number, cancelled: boolean, updatedAt: number): Promise<void> {
-    await this.createQueryBuilder()
+    await this.createQueryBuilder('offline_user_subscription')
       .update()
       .set({
         cancelled,
         updatedAt,
       })
       .where(
-        'subscription_id = :subscriptionId',
+        'offline_user_subscription.subscription_id = :subscriptionId',
         {
           subscriptionId,
         }
@@ -52,14 +52,14 @@ export class MySQLOfflineUserSubscriptionRepository extends Repository<OfflineUs
   }
 
   async updateEndsAt(subscriptionId: number, endsAt: number, updatedAt: number): Promise<void> {
-    await this.createQueryBuilder()
+    await this.createQueryBuilder('offline_user_subscription')
       .update()
       .set({
         endsAt,
         updatedAt,
       })
       .where(
-        'subscription_id = :subscriptionId',
+        'offline_user_subscription.subscription_id = :subscriptionId',
         {
           subscriptionId,
         }
