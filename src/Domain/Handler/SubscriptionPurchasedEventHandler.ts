@@ -31,7 +31,9 @@ implements DomainEventHandlerInterface
     event: SubscriptionPurchasedEvent
   ): Promise<void> {
     if (event.payload.offline) {
-      await this.createOfflineSubscription(
+      this.logger.info('Creating offline user subscription: %O', event.payload)
+
+      const offlineUserSubscription = await this.createOfflineSubscription(
         event.payload.subscriptionId,
         event.payload.subscriptionName,
         event.payload.userEmail,
@@ -39,7 +41,9 @@ implements DomainEventHandlerInterface
         event.payload.timestamp,
       )
 
-      await this.addOfflineUserRole(
+      this.logger.info('Created offline user subscription: %O', offlineUserSubscription)
+
+      await this.roleService.addOfflineUserRole(
         event.payload.userEmail,
         event.payload.subscriptionName
       )
@@ -76,13 +80,6 @@ implements DomainEventHandlerInterface
     await this.roleService.addUserRole(user, subscriptionName)
   }
 
-  private async addOfflineUserRole(
-    email: string,
-    subscriptionName: SubscriptionName
-  ): Promise<void> {
-    await this.roleService.addOfflineUserRole(email, subscriptionName)
-  }
-
   private async createSubscription(
     subscriptionId: number,
     subscriptionName: string,
@@ -108,7 +105,7 @@ implements DomainEventHandlerInterface
     email: string,
     subscriptionExpiresAt: number,
     timestamp: number,
-  ): Promise<void> {
+  ): Promise<OfflineUserSubscription> {
     const subscription = new OfflineUserSubscription()
     subscription.planName = subscriptionName
     subscription.email = email
@@ -118,6 +115,6 @@ implements DomainEventHandlerInterface
     subscription.cancelled = false
     subscription.subscriptionId = subscriptionId
 
-    await this.offlineUserSubscriptionRepository.save(subscription)
+    return this.offlineUserSubscriptionRepository.save(subscription)
   }
 }
