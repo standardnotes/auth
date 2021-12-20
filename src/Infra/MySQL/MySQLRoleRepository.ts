@@ -7,9 +7,13 @@ import { RoleRepositoryInterface } from '../../Domain/Role/RoleRepositoryInterfa
 @EntityRepository(Role)
 export class MySQLRoleRepository extends Repository<Role> implements RoleRepositoryInterface {
   async findOneByName(name: string): Promise<Role | undefined> {
-    return this.createQueryBuilder('role')
+    const roles = await this.createQueryBuilder('role')
       .where('role.name = :name', { name })
+      .orderBy('version', 'DESC')
       .cache(`role_${name}`, 600000)
-      .getOne()
+      .take(1)
+      .getMany()
+
+    return roles.shift()
   }
 }
