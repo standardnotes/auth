@@ -173,4 +173,22 @@ describe('MySQLOfflineUserSubscriptionRepository', () => {
     )
     expect(updateQueryBuilder.execute).toHaveBeenCalled()
   })
+
+  it('should find one offline user subscription by user subscription id', async () => {
+    repository.createQueryBuilder = jest.fn().mockImplementation(() => selectQueryBuilder)
+
+    selectQueryBuilder.where = jest.fn().mockReturnThis()
+    selectQueryBuilder.getOne = jest.fn().mockReturnValue(offlineSubscription)
+
+    const result = await repository.findOneBySubscriptionId(123)
+
+    expect(selectQueryBuilder.where).toHaveBeenCalledWith(
+      'offline_user_subscription.subscription_id = :subscriptionId',
+      {
+        subscriptionId: 123,
+      },
+    )
+    expect(selectQueryBuilder.getOne).toHaveBeenCalled()
+    expect(result).toEqual(offlineSubscription)
+  })
 })
