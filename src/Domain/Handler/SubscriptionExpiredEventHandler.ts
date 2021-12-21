@@ -33,7 +33,6 @@ implements DomainEventHandlerInterface
         event.payload.subscriptionId,
         event.payload.timestamp,
       )
-      await this.removeOfflineUserRole(event.payload.userEmail, event.payload.subscriptionName)
 
       return
     }
@@ -72,13 +71,6 @@ implements DomainEventHandlerInterface
       timestamp,
       timestamp,
     )
-  }
-
-  private async removeOfflineUserRole(
-    email: string,
-    subscriptionName: SubscriptionName
-  ): Promise<void> {
-    await this.roleService.removeOfflineUserRole(email, subscriptionName)
   }
 
   private async updateOfflineSubscriptionEndsAt(

@@ -57,12 +57,12 @@ describe('SubscriptionRenewedEventHandler', () => {
     offlineUserSubscription = {} as jest.Mocked<OfflineUserSubscription>
 
     offlineUserSubscriptionRepository = {} as jest.Mocked<OfflineUserSubscriptionRepositoryInterface>
-    offlineUserSubscriptionRepository.updateEndsAt = jest.fn()
+    offlineUserSubscriptionRepository.findOneBySubscriptionId = jest.fn().mockReturnValue(offlineUserSubscription)
     offlineUserSubscriptionRepository.save = jest.fn().mockReturnValue(offlineUserSubscription)
 
     roleService = {} as jest.Mocked<RoleServiceInterface>
     roleService.addUserRole = jest.fn()
-    roleService.addOfflineUserRole = jest.fn()
+    roleService.setOfflineUserRole = jest.fn()
 
     timestamp = dayjs.utc().valueOf()
     subscriptionExpiresAt = dayjs.utc().valueOf() + 365*1000
@@ -100,12 +100,8 @@ describe('SubscriptionRenewedEventHandler', () => {
     await createHandler().handle(event)
 
     expect(
-      offlineUserSubscriptionRepository.updateEndsAt
-    ).toHaveBeenCalledWith(
-      1,
-      timestamp,
-      timestamp,
-    )
+      offlineUserSubscriptionRepository.save
+    ).toHaveBeenCalledWith(offlineUserSubscription)
   })
 
   it('should update the user role', async () => {
@@ -120,11 +116,22 @@ describe('SubscriptionRenewedEventHandler', () => {
 
     await createHandler().handle(event)
 
-    expect(roleService.addOfflineUserRole).toHaveBeenCalledWith('test@test.com', SubscriptionName.ProPlan)
+    expect(roleService.setOfflineUserRole).toHaveBeenCalledWith(offlineUserSubscription)
   })
 
   it('should not do anything if no user is found for specified email', async () => {
     userRepository.findOneByEmail = jest.fn().mockReturnValue(undefined)
+
+    await createHandler().handle(event)
+
+    expect(roleService.addUserRole).not.toHaveBeenCalled()
+    expect(userSubscriptionRepository.save).not.toHaveBeenCalled()
+  })
+
+  it('should not do anything if no offline subscription is found for specified id', async () => {
+    event.payload.offline = true
+
+    offlineUserSubscriptionRepository.findOneBySubscriptionId = jest.fn().mockReturnValue(undefined)
 
     await createHandler().handle(event)
 

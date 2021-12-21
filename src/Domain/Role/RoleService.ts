@@ -10,8 +10,8 @@ import { RoleRepositoryInterface } from './RoleRepositoryInterface'
 import { RoleServiceInterface } from './RoleServiceInterface'
 import { RoleToSubscriptionMapInterface } from './RoleToSubscriptionMapInterface'
 import { OfflineUserSubscriptionRepositoryInterface } from '../Subscription/OfflineUserSubscriptionRepositoryInterface'
-import { TimerInterface } from '@standardnotes/time'
 import { Role } from './Role'
+import { OfflineUserSubscription } from '../Subscription/OfflineUserSubscription'
 
 @injectable()
 export class RoleService implements RoleServiceInterface {
@@ -22,7 +22,6 @@ export class RoleService implements RoleServiceInterface {
     @inject(TYPES.WebSocketsClientService) private webSocketsClientService: ClientServiceInterface,
     @inject(TYPES.RoleToSubscriptionMap) private roleToSubscriptionMap: RoleToSubscriptionMapInterface,
     @inject(TYPES.Logger) private logger: Logger,
-    @inject(TYPES.Timer) private timer: TimerInterface,
   ) {
   }
 
@@ -62,18 +61,12 @@ export class RoleService implements RoleServiceInterface {
     )
   }
 
-  async addOfflineUserRole(
-    email: string,
-    subscriptionName: SubscriptionName,
-  ): Promise<void> {
-    this.logger.info(`Adding offline user ${email} a role for subscription ${subscriptionName}`)
-
-    const roleName = this.roleToSubscriptionMap.getRoleNameForSubscriptionName(subscriptionName)
-
-    this.logger.info(`Found role ${roleName} for subscription name ${subscriptionName}`)
+  async setOfflineUserRole(offlineUserSubscription: OfflineUserSubscription): Promise<void> {
+    const roleName = this.roleToSubscriptionMap
+      .getRoleNameForSubscriptionName(offlineUserSubscription.planName as SubscriptionName)
 
     if (roleName === undefined) {
-      this.logger.warn(`Could not find role name for subscription name: ${subscriptionName}`)
+      this.logger.warn(`Could not find role name for subscription name: ${offlineUserSubscription.planName}`)
 
       return
     }
@@ -86,36 +79,9 @@ export class RoleService implements RoleServiceInterface {
       return
     }
 
-    const currentSubscription = await this.offlineUserSubscriptionRepository.findOneByEmail(email)
-    if (currentSubscription === undefined) {
-      this.logger.warn(`Unable to add offline roles due to no offline subscription for email: ${email}`)
+    offlineUserSubscription.roles = Promise.resolve([role])
 
-      return
-    }
-
-    const now = this.timer.getTimestampInMicroseconds()
-
-    if (currentSubscription.endsAt < now) {
-      this.logger.warn(
-        `Unable to add offline roles due to expired subscription for email ${email}.
-        The subscription endsAt ${currentSubscription.endsAt} compared to
-        the current timestamp of ${now}`
-      )
-
-      return
-    }
-
-    const rolesMap = new Map<string, Role>()
-    const currentRoles = await currentSubscription.roles
-    for (const currentRole of currentRoles) {
-      rolesMap.set(currentRole.name, currentRole)
-    }
-    if (!rolesMap.has(role.name)) {
-      rolesMap.set(role.name, role)
-    }
-    currentSubscription.roles = Promise.resolve([...rolesMap.values()])
-
-    await this.offlineUserSubscriptionRepository.save(currentSubscription)
+    await this.offlineUserSubscriptionRepository.save(offlineUserSubscription)
   }
 
   async removeUserRole(
@@ -139,32 +105,5 @@ export class RoleService implements RoleServiceInterface {
     await this.webSocketsClientService.sendUserRolesChangedEvent(
       user,
     )
-  }
-
-  async removeOfflineUserRole(
-    email: string,
-    subscriptionName: SubscriptionName,
-  ): Promise<void> {
-    const roleName = this.roleToSubscriptionMap.getRoleNameForSubscriptionName(subscriptionName)
-
-    if (roleName === undefined) {
-      this.logger.warn(
-        `Could not find role name for subscription name: ${subscriptionName}`
-      )
-      return
-    }
-
-    const currentSubscription = await this.offlineUserSubscriptionRepository.findOneByEmail(email)
-    if (currentSubscription === undefined) {
-      this.logger.warn(`Could not find current subscription for email: ${email}`)
-
-      return
-    }
-
-    const currentRoles = await currentSubscription.roles
-    currentSubscription.roles = Promise.resolve(
-      currentRoles.filter(role => role.name !== roleName)
-    )
-    await this.offlineUserSubscriptionRepository.save(currentSubscription)
   }
 }
