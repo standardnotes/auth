@@ -44,7 +44,7 @@ implements DomainEventHandlerInterface
 
       await this.updateOfflineSubscriptionEndsAt(offlineUserSubscription, event.payload.timestamp)
 
-      await this.roleService.addOfflineUserRole(offlineUserSubscription)
+      await this.roleService.setOfflineUserRole(offlineUserSubscription)
 
       return
     }

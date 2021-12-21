@@ -42,7 +42,7 @@ implements DomainEventHandlerInterface
         event.payload.timestamp,
       )
 
-      await this.roleService.addOfflineUserRole(offlineUserSubscription)
+      await this.roleService.setOfflineUserRole(offlineUserSubscription)
 
       return
     }

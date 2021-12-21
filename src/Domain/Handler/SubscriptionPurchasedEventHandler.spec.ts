@@ -64,7 +64,7 @@ describe('SubscriptionPurchasedEventHandler', () => {
 
     roleService = {} as jest.Mocked<RoleServiceInterface>
     roleService.addUserRole = jest.fn()
-    roleService.addOfflineUserRole = jest.fn()
+    roleService.setOfflineUserRole = jest.fn()
 
     subscriptionExpiresAt = timestamp + 365*1000
 
@@ -105,7 +105,7 @@ describe('SubscriptionPurchasedEventHandler', () => {
 
     await createHandler().handle(event)
 
-    expect(roleService.addOfflineUserRole).toHaveBeenCalledWith(offlineUserSubscription)
+    expect(roleService.setOfflineUserRole).toHaveBeenCalledWith(offlineUserSubscription)
   })
 
   it('should create subscription', async () => {

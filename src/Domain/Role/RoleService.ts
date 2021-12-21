@@ -83,7 +83,7 @@ export class RoleService implements RoleServiceInterface {
     )
   }
 
-  async addOfflineUserRole(offlineUserSubscription: OfflineUserSubscription): Promise<void> {
+  async setOfflineUserRole(offlineUserSubscription: OfflineUserSubscription): Promise<void> {
     const roleName = this.roleToSubscriptionMap
       .getRoleNameForSubscriptionName(offlineUserSubscription.planName as SubscriptionName)
 

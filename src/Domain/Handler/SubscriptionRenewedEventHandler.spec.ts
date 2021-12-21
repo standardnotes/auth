@@ -65,7 +65,7 @@ describe('SubscriptionRenewedEventHandler', () => {
 
     roleService = {} as jest.Mocked<RoleServiceInterface>
     roleService.addUserRole = jest.fn()
-    roleService.addOfflineUserRole = jest.fn()
+    roleService.setOfflineUserRole = jest.fn()
 
     timestamp = dayjs.utc().valueOf()
     subscriptionExpiresAt = dayjs.utc().valueOf() + 365*1000
@@ -128,7 +128,7 @@ describe('SubscriptionRenewedEventHandler', () => {
 
     await createHandler().handle(event)
 
-    expect(roleService.addOfflineUserRole).toHaveBeenCalledWith(offlineUserSubscription)
+    expect(roleService.setOfflineUserRole).toHaveBeenCalledWith(offlineUserSubscription)
   })
 
   it('should not do anything if no user is found for specified email', async () => {
