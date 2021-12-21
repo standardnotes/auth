@@ -12,7 +12,6 @@ import { RoleService } from './RoleService'
 import { RoleToSubscriptionMapInterface } from './RoleToSubscriptionMapInterface'
 import { OfflineUserSubscriptionRepositoryInterface } from '../Subscription/OfflineUserSubscriptionRepositoryInterface'
 import { OfflineUserSubscription } from '../Subscription/OfflineUserSubscription'
-import { TimerInterface } from '@standardnotes/time'
 
 describe('RoleService', () => {
   let userRepository: UserRepositoryInterface
@@ -25,8 +24,6 @@ describe('RoleService', () => {
   let user: User
   let basicRole: Role
   let proRole: Role
-  let coreRole: Role
-  let timer: TimerInterface
 
   const createService = () => new RoleService(
     userRepository,
@@ -35,7 +32,6 @@ describe('RoleService', () => {
     webSocketsClientService,
     roleToSubscriptionMap,
     logger,
-    timer,
   )
 
   beforeEach(() => {
@@ -45,10 +41,6 @@ describe('RoleService', () => {
 
     proRole = {
       name: RoleName.ProUser,
-    } as jest.Mocked<Role>
-
-    coreRole = {
-      name: RoleName.CoreUser,
     } as jest.Mocked<Role>
 
     userRepository = {} as jest.Mocked<UserRepositoryInterface>
@@ -62,8 +54,8 @@ describe('RoleService', () => {
     offlineUserSubscription = {
       endsAt: 100,
       cancelled: false,
+      planName: SubscriptionName.ProPlan,
     } as jest.Mocked<OfflineUserSubscription>
-    offlineUserSubscription.roles = Promise.resolve([ coreRole ])
 
     offlineUserSubscriptionRepository = {} as jest.Mocked<OfflineUserSubscriptionRepositoryInterface>
     offlineUserSubscriptionRepository.findOneByEmail = jest.fn().mockReturnValue(offlineUserSubscription)
@@ -71,9 +63,6 @@ describe('RoleService', () => {
 
     webSocketsClientService = {} as jest.Mocked<ClientServiceInterface>
     webSocketsClientService.sendUserRolesChangedEvent = jest.fn()
-
-    timer = {} as jest.Mocked<TimerInterface>
-    timer.getTimestampInMicroseconds = jest.fn().mockReturnValue(3)
 
     logger = {} as jest.Mocked<Logger>
     logger.info = jest.fn()
@@ -147,56 +136,30 @@ describe('RoleService', () => {
       expect(userRepository.save).not.toHaveBeenCalled()
     })
 
-    it('should add offline role to offline subscription', async () => {
-      await createService().addOfflineUserRole('test@test.com', SubscriptionName.ProPlan)
+    it('should set offline role to offline subscription', async () => {
+      await createService().setOfflineUserRole(offlineUserSubscription)
 
       expect(roleRepository.findOneByName).toHaveBeenCalledWith(RoleName.ProUser)
       expect(offlineUserSubscriptionRepository.save).toHaveBeenCalledWith({
         endsAt: 100,
         cancelled: false,
-        roles: Promise.resolve([ coreRole, proRole ]),
+        planName: SubscriptionName.ProPlan,
+        roles: Promise.resolve([ proRole ]),
       })
     })
 
-    it('should not add duplicate offline role to offline subscription', async () => {
-      roleToSubscriptionMap.getRoleNameForSubscriptionName = jest.fn().mockReturnValue(RoleName.CoreUser)
-      roleRepository.findOneByName = jest.fn().mockReturnValue(coreRole)
-
-      await createService().addOfflineUserRole('test@test.com', SubscriptionName.CorePlan)
-
-      expect(roleRepository.findOneByName).toHaveBeenCalledWith(RoleName.CoreUser)
-      expect(await offlineUserSubscription.roles).toHaveLength(1)
-    })
-
-    it('should not add offline role if no role name exists for subscription name', async () => {
+    it('should not set offline role if no role name exists for subscription name', async () => {
       roleToSubscriptionMap.getRoleNameForSubscriptionName = jest.fn().mockReturnValue(undefined)
 
-      await createService().addOfflineUserRole('test@test.com', 'test' as SubscriptionName)
+      await createService().setOfflineUserRole(offlineUserSubscription)
 
       expect(offlineUserSubscriptionRepository.save).not.toHaveBeenCalled()
     })
 
-    it('should not add offline role if no role exists for role name', async () => {
+    it('should not set offline role if no role exists for role name', async () => {
       roleRepository.findOneByName = jest.fn().mockReturnValue(undefined)
 
-      await createService().addOfflineUserRole('test@test.com', SubscriptionName.ProPlan)
-
-      expect(offlineUserSubscriptionRepository.save).not.toHaveBeenCalled()
-    })
-
-    it('should not add offline role if no offline subscription is found', async () => {
-      offlineUserSubscriptionRepository.findOneByEmail = jest.fn().mockReturnValue(undefined)
-
-      await createService().addOfflineUserRole('test@test.com', SubscriptionName.ProPlan)
-
-      expect(offlineUserSubscriptionRepository.save).not.toHaveBeenCalled()
-    })
-
-    it('should not add offline role if offline subscription is expired', async () => {
-      offlineUserSubscription.endsAt = 2
-      offlineUserSubscriptionRepository.findOneByEmail = jest.fn().mockReturnValue(offlineUserSubscription)
-
-      await createService().addOfflineUserRole('test@test.com', SubscriptionName.ProPlan)
+      await createService().setOfflineUserRole(offlineUserSubscription)
 
       expect(offlineUserSubscriptionRepository.save).not.toHaveBeenCalled()
     })
@@ -223,16 +186,6 @@ describe('RoleService', () => {
       expect(userRepository.save).toHaveBeenCalledWith(user)
     })
 
-    it('should remove role from offline subscription', async () => {
-      await createService().removeOfflineUserRole('test@test.com', SubscriptionName.ProPlan)
-
-      expect(offlineUserSubscriptionRepository.save).toHaveBeenCalledWith({
-        endsAt: 100,
-        cancelled: false,
-        roles: Promise.resolve([]),
-      })
-    })
-
     it('should send websockets event', async () => {
       await createService().removeUserRole(user, SubscriptionName.ProPlan)
 
@@ -247,22 +200,6 @@ describe('RoleService', () => {
       await createService().removeUserRole(user, 'test' as SubscriptionName)
 
       expect(userRepository.save).not.toHaveBeenCalled()
-    })
-
-    it('should not remove offline role if role name does not exist for subscription name', async () => {
-      roleToSubscriptionMap.getRoleNameForSubscriptionName = jest.fn().mockReturnValue(undefined)
-
-      await createService().removeOfflineUserRole('test@test.com', 'test' as SubscriptionName)
-
-      expect(offlineUserSubscriptionRepository.save).not.toHaveBeenCalled()
-    })
-
-    it('should not remove offline role if no subscription exists for user email', async () => {
-      offlineUserSubscriptionRepository.findOneByEmail = jest.fn().mockReturnValue(undefined)
-
-      await createService().removeOfflineUserRole('test@test.com', SubscriptionName.ProPlan)
-
-      expect(offlineUserSubscriptionRepository.save).not.toHaveBeenCalled()
     })
   })
 })

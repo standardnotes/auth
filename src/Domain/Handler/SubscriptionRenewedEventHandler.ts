@@ -12,6 +12,7 @@ import { SubscriptionName } from '@standardnotes/auth'
 import { RoleServiceInterface } from '../Role/RoleServiceInterface'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { Logger } from 'winston'
+import { OfflineUserSubscription } from '../Subscription/OfflineUserSubscription'
 
 @injectable()
 export class SubscriptionRenewedEventHandler
@@ -30,15 +31,18 @@ implements DomainEventHandlerInterface
     event: SubscriptionRenewedEvent
   ): Promise<void> {
     if (event.payload.offline) {
-      await this.updateOfflineSubscriptionEndsAt(
-        event.payload.subscriptionId,
-        event.payload.timestamp,
-      )
+      const offlineUserSubscription = await this.offlineUserSubscriptionRepository
+        .findOneBySubscriptionId(event.payload.subscriptionId)
 
-      await this.addOfflineUserRole(
-        event.payload.userEmail,
-        event.payload.subscriptionName
-      )
+      if (offlineUserSubscription === undefined) {
+        this.logger.warn(`Could not find offline user subscription with id: ${event.payload.subscriptionId}`)
+
+        return
+      }
+
+      await this.updateOfflineSubscriptionEndsAt(offlineUserSubscription, event.payload.timestamp)
+
+      await this.roleService.setOfflineUserRole(offlineUserSubscription)
 
       return
     }
@@ -67,13 +71,6 @@ implements DomainEventHandlerInterface
     await this.roleService.addUserRole(user, subscriptionName)
   }
 
-  private async addOfflineUserRole(
-    email: string,
-    subscriptionName: SubscriptionName
-  ): Promise<void> {
-    await this.roleService.addOfflineUserRole(email, subscriptionName)
-  }
-
   private async updateSubscriptionEndsAt(
     subscriptionId: number,
     subscriptionExpiresAt: number,
@@ -87,13 +84,12 @@ implements DomainEventHandlerInterface
   }
 
   private async updateOfflineSubscriptionEndsAt(
-    subscriptionId: number,
+    offlineUserSubscription: OfflineUserSubscription,
     timestamp: number,
   ): Promise<void> {
-    await this.offlineUserSubscriptionRepository.updateEndsAt(
-      subscriptionId,
-      timestamp,
-      timestamp,
-    )
+    offlineUserSubscription.endsAt = timestamp
+    offlineUserSubscription.updatedAt = timestamp
+
+    await this.offlineUserSubscriptionRepository.save(offlineUserSubscription)
   }
 }

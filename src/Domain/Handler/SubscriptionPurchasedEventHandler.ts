@@ -31,8 +31,6 @@ implements DomainEventHandlerInterface
     event: SubscriptionPurchasedEvent
   ): Promise<void> {
     if (event.payload.offline) {
-      this.logger.info('Creating offline user subscription: %O', event.payload)
-
       const offlineUserSubscription = await this.createOfflineSubscription(
         event.payload.subscriptionId,
         event.payload.subscriptionName,
@@ -41,12 +39,7 @@ implements DomainEventHandlerInterface
         event.payload.timestamp,
       )
 
-      this.logger.info('Created offline user subscription: %O', offlineUserSubscription)
-
-      await this.roleService.addOfflineUserRole(
-        event.payload.userEmail,
-        event.payload.subscriptionName
-      )
+      await this.roleService.setOfflineUserRole(offlineUserSubscription)
 
       return
     }
