@@ -59,6 +59,7 @@ describe('SubscriptionPurchasedEventHandler', () => {
     offlineUserSubscription = {} as jest.Mocked<OfflineUserSubscription>
 
     offlineUserSubscriptionRepository = {} as jest.Mocked<OfflineUserSubscriptionRepositoryInterface>
+    offlineUserSubscriptionRepository.findOneBySubscriptionId = jest.fn().mockReturnValue(offlineUserSubscription)
     offlineUserSubscriptionRepository.save = jest.fn().mockReturnValue(offlineUserSubscription)
 
     roleService = {} as jest.Mocked<RoleServiceInterface>
@@ -104,7 +105,7 @@ describe('SubscriptionPurchasedEventHandler', () => {
 
     await createHandler().handle(event)
 
-    expect(roleService.addOfflineUserRole).toHaveBeenCalledWith('test@test.com', SubscriptionName.ProPlan)
+    expect(roleService.addOfflineUserRole).toHaveBeenCalledWith(offlineUserSubscription)
   })
 
   it('should create subscription', async () => {
