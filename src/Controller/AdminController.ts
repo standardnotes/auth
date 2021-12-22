@@ -6,10 +6,12 @@ import {
   controller,
   httpDelete,
   httpGet,
+  httpPost,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   results,
 } from 'inversify-express-utils'
 import TYPES from '../Bootstrap/Types'
+import { CreateSubscriptionToken } from '../Domain/UseCase/CreateSubscriptionToken/CreateSubscriptionToken'
 import { DeleteSetting } from '../Domain/UseCase/DeleteSetting/DeleteSetting'
 import { UserRepositoryInterface } from '../Domain/User/UserRepositoryInterface'
 
@@ -18,6 +20,7 @@ export class AdminController extends BaseHttpController {
   constructor(
     @inject(TYPES.DeleteSetting) private doDeleteSetting: DeleteSetting,
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
+    @inject(TYPES.CreateSubscriptionToken) private createSubscriptionToken: CreateSubscriptionToken,
   ) {
     super()
   }
@@ -67,5 +70,17 @@ export class AdminController extends BaseHttpController {
     }
 
     return this.json(result, 400)
+  }
+
+  @httpPost('/users/:userUuid/subscription-token', TYPES.ApiGatewayAuthMiddleware)
+  async createToken(request: Request): Promise<results.JsonResult> {
+    const { userUuid } = request.params
+    const result = await this.createSubscriptionToken.execute({
+      userUuid,
+    })
+
+    return this.json({
+      token: result.subscriptionToken.token,
+    })
   }
 }
