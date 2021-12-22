@@ -31,7 +31,7 @@ describe('MySQLRoleRepository', () => {
 
     expect(queryBuilder.where).toHaveBeenCalledWith('role.name = :name', { name: 'test' })
     expect(queryBuilder.take).toHaveBeenCalledWith(1)
-    expect(queryBuilder.orderBy).toHaveBeenCalledWith('role.version', 'DESC')
+    expect(queryBuilder.orderBy).toHaveBeenCalledWith('version', 'DESC')
     expect(result).toEqual(role)
   })
 })
