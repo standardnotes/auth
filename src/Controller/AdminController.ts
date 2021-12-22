@@ -72,7 +72,7 @@ export class AdminController extends BaseHttpController {
     return this.json(result, 400)
   }
 
-  @httpPost('/users/:userUuid/subscription-token', TYPES.ApiGatewayAuthMiddleware)
+  @httpPost('/users/:userUuid/subscription-token')
   async createToken(request: Request): Promise<results.JsonResult> {
     const { userUuid } = request.params
     const result = await this.createSubscriptionToken.execute({
