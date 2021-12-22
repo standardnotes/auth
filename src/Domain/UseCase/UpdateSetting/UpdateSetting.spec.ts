@@ -50,6 +50,7 @@ describe('UpdateSetting', () => {
 
     settingToSubscriptionMap = {} as jest.Mocked<SettingToSubscriptionMapInterface>
     settingToSubscriptionMap.getPermissionAssociatedWithSetting = jest.fn().mockReturnValue(undefined)
+    settingToSubscriptionMap.getEncryptionVersionForSetting = jest.fn().mockReturnValue(EncryptionVersion.Default)
 
     roleService = {} as jest.Mocked<RoleServiceInterface>
     roleService.addUserRole = jest.fn()
@@ -63,7 +64,7 @@ describe('UpdateSetting', () => {
     const props = {
       name: 'test-setting-name',
       value: 'test-setting-value',
-      serverEncryptionVersion: EncryptionVersion.Unencrypted,
+      serverEncryptionVersion: EncryptionVersion.Default,
       sensitive: false,
     }
 
@@ -73,7 +74,7 @@ describe('UpdateSetting', () => {
       props: {
         name: 'test-setting-name',
         value: 'test-setting-value',
-        serverEncryptionVersion: 0,
+        serverEncryptionVersion: 1,
         sensitive: false,
       },
       user,

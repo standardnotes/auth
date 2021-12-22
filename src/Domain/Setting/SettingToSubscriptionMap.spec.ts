@@ -5,9 +5,18 @@ import { SettingName } from '@standardnotes/settings'
 
 import { SettingToSubscriptionMap } from './SettingToSubscriptionMap'
 import { PermissionName } from '@standardnotes/features'
+import { EncryptionVersion } from '../Encryption/EncryptionVersion'
 
 describe('SettingToSubscriptionMap', () => {
   const createMap = () => new SettingToSubscriptionMap()
+
+  it('should return default encryption version for a setting which enecryption version is not strictly defined', () => {
+    expect(createMap().getEncryptionVersionForSetting(SettingName.MfaSecret)).toEqual(EncryptionVersion.Default)
+  })
+
+  it('should return a defined encryption version for a setting which enecryption version is strictly defined', () => {
+    expect(createMap().getEncryptionVersionForSetting(SettingName.EmailBackup)).toEqual(EncryptionVersion.Unencrypted)
+  })
 
   it('should return the default set of setting values for a core subscription', () => {
     const settings = createMap().getDefaultSettingsAndValuesForSubscriptionName(SubscriptionName.CorePlan)
