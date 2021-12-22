@@ -2,11 +2,18 @@ import { SubscriptionName } from '@standardnotes/auth'
 import { PermissionName } from '@standardnotes/features'
 import { SettingName } from '@standardnotes/settings'
 import { injectable } from 'inversify'
+import { EncryptionVersion } from '../Encryption/EncryptionVersion'
 
 import { SettingToSubscriptionMapInterface } from './SettingToSubscriptionMapInterface'
 
 @injectable()
 export class SettingToSubscriptionMap implements SettingToSubscriptionMapInterface {
+  private readonly encryptionVersionsAssociatedWithSettings = new Map<SettingName, EncryptionVersion>([
+    [ SettingName.EmailBackup, EncryptionVersion.Unencrypted ],
+    [ SettingName.MuteFailedBackupsEmails, EncryptionVersion.Unencrypted ],
+    [ SettingName.MuteFailedCloudBackupsEmails, EncryptionVersion.Unencrypted ],
+  ])
+
   private readonly permissionsAssociatedWithSettings = new Map<SettingName, PermissionName>([
     [SettingName.EmailBackup, PermissionName.DailyEmailBackup],
   ])
@@ -16,6 +23,14 @@ export class SettingToSubscriptionMap implements SettingToSubscriptionMapInterfa
     [SubscriptionName.PlusPlan, new Map([])],
     [SubscriptionName.ProPlan, new Map([])],
   ])
+
+  getEncryptionVersionForSetting(settingName: SettingName): EncryptionVersion {
+    if (!this.encryptionVersionsAssociatedWithSettings.has(settingName)) {
+      return EncryptionVersion.Default
+    }
+
+    return this.encryptionVersionsAssociatedWithSettings.get(settingName) as EncryptionVersion
+  }
 
   getPermissionAssociatedWithSetting(settingName: SettingName): PermissionName | undefined {
     if (!this.permissionsAssociatedWithSettings.has(settingName)) {
