@@ -66,7 +66,7 @@ export class MySQLSettingRepository extends Repository<Setting> implements Setti
           user_uuid: userUuid,
         }
       )
-      .orderBy('setting.updated_at', 'DESC')
+      .orderBy('updated_at', 'DESC')
       .limit(1)
       .getMany()
 
@@ -91,7 +91,7 @@ export class MySQLSettingRepository extends Repository<Setting> implements Setti
     await this.createQueryBuilder('setting')
       .delete()
       .where(
-        'setting.name = :name AND setting.user_uuid = :user_uuid',
+        'name = :name AND user_uuid = :user_uuid',
         {
           user_uuid: userUuid,
           name: settingName,
