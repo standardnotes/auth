@@ -6,16 +6,19 @@ import { User } from '../Domain/User/User'
 import { UserRepositoryInterface } from '../Domain/User/UserRepositoryInterface'
 import * as express from 'express'
 import { DeleteSetting } from '../Domain/UseCase/DeleteSetting/DeleteSetting'
+import { CreateSubscriptionToken } from '../Domain/UseCase/CreateSubscriptionToken/CreateSubscriptionToken'
 
 describe('AdminController', () => {
   let deleteSetting: DeleteSetting
   let userRepository: UserRepositoryInterface
+  let createSubscriptionToken: CreateSubscriptionToken
   let request: express.Request
   let user: User
 
   const createController = () => new AdminController(
     deleteSetting,
     userRepository,
+    createSubscriptionToken,
   )
 
   beforeEach(() => {
@@ -27,6 +30,13 @@ describe('AdminController', () => {
 
     userRepository = {} as jest.Mocked<UserRepositoryInterface>
     userRepository.findOneByEmail = jest.fn().mockReturnValue(user)
+
+    createSubscriptionToken = {} as jest.Mocked<CreateSubscriptionToken>
+    createSubscriptionToken.execute = jest.fn().mockReturnValue({
+      subscriptionToken: {
+        token: '123-sub-token',
+      },
+    })
 
     request = {
       headers: {},
@@ -95,5 +105,17 @@ describe('AdminController', () => {
     expect(deleteSetting.execute).toHaveBeenCalledWith({ userUuid: '1-2-3', settingName: 'MFA_SECRET', softDelete: true })
 
     expect(result.statusCode).toEqual(400)
+  })
+
+  it('should return a new subscription token for the user\'s uuid', async () => {
+    request.params.userUuid = '1-2-3'
+
+    const httpResponse = await createController().createToken(request)
+    const result = await httpResponse.executeAsync()
+
+    expect(httpResponse).toBeInstanceOf(results.JsonResult)
+
+    expect(result.statusCode).toBe(200)
+    expect(await result.content.readAsStringAsync()).toEqual('{"token":"123-sub-token"}')
   })
 })
