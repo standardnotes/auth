@@ -18,27 +18,27 @@ export class MySQLOfflineUserSubscriptionRepository extends Repository<OfflineUs
   }
 
   async findByEmail(email: string, activeAfter: number): Promise<OfflineUserSubscription[]> {
-    return await this.createQueryBuilder('offline_user_subscription')
+    return await this.createQueryBuilder()
       .where(
-        'offline_user_subscription.email = :email AND offline_user_subscription.ends_at > :endsAt',
+        'email = :email AND ends_at > :endsAt',
         {
           email,
           endsAt: activeAfter,
         }
       )
-      .orderBy('offline_user_subscription.ends_at', 'DESC')
+      .orderBy('ends_at', 'DESC')
       .getMany()
   }
 
   async findOneByEmail(email: string): Promise<OfflineUserSubscription | undefined> {
-    const subscriptions = await this.createQueryBuilder('offline_user_subscription')
+    const subscriptions = await this.createQueryBuilder()
       .where(
-        'offline_user_subscription.email = :email',
+        'email = :email',
         {
           email,
         }
       )
-      .orderBy('offline_user_subscription.ends_at', 'DESC')
+      .orderBy('ends_at', 'DESC')
       .getMany()
 
     const uncanceled = subscriptions.find((subscription) => !subscription.cancelled)
@@ -47,14 +47,14 @@ export class MySQLOfflineUserSubscriptionRepository extends Repository<OfflineUs
   }
 
   async updateCancelled(subscriptionId: number, cancelled: boolean, updatedAt: number): Promise<void> {
-    await this.createQueryBuilder('offline_user_subscription')
+    await this.createQueryBuilder()
       .update()
       .set({
         cancelled,
         updatedAt,
       })
       .where(
-        'offline_user_subscription.subscription_id = :subscriptionId',
+        'subscription_id = :subscriptionId',
         {
           subscriptionId,
         }
@@ -63,14 +63,14 @@ export class MySQLOfflineUserSubscriptionRepository extends Repository<OfflineUs
   }
 
   async updateEndsAt(subscriptionId: number, endsAt: number, updatedAt: number): Promise<void> {
-    await this.createQueryBuilder('offline_user_subscription')
+    await this.createQueryBuilder()
       .update()
       .set({
         endsAt,
         updatedAt,
       })
       .where(
-        'offline_user_subscription.subscription_id = :subscriptionId',
+        'subscription_id = :subscriptionId',
         {
           subscriptionId,
         }
