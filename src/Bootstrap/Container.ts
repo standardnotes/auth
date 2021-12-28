@@ -123,6 +123,10 @@ import { ContentDecoder, ContentDecoderInterface } from '@standardnotes/common'
 import { GetUserOfflineSubscription } from '../Domain/UseCase/GetUserOfflineSubscription/GetUserOfflineSubscription'
 import { ApiGatewayOfflineAuthMiddleware } from '../Controller/ApiGatewayOfflineAuthMiddleware'
 import { UserEmailChangedEventHandler } from '../Domain/Handler/UserEmailChangedEventHandler'
+import { SettingToSubscriptionMapInterface } from '../Domain/Setting/SettingToSubscriptionMapInterface'
+import { SettingToSubscriptionMap } from '../Domain/Setting/SettingToSubscriptionMap'
+import { MuteFailedBackupsEmails } from '../Domain/UseCase/MuteFailedBackupsEmails/MuteFailedBackupsEmails'
+import { SubscriptionSyncRequestedEventHandler } from '../Domain/Handler/SubscriptionSyncRequestedEventHandler'
 
 export class ContainerConfigLoader {
   async load(): Promise<Container> {
@@ -315,6 +319,7 @@ export class ContainerConfigLoader {
     container.bind<SubscriptionRenewedEventHandler>(TYPES.SubscriptionRenewedEventHandler).to(SubscriptionRenewedEventHandler)
     container.bind<SubscriptionRefundedEventHandler>(TYPES.SubscriptionRefundedEventHandler).to(SubscriptionRefundedEventHandler)
     container.bind<SubscriptionExpiredEventHandler>(TYPES.SubscriptionExpiredEventHandler).to(SubscriptionExpiredEventHandler)
+    container.bind<SubscriptionSyncRequestedEventHandler>(TYPES.SubscriptionSyncRequestedEventHandler).to(SubscriptionSyncRequestedEventHandler)
     container.bind<ExtensionKeyGrantedEventHandler>(TYPES.ExtensionKeyGrantedEventHandler).to(ExtensionKeyGrantedEventHandler)
     container.bind<SubscriptionReassignedEventHandler>(TYPES.SubscriptionReassignedEventHandler).to(SubscriptionReassignedEventHandler)
     container.bind<UserEmailChangedEventHandler>(TYPES.UserEmailChangedEventHandler).to(UserEmailChangedEventHandler)
@@ -367,6 +372,7 @@ export class ContainerConfigLoader {
       ['SUBSCRIPTION_RENEWED', container.get(TYPES.SubscriptionRenewedEventHandler)],
       ['SUBSCRIPTION_REFUNDED', container.get(TYPES.SubscriptionRefundedEventHandler)],
       ['SUBSCRIPTION_EXPIRED', container.get(TYPES.SubscriptionExpiredEventHandler)],
+      ['SUBSCRIPTION_SYNC_REQUESTED', container.get(TYPES.SubscriptionSyncRequestedEventHandler)],
       ['EXTENSION_KEY_GRANTED', container.get(TYPES.ExtensionKeyGrantedEventHandler)],
       ['SUBSCRIPTION_REASSIGNED', container.get(TYPES.SubscriptionReassignedEventHandler)],
       ['USER_EMAIL_CHANGED', container.get(TYPES.UserEmailChangedEventHandler)],

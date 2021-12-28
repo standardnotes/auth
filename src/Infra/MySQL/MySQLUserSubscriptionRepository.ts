@@ -7,6 +7,17 @@ import { UserSubscriptionRepositoryInterface } from '../../Domain/Subscription/U
 @injectable()
 @EntityRepository(UserSubscription)
 export class MySQLUserSubscriptionRepository extends Repository<UserSubscription> implements UserSubscriptionRepositoryInterface {
+  async findOneBySubscriptionId(subscriptionId: number): Promise<UserSubscription | undefined> {
+    return await this.createQueryBuilder()
+      .where(
+        'subscription_id = :subscriptionId',
+        {
+          subscriptionId,
+        }
+      )
+      .getOne()
+  }
+
   async findOneByUserUuid(userUuid: string): Promise<UserSubscription | undefined> {
     const subscriptions = await this.createQueryBuilder()
       .where(
