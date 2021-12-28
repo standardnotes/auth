@@ -13,7 +13,7 @@ export class DomainEventFactory implements DomainEventFactoryInterface {
   ) {
   }
 
-  createEmailBackupRequestedEvent(userUuid: string, userHasEmailsMuted: boolean): EmailBackupRequestedEvent {
+  createEmailBackupRequestedEvent(userUuid: string, muteEmailsSettingUuid: string, userHasEmailsMuted: boolean): EmailBackupRequestedEvent {
     return {
       type: 'EMAIL_BACKUP_REQUESTED',
       createdAt: dayjs.utc().toDate(),
@@ -26,6 +26,7 @@ export class DomainEventFactory implements DomainEventFactoryInterface {
       payload: {
         userUuid,
         userHasEmailsMuted,
+        muteEmailsSettingUuid,
       },
     }
   }

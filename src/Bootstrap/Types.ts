@@ -101,6 +101,7 @@ const TYPES = {
   SubscriptionRenewedEventHandler: Symbol.for('SubscriptionRenewedEventHandler'),
   SubscriptionRefundedEventHandler: Symbol.for('SubscriptionRefundedEventHandler'),
   SubscriptionExpiredEventHandler: Symbol.for('SubscriptionExpiredEventHandler'),
+  SubscriptionSyncRequestedEventHandler: Symbol.for('SubscriptionSyncRequestedEventHandler'),
   ExtensionKeyGrantedEventHandler: Symbol.for('ExtensionKeyGrantedEventHandler'),
   UserEmailChangedEventHandler: Symbol.for('UserEmailChangedEventHandler'),
   // Services
