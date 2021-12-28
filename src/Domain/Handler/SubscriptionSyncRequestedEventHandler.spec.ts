@@ -102,7 +102,6 @@ describe('SubscriptionSyncRequestedEventHandler', () => {
     }
 
     settingService = {} as jest.Mocked<SettingServiceInterface>
-    settingService.applyDefaultSettingsForSubscription = jest.fn()
     settingService.createOrReplace = jest.fn()
 
     logger = {} as jest.Mocked<Logger>
@@ -119,8 +118,6 @@ describe('SubscriptionSyncRequestedEventHandler', () => {
 
   it('should update user default settings', async () => {
     await createHandler().handle(event)
-
-    expect(settingService.applyDefaultSettingsForSubscription).toHaveBeenCalledWith(user, SubscriptionName.ProPlan)
 
     expect(settingService.createOrReplace).toHaveBeenCalledWith({
       props: {

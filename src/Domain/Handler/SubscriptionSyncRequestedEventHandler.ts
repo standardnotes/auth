@@ -92,8 +92,6 @@ implements DomainEventHandlerInterface
 
     await this.roleService.addUserRole(user, event.payload.subscriptionName)
 
-    await this.settingService.applyDefaultSettingsForSubscription(user, event.payload.subscriptionName)
-
     await this.settingService.createOrReplace({
       user,
       props: {
