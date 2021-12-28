@@ -38,6 +38,7 @@ const requestEmailBackups = async (
         await domainEventPublisher.publish(
           domainEventFactory.createEmailBackupRequestedEvent(
             setting.setting_user_uuid,
+            emailsMutedSetting?.uuid as string,
             userHasEmailsMuted,
           )
         )

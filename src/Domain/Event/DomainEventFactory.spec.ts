@@ -72,7 +72,7 @@ describe('DomainEventFactory', () => {
   })
 
   it('should create a EMAIL_BACKUP_REQUESTED event', () => {
-    expect(createFactory().createEmailBackupRequestedEvent('1-2-3', true))
+    expect(createFactory().createEmailBackupRequestedEvent('1-2-3', '2-3-4', true))
       .toEqual({
         createdAt: expect.any(Date),
         meta: {
@@ -83,6 +83,7 @@ describe('DomainEventFactory', () => {
         },
         payload: {
           userUuid: '1-2-3',
+          muteEmailsSettingUuid: '2-3-4',
           userHasEmailsMuted: true,
         },
         type: 'EMAIL_BACKUP_REQUESTED',
