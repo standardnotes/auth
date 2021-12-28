@@ -96,9 +96,6 @@ describe('SubscriptionSyncRequestedEventHandler', () => {
       extensionKey: 'abc123',
       offlineFeaturesToken: 'test',
       canceled: false,
-      payAmount: 1000,
-      billingEveryNMonths: 1,
-      activeUntil: new Date(10).toString(),
     }
 
     settingService = {} as jest.Mocked<SettingServiceInterface>

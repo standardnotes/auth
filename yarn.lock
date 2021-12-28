@@ -718,12 +718,12 @@
     "@typescript-eslint/eslint-plugin" "^4.14.0"
     "@typescript-eslint/parser" "^4.14.0"
 
-"@standardnotes/domain-events-infra@1.4.3":
-  version "1.4.3"
-  resolved "https://registry.yarnpkg.com/@standardnotes/domain-events-infra/-/domain-events-infra-1.4.3.tgz#63394f19ce3bd8f01153dedb8d163dbc8a23119f"
-  integrity sha512-Qc2mQUGoy81FPWauG9yyN+dmXWAkYC2l92iJC1ORdKam7a/7rmGTe8HDyHXFr2CkXhVUF8Oq1SuTUJbpXjanTA==
+"@standardnotes/domain-events-infra@1.4.4":
+  version "1.4.4"
+  resolved "https://registry.yarnpkg.com/@standardnotes/domain-events-infra/-/domain-events-infra-1.4.4.tgz#ed3b650e5f07c2f9f34a0058b9f98f738923ecac"
+  integrity sha512-n9xD3bVcMzeh/2U9lp9y0mTB+nhK+vQ6eml/LTfPufdM51EBEdLbbCQuyLYWG1pQZclJEpTTaHci08BJYo+ISw==
   dependencies:
-    "@standardnotes/domain-events" "^2.14.1"
+    "@standardnotes/domain-events" "^2.14.2"
     aws-sdk "^2.824.0"
     ioredis "^4.19.4"
     newrelic "^7.4.0"
@@ -731,10 +731,10 @@
     sqs-consumer "^5.5.0"
     winston "^3.3.3"
 
-"@standardnotes/domain-events@2.14.1", "@standardnotes/domain-events@^2.14.1":
-  version "2.14.1"
-  resolved "https://registry.yarnpkg.com/@standardnotes/domain-events/-/domain-events-2.14.1.tgz#59a18b3ef7cd2b027ad6226ee9ab9c827e9dec04"
-  integrity sha512-t52VHnZSEILEHYvB1fB+9xorPIO+hf25t5OH5HlZeMZm1lBEtBIBKTlqpIa1Xen0f9NNc2o6Fo7aKWB37lP4ew==
+"@standardnotes/domain-events@2.14.2", "@standardnotes/domain-events@^2.14.2":
+  version "2.14.2"
+  resolved "https://registry.yarnpkg.com/@standardnotes/domain-events/-/domain-events-2.14.2.tgz#1070e130f8e376fea76e536cf84c14eaf3c1f78c"
+  integrity sha512-UCJmsNoaKe48sXxdz6hHw4qD72Hi6j5aJqDnuQq6ckM7eKqtxPsS28hmzldfpxWf6toT/pZuy8joNe0i+jYlEQ==
   dependencies:
     "@standardnotes/auth" "^3.12.0"
 
