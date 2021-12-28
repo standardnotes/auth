@@ -28,7 +28,7 @@
     "@standardnotes/common": "1.3.0",
     "@standardnotes/domain-events": "2.14.1",
     "@standardnotes/domain-events-infra": "1.4.3",
-    "@standardnotes/features": "1.10.3",
+    "@standardnotes/features": "1.15.1",
     "@standardnotes/settings": "1.4.0",
     "@standardnotes/sncrypto-common": "1.3.0",
     "@standardnotes/sncrypto-node": "1.3.0",

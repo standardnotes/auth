@@ -84,8 +84,8 @@ describe('DomainEventFactory', () => {
         },
         payload: {
           userUuid: '1-2-3',
-          userHasEmailsMuted: true,
           muteEmailsSettingUuid: '2-3-4',
+          userHasEmailsMuted: true,
         },
         type: 'EMAIL_BACKUP_REQUESTED',
       })
