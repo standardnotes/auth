@@ -7,9 +7,9 @@ import { OfflineUserSubscriptionRepositoryInterface } from '../../Domain/Subscri
 @EntityRepository(OfflineUserSubscription)
 export class MySQLOfflineUserSubscriptionRepository extends Repository<OfflineUserSubscription> implements OfflineUserSubscriptionRepositoryInterface {
   async findOneBySubscriptionId(subscriptionId: number): Promise<OfflineUserSubscription | undefined> {
-    return await this.createQueryBuilder('offline_user_subscription')
+    return await this.createQueryBuilder()
       .where(
-        'offline_user_subscription.subscription_id = :subscriptionId',
+        'subscription_id = :subscriptionId',
         {
           subscriptionId,
         }

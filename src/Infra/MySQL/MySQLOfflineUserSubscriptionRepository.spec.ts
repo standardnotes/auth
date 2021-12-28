@@ -183,7 +183,7 @@ describe('MySQLOfflineUserSubscriptionRepository', () => {
     const result = await repository.findOneBySubscriptionId(123)
 
     expect(selectQueryBuilder.where).toHaveBeenCalledWith(
-      'offline_user_subscription.subscription_id = :subscriptionId',
+      'subscription_id = :subscriptionId',
       {
         subscriptionId: 123,
       },
