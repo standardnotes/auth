@@ -26,6 +26,16 @@ export class UpdateSetting implements UseCaseInterface {
   }
 
   async execute(dto: UpdateSettingDto): Promise<UpdateSettingResponse> {
+    if (!Object.values(SettingName).includes(dto.props.name as SettingName)) {
+      return {
+        success: false,
+        error: {
+          message: `Setting name ${dto.props.name} is invalid.`,
+        },
+        statusCode: 400,
+      }
+    }
+
     this.logger.debug('[%s] Updating setting: %O', dto.userUuid, dto)
 
     const { userUuid, props } = dto
