@@ -13,6 +13,7 @@ import { SimpleSetting } from '../../Setting/SimpleSetting'
 import { User } from '../../User/User'
 import { UserRepositoryInterface } from '../../User/UserRepositoryInterface'
 import { UpdateSetting } from './UpdateSetting'
+import { SettingName } from '@standardnotes/settings'
 
 describe('UpdateSetting', () => {
   let settingService: SettingServiceInterface
@@ -62,7 +63,7 @@ describe('UpdateSetting', () => {
 
   it('should create a setting', async () => {
     const props = {
-      name: 'test-setting-name',
+      name: SettingName.ExtensionKey,
       value: 'test-setting-value',
       serverEncryptionVersion: EncryptionVersion.Default,
       sensitive: false,
@@ -72,7 +73,7 @@ describe('UpdateSetting', () => {
 
     expect(settingService.createOrReplace).toHaveBeenCalledWith({
       props: {
-        name: 'test-setting-name',
+        name: 'EXTENSION_KEY',
         value: 'test-setting-value',
         serverEncryptionVersion: 1,
         sensitive: false,
@@ -91,7 +92,7 @@ describe('UpdateSetting', () => {
     userRepository.findOneByUuid = jest.fn().mockReturnValue(undefined)
 
     const props = {
-      name: 'test-setting-name',
+      name: SettingName.ExtensionKey,
       value: 'test-setting-value',
       serverEncryptionVersion: EncryptionVersion.Unencrypted,
       sensitive: false,
@@ -110,13 +111,34 @@ describe('UpdateSetting', () => {
     })
   })
 
+  it('should not create a setting if the setting name is invalid', async () => {
+    const props = {
+      name: 'random-setting',
+      value: 'test-setting-value',
+      serverEncryptionVersion: EncryptionVersion.Unencrypted,
+      sensitive: false,
+    }
+
+    const response = await createUseCase().execute({ props, userUuid: '1-2-3' })
+
+    expect(settingService.createOrReplace).not.toHaveBeenCalled()
+
+    expect(response).toEqual({
+      success: false,
+      error: {
+        message: 'Setting name random-setting is invalid.',
+      },
+      statusCode: 400,
+    })
+  })
+
   it('should not create a setting if user is not permitted to', async () => {
     settingToSubscriptionMap.getPermissionAssociatedWithSetting = jest.fn().mockReturnValue(PermissionName.DailyEmailBackup)
 
     roleService.userHasPermission = jest.fn().mockReturnValue(false)
 
     const props = {
-      name: 'test-setting-name',
+      name: SettingName.ExtensionKey,
       value: 'test-setting-value',
       serverEncryptionVersion: EncryptionVersion.Unencrypted,
       sensitive: false,
