@@ -13,14 +13,12 @@ import { OfflineUserSubscriptionRepositoryInterface } from '../Subscription/Offl
 import { Role } from '../Role/Role'
 import { OfflineUserSubscription } from '../Subscription/OfflineUserSubscription'
 import { TimerInterface } from '@standardnotes/time'
-import { RoleRepositoryInterface } from '../Role/RoleRepositoryInterface'
 
 @injectable()
 export class FeatureService implements FeatureServiceInterface {
   constructor(
     @inject(TYPES.RoleToSubscriptionMap) private roleToSubscriptionMap: RoleToSubscriptionMapInterface,
     @inject(TYPES.SettingService) private settingService: SettingServiceInterface,
-    @inject(TYPES.RoleRepository) private roleRepository: RoleRepositoryInterface,
     @inject(TYPES.OfflineUserSubscriptionRepository) private offlineUserSubscriptionRepository: OfflineUserSubscriptionRepositoryInterface,
     @inject(TYPES.Timer) private timer: TimerInterface,
     @inject(TYPES.EXTENSION_SERVER_URL) private extensionServerUrl: string,
@@ -37,7 +35,7 @@ export class FeatureService implements FeatureServiceInterface {
       }
     }
 
-    return this.getFeaturesForSubscriptions(userSubscriptions, offlineFeaturesToken)
+    return this.getFeaturesForSubscriptions(userSubscriptions, [...userRolesMap.values()], offlineFeaturesToken)
   }
 
   async getFeaturesForUser(user: User): Promise<Array<FeatureDescription>> {
@@ -52,14 +50,18 @@ export class FeatureService implements FeatureServiceInterface {
       extensionKey = extensionKeySetting.value as string
     }
 
-    return this.getFeaturesForSubscriptions(userSubscriptions, extensionKey)
+    return this.getFeaturesForSubscriptions(userSubscriptions, await user.roles, extensionKey)
   }
 
   private injectExtensionKeyIntoUrl(url: string, extensionKey: string): string {
     return url.replace('#{url_prefix}', `${this.extensionServerUrl}/${extensionKey}`)
   }
 
-  private async getFeaturesForSubscriptions(userSubscriptions: Array<UserSubscription | OfflineUserSubscription>, extensionKey?: string): Promise<Array<FeatureDescription>> {
+  private async getFeaturesForSubscriptions(
+    userSubscriptions: Array<UserSubscription | OfflineUserSubscription>,
+    userRoles: Array<Role>,
+    extensionKey?: string
+  ): Promise<Array<FeatureDescription>> {
     const userFeatures: Map<string, FeatureDescription> = new Map()
     const userSubscriptionNames: Array<SubscriptionName> = []
 
@@ -75,7 +77,7 @@ export class FeatureService implements FeatureServiceInterface {
       if (roleName === undefined) {
         continue
       }
-      const role = await this.roleRepository.findOneByName(roleName)
+      const role = userRoles.find((role: Role) => role.name === roleName)
       if (role === undefined) {
         continue
       }
