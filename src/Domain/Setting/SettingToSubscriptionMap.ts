@@ -9,13 +9,13 @@ import { SettingToSubscriptionMapInterface } from './SettingToSubscriptionMapInt
 @injectable()
 export class SettingToSubscriptionMap implements SettingToSubscriptionMapInterface {
   private readonly encryptionVersionsAssociatedWithSettings = new Map<SettingName, EncryptionVersion>([
-    [ SettingName.EmailBackup, EncryptionVersion.Unencrypted ],
+    [ SettingName.EmailBackupFrequency, EncryptionVersion.Unencrypted ],
     [ SettingName.MuteFailedBackupsEmails, EncryptionVersion.Unencrypted ],
     [ SettingName.MuteFailedCloudBackupsEmails, EncryptionVersion.Unencrypted ],
   ])
 
   private readonly permissionsAssociatedWithSettings = new Map<SettingName, PermissionName>([
-    [SettingName.EmailBackup, PermissionName.DailyEmailBackup],
+    [SettingName.EmailBackupFrequency, PermissionName.DailyEmailBackup],
   ])
 
   private readonly settingsToSubscriptionNameMap = new Map<SubscriptionName, Map<SettingName, { value: string, sensitive: boolean, serverEncryptionVersion: number }>>([

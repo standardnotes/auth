@@ -113,7 +113,7 @@ export class SettingService implements SettingServiceInterface {
   }
 
   private async triggerDefaultActionsUponSettingCreated(setting: Setting, user: User) {
-    if (setting.name === SettingName.EmailBackup) {
+    if (setting.name === SettingName.EmailBackupFrequency) {
       let userHasEmailsMuted = false
       let muteEmailsSettingUuid = ''
       const muteFailedEmailsBackupSetting = await this.settingRepository.findOneByNameAndUserUuid(SettingName.MuteFailedBackupsEmails, user.uuid)

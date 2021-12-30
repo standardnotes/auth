@@ -27,7 +27,7 @@ const requestEmailBackups = async (
   domainEventFactory: DomainEventFactoryInterface,
   domainEventPublisher: DomainEventPublisherInterface,
 ): Promise<void> => {
-  const stream = await settingRepository.streamAllByNameAndValue(SettingName.EmailBackup, emailBackupFrequency)
+  const stream = await settingRepository.streamAllByNameAndValue(SettingName.EmailBackupFrequency, emailBackupFrequency)
   return new Promise((resolve, reject) => {
     stream.pipe(new Stream.Transform({
       objectMode: true,

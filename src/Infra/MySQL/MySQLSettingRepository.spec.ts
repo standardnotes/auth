@@ -32,7 +32,7 @@ describe('MySQLSettingRepository', () => {
     queryBuilder.orderBy = jest.fn().mockReturnThis()
     queryBuilder.stream = jest.fn().mockReturnValue(stream)
 
-    const result = await repository.streamAllByNameAndValue(SettingName.EmailBackup, EmailBackupFrequency.Daily)
+    const result = await repository.streamAllByNameAndValue(SettingName.EmailBackupFrequency, EmailBackupFrequency.Daily)
 
     expect(result).toEqual(stream)
   })

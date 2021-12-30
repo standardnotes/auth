@@ -15,7 +15,7 @@ describe('SettingToSubscriptionMap', () => {
   })
 
   it('should return a defined encryption version for a setting which enecryption version is strictly defined', () => {
-    expect(createMap().getEncryptionVersionForSetting(SettingName.EmailBackup)).toEqual(EncryptionVersion.Unencrypted)
+    expect(createMap().getEncryptionVersionForSetting(SettingName.EmailBackupFrequency)).toEqual(EncryptionVersion.Unencrypted)
   })
 
   it('should return the default set of setting values for a core subscription', () => {
@@ -52,7 +52,7 @@ describe('SettingToSubscriptionMap', () => {
   })
 
   it('should return a permission name associated to a given setting', () => {
-    expect(createMap().getPermissionAssociatedWithSetting(SettingName.EmailBackup)).toEqual(PermissionName.DailyEmailBackup)
+    expect(createMap().getPermissionAssociatedWithSetting(SettingName.EmailBackupFrequency)).toEqual(PermissionName.DailyEmailBackup)
   })
 
   it('should not return a permission name if not associated to a given setting', () => {
