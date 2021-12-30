@@ -2,6 +2,9 @@ import 'reflect-metadata'
 
 import 'newrelic'
 
+import * as Sentry from '@sentry/node'
+import * as Tracing from '@sentry/tracing'
+
 import '../src/Controller/HealthCheckController'
 import '../src/Controller/SessionController'
 import '../src/Controller/SessionsController'
@@ -16,7 +19,7 @@ import '../src/Controller/SubscriptionTokensController'
 import '../src/Controller/OfflineController'
 
 import * as cors from 'cors'
-import { urlencoded, json, Request, Response, NextFunction } from 'express'
+import { urlencoded, json, Request, Response, NextFunction, RequestHandler, ErrorRequestHandler } from 'express'
 import * as winston from 'winston'
 import * as dayjs from 'dayjs'
 import * as utc from 'dayjs/plugin/utc'
@@ -30,6 +33,9 @@ const container = new ContainerConfigLoader
 void container.load().then(container => {
   dayjs.extend(utc)
 
+  const env: Env = new Env()
+  env.load()
+
   const server = new InversifyExpressServer(container)
 
   server.setConfig((app) => {
@@ -40,11 +46,30 @@ void container.load().then(container => {
     app.use(json())
     app.use(urlencoded({ extended: true }))
     app.use(cors())
+
+    if (env.get('SENTRY_DSN', true)) {
+      Sentry.init({
+        dsn: env.get('SENTRY_DSN'),
+        integrations: [
+          new Sentry.Integrations.Http({ tracing: true }),
+          new Tracing.Integrations.Express({ app }),
+        ],
+        tracesSampleRate: 0.5,
+      })
+
+      app.use(Sentry.Handlers.requestHandler() as RequestHandler)
+
+      app.use(Sentry.Handlers.tracingHandler())
+    }
   })
 
   const logger: winston.Logger = container.get(TYPES.Logger)
 
   server.setErrorConfig((app) => {
+    if (env.get('SENTRY_DSN', true)) {
+      app.use(Sentry.Handlers.errorHandler() as ErrorRequestHandler)
+    }
+
     app.use((error: Record<string, unknown>, _request: Request, response: Response, _next: NextFunction) => {
       logger.error(error.stack)
 
@@ -57,9 +82,6 @@ void container.load().then(container => {
   })
 
   const serverInstance = server.build()
-
-  const env: Env = new Env()
-  env.load()
 
   serverInstance.listen(env.get('PORT'))
 
