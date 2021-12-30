@@ -19,7 +19,7 @@ import '../src/Controller/SubscriptionTokensController'
 import '../src/Controller/OfflineController'
 
 import * as cors from 'cors'
-import { urlencoded, json, Request, Response, NextFunction } from 'express'
+import { urlencoded, json, Request, Response, NextFunction, RequestHandler, ErrorRequestHandler } from 'express'
 import * as winston from 'winston'
 import * as dayjs from 'dayjs'
 import * as utc from 'dayjs/plugin/utc'
@@ -57,7 +57,7 @@ void container.load().then(container => {
         tracesSampleRate: 0.5,
       })
 
-      app.use(Sentry.Handlers.requestHandler())
+      app.use(Sentry.Handlers.requestHandler() as RequestHandler)
 
       app.use(Sentry.Handlers.tracingHandler())
     }
@@ -67,7 +67,7 @@ void container.load().then(container => {
 
   server.setErrorConfig((app) => {
     if (env.get('SENTRY_DSN', true)) {
-      app.use(Sentry.Handlers.errorHandler())
+      app.use(Sentry.Handlers.errorHandler() as ErrorRequestHandler)
     }
 
     app.use((error: Record<string, unknown>, _request: Request, response: Response, _next: NextFunction) => {
