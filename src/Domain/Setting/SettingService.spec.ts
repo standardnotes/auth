@@ -56,7 +56,7 @@ describe('SettingService', () => {
 
     settingToSubscriptionMap = {} as jest.Mocked<SettingToSubscriptionMapInterface>
     settingToSubscriptionMap.getDefaultSettingsAndValuesForSubscriptionName = jest.fn().mockReturnValue(new Map([
-      [SettingName.EmailBackup,
+      [SettingName.EmailBackupFrequency,
         {
           value: EmailBackupFrequency.Weekly,
           sensitive: 0,
@@ -111,7 +111,7 @@ describe('SettingService', () => {
 
   it ('should trigger backup if email backup setting is created - emails not muted', async () => {
     factory.create = jest.fn().mockReturnValue({
-      name: SettingName.EmailBackup,
+      name: SettingName.EmailBackupFrequency,
       value: EmailBackupFrequency.Daily,
     } as jest.Mocked<Setting>)
     settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue(undefined)
@@ -119,7 +119,7 @@ describe('SettingService', () => {
     const result = await createService().createOrReplace({
       user,
       props: {
-        name: SettingName.EmailBackup,
+        name: SettingName.EmailBackupFrequency,
         value: 'value',
         serverEncryptionVersion: 1,
         sensitive: false,
@@ -134,7 +134,7 @@ describe('SettingService', () => {
 
   it ('should trigger backup if email backup setting is created - emails muted', async () => {
     factory.create = jest.fn().mockReturnValue({
-      name: SettingName.EmailBackup,
+      name: SettingName.EmailBackupFrequency,
       value: EmailBackupFrequency.Daily,
     } as jest.Mocked<Setting>)
     settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue({
@@ -146,7 +146,7 @@ describe('SettingService', () => {
     const result = await createService().createOrReplace({
       user,
       props: {
-        name: SettingName.EmailBackup,
+        name: SettingName.EmailBackupFrequency,
         value: 'value',
         serverEncryptionVersion: 1,
         sensitive: false,
