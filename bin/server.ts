@@ -3,7 +3,6 @@ import 'reflect-metadata'
 import 'newrelic'
 
 import * as Sentry from '@sentry/node'
-import * as Tracing from '@sentry/tracing'
 
 import '../src/Controller/HealthCheckController'
 import '../src/Controller/SessionController'
@@ -52,14 +51,11 @@ void container.load().then(container => {
         dsn: env.get('SENTRY_DSN'),
         integrations: [
           new Sentry.Integrations.Http({ tracing: true }),
-          new Tracing.Integrations.Express({ app }),
         ],
-        tracesSampleRate: 0.5,
+        tracesSampleRate: 0,
       })
 
       app.use(Sentry.Handlers.requestHandler() as RequestHandler)
-
-      app.use(Sentry.Handlers.tracingHandler())
     }
   })
 
