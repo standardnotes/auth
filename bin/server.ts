@@ -50,7 +50,7 @@ void container.load().then(container => {
       Sentry.init({
         dsn: env.get('SENTRY_DSN'),
         integrations: [
-          new Sentry.Integrations.Http({ tracing: false }),
+          new Sentry.Integrations.Http({ tracing: false, breadcrumbs: true }),
         ],
         tracesSampleRate: 0,
       })
