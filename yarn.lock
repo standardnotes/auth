@@ -806,10 +806,10 @@
   dependencies:
     "@standardnotes/auth" "^3.12.0"
 
-"@standardnotes/features@1.15.1":
-  version "1.15.1"
-  resolved "https://registry.yarnpkg.com/@standardnotes/features/-/features-1.15.1.tgz#3880d73fb32ab952359e70fb313abfdf14023c7d"
-  integrity sha512-QurBvYwfNrcAKLwE7Z/1EsFpZ6Vuwp8E9O7jlMlzf0GyMXY/djCooeXjmoCWed+B/qJ4sdDdtptGyMsjKVeJCw==
+"@standardnotes/features@1.20.4":
+  version "1.20.4"
+  resolved "https://registry.yarnpkg.com/@standardnotes/features/-/features-1.20.4.tgz#85510217adfa703db59e73132f50348184276e62"
+  integrity sha512-HVl4dRlcDYGkLWY0Gl9z6kM1Gpria9UM3+8oeXyMsEe4T9Uye3s/SOKVWA++1ES7j2mkxcXXuW4wmmMuFYsRxA==
   dependencies:
     "@standardnotes/auth" "3.8.3"
     "@standardnotes/common" "1.2.1"
