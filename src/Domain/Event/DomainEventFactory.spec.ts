@@ -72,6 +72,27 @@ describe('DomainEventFactory', () => {
       })
   })
 
+  it('should create a CLOUD_BACKUP_REQUESTED event', () => {
+    expect(createFactory().createCloudBackupRequestedEvent('GOOGLE_DRIVE', 'test', '1-2-3', '2-3-4', true))
+      .toEqual({
+        createdAt: expect.any(Date),
+        meta: {
+          correlation: {
+            userIdentifier: '1-2-3',
+            userIdentifierType: 'uuid',
+          },
+        },
+        payload: {
+          cloudProvider: 'GOOGLE_DRIVE',
+          cloudProviderToken: 'test',
+          userUuid: '1-2-3',
+          muteEmailsSettingUuid: '2-3-4',
+          userHasEmailsMuted: true,
+        },
+        type: 'CLOUD_BACKUP_REQUESTED',
+      })
+  })
+
   it('should create a EMAIL_BACKUP_REQUESTED event', () => {
     expect(createFactory().createEmailBackupRequestedEvent('1-2-3', '2-3-4', true))
       .toEqual({
