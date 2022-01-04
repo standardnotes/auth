@@ -21,14 +21,29 @@ case "$COMMAND" in
     yarn worker
     ;;
 
-  'daily-backup' )
-    echo "Starting Daily Backup..."
-    yarn daily-backup
+  'email-daily-backup' )
+    echo "Starting Email Daily Backup..."
+    yarn daily-backup:email
     ;;
 
-  'weekly-backup' )
-    echo "Starting Weekly Backup..."
-    yarn weekly-backup
+  'email-weekly-backup' )
+    echo "Starting Email Weekly Backup..."
+    yarn weekly-backup:email
+    ;;
+
+  'dropbox-daily-backup' )
+    echo "Starting Dropbox Daily Backup..."
+    yarn daily-backup:dropbox
+    ;;
+
+  'google-drive-daily-backup' )
+    echo "Starting Google Drive Daily Backup..."
+    yarn daily-backup:google_drive
+    ;;
+
+  'one-drive-daily-backup' )
+    echo "Starting One Drive Daily Backup..."
+    yarn daily-backup:one_drive
     ;;
 
    * )

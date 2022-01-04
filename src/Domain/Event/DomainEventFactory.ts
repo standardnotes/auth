@@ -1,5 +1,5 @@
 import { RoleName } from '@standardnotes/auth'
-import { AccountDeletionRequestedEvent, UserEmailChangedEvent, UserRegisteredEvent, UserRolesChangedEvent, OfflineSubscriptionTokenCreatedEvent, EmailBackupRequestedEvent } from '@standardnotes/domain-events'
+import { AccountDeletionRequestedEvent, UserEmailChangedEvent, UserRegisteredEvent, UserRolesChangedEvent, OfflineSubscriptionTokenCreatedEvent, EmailBackupRequestedEvent, CloudBackupRequestedEvent } from '@standardnotes/domain-events'
 import { TimerInterface } from '@standardnotes/time'
 import * as dayjs from 'dayjs'
 import { inject, injectable } from 'inversify'
@@ -11,6 +11,26 @@ export class DomainEventFactory implements DomainEventFactoryInterface {
   constructor (
     @inject(TYPES.Timer) private timer: TimerInterface,
   ) {
+  }
+
+  createCloudBackupRequestedEvent(cloudProvider: 'DROPBOX' | 'ONE_DRIVE' | 'GOOGLE_DRIVE', cloudProviderToken: string, userUuid: string, muteEmailsSettingUuid: string, userHasEmailsMuted: boolean): CloudBackupRequestedEvent {
+    return {
+      type: 'CLOUD_BACKUP_REQUESTED',
+      createdAt: dayjs.utc().toDate(),
+      meta: {
+        correlation: {
+          userIdentifier: userUuid,
+          userIdentifierType: 'uuid',
+        },
+      },
+      payload: {
+        cloudProvider,
+        cloudProviderToken,
+        userUuid,
+        userHasEmailsMuted,
+        muteEmailsSettingUuid,
+      },
+    }
   }
 
   createEmailBackupRequestedEvent(userUuid: string, muteEmailsSettingUuid: string, userHasEmailsMuted: boolean): EmailBackupRequestedEvent {

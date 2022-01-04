@@ -799,7 +799,14 @@
     sqs-consumer "^5.5.0"
     winston "^3.3.3"
 
-"@standardnotes/domain-events@2.14.2", "@standardnotes/domain-events@^2.14.2":
+"@standardnotes/domain-events@2.15.0":
+  version "2.15.0"
+  resolved "https://registry.yarnpkg.com/@standardnotes/domain-events/-/domain-events-2.15.0.tgz#f59573f21439ad6303f63f22e8b08caebc74994e"
+  integrity sha512-XwagnECYZgkQxWqxiidnp55SVHLGgJNS2x+76OoJ5t2+q2+CgSy297H8e/gr9Jm7KMvnH3MnNPJFo9WBwF6pGw==
+  dependencies:
+    "@standardnotes/auth" "^3.12.0"
+
+"@standardnotes/domain-events@^2.14.2":
   version "2.14.2"
   resolved "https://registry.yarnpkg.com/@standardnotes/domain-events/-/domain-events-2.14.2.tgz#1070e130f8e376fea76e536cf84c14eaf3c1f78c"
   integrity sha512-UCJmsNoaKe48sXxdz6hHw4qD72Hi6j5aJqDnuQq6ckM7eKqtxPsS28hmzldfpxWf6toT/pZuy8joNe0i+jYlEQ==
