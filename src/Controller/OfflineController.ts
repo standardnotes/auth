@@ -34,7 +34,6 @@ export class OfflineController extends BaseHttpController {
   async getOfflineFeatures(_request: Request, response: Response): Promise<results.JsonResult> {
     const result = await this.doGetUserFeatures.execute({
       email: response.locals.offlineUserEmail,
-      offlineFeaturesToken: response.locals.offlineFeaturesToken,
       offline: true,
     })
 
