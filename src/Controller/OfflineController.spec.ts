@@ -83,7 +83,6 @@ describe('OfflineController', () => {
 
   it('should get offline user features', async () => {
     response.locals.offlineUserEmail = 'test@test.com'
-    response.locals.offlineFeaturesToken = 'features-token'
 
     getUserFeatures.execute = jest.fn().mockReturnValue({ success: true })
 
@@ -93,7 +92,6 @@ describe('OfflineController', () => {
     expect(getUserFeatures.execute).toHaveBeenCalledWith({
       email: 'test@test.com',
       offline: true,
-      offlineFeaturesToken: 'features-token',
     })
 
     expect(result.statusCode).toEqual(200)
@@ -129,7 +127,6 @@ describe('OfflineController', () => {
 
   it('should not get offline user features if the procedure fails', async () => {
     response.locals.offlineUserEmail = 'test@test.com'
-    response.locals.offlineFeaturesToken = 'features-token'
 
     getUserFeatures.execute = jest.fn().mockReturnValue({ success: false })
 
@@ -139,7 +136,6 @@ describe('OfflineController', () => {
     expect(getUserFeatures.execute).toHaveBeenCalledWith({
       email: 'test@test.com',
       offline: true,
-      offlineFeaturesToken: 'features-token',
     })
 
     expect(result.statusCode).toEqual(400)

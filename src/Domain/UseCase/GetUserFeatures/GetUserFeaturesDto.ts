@@ -5,6 +5,5 @@ export type GetUserFeaturesDto = {
   offline: false
 } | {
   email: string,
-  offlineFeaturesToken: string,
   offline: true
 }
