@@ -1,7 +1,7 @@
 import 'reflect-metadata'
 
 import { SubscriptionName } from '@standardnotes/auth'
-import { DomainEventPublisherInterface, EmailBackupRequestedEvent } from '@standardnotes/domain-events'
+import { CloudBackupRequestedEvent, DomainEventPublisherInterface, EmailBackupRequestedEvent } from '@standardnotes/domain-events'
 import { EmailBackupFrequency, SettingName } from '@standardnotes/settings'
 import { Logger } from 'winston'
 import { CrypterInterface } from '../Encryption/CrypterInterface'
@@ -75,6 +75,7 @@ describe('SettingService', () => {
 
     domainEventFactory = {} as jest.Mocked<DomainEventFactoryInterface>
     domainEventFactory.createEmailBackupRequestedEvent = jest.fn().mockReturnValue({} as jest.Mocked<EmailBackupRequestedEvent>)
+    domainEventFactory.createCloudBackupRequestedEvent = jest.fn().mockReturnValue({} as jest.Mocked<CloudBackupRequestedEvent>)
 
     logger = {} as jest.Mocked<Logger>
     logger.debug = jest.fn()
@@ -155,6 +156,126 @@ describe('SettingService', () => {
 
     expect(domainEventPublisher.publish).toHaveBeenCalled()
     expect(domainEventFactory.createEmailBackupRequestedEvent).toHaveBeenCalledWith('4-5-6', '6-7-8', true)
+
+    expect(result.status).toEqual('created')
+  })
+
+  it ('should trigger cloud backup if dropbox backup setting is created', async () => {
+    factory.create = jest.fn().mockReturnValue({
+      name: SettingName.DropboxBackupToken,
+      value: 'test-token',
+    } as jest.Mocked<Setting>)
+    settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue(undefined)
+
+    const result = await createService().createOrReplace({
+      user,
+      props: {
+        name: SettingName.DropboxBackupToken,
+        value: 'test-token',
+        serverEncryptionVersion: 1,
+        sensitive: true,
+      },
+    })
+
+    expect(domainEventPublisher.publish).toHaveBeenCalled()
+    expect(domainEventFactory.createCloudBackupRequestedEvent).toHaveBeenCalledWith(
+      'DROPBOX',
+      'test-token',
+      '4-5-6',
+      '',
+      false
+    )
+
+    expect(result.status).toEqual('created')
+  })
+
+  it ('should trigger cloud backup if dropbox backup setting is created - muted emails', async () => {
+    factory.create = jest.fn().mockReturnValue({
+      name: SettingName.DropboxBackupToken,
+      value: 'test-token',
+    } as jest.Mocked<Setting>)
+    settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue({
+      name: SettingName.MuteFailedCloudBackupsEmails,
+      uuid: '6-7-8',
+      value: 'muted',
+    } as jest.Mocked<Setting>)
+
+    const result = await createService().createOrReplace({
+      user,
+      props: {
+        name: SettingName.DropboxBackupToken,
+        value: 'test-token',
+        serverEncryptionVersion: 1,
+        sensitive: true,
+      },
+    })
+
+    expect(domainEventPublisher.publish).toHaveBeenCalled()
+    expect(domainEventFactory.createCloudBackupRequestedEvent).toHaveBeenCalledWith(
+      'DROPBOX',
+      'test-token',
+      '4-5-6',
+      '6-7-8',
+      true
+    )
+
+    expect(result.status).toEqual('created')
+  })
+
+  it ('should trigger cloud backup if google drive backup setting is created', async () => {
+    factory.create = jest.fn().mockReturnValue({
+      name: SettingName.GoogleDriveBackupToken,
+      value: 'test-token',
+    } as jest.Mocked<Setting>)
+    settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue(undefined)
+
+    const result = await createService().createOrReplace({
+      user,
+      props: {
+        name: SettingName.GoogleDriveBackupToken,
+        value: 'test-token',
+        serverEncryptionVersion: 1,
+        sensitive: true,
+      },
+    })
+
+    expect(domainEventPublisher.publish).toHaveBeenCalled()
+    expect(domainEventFactory.createCloudBackupRequestedEvent).toHaveBeenCalledWith(
+      'GOOGLE_DRIVE',
+      'test-token',
+      '4-5-6',
+      '',
+      false
+    )
+
+    expect(result.status).toEqual('created')
+  })
+
+  it ('should trigger cloud backup if one drive backup setting is created', async () => {
+    factory.create = jest.fn().mockReturnValue({
+      name: SettingName.OneDriveBackupToken,
+      value: 'test-token',
+    } as jest.Mocked<Setting>)
+    settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue(undefined)
+
+    const result = await createService().createOrReplace({
+      user,
+      props: {
+        name: SettingName.OneDriveBackupToken,
+        value: 'test-token',
+        serverEncryptionVersion: 1,
+        sensitive: true,
+      },
+    })
+
+    expect(domainEventPublisher.publish).toHaveBeenCalled()
+    expect(domainEventFactory.createCloudBackupRequestedEvent).toHaveBeenCalledWith(
+      'ONE_DRIVE',
+      'test-token',
+      '4-5-6',
+      '',
+      false
+    )
 
     expect(result.status).toEqual('created')
   })
