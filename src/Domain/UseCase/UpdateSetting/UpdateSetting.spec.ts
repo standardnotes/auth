@@ -52,6 +52,7 @@ describe('UpdateSetting', () => {
     settingToSubscriptionMap = {} as jest.Mocked<SettingToSubscriptionMapInterface>
     settingToSubscriptionMap.getPermissionAssociatedWithSetting = jest.fn().mockReturnValue(undefined)
     settingToSubscriptionMap.getEncryptionVersionForSetting = jest.fn().mockReturnValue(EncryptionVersion.Default)
+    settingToSubscriptionMap.getSensitivityForSetting = jest.fn().mockReturnValue(false)
 
     roleService = {} as jest.Mocked<RoleServiceInterface>
     roleService.addUserRole = jest.fn()

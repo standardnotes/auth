@@ -63,6 +63,7 @@ export class UpdateSetting implements UseCaseInterface {
     }
 
     props.serverEncryptionVersion = this.settingToSubscriptionMap.getEncryptionVersionForSetting(props.name as SettingName)
+    props.sensitive = this.settingToSubscriptionMap.getSensitivityForSetting(props.name as SettingName)
 
     const response = await this.settingService.createOrReplace({
       user,

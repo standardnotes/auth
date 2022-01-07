@@ -18,6 +18,14 @@ describe('SettingToSubscriptionMap', () => {
     expect(createMap().getEncryptionVersionForSetting(SettingName.EmailBackupFrequency)).toEqual(EncryptionVersion.Unencrypted)
   })
 
+  it('should return default sensitivity for a setting which sensitivity is not strictly defined', () => {
+    expect(createMap().getSensitivityForSetting(SettingName.DropboxBackupToken)).toBeTruthy()
+  })
+
+  it('should return a defined sensitivity for a setting which sensitivity is strictly defined', () => {
+    expect(createMap().getSensitivityForSetting(SettingName.DropboxBackupFrequency)).toBeFalsy()
+  })
+
   it('should return the default set of setting values for a core subscription', () => {
     const settings = createMap().getDefaultSettingsAndValuesForSubscriptionName(SubscriptionName.CorePlan)
 

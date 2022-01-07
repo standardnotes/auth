@@ -12,6 +12,16 @@ export class SettingToSubscriptionMap implements SettingToSubscriptionMapInterfa
     [ SettingName.EmailBackupFrequency, EncryptionVersion.Unencrypted ],
     [ SettingName.MuteFailedBackupsEmails, EncryptionVersion.Unencrypted ],
     [ SettingName.MuteFailedCloudBackupsEmails, EncryptionVersion.Unencrypted ],
+    [ SettingName.DropboxBackupFrequency, EncryptionVersion.Unencrypted ],
+    [ SettingName.GoogleDriveBackupFrequency, EncryptionVersion.Unencrypted ],
+    [ SettingName.OneDriveBackupFrequency, EncryptionVersion.Unencrypted ],
+  ])
+
+  private readonly sensitivityAssociatedWithSettings = new Map<SettingName, boolean>([
+    [ SettingName.DropboxBackupFrequency, false ],
+    [ SettingName.GoogleDriveBackupFrequency, false ],
+    [ SettingName.OneDriveBackupFrequency, false ],
+    [ SettingName.EmailBackupFrequency, false ],
   ])
 
   private readonly permissionsAssociatedWithSettings = new Map<SettingName, PermissionName>([
@@ -23,6 +33,14 @@ export class SettingToSubscriptionMap implements SettingToSubscriptionMapInterfa
     [SubscriptionName.PlusPlan, new Map([])],
     [SubscriptionName.ProPlan, new Map([])],
   ])
+
+  getSensitivityForSetting(settingName: SettingName): boolean {
+    if (!this.sensitivityAssociatedWithSettings.has(settingName)) {
+      return true
+    }
+
+    return this.sensitivityAssociatedWithSettings.get(settingName) as boolean
+  }
 
   getEncryptionVersionForSetting(settingName: SettingName): EncryptionVersion {
     if (!this.encryptionVersionsAssociatedWithSettings.has(settingName)) {
