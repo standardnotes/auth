@@ -32,6 +32,18 @@ export class SettingService implements SettingServiceInterface {
   ) {
   }
 
+  private readonly cloudBackupTokenSettings = [
+    SettingName.DropboxBackupToken,
+    SettingName.GoogleDriveBackupToken,
+    SettingName.OneDriveBackupToken,
+  ]
+
+  private readonly cloudBackupFrequencySettings = [
+    SettingName.DropboxBackupFrequency,
+    SettingName.GoogleDriveBackupFrequency,
+    SettingName.OneDriveBackupFrequency,
+  ]
+
   async applyDefaultSettingsForSubscription(user: User, subscriptionName: SubscriptionName): Promise<void> {
     const defaultSettingsWithValues = this.settingToSubscriptionMap.getDefaultSettingsAndValuesForSubscriptionName(subscriptionName)
     if (defaultSettingsWithValues === undefined) {
@@ -94,7 +106,7 @@ export class SettingService implements SettingServiceInterface {
 
       this.logger.debug('[%s] Created setting %s: %O', user.uuid, props.name, setting)
 
-      await this.triggerDefaultActionsUponSettingCreated(setting, user)
+      await this.triggerDefaultActionsUponSettingUpdated(setting, user)
 
       return {
         status: 'created',
@@ -106,24 +118,21 @@ export class SettingService implements SettingServiceInterface {
 
     this.logger.debug('[%s] Replaced existing setting %s with: %O', user.uuid, props.name, setting)
 
+    await this.triggerDefaultActionsUponSettingUpdated(setting, user)
+
     return {
       status: 'replaced',
       setting,
     }
   }
 
-  private async triggerDefaultActionsUponSettingCreated(setting: Setting, user: User) {
+  private async triggerDefaultActionsUponSettingUpdated(setting: Setting, user: User) {
     if (setting.name === SettingName.EmailBackupFrequency) {
       await this.triggerEmailBackup(user.uuid)
     }
 
-    const cloudBackupSettings = [
-      SettingName.DropboxBackupToken,
-      SettingName.GoogleDriveBackupToken,
-      SettingName.OneDriveBackupToken,
-    ]
-
-    if (cloudBackupSettings.includes(setting.name as SettingName)) {
+    if (this.cloudBackupFrequencySettings.includes(setting.name as SettingName) ||
+      this.cloudBackupTokenSettings.includes(setting.name as SettingName)) {
       await this.triggerCloudBackup(setting, user.uuid)
     }
   }
@@ -148,16 +157,39 @@ export class SettingService implements SettingServiceInterface {
 
   private async triggerCloudBackup(setting: Setting, userUuid: string): Promise<void> {
     let cloudProvider
+    let tokenSettingName
     switch (setting.name) {
     case SettingName.DropboxBackupToken:
+    case SettingName.DropboxBackupFrequency:
       cloudProvider = 'DROPBOX'
+      tokenSettingName = SettingName.DropboxBackupToken
       break
     case SettingName.GoogleDriveBackupToken:
+    case SettingName.GoogleDriveBackupFrequency:
       cloudProvider = 'GOOGLE_DRIVE'
+      tokenSettingName = SettingName.GoogleDriveBackupToken
       break
     case SettingName.OneDriveBackupToken:
+    case SettingName.OneDriveBackupFrequency:
       cloudProvider = 'ONE_DRIVE'
+      tokenSettingName = SettingName.OneDriveBackupToken
       break
+    }
+
+    let backupToken = null
+    if (this.cloudBackupFrequencySettings.includes(setting.name as SettingName)) {
+      const tokenSetting = await this.findSetting({ settingName: tokenSettingName as SettingName, userUuid })
+      if (tokenSetting !== undefined) {
+        backupToken = tokenSetting.value as string
+      }
+    } else {
+      backupToken = setting.value as string
+    }
+
+    if (!backupToken) {
+      this.logger.error(`Could not trigger backup. Missing backup token for user ${userUuid}`)
+
+      return
     }
 
     let userHasEmailsMuted = false
@@ -171,7 +203,7 @@ export class SettingService implements SettingServiceInterface {
     await this.domainEventPublisher.publish(
       this.domainEventFactory.createCloudBackupRequestedEvent(
         cloudProvider as 'DROPBOX' | 'GOOGLE_DRIVE' | 'ONE_DRIVE',
-        setting.value as string,
+        backupToken,
         userUuid,
         muteEmailsSettingUuid,
         userHasEmailsMuted
