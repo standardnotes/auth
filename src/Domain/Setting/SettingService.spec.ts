@@ -103,7 +103,7 @@ describe('SettingService', () => {
       user,
       props: {
         name: 'name',
-        value: 'value',
+        unencryptedValue: 'value',
         serverEncryptionVersion: 1,
         sensitive: false,
       },
@@ -123,7 +123,7 @@ describe('SettingService', () => {
       user,
       props: {
         name: SettingName.EmailBackupFrequency,
-        value: 'value',
+        unencryptedValue: 'value',
         serverEncryptionVersion: 1,
         sensitive: false,
       },
@@ -150,7 +150,7 @@ describe('SettingService', () => {
       user,
       props: {
         name: SettingName.EmailBackupFrequency,
-        value: 'value',
+        unencryptedValue: 'value',
         serverEncryptionVersion: 1,
         sensitive: false,
       },
@@ -173,7 +173,7 @@ describe('SettingService', () => {
       user,
       props: {
         name: SettingName.DropboxBackupToken,
-        value: 'test-token',
+        unencryptedValue: 'test-token',
         serverEncryptionVersion: 1,
         sensitive: true,
       },
@@ -206,7 +206,7 @@ describe('SettingService', () => {
       user,
       props: {
         name: SettingName.DropboxBackupToken,
-        value: 'test-token',
+        unencryptedValue: 'test-token',
         serverEncryptionVersion: 1,
         sensitive: true,
       },
@@ -235,7 +235,7 @@ describe('SettingService', () => {
       user,
       props: {
         name: SettingName.GoogleDriveBackupToken,
-        value: 'test-token',
+        unencryptedValue: 'test-token',
         serverEncryptionVersion: 1,
         sensitive: true,
       },
@@ -264,7 +264,7 @@ describe('SettingService', () => {
       user,
       props: {
         name: SettingName.OneDriveBackupToken,
-        value: 'test-token',
+        unencryptedValue: 'test-token',
         serverEncryptionVersion: 1,
         sensitive: true,
       },
@@ -307,7 +307,7 @@ describe('SettingService', () => {
       user,
       props: {
         name: SettingName.OneDriveBackupFrequency,
-        value: 'daily',
+        unencryptedValue: 'daily',
         serverEncryptionVersion: 0,
         sensitive: false,
       },
@@ -345,7 +345,7 @@ describe('SettingService', () => {
       user,
       props: {
         name: SettingName.OneDriveBackupFrequency,
-        value: 'daily',
+        unencryptedValue: 'daily',
         serverEncryptionVersion: 0,
         sensitive: false,
       },
@@ -365,7 +365,7 @@ describe('SettingService', () => {
       props: {
         uuid: '1-2-3',
         name: 'name',
-        value: 'value',
+        unencryptedValue: 'value',
         serverEncryptionVersion: 1,
         sensitive: false,
       },
@@ -381,7 +381,7 @@ describe('SettingService', () => {
       user: user,
       props: {
         ...setting,
-        value: 'value',
+        unencryptedValue: 'value',
         serverEncryptionVersion: 1,
       },
     })
@@ -397,7 +397,7 @@ describe('SettingService', () => {
       props: {
         ...setting,
         uuid: '1-2-3',
-        value: 'value',
+        unencryptedValue: 'value',
         serverEncryptionVersion: 1,
       },
     })

@@ -65,7 +65,7 @@ describe('UpdateSetting', () => {
   it('should create a setting', async () => {
     const props = {
       name: SettingName.ExtensionKey,
-      value: 'test-setting-value',
+      unencryptedValue: 'test-setting-value',
       serverEncryptionVersion: EncryptionVersion.Default,
       sensitive: false,
     }
@@ -75,7 +75,7 @@ describe('UpdateSetting', () => {
     expect(settingService.createOrReplace).toHaveBeenCalledWith({
       props: {
         name: 'EXTENSION_KEY',
-        value: 'test-setting-value',
+        unencryptedValue: 'test-setting-value',
         serverEncryptionVersion: 1,
         sensitive: false,
       },
@@ -94,7 +94,7 @@ describe('UpdateSetting', () => {
 
     const props = {
       name: SettingName.ExtensionKey,
-      value: 'test-setting-value',
+      unencryptedValue: 'test-setting-value',
       serverEncryptionVersion: EncryptionVersion.Unencrypted,
       sensitive: false,
     }
@@ -115,7 +115,7 @@ describe('UpdateSetting', () => {
   it('should not create a setting if the setting name is invalid', async () => {
     const props = {
       name: 'random-setting',
-      value: 'test-setting-value',
+      unencryptedValue: 'test-setting-value',
       serverEncryptionVersion: EncryptionVersion.Unencrypted,
       sensitive: false,
     }
@@ -140,7 +140,7 @@ describe('UpdateSetting', () => {
 
     const props = {
       name: SettingName.ExtensionKey,
-      value: 'test-setting-value',
+      unencryptedValue: 'test-setting-value',
       serverEncryptionVersion: EncryptionVersion.Unencrypted,
       sensitive: false,
     }
