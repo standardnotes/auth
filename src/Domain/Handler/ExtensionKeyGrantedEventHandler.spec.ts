@@ -104,7 +104,7 @@ describe('ExtensionKeyGrantedEventHandler', () => {
       props: {
         name: 'EXTENSION_KEY',
         serverEncryptionVersion: 1,
-        value: 'abc123',
+        unencryptedValue: 'abc123',
         sensitive: true,
       },
       user: {

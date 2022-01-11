@@ -59,7 +59,7 @@ export class SettingService implements SettingServiceInterface {
         user,
         props: {
           name: settingName,
-          value: setting.value,
+          unencryptedValue: setting.value,
           serverEncryptionVersion: setting.serverEncryptionVersion,
           sensitive: setting.sensitive,
         },
@@ -106,7 +106,7 @@ export class SettingService implements SettingServiceInterface {
 
       this.logger.debug('[%s] Created setting %s: %O', user.uuid, props.name, setting)
 
-      await this.triggerDefaultActionsUponSettingUpdated(setting, user)
+      await this.triggerDefaultActionsUponSettingUpdated(setting, user, props.unencryptedValue)
 
       return {
         status: 'created',
@@ -118,7 +118,7 @@ export class SettingService implements SettingServiceInterface {
 
     this.logger.debug('[%s] Replaced existing setting %s with: %O', user.uuid, props.name, setting)
 
-    await this.triggerDefaultActionsUponSettingUpdated(setting, user)
+    await this.triggerDefaultActionsUponSettingUpdated(setting, user, props.unencryptedValue)
 
     return {
       status: 'replaced',
@@ -126,14 +126,14 @@ export class SettingService implements SettingServiceInterface {
     }
   }
 
-  private async triggerDefaultActionsUponSettingUpdated(setting: Setting, user: User) {
+  private async triggerDefaultActionsUponSettingUpdated(setting: Setting, user: User, unencryptedValue: string | null) {
     if (setting.name === SettingName.EmailBackupFrequency) {
       await this.triggerEmailBackup(user.uuid)
     }
 
     if (this.cloudBackupFrequencySettings.includes(setting.name as SettingName) ||
       this.cloudBackupTokenSettings.includes(setting.name as SettingName)) {
-      await this.triggerCloudBackup(setting, user.uuid)
+      await this.triggerCloudBackup(setting, user.uuid, unencryptedValue)
     }
   }
 
@@ -155,7 +155,7 @@ export class SettingService implements SettingServiceInterface {
     )
   }
 
-  private async triggerCloudBackup(setting: Setting, userUuid: string): Promise<void> {
+  private async triggerCloudBackup(setting: Setting, userUuid: string, unencryptedValue: string | null): Promise<void> {
     let cloudProvider
     let tokenSettingName
     switch (setting.name) {
@@ -183,7 +183,7 @@ export class SettingService implements SettingServiceInterface {
         backupToken = tokenSetting.value as string
       }
     } else {
-      backupToken = setting.value as string
+      backupToken = unencryptedValue
     }
 
     if (!backupToken) {

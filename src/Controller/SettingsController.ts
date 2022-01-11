@@ -84,7 +84,7 @@ export class SettingsController extends BaseHttpController {
 
     const props = {
       name,
-      value,
+      unencryptedValue: value,
       serverEncryptionVersion,
       sensitive,
     }

@@ -161,7 +161,7 @@ describe('SettingsController', () => {
         name: 'foo',
         sensitive: false,
         serverEncryptionVersion: 1,
-        value: 'bar',
+        unencryptedValue: 'bar',
       },
       userUuid: '1-2-3',
     })
@@ -191,7 +191,7 @@ describe('SettingsController', () => {
         name: 'foo',
         sensitive: false,
         serverEncryptionVersion: 0,
-        value: 'bar',
+        unencryptedValue: 'bar',
       },
       userUuid: '1-2-3',
     })
@@ -243,7 +243,7 @@ describe('SettingsController', () => {
         name: 'foo',
         serverEncryptionVersion: 1,
         sensitive: false,
-        value: 'bar',
+        unencryptedValue: 'bar',
       },
       userUuid: '1-2-3',
     })
