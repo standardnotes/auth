@@ -52,6 +52,7 @@ describe('SettingService', () => {
 
     settingRepository = {} as jest.Mocked<SettingRepositoryInterface>
     settingRepository.findLastByNameAndUserUuid = jest.fn().mockReturnValue(undefined)
+    settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue(undefined)
     settingRepository.save = jest.fn().mockImplementation(setting => setting)
 
     settingToSubscriptionMap = {} as jest.Mocked<SettingToSubscriptionMapInterface>
@@ -80,6 +81,7 @@ describe('SettingService', () => {
     logger = {} as jest.Mocked<Logger>
     logger.debug = jest.fn()
     logger.warn = jest.fn()
+    logger.error = jest.fn()
   })
 
   it ('should create default settings for a subscription', async () => {
@@ -278,6 +280,81 @@ describe('SettingService', () => {
     )
 
     expect(result.status).toEqual('created')
+  })
+
+  it ('should trigger cloud backup if backup frequency setting is updated and a backup token setting is present', async () => {
+    settingRepository.findLastByNameAndUserUuid = jest.fn()
+      .mockReturnValueOnce({
+        name: SettingName.OneDriveBackupFrequency,
+        serverEncryptionVersion: 0,
+        value: 'daily',
+        sensitive: false,
+      } as jest.Mocked<Setting>)
+      .mockReturnValueOnce({
+        name: SettingName.OneDriveBackupToken,
+        serverEncryptionVersion: 1,
+        value: 'encrypted-backup-token',
+        sensitive: true,
+      } as jest.Mocked<Setting>)
+    factory.createReplacement = jest.fn().mockReturnValue({
+      name: SettingName.OneDriveBackupFrequency,
+      serverEncryptionVersion: 0,
+      value: 'daily',
+      sensitive: false,
+    } as jest.Mocked<Setting>)
+
+    const result = await createService().createOrReplace({
+      user,
+      props: {
+        name: SettingName.OneDriveBackupFrequency,
+        value: 'daily',
+        serverEncryptionVersion: 0,
+        sensitive: false,
+      },
+    })
+
+    expect(domainEventPublisher.publish).toHaveBeenCalled()
+    expect(domainEventFactory.createCloudBackupRequestedEvent).toHaveBeenCalledWith(
+      'ONE_DRIVE',
+      'decrypted',
+      '4-5-6',
+      '',
+      false
+    )
+
+    expect(result.status).toEqual('replaced')
+  })
+
+  it ('should not trigger cloud backup if backup frequency setting is updated and a backup token setting is not present', async () => {
+    settingRepository.findLastByNameAndUserUuid = jest.fn()
+      .mockReturnValueOnce({
+        name: SettingName.OneDriveBackupFrequency,
+        serverEncryptionVersion: 0,
+        value: 'daily',
+        sensitive: false,
+      } as jest.Mocked<Setting>)
+      .mockReturnValueOnce(undefined)
+    factory.createReplacement = jest.fn().mockReturnValue({
+      name: SettingName.OneDriveBackupFrequency,
+      serverEncryptionVersion: 0,
+      value: 'daily',
+      sensitive: false,
+    } as jest.Mocked<Setting>)
+
+    const result = await createService().createOrReplace({
+      user,
+      props: {
+        name: SettingName.OneDriveBackupFrequency,
+        value: 'daily',
+        serverEncryptionVersion: 0,
+        sensitive: false,
+      },
+    })
+
+    expect(domainEventPublisher.publish).not.toHaveBeenCalled()
+    expect(domainEventFactory.createCloudBackupRequestedEvent).not.toHaveBeenCalled()
+
+    expect(result.status).toEqual('replaced')
   })
 
   it ('should create setting with a given uuid if it does not exist', async () => {
