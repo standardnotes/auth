@@ -2,7 +2,7 @@ import 'reflect-metadata'
 
 import { SubscriptionName } from '@standardnotes/auth'
 import { CloudBackupRequestedEvent, DomainEventPublisherInterface, EmailBackupRequestedEvent } from '@standardnotes/domain-events'
-import { EmailBackupFrequency, SettingName } from '@standardnotes/settings'
+import { EmailBackupFrequency, OneDriveBackupFrequency, SettingName } from '@standardnotes/settings'
 import { Logger } from 'winston'
 import { CrypterInterface } from '../Encryption/CrypterInterface'
 import { EncryptionVersion } from '../Encryption/EncryptionVersion'
@@ -158,6 +158,29 @@ describe('SettingService', () => {
 
     expect(domainEventPublisher.publish).toHaveBeenCalled()
     expect(domainEventFactory.createEmailBackupRequestedEvent).toHaveBeenCalledWith('4-5-6', '6-7-8', true)
+
+    expect(result.status).toEqual('created')
+  })
+
+  it ('should not trigger backup if email backup setting is disabled', async () => {
+    factory.create = jest.fn().mockReturnValue({
+      name: SettingName.EmailBackupFrequency,
+      value: EmailBackupFrequency.Disabled,
+    } as jest.Mocked<Setting>)
+    settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue(undefined)
+
+    const result = await createService().createOrReplace({
+      user,
+      props: {
+        name: SettingName.EmailBackupFrequency,
+        unencryptedValue: EmailBackupFrequency.Disabled,
+        serverEncryptionVersion: 1,
+        sensitive: false,
+      },
+    })
+
+    expect(domainEventPublisher.publish).not.toHaveBeenCalled()
+    expect(domainEventFactory.createEmailBackupRequestedEvent).not.toHaveBeenCalled()
 
     expect(result.status).toEqual('created')
   })
@@ -321,6 +344,43 @@ describe('SettingService', () => {
       '',
       false
     )
+
+    expect(result.status).toEqual('replaced')
+  })
+
+  it ('should not trigger cloud backup if backup frequency setting is updated as disabled', async () => {
+    settingRepository.findLastByNameAndUserUuid = jest.fn()
+      .mockReturnValueOnce({
+        name: SettingName.OneDriveBackupFrequency,
+        serverEncryptionVersion: 0,
+        value: 'daily',
+        sensitive: false,
+      } as jest.Mocked<Setting>)
+      .mockReturnValueOnce({
+        name: SettingName.OneDriveBackupToken,
+        serverEncryptionVersion: 1,
+        value: 'encrypted-backup-token',
+        sensitive: true,
+      } as jest.Mocked<Setting>)
+    factory.createReplacement = jest.fn().mockReturnValue({
+      name: SettingName.OneDriveBackupFrequency,
+      serverEncryptionVersion: 0,
+      value: OneDriveBackupFrequency.Disabled,
+      sensitive: false,
+    } as jest.Mocked<Setting>)
+
+    const result = await createService().createOrReplace({
+      user,
+      props: {
+        name: SettingName.OneDriveBackupFrequency,
+        unencryptedValue: OneDriveBackupFrequency.Disabled,
+        serverEncryptionVersion: 0,
+        sensitive: false,
+      },
+    })
+
+    expect(domainEventPublisher.publish).not.toHaveBeenCalled()
+    expect(domainEventFactory.createCloudBackupRequestedEvent).not.toHaveBeenCalled()
 
     expect(result.status).toEqual('replaced')
   })
