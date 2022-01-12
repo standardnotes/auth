@@ -1,6 +1,6 @@
 import { SubscriptionName } from '@standardnotes/auth'
 import { DomainEventPublisherInterface } from '@standardnotes/domain-events'
-import { MuteFailedBackupsEmailsOption, MuteFailedCloudBackupsEmailsOption, SettingName } from '@standardnotes/settings'
+import { DropboxBackupFrequency, EmailBackupFrequency, GoogleDriveBackupFrequency, MuteFailedBackupsEmailsOption, MuteFailedCloudBackupsEmailsOption, OneDriveBackupFrequency, SettingName } from '@standardnotes/settings'
 import { inject, injectable } from 'inversify'
 import { Logger } from 'winston'
 import TYPES from '../../Bootstrap/Types'
@@ -42,6 +42,12 @@ export class SettingService implements SettingServiceInterface {
     SettingName.DropboxBackupFrequency,
     SettingName.GoogleDriveBackupFrequency,
     SettingName.OneDriveBackupFrequency,
+  ]
+
+  private readonly cloudBackupFrequencyDisabledValues = [
+    DropboxBackupFrequency.Disabled,
+    GoogleDriveBackupFrequency.Disabled,
+    OneDriveBackupFrequency.Disabled,
   ]
 
   async applyDefaultSettingsForSubscription(user: User, subscriptionName: SubscriptionName): Promise<void> {
@@ -127,12 +133,11 @@ export class SettingService implements SettingServiceInterface {
   }
 
   private async triggerDefaultActionsUponSettingUpdated(setting: Setting, user: User, unencryptedValue: string | null) {
-    if (setting.name === SettingName.EmailBackupFrequency) {
+    if (this.isEnablingEmailBackupSetting(setting)) {
       await this.triggerEmailBackup(user.uuid)
     }
 
-    if (this.cloudBackupFrequencySettings.includes(setting.name as SettingName) ||
-      this.cloudBackupTokenSettings.includes(setting.name as SettingName)) {
+    if (this.isEnablingCloudBackupSetting(setting)) {
       await this.triggerCloudBackup(setting, user.uuid, unencryptedValue)
     }
   }
@@ -153,6 +158,16 @@ export class SettingService implements SettingServiceInterface {
         userHasEmailsMuted
       )
     )
+  }
+
+  private isEnablingEmailBackupSetting(setting: Setting): boolean {
+    return setting.name === SettingName.EmailBackupFrequency && setting.value !== EmailBackupFrequency.Disabled
+  }
+
+  private isEnablingCloudBackupSetting(setting: Setting): boolean {
+    return (this.cloudBackupFrequencySettings.includes(setting.name as SettingName)
+      || this.cloudBackupTokenSettings.includes(setting.name as SettingName))
+      && !this.cloudBackupFrequencyDisabledValues.includes(setting.value as DropboxBackupFrequency | OneDriveBackupFrequency | GoogleDriveBackupFrequency)
   }
 
   private async triggerCloudBackup(setting: Setting, userUuid: string, unencryptedValue: string | null): Promise<void> {
