@@ -22,6 +22,8 @@ export class SettingToSubscriptionMap implements SettingToSubscriptionMapInterfa
     [ SettingName.GoogleDriveBackupFrequency, false ],
     [ SettingName.OneDriveBackupFrequency, false ],
     [ SettingName.EmailBackupFrequency, false ],
+    [ SettingName.MuteFailedBackupsEmails, false ],
+    [ SettingName.MuteFailedCloudBackupsEmails, false ],
   ])
 
   private readonly permissionsAssociatedWithSettings = new Map<SettingName, PermissionName>([
