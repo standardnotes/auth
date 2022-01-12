@@ -12,6 +12,8 @@ import { RoleService } from './RoleService'
 import { RoleToSubscriptionMapInterface } from './RoleToSubscriptionMapInterface'
 import { OfflineUserSubscriptionRepositoryInterface } from '../Subscription/OfflineUserSubscriptionRepositoryInterface'
 import { OfflineUserSubscription } from '../Subscription/OfflineUserSubscription'
+import { PermissionName } from '@standardnotes/features'
+import { Permission } from '../Permission/Permission'
 
 describe('RoleService', () => {
   let userRepository: UserRepositoryInterface
@@ -37,10 +39,20 @@ describe('RoleService', () => {
   beforeEach(() => {
     basicRole = {
       name: RoleName.BasicUser,
+      permissions: Promise.resolve([
+        {
+          name: PermissionName.MarkdownBasicEditor,
+        } as jest.Mocked<Permission>,
+      ]),
     } as jest.Mocked<Role>
 
     proRole = {
       name: RoleName.ProUser,
+      permissions: Promise.resolve([
+        {
+          name: PermissionName.DailyEmailBackup,
+        } as jest.Mocked<Permission>,
+      ]),
     } as jest.Mocked<Role>
 
     userRepository = {} as jest.Mocked<UserRepositoryInterface>
@@ -200,6 +212,41 @@ describe('RoleService', () => {
       await createService().removeUserRole(user, 'test' as SubscriptionName)
 
       expect(userRepository.save).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('checking permissions', () => {
+    beforeEach(() => {
+      user = {
+        uuid: '123',
+        email: 'test@test.com',
+        roles: Promise.resolve([
+          basicRole,
+          proRole,
+        ]),
+      } as jest.Mocked<User>
+
+      userRepository.findOneByUuid = jest.fn().mockReturnValue(user)
+    })
+
+    it('should indicate if a user has given permission', async () => {
+      const userHasPermission = await createService().userHasPermission('1-2-3', PermissionName.DailyEmailBackup)
+
+      expect(userHasPermission).toBeTruthy()
+    })
+
+    it('should indicate if a user does not have a given permission', async () => {
+      const userHasPermission = await createService().userHasPermission('1-2-3', PermissionName.DailyGDriveBackup)
+
+      expect(userHasPermission).toBeFalsy()
+    })
+
+    it('should indicate user does not have a permission if user could not be found', async () => {
+      userRepository.findOneByUuid = jest.fn().mockReturnValue(undefined)
+
+      const userHasPermission = await createService().userHasPermission('1-2-3', PermissionName.DailyGDriveBackup)
+
+      expect(userHasPermission).toBeFalsy()
     })
   })
 })

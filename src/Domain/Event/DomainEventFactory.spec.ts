@@ -1,6 +1,7 @@
+import 'reflect-metadata'
+
 import { RoleName } from '@standardnotes/auth'
 import { TimerInterface } from '@standardnotes/time'
-import 'reflect-metadata'
 
 import { DomainEventFactory } from './DomainEventFactory'
 
@@ -68,6 +69,27 @@ describe('DomainEventFactory', () => {
           toEmail: 'test2@test.te',
         },
         type: 'USER_EMAIL_CHANGED',
+      })
+  })
+
+  it('should create a CLOUD_BACKUP_REQUESTED event', () => {
+    expect(createFactory().createCloudBackupRequestedEvent('GOOGLE_DRIVE', 'test', '1-2-3', '2-3-4', true))
+      .toEqual({
+        createdAt: expect.any(Date),
+        meta: {
+          correlation: {
+            userIdentifier: '1-2-3',
+            userIdentifierType: 'uuid',
+          },
+        },
+        payload: {
+          cloudProvider: 'GOOGLE_DRIVE',
+          cloudProviderToken: 'test',
+          userUuid: '1-2-3',
+          muteEmailsSettingUuid: '2-3-4',
+          userHasEmailsMuted: true,
+        },
+        type: 'CLOUD_BACKUP_REQUESTED',
       })
   })
 

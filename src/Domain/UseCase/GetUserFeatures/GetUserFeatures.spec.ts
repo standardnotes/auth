@@ -46,7 +46,7 @@ describe('GetUserFeatures', () => {
   })
 
   it('should return offline user features', async () => {
-    expect(await createUseCase().execute({ email: 'test@test.com', offline: true, offlineFeaturesToken: 'features-token' })).toEqual({
+    expect(await createUseCase().execute({ email: 'test@test.com', offline: true })).toEqual({
       success: true,
       features: [{
         name: 'foobar',

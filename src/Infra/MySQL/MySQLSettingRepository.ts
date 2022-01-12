@@ -9,6 +9,18 @@ import { DeleteSettingDto } from '../../Domain/UseCase/DeleteSetting/DeleteSetti
 @injectable()
 @EntityRepository(Setting)
 export class MySQLSettingRepository extends Repository<Setting> implements SettingRepositoryInterface {
+  async findOneByUuidAndNames(uuid: string, names: SettingName[]): Promise<Setting | undefined> {
+    return this.createQueryBuilder('setting')
+      .where(
+        'setting.uuid = :uuid AND setting.name IN (:...names)',
+        {
+          names,
+          uuid,
+        }
+      )
+      .getOne()
+  }
+
   async streamAllByNameAndValue(name: SettingName, value: string): Promise<ReadStream> {
     return this.createQueryBuilder('setting')
       .where(

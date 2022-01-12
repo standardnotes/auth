@@ -92,11 +92,13 @@ implements DomainEventHandlerInterface
 
     await this.roleService.addUserRole(user, event.payload.subscriptionName)
 
+    await this.settingService.applyDefaultSettingsForSubscription(user, event.payload.subscriptionName)
+
     await this.settingService.createOrReplace({
       user,
       props: {
         name: SettingName.ExtensionKey,
-        value: event.payload.extensionKey,
+        unencryptedValue: event.payload.extensionKey,
         serverEncryptionVersion: EncryptionVersion.Default,
         sensitive: true,
       },

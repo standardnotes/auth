@@ -5,10 +5,12 @@ export type SettingProps = Omit<Setting,
   'user' |
   'createdAt' |
   'updatedAt' |
-  'serverEncryptionVersion'
+  'serverEncryptionVersion' |
+  'value'
 > & {
   uuid?: string,
   createdAt?: number,
   updatedAt?: number,
+  unencryptedValue: string | null,
   serverEncryptionVersion?: number
 }

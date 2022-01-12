@@ -6,15 +6,18 @@ import { InternalController } from './InternalController'
 import { results } from 'inversify-express-utils'
 import { User } from '../Domain/User/User'
 import { GetUserFeatures } from '../Domain/UseCase/GetUserFeatures/GetUserFeatures'
+import { GetSetting } from '../Domain/UseCase/GetSetting/GetSetting'
 
 describe('InternalController', () => {
   let getUserFeatures: GetUserFeatures
+  let getSetting: GetSetting
 
   let request: express.Request
   let user: User
 
   const createController = () => new InternalController(
     getUserFeatures,
+    getSetting,
   )
 
   beforeEach(() => {
@@ -23,6 +26,9 @@ describe('InternalController', () => {
 
     getUserFeatures = {} as jest.Mocked<GetUserFeatures>
     getUserFeatures.execute = jest.fn()
+
+    getSetting = {} as jest.Mocked<GetSetting>
+    getSetting.execute = jest.fn()
 
     request = {
       headers: {},
@@ -58,6 +64,41 @@ describe('InternalController', () => {
     expect(getUserFeatures.execute).toHaveBeenCalledWith({ userUuid: '1-2-3', offline: false })
 
     expect(result.statusCode).toEqual(400)
+  })
 
+  it('should get user setting', async () => {
+    request.params.userUuid = '1-2-3'
+    request.params.settingName = 'foobar'
+
+    getSetting.execute = jest.fn().mockReturnValue({ success: true })
+
+    const httpResponse = <results.JsonResult> await createController().getSetting(request)
+    const result = await httpResponse.executeAsync()
+
+    expect(getSetting.execute).toHaveBeenCalledWith({
+      userUuid: '1-2-3',
+      settingName: 'foobar',
+      allowSensitiveRetrieval: true,
+    })
+
+    expect(result.statusCode).toEqual(200)
+  })
+
+  it('should not get user setting if the use case fails', async () => {
+    request.params.userUuid = '1-2-3'
+    request.params.settingName = 'foobar'
+
+    getSetting.execute = jest.fn().mockReturnValue({ success: false })
+
+    const httpResponse = <results.JsonResult> await createController().getSetting(request)
+    const result = await httpResponse.executeAsync()
+
+    expect(getSetting.execute).toHaveBeenCalledWith({
+      userUuid: '1-2-3',
+      settingName: 'foobar',
+      allowSensitiveRetrieval: true,
+    })
+
+    expect(result.statusCode).toEqual(400)
   })
 })

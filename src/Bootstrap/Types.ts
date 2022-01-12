@@ -60,7 +60,6 @@ const TYPES = {
   SYNCING_SERVER_URL: Symbol.for('SYNCING_SERVER_URL'),
   WEBSOCKETS_API_URL: Symbol.for('WEBSOCKETS_API_URL'),
   VERSION: Symbol.for('VERSION'),
-  EXTENSION_SERVER_URL: Symbol.for('EXTENSION_SERVER_URL'),
   PAYMENTS_SERVER_URL: Symbol.for('PAYMENTS_SERVER_URL'),
   // use cases
   AuthenticateUser: Symbol.for('AuthenticateUser'),
@@ -92,6 +91,7 @@ const TYPES = {
   AuthenticateSubscriptionToken: Symbol.for('AuthenticateSubscriptionToken'),
   CreateOfflineSubscriptionToken: Symbol.for('CreateOfflineSubscriptionToken'),
   AuthenticateOfflineSubscriptionToken: Symbol.for('AuthenticateOfflineSubscriptionToken'),
+  MuteFailedBackupsEmails: Symbol.for('MuteFailedBackupsEmails'),
   // Handlers
   UserRegisteredEventHandler: Symbol.for('UserRegisteredEventHandler'),
   AccountDeletionRequestedEventHandler: Symbol.for('AccountDeletionRequestedEventHandler'),
@@ -128,8 +128,8 @@ const TYPES = {
   WebSocketsClientService: Symbol.for('WebSocketClientService'),
   RoleService: Symbol.for('RoleService'),
   RoleToSubscriptionMap: Symbol.for('RoleToSubscriptionMap'),
+  SettingToSubscriptionMap: Symbol.for('SettingToSubscriptionMap'),
   FeatureService: Symbol.for('FeatureService'),
-  PaymentsHttpService: Symbol.for('PaymentsHttpService'),
 }
 
 export default TYPES

@@ -14,6 +14,7 @@ import { SubscriptionPurchasedEventHandler } from './SubscriptionPurchasedEventH
 import { UserSubscription } from '../Subscription/UserSubscription'
 import { OfflineUserSubscriptionRepositoryInterface } from '../Subscription/OfflineUserSubscriptionRepositoryInterface'
 import { OfflineUserSubscription } from '../Subscription/OfflineUserSubscription'
+import { SettingServiceInterface } from '../Setting/SettingServiceInterface'
 
 describe('SubscriptionPurchasedEventHandler', () => {
   let userRepository: UserRepositoryInterface
@@ -26,6 +27,7 @@ describe('SubscriptionPurchasedEventHandler', () => {
   let subscription: UserSubscription
   let event: SubscriptionPurchasedEvent
   let subscriptionExpiresAt: number
+  let settingService: SettingServiceInterface
   let timestamp: number
 
   const createHandler = () => new SubscriptionPurchasedEventHandler(
@@ -33,6 +35,7 @@ describe('SubscriptionPurchasedEventHandler', () => {
     userSubscriptionRepository,
     offlineUserSubscriptionRepository,
     roleService,
+    settingService,
     logger
   )
 
@@ -76,6 +79,9 @@ describe('SubscriptionPurchasedEventHandler', () => {
       offline: false,
     }
 
+    settingService = {} as jest.Mocked<SettingServiceInterface>
+    settingService.applyDefaultSettingsForSubscription = jest.fn()
+
     logger = {} as jest.Mocked<Logger>
     logger.info = jest.fn()
     logger.warn = jest.fn()
@@ -86,6 +92,12 @@ describe('SubscriptionPurchasedEventHandler', () => {
 
     expect(userRepository.findOneByEmail).toHaveBeenCalledWith('test@test.com')
     expect(roleService.addUserRole).toHaveBeenCalledWith(user, SubscriptionName.ProPlan)
+  })
+
+  it('should update user default settings', async () => {
+    await createHandler().handle(event)
+
+    expect(settingService.applyDefaultSettingsForSubscription).toHaveBeenCalledWith(user, SubscriptionName.ProPlan)
   })
 
   it('should update the offline user role', async () => {

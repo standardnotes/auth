@@ -1,4 +1,5 @@
 import { SubscriptionName } from '@standardnotes/auth'
+import { PermissionName } from '@standardnotes/features'
 import { inject, injectable } from 'inversify'
 import { Logger } from 'winston'
 
@@ -23,6 +24,27 @@ export class RoleService implements RoleServiceInterface {
     @inject(TYPES.RoleToSubscriptionMap) private roleToSubscriptionMap: RoleToSubscriptionMapInterface,
     @inject(TYPES.Logger) private logger: Logger,
   ) {
+  }
+
+  async userHasPermission(userUuid: string, permissionName: PermissionName): Promise<boolean> {
+    const user = await this.userRepository.findOneByUuid(userUuid)
+    if (user === undefined) {
+      this.logger.warn(`Could not find user with uuid ${userUuid} for permissions check`)
+
+      return false
+    }
+
+    const roles = await user.roles
+    for (const role of roles) {
+      const permissions = await role.permissions
+      for (const permission of permissions) {
+        if (permission.name === permissionName) {
+          return true
+        }
+      }
+    }
+
+    return false
   }
 
   async addUserRole(

@@ -70,10 +70,17 @@ describe('SubscriptionReassignedEventHandler', () => {
 
     settingService = {} as jest.Mocked<SettingServiceInterface>
     settingService.createOrReplace = jest.fn()
+    settingService.applyDefaultSettingsForSubscription = jest.fn()
 
     logger = {} as jest.Mocked<Logger>
     logger.info = jest.fn()
     logger.warn = jest.fn()
+  })
+
+  it('should update user default settings', async () => {
+    await createHandler().handle(event)
+
+    expect(settingService.applyDefaultSettingsForSubscription).toHaveBeenCalledWith(user, SubscriptionName.ProPlan)
   })
 
   it('should update the user role', async () => {
@@ -109,7 +116,7 @@ describe('SubscriptionReassignedEventHandler', () => {
       props: {
         name: 'EXTENSION_KEY',
         serverEncryptionVersion: 1,
-        value: 'abc123',
+        unencryptedValue: 'abc123',
         sensitive: true,
       },
       user: {

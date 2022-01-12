@@ -23,7 +23,7 @@ export class SettingFactory {
 
     const {
       name,
-      value,
+      unencryptedValue,
       serverEncryptionVersion = EncryptionVersion.Default,
       sensitive,
     } = props
@@ -33,7 +33,7 @@ export class SettingFactory {
       user: (async () => user)(),
       name,
       value: await this.createValue({
-        value,
+        unencryptedValue,
         serverEncryptionVersion,
         user,
       }),
@@ -58,19 +58,19 @@ export class SettingFactory {
   }
 
   async createValue({
-    value,
+    unencryptedValue,
     serverEncryptionVersion,
     user,
   }: {
-    value: string | null,
+    unencryptedValue: string | null,
     serverEncryptionVersion: number,
     user: User
   }): Promise<string | null> {
     switch(serverEncryptionVersion) {
     case EncryptionVersion.Unencrypted:
-      return value
+      return unencryptedValue
     case EncryptionVersion.Default:
-      return this.crypter.encryptForUser(value as string, user)
+      return this.crypter.encryptForUser(unencryptedValue as string, user)
     default:
       throw Error(`Unrecognized encryption version: ${serverEncryptionVersion}!`)
     }

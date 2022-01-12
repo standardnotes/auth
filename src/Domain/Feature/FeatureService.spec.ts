@@ -8,8 +8,6 @@ import { UserSubscription } from '../Subscription/UserSubscription'
 
 import { FeatureService } from './FeatureService'
 import { Permission, PermissionName } from '@standardnotes/features'
-import { Setting } from '../Setting/Setting'
-import { SettingServiceInterface } from '../Setting/SettingServiceInterface'
 import { OfflineUserSubscriptionRepositoryInterface } from '../Subscription/OfflineUserSubscriptionRepositoryInterface'
 import { TimerInterface } from '@standardnotes/time'
 import { OfflineUserSubscription } from '../Subscription/OfflineUserSubscription'
@@ -27,24 +25,17 @@ describe('FeatureService', () => {
   let permission2: Permission
   let permission3: Permission
   let permission4: Permission
-  let extensionKeySetting: Setting
-  let settingService: SettingServiceInterface
-  let extensionServerUrl: string
   let offlineUserSubscriptionRepository: OfflineUserSubscriptionRepositoryInterface
   let timer: TimerInterface
   let offlineUserSubscription: OfflineUserSubscription
 
   const createService = () => new FeatureService(
     roleToSubscriptionMap,
-    settingService,
     offlineUserSubscriptionRepository,
-    timer,
-    extensionServerUrl
+    timer
   )
 
   beforeEach(() => {
-    extensionServerUrl = 'https://extension-server'
-
     roleToSubscriptionMap = {} as jest.Mocked<RoleToSubscriptionMapInterface>
     roleToSubscriptionMap.getRoleNameForSubscriptionName = jest.fn().mockImplementation((subscriptionName: SubscriptionName) => {
       if (subscriptionName === SubscriptionName.CorePlan) {
@@ -138,14 +129,6 @@ describe('FeatureService', () => {
       subscriptions: Promise.resolve([subscription1]),
     } as jest.Mocked<User>
 
-    extensionKeySetting = {
-      name: 'EXTENSION_KEY',
-      value: 'abc123',
-    } as jest.Mocked<Setting>
-
-    settingService = {} as jest.Mocked<SettingServiceInterface>
-    settingService.findSetting = jest.fn().mockReturnValue(extensionKeySetting)
-
     offlineUserSubscription = {
       roles: Promise.resolve([role1]),
       uuid: 'subscription-1-1-1',
@@ -166,7 +149,7 @@ describe('FeatureService', () => {
   describe('offline subscribers', () => {
     it('should return user features with `expires_at` field', async () => {
       const features = await createService()
-        .getFeaturesForOfflineUser('test@test.com', 'features-token')
+        .getFeaturesForOfflineUser('test@test.com')
 
       expect(features).toEqual(
         expect.arrayContaining([
@@ -181,7 +164,7 @@ describe('FeatureService', () => {
     it('should not return user features if a subscription could not be found', async () => {
       offlineUserSubscriptionRepository.findByEmail = jest.fn().mockReturnValue([])
 
-      expect(await createService().getFeaturesForOfflineUser('test@test.com', 'features-token')).toEqual([])
+      expect(await createService().getFeaturesForOfflineUser('test@test.com')).toEqual([])
     })
   })
 
@@ -269,35 +252,6 @@ describe('FeatureService', () => {
       user.roles = Promise.resolve([])
 
       expect(await createService().getFeaturesForUser(user)).toEqual([])
-    })
-
-    it('should return user features without dedicated urls if extension key is missing', async () => {
-      settingService.findSetting = jest.fn().mockReturnValue(undefined)
-
-      const features = await createService().getFeaturesForUser(user)
-      expect(features).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            identifier: 'org.standardnotes.two-factor-auth',
-            expires_at: 555,
-          }),
-        ])
-      )
-    })
-
-    it('should skip features with dedicated url if the extension server url is missing', async () => {
-      extensionServerUrl = ''
-
-      const features = await createService().getFeaturesForUser(user)
-
-      expect(features.find((f) => f.identifier === 'org.standardnotes.theme-autobiography')).toBeUndefined
-    })
-
-    it('should skip features with dedicated url if the extension key setting is missing', async () => {
-      settingService.findSetting = jest.fn().mockReturnValue(undefined)
-
-      const features = await createService().getFeaturesForUser(user)
-      expect(features.find((f) => f.identifier === 'org.standardnotes.theme-autobiography')).toBeUndefined
     })
 
     it('should return user features with `expires_at` field when user has more than 1 role & subscription', async () => {

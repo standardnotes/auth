@@ -1,10 +1,8 @@
 import { SubscriptionName } from '@standardnotes/auth'
 import { FeatureDescription, Features } from '@standardnotes/features'
-import { SettingName } from '@standardnotes/settings'
 import { inject, injectable } from 'inversify'
 import TYPES from '../../Bootstrap/Types'
 import { RoleToSubscriptionMapInterface } from '../Role/RoleToSubscriptionMapInterface'
-import { SettingServiceInterface } from '../Setting/SettingServiceInterface'
 
 import { User } from '../User/User'
 import { UserSubscription } from '../Subscription/UserSubscription'
@@ -18,14 +16,12 @@ import { TimerInterface } from '@standardnotes/time'
 export class FeatureService implements FeatureServiceInterface {
   constructor(
     @inject(TYPES.RoleToSubscriptionMap) private roleToSubscriptionMap: RoleToSubscriptionMapInterface,
-    @inject(TYPES.SettingService) private settingService: SettingServiceInterface,
     @inject(TYPES.OfflineUserSubscriptionRepository) private offlineUserSubscriptionRepository: OfflineUserSubscriptionRepositoryInterface,
     @inject(TYPES.Timer) private timer: TimerInterface,
-    @inject(TYPES.EXTENSION_SERVER_URL) private extensionServerUrl: string,
   ) {
   }
 
-  async getFeaturesForOfflineUser(email: string, offlineFeaturesToken: string): Promise<FeatureDescription[]> {
+  async getFeaturesForOfflineUser(email: string): Promise<FeatureDescription[]> {
     const userSubscriptions = await this.offlineUserSubscriptionRepository.findByEmail(email, this.timer.getTimestampInMicroseconds())
     const userRolesMap: Map<string, Role> = new Map()
     for (const userSubscription of userSubscriptions) {
@@ -35,32 +31,18 @@ export class FeatureService implements FeatureServiceInterface {
       }
     }
 
-    return this.getFeaturesForSubscriptions(userSubscriptions, [...userRolesMap.values()], offlineFeaturesToken)
+    return this.getFeaturesForSubscriptions(userSubscriptions, [...userRolesMap.values()])
   }
 
   async getFeaturesForUser(user: User): Promise<Array<FeatureDescription>> {
     const userSubscriptions = await user.subscriptions
 
-    let extensionKey = undefined
-    const extensionKeySetting = await this.settingService.findSetting({
-      settingName: SettingName.ExtensionKey,
-      userUuid: user.uuid,
-    })
-    if (extensionKeySetting !== undefined) {
-      extensionKey = extensionKeySetting.value as string
-    }
-
-    return this.getFeaturesForSubscriptions(userSubscriptions, await user.roles, extensionKey)
-  }
-
-  private injectExtensionKeyIntoUrl(url: string, extensionKey: string): string {
-    return url.replace('#{url_prefix}', `${this.extensionServerUrl}/${extensionKey}`)
+    return this.getFeaturesForSubscriptions(userSubscriptions, await user.roles)
   }
 
   private async getFeaturesForSubscriptions(
     userSubscriptions: Array<UserSubscription | OfflineUserSubscription>,
     userRoles: Array<Role>,
-    extensionKey?: string
   ): Promise<Array<FeatureDescription>> {
     const userFeatures: Map<string, FeatureDescription> = new Map()
     const userSubscriptionNames: Array<SubscriptionName> = []
@@ -87,20 +69,9 @@ export class FeatureService implements FeatureServiceInterface {
       const rolePermissions = await role.permissions
 
       for (const rolePermission of rolePermissions) {
-        let featureForPermission = Features.find(feature => feature.permission_name === rolePermission.name) as FeatureDescription
+        const featureForPermission = Features.find(feature => feature.permission_name === rolePermission.name) as FeatureDescription
         if (featureForPermission === undefined) {
           continue
-        }
-        const needsUrlReplace = featureForPermission.url && featureForPermission.url.includes('#{url_prefix}')
-        if (needsUrlReplace && (!this.extensionServerUrl || !extensionKey)) {
-          continue
-        }
-
-        if (extensionKey !== undefined && featureForPermission.url !== undefined) {
-          featureForPermission = {
-            ...featureForPermission,
-            url: this.injectExtensionKeyIntoUrl(featureForPermission.url, extensionKey),
-          }
         }
 
         const alreadyAddedFeature = userFeatures.get(rolePermission.name)

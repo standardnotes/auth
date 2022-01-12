@@ -6,6 +6,7 @@ import { Setting } from './Setting'
 
 export interface SettingRepositoryInterface {
   findOneByUuid(uuid: string): Promise<Setting | undefined>
+  findOneByUuidAndNames(uuid: string, names: SettingName[]): Promise<Setting | undefined>
   findOneByNameAndUserUuid(name: string, userUuid: string): Promise<Setting | undefined>
   findLastByNameAndUserUuid(name: string, userUuid: string): Promise<Setting | undefined>
   findAllByUserUuid(userUuid: string): Promise<Setting[]>

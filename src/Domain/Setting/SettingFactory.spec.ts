@@ -1,5 +1,6 @@
-import { TimerInterface } from '@standardnotes/time'
 import 'reflect-metadata'
+
+import { TimerInterface } from '@standardnotes/time'
 import { CrypterInterface } from '../Encryption/CrypterInterface'
 import { EncryptionVersion } from '../Encryption/EncryptionVersion'
 import { User } from '../User/User'
@@ -27,7 +28,7 @@ describe('SettingFactory', () => {
   it('should create a Setting', async () => {
     const props: SettingProps = {
       name: 'name',
-      value: 'value',
+      unencryptedValue: 'value',
       serverEncryptionVersion: EncryptionVersion.Unencrypted,
       sensitive: false,
     }
@@ -51,7 +52,7 @@ describe('SettingFactory', () => {
 
     const props: SettingProps = {
       name: 'name',
-      value: 'value2',
+      unencryptedValue: 'value2',
       serverEncryptionVersion: EncryptionVersion.Unencrypted,
       sensitive: true,
     }
@@ -74,7 +75,7 @@ describe('SettingFactory', () => {
     const value = 'value'
     const props: SettingProps = {
       name: 'name',
-      value,
+      unencryptedValue: value,
       sensitive: false,
     }
 
@@ -97,7 +98,7 @@ describe('SettingFactory', () => {
     const value = 'value'
     const props: SettingProps = {
       name: 'name',
-      value,
+      unencryptedValue: value,
       serverEncryptionVersion: 99999999999,
       sensitive: false,
     }
