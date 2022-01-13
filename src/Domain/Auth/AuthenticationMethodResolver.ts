@@ -1,10 +1,10 @@
+import { TokenDecoderInterface } from '@standardnotes/auth'
 import { inject, injectable } from 'inversify'
 import TYPES from '../../Bootstrap/Types'
 import { SessionServiceInterace } from '../Session/SessionServiceInterface'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { AuthenticationMethod } from './AuthenticationMethod'
 import { AuthenticationMethodResolverInterface } from './AuthenticationMethodResolverInterface'
-import { TokenDecoderInterface } from './TokenDecoderInterface'
 
 @injectable()
 export class AuthenticationMethodResolver implements AuthenticationMethodResolverInterface {

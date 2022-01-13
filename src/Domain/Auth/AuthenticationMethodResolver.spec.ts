@@ -1,3 +1,4 @@
+import { TokenDecoderInterface } from '@standardnotes/auth'
 import 'reflect-metadata'
 
 import { RevokedSession } from '../Session/RevokedSession'
@@ -7,7 +8,6 @@ import { User } from '../User/User'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 
 import { AuthenticationMethodResolver } from './AuthenticationMethodResolver'
-import { TokenDecoderInterface } from './TokenDecoderInterface'
 
 describe('AuthenticationMethodResolver', () => {
   let userRepository: UserRepositoryInterface

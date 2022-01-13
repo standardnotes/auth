@@ -1,9 +1,9 @@
+import { TokenDecoderInterface } from '@standardnotes/auth'
 import { NextFunction, Request, Response } from 'express'
 import { inject, injectable } from 'inversify'
 import { BaseMiddleware } from 'inversify-express-utils'
 import { Logger } from 'winston'
 import TYPES from '../Bootstrap/Types'
-import { TokenDecoderInterface } from '../Domain/Auth/TokenDecoderInterface'
 
 @injectable()
 export class ApiGatewayOfflineAuthMiddleware extends BaseMiddleware {

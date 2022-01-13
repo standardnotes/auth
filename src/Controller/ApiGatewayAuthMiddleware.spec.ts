@@ -3,8 +3,7 @@ import 'reflect-metadata'
 import { ApiGatewayAuthMiddleware } from './ApiGatewayAuthMiddleware'
 import { NextFunction, Request, Response } from 'express'
 import { Logger } from 'winston'
-import { TokenDecoderInterface } from '../Domain/Auth/TokenDecoderInterface'
-import { RoleName } from '@standardnotes/auth'
+import { RoleName, TokenDecoderInterface } from '@standardnotes/auth'
 
 describe('ApiGatewayAuthMiddleware', () => {
   let tokenDecoder: TokenDecoderInterface

@@ -19,7 +19,6 @@ import { IncreaseLoginAttempts } from '../Domain/UseCase/IncreaseLoginAttempts'
 import { Logger } from 'winston'
 import { GetUserKeyParams } from '../Domain/UseCase/GetUserKeyParams/GetUserKeyParams'
 import { Register } from '../Domain/UseCase/Register'
-import { GetAuthMethods } from '../Domain/UseCase/GetAuthMethods/GetAuthMethods'
 import { DomainEventFactoryInterface } from '../Domain/Event/DomainEventFactoryInterface'
 
 @controller('/auth')
@@ -35,7 +34,6 @@ export class AuthController extends BaseHttpController {
     @inject(TYPES.DomainEventPublisher) private domainEventPublisher: DomainEventPublisherInterface,
     @inject(TYPES.DomainEventFactory) private domainEventFactory: DomainEventFactoryInterface,
     @inject(TYPES.Logger) private logger: Logger,
-    @inject(TYPES.GetAuthMethods) private getAuthMethods: GetAuthMethods,
   ) {
     super()
   }
@@ -198,28 +196,5 @@ export class AuthController extends BaseHttpController {
     )
 
     return this.json(registerResult.authResponse)
-  }
-
-  @httpGet('/methods')
-  async methods(request: Request): Promise<results.JsonResult> {
-    const email = request.query.email
-
-    if (typeof email !== 'string') {
-      return this.json({
-        error: {
-          message: 'Please provide an email address.',
-        },
-      }, 400)
-    }
-
-    const result = await this.getAuthMethods.execute({
-      email,
-    })
-
-    if (result.success) {
-      return this.json(result)
-    }
-
-    return this.json(result, 400)
   }
 }

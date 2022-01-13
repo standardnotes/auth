@@ -3,7 +3,7 @@ import 'reflect-metadata'
 import { ApiGatewayOfflineAuthMiddleware } from './ApiGatewayOfflineAuthMiddleware'
 import { NextFunction, Request, Response } from 'express'
 import { Logger } from 'winston'
-import { TokenDecoderInterface } from '../Domain/Auth/TokenDecoderInterface'
+import { TokenDecoderInterface } from '@standardnotes/auth'
 
 describe('ApiGatewayOfflineAuthMiddleware', () => {
   let tokenDecoder: TokenDecoderInterface

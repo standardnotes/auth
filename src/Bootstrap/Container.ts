@@ -44,7 +44,6 @@ import { DeleteSessionForUser } from '../Domain/UseCase/DeleteSessionForUser'
 import { Register } from '../Domain/UseCase/Register'
 import { LockRepository } from '../Infra/Redis/LockRepository'
 import { MySQLRevokedSessionRepository } from '../Infra/MySQL/MySQLRevokedSessionRepository'
-import { TokenDecoder } from '../Domain/Auth/TokenDecoder'
 import { AuthenticationMethodResolver } from '../Domain/Auth/AuthenticationMethodResolver'
 import { RevokedSession } from '../Domain/Session/RevokedSession'
 import { UserRegisteredEventHandler } from '../Domain/Handler/UserRegisteredEventHandler'
@@ -64,7 +63,6 @@ import { GetSettings } from '../Domain/UseCase/GetSettings/GetSettings'
 import { SettingProjector } from '../Projection/SettingProjector'
 import { GetSetting } from '../Domain/UseCase/GetSetting/GetSetting'
 import { UpdateSetting } from '../Domain/UseCase/UpdateSetting/UpdateSetting'
-import { GetAuthMethods } from '../Domain/UseCase/GetAuthMethods/GetAuthMethods'
 import { AccountDeletionRequestedEventHandler } from '../Domain/Handler/AccountDeletionRequestedEventHandler'
 import { SubscriptionPurchasedEventHandler } from '../Domain/Handler/SubscriptionPurchasedEventHandler'
 import { SubscriptionRenewedEventHandler } from '../Domain/Handler/SubscriptionRenewedEventHandler'
@@ -125,6 +123,7 @@ import { SettingToSubscriptionMapInterface } from '../Domain/Setting/SettingToSu
 import { SettingToSubscriptionMap } from '../Domain/Setting/SettingToSubscriptionMap'
 import { MuteFailedBackupsEmails } from '../Domain/UseCase/MuteFailedBackupsEmails/MuteFailedBackupsEmails'
 import { SubscriptionSyncRequestedEventHandler } from '../Domain/Handler/SubscriptionSyncRequestedEventHandler'
+import { TokenDecoder, TokenDecoderInterface } from '@standardnotes/auth'
 
 export class ContainerConfigLoader {
   async load(): Promise<Container> {
@@ -297,7 +296,6 @@ export class ContainerConfigLoader {
     container.bind<GetUserFeatures>(TYPES.GetUserFeatures).to(GetUserFeatures)
     container.bind<UpdateSetting>(TYPES.UpdateSetting).to(UpdateSetting)
     container.bind<DeleteSetting>(TYPES.DeleteSetting).to(DeleteSetting)
-    container.bind<GetAuthMethods>(TYPES.GetAuthMethods).to(GetAuthMethods)
     container.bind<DeleteAccount>(TYPES.DeleteAccount).to(DeleteAccount)
     container.bind<AddWebSocketsConnection>(TYPES.AddWebSocketsConnection).to(AddWebSocketsConnection)
     container.bind<RemoveWebSocketsConnection>(TYPES.RemoveWebSocketsConnection).to(RemoveWebSocketsConnection)
@@ -330,7 +328,11 @@ export class ContainerConfigLoader {
     container.bind<AuthResponseFactory20200115>(TYPES.AuthResponseFactory20200115).to(AuthResponseFactory20200115)
     container.bind<AuthResponseFactoryResolver>(TYPES.AuthResponseFactoryResolver).to(AuthResponseFactoryResolver)
     container.bind<KeyParamsFactory>(TYPES.KeyParamsFactory).to(KeyParamsFactory)
-    container.bind<TokenDecoder>(TYPES.TokenDecoder).to(TokenDecoder)
+    container.bind<TokenDecoderInterface>(TYPES.TokenDecoder).toConstantValue(new TokenDecoder(
+      container.get(TYPES.JWT_SECRET),
+      container.get(TYPES.LEGACY_JWT_SECRET),
+      container.get(TYPES.AUTH_JWT_SECRET)
+    ))
     container.bind<AuthenticationMethodResolver>(TYPES.AuthenticationMethodResolver).to(AuthenticationMethodResolver)
     container.bind<DomainEventFactory>(TYPES.DomainEventFactory).to(DomainEventFactory)
     container.bind<AxiosInstance>(TYPES.HTTPClient).toConstantValue(axios.create())

@@ -81,7 +81,6 @@ const TYPES = {
   GetUserFeatures: Symbol.for('GetUserFeatures'),
   UpdateSetting: Symbol.for('UpdateSetting'),
   DeleteSetting: Symbol.for('DeleteSetting'),
-  GetAuthMethods: Symbol.for('GetAuthMethods'),
   DeleteAccount: Symbol.for('DeleteAccount'),
   AddWebSocketsConnection: Symbol.for('AddWebSocketsConnection'),
   RemoveWebSocketsConnection: Symbol.for('RemoveWebSocketsConnection'),
