@@ -1,7 +1,6 @@
 import 'reflect-metadata'
 
 import * as express from 'express'
-import { decode } from 'jsonwebtoken'
 
 import { SessionsController } from './SessionsController'
 import { results } from 'inversify-express-utils'
@@ -11,12 +10,13 @@ import { GetActiveSessionsForUser } from '../Domain/UseCase/GetActiveSessionsFor
 import { AuthenticateRequest } from '../Domain/UseCase/AuthenticateRequest'
 import { User } from '../Domain/User/User'
 import { Role } from '../Domain/Role/Role'
+import { CrossServiceTokenData, TokenEncoderInterface } from '@standardnotes/auth'
 
 describe('SessionsController', () => {
   let getActiveSessionsForUser: GetActiveSessionsForUser
   let authenticateRequest: AuthenticateRequest
   let userProjector: ProjectorInterface<User>
-  const jwtSecret = 'auth_jwt_secret'
+  let tokenEncoder: TokenEncoderInterface<CrossServiceTokenData>
   const jwtTTL = 60
   let sessionProjector: ProjectorInterface<Session>
   let roleProjector: ProjectorInterface<Role>
@@ -32,7 +32,7 @@ describe('SessionsController', () => {
     userProjector,
     sessionProjector,
     roleProjector,
-    jwtSecret,
+    tokenEncoder,
     jwtTTL
   )
 
@@ -57,6 +57,9 @@ describe('SessionsController', () => {
     sessionProjector = {} as jest.Mocked<ProjectorInterface<Session>>
     sessionProjector.projectCustom = jest.fn().mockReturnValue({ foo: 'bar' })
     sessionProjector.projectSimple = jest.fn().mockReturnValue({ test: 'test' })
+
+    tokenEncoder = {} as jest.Mocked<TokenEncoderInterface<CrossServiceTokenData>>
+    tokenEncoder.encodeExpirableToken = jest.fn().mockReturnValue('foobar')
 
     request = {
       params: {},
@@ -103,22 +106,7 @@ describe('SessionsController', () => {
     const httpResponseContent = await result.content.readAsStringAsync()
     const httpResponseJSON = JSON.parse(httpResponseContent)
 
-    expect(decode(httpResponseJSON.authToken)).toEqual({
-      exp: expect.any(Number),
-      iat: expect.any(Number),
-      session: {
-        test: 'test',
-      },
-      user:  {
-        bar: 'baz',
-      },
-      roles: [
-        {
-          uuid: '1-3-4',
-          name: 'role1',
-        },
-      ],
-    })
+    expect(httpResponseJSON.authToken).toEqual('foobar')
   })
 
   it('should validate a user from an incoming request', async () => {
@@ -137,19 +125,7 @@ describe('SessionsController', () => {
     const httpResponseContent = await result.content.readAsStringAsync()
     const httpResponseJSON = JSON.parse(httpResponseContent)
 
-    expect(decode(httpResponseJSON.authToken)).toEqual({
-      exp: expect.any(Number),
-      iat: expect.any(Number),
-      user:  {
-        bar: 'baz',
-      },
-      roles: [
-        {
-          uuid: '1-3-4',
-          name: 'role1',
-        },
-      ],
-    })
+    expect(httpResponseJSON.authToken).toEqual('foobar')
   })
 
   it('should not validate a session from an incoming request', async () => {

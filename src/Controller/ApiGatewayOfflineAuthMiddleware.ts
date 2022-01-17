@@ -1,14 +1,14 @@
+import { OfflineUserTokenData, TokenDecoderInterface } from '@standardnotes/auth'
 import { NextFunction, Request, Response } from 'express'
 import { inject, injectable } from 'inversify'
 import { BaseMiddleware } from 'inversify-express-utils'
 import { Logger } from 'winston'
 import TYPES from '../Bootstrap/Types'
-import { TokenDecoderInterface } from '../Domain/Auth/TokenDecoderInterface'
 
 @injectable()
 export class ApiGatewayOfflineAuthMiddleware extends BaseMiddleware {
   constructor (
-    @inject(TYPES.TokenDecoder) private tokenDecoder: TokenDecoderInterface,
+    @inject(TYPES.OfflineUserTokenDecoder) private tokenDecoder: TokenDecoderInterface<OfflineUserTokenData>,
     @inject(TYPES.Logger) private logger: Logger,
   ) {
     super()
@@ -29,7 +29,8 @@ export class ApiGatewayOfflineAuthMiddleware extends BaseMiddleware {
         return
       }
 
-      const token = this.tokenDecoder.decodeCrossServiceCommunicationOfflineToken(request.headers['x-auth-offline-token'] as string)
+      const token: OfflineUserTokenData | undefined = this.tokenDecoder.decodeToken(request.headers['x-auth-offline-token'] as string)
+
       this.logger.debug('ApiGatewayOfflineAuthMiddleware decoded token %O', token)
 
       if (token === undefined) {

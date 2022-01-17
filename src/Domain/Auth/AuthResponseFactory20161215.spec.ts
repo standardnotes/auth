@@ -1,4 +1,6 @@
 import 'reflect-metadata'
+
+import { SessionTokenData, TokenEncoderInterface } from '@standardnotes/auth'
 import { Logger } from 'winston'
 
 import { ProjectorInterface } from '../../Projection/ProjectorInterface'
@@ -7,12 +9,13 @@ import { AuthResponseFactory20161215 } from './AuthResponseFactory20161215'
 
 describe('AuthResponseFactory20161215', () => {
   let userProjector: ProjectorInterface<User>
+  let tokenEncoder: TokenEncoderInterface<SessionTokenData>
   let user: User
   let logger: Logger
 
   const createFactory = () => new AuthResponseFactory20161215(
     userProjector,
-    'secret',
+    tokenEncoder,
     logger
   )
 
@@ -25,6 +28,9 @@ describe('AuthResponseFactory20161215', () => {
 
     user = {} as jest.Mocked<User>
     user.encryptedPassword = 'test123'
+
+    tokenEncoder = {} as jest.Mocked<TokenEncoderInterface<SessionTokenData>>
+    tokenEncoder.encodeToken = jest.fn().mockReturnValue('foobar')
   })
 
   it('should create a 20161215 auth response', async () => {
@@ -32,7 +38,7 @@ describe('AuthResponseFactory20161215', () => {
 
     expect(response).toEqual({
       user: { foo: 'bar' },
-      token: expect.any(String),
+      token: 'foobar',
     })
   })
 })

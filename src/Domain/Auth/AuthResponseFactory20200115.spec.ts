@@ -1,3 +1,4 @@
+import { SessionTokenData, TokenEncoderInterface } from '@standardnotes/auth'
 import 'reflect-metadata'
 import { Logger } from 'winston'
 
@@ -15,12 +16,13 @@ describe('AuthResponseFactory20200115', () => {
   let user: User
   let sessionPayload: SessionPayload
   let logger: Logger
+  let tokenEncoder: TokenEncoderInterface<SessionTokenData>
 
   const createFactory = () => new AuthResponseFactory20200115(
     sessionService,
     keyParamsFactory,
     userProjector,
-    'secret',
+    tokenEncoder,
     logger
   )
 
@@ -50,6 +52,9 @@ describe('AuthResponseFactory20200115', () => {
 
     user = {} as jest.Mocked<User>
     user.encryptedPassword = 'test123'
+
+    tokenEncoder = {} as jest.Mocked<TokenEncoderInterface<SessionTokenData>>
+    tokenEncoder.encodeToken = jest.fn().mockReturnValue('foobar')
   })
 
   it('should create a 20161215 auth response if user does not support sessions', async () => {
