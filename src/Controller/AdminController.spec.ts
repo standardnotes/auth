@@ -118,4 +118,33 @@ describe('AdminController', () => {
     expect(result.statusCode).toBe(200)
     expect(await result.content.readAsStringAsync()).toEqual('{"token":"123-sub-token"}')
   })
+
+  it('should not delete email backup setting if value is null', async () => {
+    request.body = {}
+    request.params = {
+      userUuid: '1-2-3',
+    }
+
+    deleteSetting.execute = jest.fn().mockReturnValue({ success: false })
+
+    const httpResponse = <results.OkResult> await createController().disableEmailBackups(request)
+    const result = await httpResponse.executeAsync()
+
+    expect(result.statusCode).toEqual(400)
+    expect(await result.content.readAsStringAsync()).toEqual('No email backups found')
+  })
+
+  it('should disable email backups by deleting the setting', async () => {
+    request.body = {}
+    request.params = {
+      userUuid: '1-2-3',
+    }
+
+    deleteSetting.execute = jest.fn().mockReturnValue({ success: true })
+
+    const httpResponse = <results.OkResult> await createController().disableEmailBackups(request)
+    const result = await httpResponse.executeAsync()
+
+    expect(result.statusCode).toEqual(200)
+  })
 })
