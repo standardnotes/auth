@@ -1,5 +1,6 @@
-import { TokenDecoderInterface } from '@standardnotes/auth'
 import 'reflect-metadata'
+
+import { SessionTokenData, TokenDecoderInterface } from '@standardnotes/auth'
 
 import { RevokedSession } from '../Session/RevokedSession'
 import { Session } from '../Session/Session'
@@ -12,12 +13,13 @@ import { AuthenticationMethodResolver } from './AuthenticationMethodResolver'
 describe('AuthenticationMethodResolver', () => {
   let userRepository: UserRepositoryInterface
   let sessionService: SessionServiceInterace
-  let tokenDecoder: TokenDecoderInterface
+  let sessionTokenDecoder: TokenDecoderInterface<SessionTokenData>
+  let fallbackTokenDecoder: TokenDecoderInterface<SessionTokenData>
   let user: User
   let session: Session
   let revokedSession: RevokedSession
 
-  const createResolver = () => new AuthenticationMethodResolver(userRepository, sessionService, tokenDecoder)
+  const createResolver = () => new AuthenticationMethodResolver(userRepository, sessionService, sessionTokenDecoder, fallbackTokenDecoder)
 
   beforeEach(() => {
     user = {} as jest.Mocked<User>
@@ -34,12 +36,15 @@ describe('AuthenticationMethodResolver', () => {
     sessionService.getRevokedSessionFromToken = jest.fn()
     sessionService.markRevokedSessionAsReceived = jest.fn().mockReturnValue(revokedSession)
 
-    tokenDecoder = {} as jest.Mocked<TokenDecoderInterface>
-    tokenDecoder.decodeSessionToken = jest.fn()
+    sessionTokenDecoder = {} as jest.Mocked<TokenDecoderInterface<SessionTokenData>>
+    sessionTokenDecoder.decodeToken = jest.fn()
+
+    fallbackTokenDecoder = {} as jest.Mocked<TokenDecoderInterface<SessionTokenData>>
+    fallbackTokenDecoder.decodeToken = jest.fn()
   })
 
   it('should resolve jwt authentication method', async () => {
-    tokenDecoder.decodeSessionToken = jest.fn().mockReturnValue({ user_uuid: '123' })
+    sessionTokenDecoder.decodeToken = jest.fn().mockReturnValue({ user_uuid: '123' })
 
     expect(await createResolver().resolve('test')).toEqual({
       claims: {

@@ -3,10 +3,10 @@ import 'reflect-metadata'
 import { ApiGatewayOfflineAuthMiddleware } from './ApiGatewayOfflineAuthMiddleware'
 import { NextFunction, Request, Response } from 'express'
 import { Logger } from 'winston'
-import { TokenDecoderInterface } from '@standardnotes/auth'
+import { OfflineUserTokenData, TokenDecoderInterface } from '@standardnotes/auth'
 
 describe('ApiGatewayOfflineAuthMiddleware', () => {
-  let tokenDecoder: TokenDecoderInterface
+  let tokenDecoder: TokenDecoderInterface<OfflineUserTokenData>
   let request: Request
   let response: Response
   let next: NextFunction
@@ -21,8 +21,8 @@ describe('ApiGatewayOfflineAuthMiddleware', () => {
   )
 
   beforeEach(() => {
-    tokenDecoder = {} as jest.Mocked<TokenDecoderInterface>
-    tokenDecoder.decodeCrossServiceCommunicationOfflineToken = jest.fn().mockReturnValue({
+    tokenDecoder = {} as jest.Mocked<TokenDecoderInterface<OfflineUserTokenData>>
+    tokenDecoder.decodeToken = jest.fn().mockReturnValue({
       userEmail: 'test@test.te',
       featuresToken: 'abc',
     })
@@ -59,7 +59,7 @@ describe('ApiGatewayOfflineAuthMiddleware', () => {
   it('should not authorize if auth jwt token is malformed', async () => {
     request.headers['x-auth-offline-token'] = 'auth-jwt-token'
 
-    tokenDecoder.decodeCrossServiceCommunicationOfflineToken = jest.fn().mockReturnValue(undefined)
+    tokenDecoder.decodeToken = jest.fn().mockReturnValue(undefined)
 
     await createMiddleware().handler(request, response, next)
 
@@ -72,7 +72,7 @@ describe('ApiGatewayOfflineAuthMiddleware', () => {
 
     const error = new Error('Ooops')
 
-    tokenDecoder.decodeCrossServiceCommunicationOfflineToken = jest.fn().mockImplementation(() => {
+    tokenDecoder.decodeToken = jest.fn().mockImplementation(() => {
       throw error
     })
 

@@ -1,7 +1,6 @@
 import 'reflect-metadata'
 
 import * as express from 'express'
-import { decode } from 'jsonwebtoken'
 import { results } from 'inversify-express-utils'
 
 import { SubscriptionTokensController } from './SubscriptionTokensController'
@@ -13,17 +12,17 @@ import { ProjectorInterface } from '../Projection/ProjectorInterface'
 import { Role } from '../Domain/Role/Role'
 import { SettingServiceInterface } from '../Domain/Setting/SettingServiceInterface'
 import { Setting } from '../Domain/Setting/Setting'
-import { Token } from '@standardnotes/auth'
+import { CrossServiceTokenData, TokenEncoderInterface } from '@standardnotes/auth'
 
 describe('SubscriptionTokensController', () => {
   let createSubscriptionToken: CreateSubscriptionToken
   let authenticateToken: AuthenticateSubscriptionToken
-  const jwtSecret = 'auth_jwt_secret'
   const jwtTTL = 60
   let userProjector: ProjectorInterface<User>
   let roleProjector: ProjectorInterface<Role>
   let settingService: SettingServiceInterface
   let extensionKeySetting: Setting
+  let tokenEncoder: TokenEncoderInterface<CrossServiceTokenData>
 
   let request: express.Request
   let response: express.Response
@@ -36,7 +35,7 @@ describe('SubscriptionTokensController', () => {
     settingService,
     userProjector,
     roleProjector,
-    jwtSecret,
+    tokenEncoder,
     jwtTTL
   )
 
@@ -71,6 +70,9 @@ describe('SubscriptionTokensController', () => {
 
     settingService = {} as jest.Mocked<SettingServiceInterface>
     settingService.findSetting = jest.fn().mockReturnValue(extensionKeySetting)
+
+    tokenEncoder = {} as jest.Mocked<TokenEncoderInterface<CrossServiceTokenData>>
+    tokenEncoder.encodeExpirableToken = jest.fn().mockReturnValue('foobar')
 
     request = {
       headers: {},
@@ -109,10 +111,7 @@ describe('SubscriptionTokensController', () => {
     })
 
     const responseBody = JSON.parse(await result.content.readAsStringAsync())
-    const decodedToken = decode(responseBody.authToken as string)
-
-    expect((decodedToken as Token).roles).toHaveLength(1)
-    expect((decodedToken as Token).extensionKey).toEqual('abc123')
+    expect(responseBody.authToken).toEqual('foobar')
     expect(result.statusCode).toEqual(200)
   })
 
@@ -129,10 +128,8 @@ describe('SubscriptionTokensController', () => {
     })
 
     const responseBody = JSON.parse(await result.content.readAsStringAsync())
-    const decodedToken = decode(responseBody.authToken as string)
 
-    expect((decodedToken as Token).roles).toHaveLength(1)
-    expect((decodedToken as Token).extensionKey).toBeUndefined()
+    expect(responseBody.authToken).toEqual('foobar')
     expect(result.statusCode).toEqual(200)
   })
 

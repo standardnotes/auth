@@ -1,4 +1,4 @@
-import { TokenDecoderInterface } from '@standardnotes/auth'
+import { SessionTokenData, TokenDecoderInterface } from '@standardnotes/auth'
 import { inject, injectable } from 'inversify'
 import TYPES from '../../Bootstrap/Types'
 import { SessionServiceInterace } from '../Session/SessionServiceInterface'
@@ -11,12 +11,17 @@ export class AuthenticationMethodResolver implements AuthenticationMethodResolve
   constructor(
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
     @inject(TYPES.SessionService) private sessionService: SessionServiceInterace,
-    @inject(TYPES.TokenDecoder) private tokenDecoder: TokenDecoderInterface
+    @inject(TYPES.SessionTokenDecoder) private sessionTokenDecoder: TokenDecoderInterface<SessionTokenData>,
+    @inject(TYPES.FallbackSessionTokenDecoder) private fallbackSessionTokenDecoder: TokenDecoderInterface<SessionTokenData>
   ) {
   }
 
   async resolve(token: string): Promise<AuthenticationMethod | undefined> {
-    const decodedToken = this.tokenDecoder.decodeSessionToken(token)
+    let decodedToken: SessionTokenData | undefined = this.sessionTokenDecoder.decodeToken(token)
+    if (decodedToken === undefined) {
+      decodedToken = this.fallbackSessionTokenDecoder.decodeToken(token)
+    }
+
     if (decodedToken) {
       return {
         type: 'jwt',

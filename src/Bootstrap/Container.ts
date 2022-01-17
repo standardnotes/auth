@@ -123,7 +123,7 @@ import { SettingToSubscriptionMapInterface } from '../Domain/Setting/SettingToSu
 import { SettingToSubscriptionMap } from '../Domain/Setting/SettingToSubscriptionMap'
 import { MuteFailedBackupsEmails } from '../Domain/UseCase/MuteFailedBackupsEmails/MuteFailedBackupsEmails'
 import { SubscriptionSyncRequestedEventHandler } from '../Domain/Handler/SubscriptionSyncRequestedEventHandler'
-import { TokenDecoder, TokenDecoderInterface } from '@standardnotes/auth'
+import { CrossServiceTokenData, OfflineUserTokenData, SessionTokenData, TokenDecoder, TokenDecoderInterface, TokenEncoder, TokenEncoderInterface } from '@standardnotes/auth'
 
 export class ContainerConfigLoader {
   async load(): Promise<Container> {
@@ -328,11 +328,13 @@ export class ContainerConfigLoader {
     container.bind<AuthResponseFactory20200115>(TYPES.AuthResponseFactory20200115).to(AuthResponseFactory20200115)
     container.bind<AuthResponseFactoryResolver>(TYPES.AuthResponseFactoryResolver).to(AuthResponseFactoryResolver)
     container.bind<KeyParamsFactory>(TYPES.KeyParamsFactory).to(KeyParamsFactory)
-    container.bind<TokenDecoderInterface>(TYPES.TokenDecoder).toConstantValue(new TokenDecoder(
-      container.get(TYPES.JWT_SECRET),
-      container.get(TYPES.LEGACY_JWT_SECRET),
-      container.get(TYPES.AUTH_JWT_SECRET)
-    ))
+    container.bind<TokenDecoderInterface<SessionTokenData>>(TYPES.SessionTokenDecoder).toConstantValue(new TokenDecoder<SessionTokenData>(container.get(TYPES.JWT_SECRET)))
+    container.bind<TokenDecoderInterface<SessionTokenData>>(TYPES.FallbackSessionTokenDecoder).toConstantValue(new TokenDecoder<SessionTokenData>(container.get(TYPES.LEGACY_JWT_SECRET)))
+    container.bind<TokenDecoderInterface<CrossServiceTokenData>>(TYPES.CrossServiceTokenDecoder).toConstantValue(new TokenDecoder<CrossServiceTokenData>(container.get(TYPES.AUTH_JWT_SECRET)))
+    container.bind<TokenDecoderInterface<OfflineUserTokenData>>(TYPES.OfflineUserTokenDecoder).toConstantValue(new TokenDecoder<OfflineUserTokenData>(container.get(TYPES.AUTH_JWT_SECRET)))
+    container.bind<TokenEncoderInterface<OfflineUserTokenData>>(TYPES.OfflineUserTokenEncoder).toConstantValue(new TokenEncoder<OfflineUserTokenData>(container.get(TYPES.AUTH_JWT_SECRET)))
+    container.bind<TokenEncoderInterface<SessionTokenData>>(TYPES.SessionTokenEncoder).toConstantValue(new TokenEncoder<SessionTokenData>(container.get(TYPES.JWT_SECRET)))
+    container.bind<TokenEncoderInterface<CrossServiceTokenData>>(TYPES.CrossServiceTokenEncoder).toConstantValue(new TokenEncoder<CrossServiceTokenData>(container.get(TYPES.AUTH_JWT_SECRET)))
     container.bind<AuthenticationMethodResolver>(TYPES.AuthenticationMethodResolver).to(AuthenticationMethodResolver)
     container.bind<DomainEventFactory>(TYPES.DomainEventFactory).to(DomainEventFactory)
     container.bind<AxiosInstance>(TYPES.HTTPClient).toConstantValue(axios.create())

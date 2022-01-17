@@ -1,4 +1,4 @@
-import { TokenDecoderInterface } from '@standardnotes/auth'
+import { CrossServiceTokenData, TokenDecoderInterface } from '@standardnotes/auth'
 import { NextFunction, Request, Response } from 'express'
 import { inject, injectable } from 'inversify'
 import { BaseMiddleware } from 'inversify-express-utils'
@@ -8,7 +8,7 @@ import TYPES from '../Bootstrap/Types'
 @injectable()
 export class ApiGatewayAuthMiddleware extends BaseMiddleware {
   constructor (
-    @inject(TYPES.TokenDecoder) private tokenDecoder: TokenDecoderInterface,
+    @inject(TYPES.CrossServiceTokenDecoder) private tokenDecoder: TokenDecoderInterface<CrossServiceTokenData>,
     @inject(TYPES.Logger) private logger: Logger,
   ) {
     super()
@@ -29,7 +29,7 @@ export class ApiGatewayAuthMiddleware extends BaseMiddleware {
         return
       }
 
-      const token = this.tokenDecoder.decodeCrossServiceCommunicationToken(request.headers['x-auth-token'] as string)
+      const token: CrossServiceTokenData | undefined = this.tokenDecoder.decodeToken(request.headers['x-auth-token'] as string)
 
       if (token === undefined) {
         this.logger.debug('ApiGatewayAuthMiddleware authentication failure.')

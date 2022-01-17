@@ -1,4 +1,4 @@
-import { RoleName, Token } from '@standardnotes/auth'
+import { CrossServiceTokenData, RoleName, TokenEncoderInterface } from '@standardnotes/auth'
 import { SettingName } from '@standardnotes/settings'
 import { Request, Response } from 'express'
 import { inject } from 'inversify'
@@ -9,7 +9,6 @@ import {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   results,
 } from 'inversify-express-utils'
-import { sign } from 'jsonwebtoken'
 
 import TYPES from '../Bootstrap/Types'
 import { Role } from '../Domain/Role/Role'
@@ -27,7 +26,7 @@ export class SubscriptionTokensController extends BaseHttpController {
     @inject(TYPES.SettingService) private settingService: SettingServiceInterface,
     @inject(TYPES.UserProjector) private userProjector: ProjectorInterface<User>,
     @inject(TYPES.RoleProjector) private roleProjector: ProjectorInterface<Role>,
-    @inject(TYPES.AUTH_JWT_SECRET) private jwtSecret: string,
+    @inject(TYPES.CrossServiceTokenEncoder) private tokenEncoder: TokenEncoderInterface<CrossServiceTokenData>,
     @inject(TYPES.AUTH_JWT_TTL) private jwtTTL: number,
   ) {
     super()
@@ -71,13 +70,13 @@ export class SubscriptionTokensController extends BaseHttpController {
 
     const roles = await user.roles
 
-    const authTokenData: Token = {
+    const authTokenData: CrossServiceTokenData = {
       user: await this.projectUser(user),
       roles: await this.projectRoles(roles),
       extensionKey,
     }
 
-    const authToken = sign(authTokenData, this.jwtSecret, { algorithm: 'HS256', expiresIn: this.jwtTTL })
+    const authToken = this.tokenEncoder.encodeExpirableToken(authTokenData, this.jwtTTL)
 
     return this.json({ authToken })
   }
