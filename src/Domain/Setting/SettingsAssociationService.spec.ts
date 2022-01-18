@@ -8,26 +8,34 @@ import { PermissionName } from '@standardnotes/features'
 import { EncryptionVersion } from '../Encryption/EncryptionVersion'
 
 describe('SettingsAssociationService', () => {
-  const createMap = () => new SettingsAssociationService()
+  const createService = () => new SettingsAssociationService()
+
+  it('should tell if a setting is mutable by the client', () => {
+    expect(createService().isSettingClientMutable(SettingName.DropboxBackupFrequency)).toBeTruthy()
+  })
+
+  it('should tell if a setting is immutable by the client', () => {
+    expect(createService().isSettingClientMutable(SettingName.FileUploadBytesLimit)).toBeFalsy()
+  })
 
   it('should return default encryption version for a setting which enecryption version is not strictly defined', () => {
-    expect(createMap().getEncryptionVersionForSetting(SettingName.MfaSecret)).toEqual(EncryptionVersion.Default)
+    expect(createService().getEncryptionVersionForSetting(SettingName.MfaSecret)).toEqual(EncryptionVersion.Default)
   })
 
   it('should return a defined encryption version for a setting which enecryption version is strictly defined', () => {
-    expect(createMap().getEncryptionVersionForSetting(SettingName.EmailBackupFrequency)).toEqual(EncryptionVersion.Unencrypted)
+    expect(createService().getEncryptionVersionForSetting(SettingName.EmailBackupFrequency)).toEqual(EncryptionVersion.Unencrypted)
   })
 
   it('should return default sensitivity for a setting which sensitivity is not strictly defined', () => {
-    expect(createMap().getSensitivityForSetting(SettingName.DropboxBackupToken)).toBeTruthy()
+    expect(createService().getSensitivityForSetting(SettingName.DropboxBackupToken)).toBeTruthy()
   })
 
   it('should return a defined sensitivity for a setting which sensitivity is strictly defined', () => {
-    expect(createMap().getSensitivityForSetting(SettingName.DropboxBackupFrequency)).toBeFalsy()
+    expect(createService().getSensitivityForSetting(SettingName.DropboxBackupFrequency)).toBeFalsy()
   })
 
   it('should return the default set of setting values for a core subscription', () => {
-    const settings = createMap().getDefaultSettingsAndValuesForSubscriptionName(SubscriptionName.CorePlan)
+    const settings = createService().getDefaultSettingsAndValuesForSubscriptionName(SubscriptionName.CorePlan)
 
     expect(settings).not.toBeUndefined()
 
@@ -36,7 +44,7 @@ describe('SettingsAssociationService', () => {
   })
 
   it('should return the default set of setting values for a plus subscription', () => {
-    const settings = createMap().getDefaultSettingsAndValuesForSubscriptionName(SubscriptionName.PlusPlan)
+    const settings = createService().getDefaultSettingsAndValuesForSubscriptionName(SubscriptionName.PlusPlan)
 
     expect(settings).not.toBeUndefined()
 
@@ -45,7 +53,7 @@ describe('SettingsAssociationService', () => {
   })
 
   it('should return the default set of setting values for a pro subscription', () => {
-    const settings = createMap().getDefaultSettingsAndValuesForSubscriptionName(SubscriptionName.ProPlan)
+    const settings = createService().getDefaultSettingsAndValuesForSubscriptionName(SubscriptionName.ProPlan)
 
     expect(settings).not.toBeUndefined()
 
@@ -54,16 +62,16 @@ describe('SettingsAssociationService', () => {
   })
 
   it('should return undefined set of setting values for an undefined subscription', () => {
-    const settings = createMap().getDefaultSettingsAndValuesForSubscriptionName('foobar' as SubscriptionName)
+    const settings = createService().getDefaultSettingsAndValuesForSubscriptionName('foobar' as SubscriptionName)
 
     expect(settings).toBeUndefined()
   })
 
   it('should return a permission name associated to a given setting', () => {
-    expect(createMap().getPermissionAssociatedWithSetting(SettingName.EmailBackupFrequency)).toEqual(PermissionName.DailyEmailBackup)
+    expect(createService().getPermissionAssociatedWithSetting(SettingName.EmailBackupFrequency)).toEqual(PermissionName.DailyEmailBackup)
   })
 
   it('should not return a permission name if not associated to a given setting', () => {
-    expect(createMap().getPermissionAssociatedWithSetting(SettingName.ExtensionKey)).toBeUndefined()
+    expect(createService().getPermissionAssociatedWithSetting(SettingName.ExtensionKey)).toBeUndefined()
   })
 })

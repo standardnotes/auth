@@ -28,6 +28,12 @@ export class SettingsAssociationService implements SettingsAssociationServiceInt
     SettingName.MuteFailedCloudBackupsEmails,
   ]
 
+  private readonly CLIENT_IMMUTABLE_SETTINGS = [
+    SettingName.ExtensionKey,
+    SettingName.FileUploadBytesLimit,
+    SettingName.FileUploadBytesUsed,
+  ]
+
   private readonly permissionsAssociatedWithSettings = new Map<SettingName, PermissionName>([
     [SettingName.EmailBackupFrequency, PermissionName.DailyEmailBackup],
   ])
@@ -37,6 +43,14 @@ export class SettingsAssociationService implements SettingsAssociationServiceInt
     [SubscriptionName.PlusPlan, new Map([])],
     [SubscriptionName.ProPlan, new Map([])],
   ])
+
+  isSettingClientMutable(settingName: SettingName): boolean {
+    if (this.CLIENT_IMMUTABLE_SETTINGS.includes(settingName)) {
+      return false
+    }
+
+    return true
+  }
 
   getSensitivityForSetting(settingName: SettingName): boolean {
     if (this.UNSENSITIVE_SETTINGS.includes(settingName)) {
