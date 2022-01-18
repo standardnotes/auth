@@ -4,27 +4,29 @@ import { SettingName } from '@standardnotes/settings'
 import { injectable } from 'inversify'
 import { EncryptionVersion } from '../Encryption/EncryptionVersion'
 
-import { SettingToSubscriptionMapInterface } from './SettingToSubscriptionMapInterface'
+import { SettingsAssociationServiceInterface } from './SettingsAssociationServiceInterface'
 
 @injectable()
-export class SettingToSubscriptionMap implements SettingToSubscriptionMapInterface {
-  private readonly encryptionVersionsAssociatedWithSettings = new Map<SettingName, EncryptionVersion>([
-    [ SettingName.EmailBackupFrequency, EncryptionVersion.Unencrypted ],
-    [ SettingName.MuteFailedBackupsEmails, EncryptionVersion.Unencrypted ],
-    [ SettingName.MuteFailedCloudBackupsEmails, EncryptionVersion.Unencrypted ],
-    [ SettingName.DropboxBackupFrequency, EncryptionVersion.Unencrypted ],
-    [ SettingName.GoogleDriveBackupFrequency, EncryptionVersion.Unencrypted ],
-    [ SettingName.OneDriveBackupFrequency, EncryptionVersion.Unencrypted ],
-  ])
+export class SettingsAssociationService implements SettingsAssociationServiceInterface {
+  private readonly UNENCRYPTED_SETTINGS = [
+    SettingName.EmailBackupFrequency,
+    SettingName.MuteFailedBackupsEmails,
+    SettingName.MuteFailedCloudBackupsEmails,
+    SettingName.DropboxBackupFrequency,
+    SettingName.GoogleDriveBackupFrequency,
+    SettingName.OneDriveBackupFrequency,
+    SettingName.FileUploadBytesLimit,
+    SettingName.FileUploadBytesUsed,
+  ]
 
-  private readonly sensitivityAssociatedWithSettings = new Map<SettingName, boolean>([
-    [ SettingName.DropboxBackupFrequency, false ],
-    [ SettingName.GoogleDriveBackupFrequency, false ],
-    [ SettingName.OneDriveBackupFrequency, false ],
-    [ SettingName.EmailBackupFrequency, false ],
-    [ SettingName.MuteFailedBackupsEmails, false ],
-    [ SettingName.MuteFailedCloudBackupsEmails, false ],
-  ])
+  private readonly UNSENSITIVE_SETTINGS = [
+    SettingName.DropboxBackupFrequency,
+    SettingName.GoogleDriveBackupFrequency,
+    SettingName.OneDriveBackupFrequency,
+    SettingName.EmailBackupFrequency,
+    SettingName.MuteFailedBackupsEmails,
+    SettingName.MuteFailedCloudBackupsEmails,
+  ]
 
   private readonly permissionsAssociatedWithSettings = new Map<SettingName, PermissionName>([
     [SettingName.EmailBackupFrequency, PermissionName.DailyEmailBackup],
@@ -37,19 +39,19 @@ export class SettingToSubscriptionMap implements SettingToSubscriptionMapInterfa
   ])
 
   getSensitivityForSetting(settingName: SettingName): boolean {
-    if (!this.sensitivityAssociatedWithSettings.has(settingName)) {
-      return true
+    if (this.UNSENSITIVE_SETTINGS.includes(settingName)) {
+      return false
     }
 
-    return this.sensitivityAssociatedWithSettings.get(settingName) as boolean
+    return true
   }
 
   getEncryptionVersionForSetting(settingName: SettingName): EncryptionVersion {
-    if (!this.encryptionVersionsAssociatedWithSettings.has(settingName)) {
-      return EncryptionVersion.Default
+    if (this.UNENCRYPTED_SETTINGS.includes(settingName)) {
+      return EncryptionVersion.Unencrypted
     }
 
-    return this.encryptionVersionsAssociatedWithSettings.get(settingName) as EncryptionVersion
+    return EncryptionVersion.Default
   }
 
   getPermissionAssociatedWithSetting(settingName: SettingName): PermissionName | undefined {

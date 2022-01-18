@@ -133,7 +133,7 @@ const TYPES = {
   WebSocketsClientService: Symbol.for('WebSocketClientService'),
   RoleService: Symbol.for('RoleService'),
   RoleToSubscriptionMap: Symbol.for('RoleToSubscriptionMap'),
-  SettingToSubscriptionMap: Symbol.for('SettingToSubscriptionMap'),
+  SettingsAssociationService: Symbol.for('SettingsAssociationService'),
   FeatureService: Symbol.for('FeatureService'),
 }
 

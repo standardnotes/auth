@@ -119,8 +119,8 @@ import { ContentDecoder, ContentDecoderInterface } from '@standardnotes/common'
 import { GetUserOfflineSubscription } from '../Domain/UseCase/GetUserOfflineSubscription/GetUserOfflineSubscription'
 import { ApiGatewayOfflineAuthMiddleware } from '../Controller/ApiGatewayOfflineAuthMiddleware'
 import { UserEmailChangedEventHandler } from '../Domain/Handler/UserEmailChangedEventHandler'
-import { SettingToSubscriptionMapInterface } from '../Domain/Setting/SettingToSubscriptionMapInterface'
-import { SettingToSubscriptionMap } from '../Domain/Setting/SettingToSubscriptionMap'
+import { SettingsAssociationServiceInterface } from '../Domain/Setting/SettingsAssociationServiceInterface'
+import { SettingsAssociationService } from '../Domain/Setting/SettingsAssociationService'
 import { MuteFailedBackupsEmails } from '../Domain/UseCase/MuteFailedBackupsEmails/MuteFailedBackupsEmails'
 import { SubscriptionSyncRequestedEventHandler } from '../Domain/Handler/SubscriptionSyncRequestedEventHandler'
 import { CrossServiceTokenData, OfflineUserTokenData, SessionTokenData, TokenDecoder, TokenDecoderInterface, TokenEncoder, TokenEncoderInterface } from '@standardnotes/auth'
@@ -347,7 +347,7 @@ export class ContainerConfigLoader {
     container.bind<ClientServiceInterface>(TYPES.WebSocketsClientService).to(WebSocketsClientService)
     container.bind<RoleServiceInterface>(TYPES.RoleService).to(RoleService)
     container.bind<RoleToSubscriptionMapInterface>(TYPES.RoleToSubscriptionMap).to(RoleToSubscriptionMap)
-    container.bind<SettingToSubscriptionMapInterface>(TYPES.SettingToSubscriptionMap).to(SettingToSubscriptionMap)
+    container.bind<SettingsAssociationServiceInterface>(TYPES.SettingsAssociationService).to(SettingsAssociationService)
     container.bind<FeatureServiceInterface>(TYPES.FeatureService).to(FeatureService)
 
     if (env.get('SNS_TOPIC_ARN', true)) {

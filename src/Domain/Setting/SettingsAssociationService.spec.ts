@@ -3,12 +3,12 @@ import 'reflect-metadata'
 import { SubscriptionName } from '@standardnotes/auth'
 import { SettingName } from '@standardnotes/settings'
 
-import { SettingToSubscriptionMap } from './SettingToSubscriptionMap'
+import { SettingsAssociationService } from './SettingsAssociationService'
 import { PermissionName } from '@standardnotes/features'
 import { EncryptionVersion } from '../Encryption/EncryptionVersion'
 
-describe('SettingToSubscriptionMap', () => {
-  const createMap = () => new SettingToSubscriptionMap()
+describe('SettingsAssociationService', () => {
+  const createMap = () => new SettingsAssociationService()
 
   it('should return default encryption version for a setting which enecryption version is not strictly defined', () => {
     expect(createMap().getEncryptionVersionForSetting(SettingName.MfaSecret)).toEqual(EncryptionVersion.Default)

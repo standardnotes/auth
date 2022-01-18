@@ -11,14 +11,14 @@ import { SettingServiceInterface } from '../../Setting/SettingServiceInterface'
 import { User } from '../../User/User'
 import { SettingName } from '@standardnotes/settings'
 import { RoleServiceInterface } from '../../Role/RoleServiceInterface'
-import { SettingToSubscriptionMapInterface } from '../../Setting/SettingToSubscriptionMapInterface'
+import { SettingsAssociationServiceInterface } from '../../Setting/SettingsAssociationServiceInterface'
 
 @injectable()
 export class UpdateSetting implements UseCaseInterface {
   constructor (
     @inject(TYPES.SettingService) private settingService: SettingServiceInterface,
     @inject(TYPES.SettingProjector) private settingProjector: SettingProjector,
-    @inject(TYPES.SettingToSubscriptionMap) private settingToSubscriptionMap: SettingToSubscriptionMapInterface,
+    @inject(TYPES.SettingsAssociationService) private settingsAssociationService: SettingsAssociationServiceInterface,
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
     @inject(TYPES.RoleService) private roleService: RoleServiceInterface,
     @inject(TYPES.Logger) private logger: Logger,
@@ -62,8 +62,8 @@ export class UpdateSetting implements UseCaseInterface {
       }
     }
 
-    props.serverEncryptionVersion = this.settingToSubscriptionMap.getEncryptionVersionForSetting(props.name as SettingName)
-    props.sensitive = this.settingToSubscriptionMap.getSensitivityForSetting(props.name as SettingName)
+    props.serverEncryptionVersion = this.settingsAssociationService.getEncryptionVersionForSetting(props.name as SettingName)
+    props.sensitive = this.settingsAssociationService.getSensitivityForSetting(props.name as SettingName)
 
     const response = await this.settingService.createOrReplace({
       user,
@@ -91,7 +91,7 @@ export class UpdateSetting implements UseCaseInterface {
   }
 
   private async userHasPermissionToUpdateSetting(user: User, settingName: SettingName): Promise<boolean> {
-    const permissionAssociatedWithSetting = await this.settingToSubscriptionMap.getPermissionAssociatedWithSetting(settingName)
+    const permissionAssociatedWithSetting = await this.settingsAssociationService.getPermissionAssociatedWithSetting(settingName)
     if (permissionAssociatedWithSetting === undefined) {
       return true
     }
