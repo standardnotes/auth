@@ -83,4 +83,20 @@ export class AdminController extends BaseHttpController {
       token: result.subscriptionToken.token,
     })
   }
+
+  @httpPost('/users/:userUuid/email-backups')
+  async disableEmailBackups(request: Request): Promise<results.BadRequestErrorMessageResult | results.OkResult> {
+    const { userUuid } = request.params
+
+    const result = await this.doDeleteSetting.execute({
+      userUuid,
+      settingName: SettingName.EmailBackupFrequency,
+    })
+
+    if (result.success) {
+      return this.ok()
+    }
+
+    return this.badRequest('No email backups found')
+  }
 }
