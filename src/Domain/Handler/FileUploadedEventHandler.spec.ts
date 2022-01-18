@@ -61,6 +61,14 @@ describe('FileUploadedEventHandler', () => {
     })
   })
 
+  it('should not do anything if a user is not found', async () => {
+    userRepository.findOneByUuid = jest.fn().mockReturnValue(undefined)
+
+    await createHandler().handle(event)
+
+    expect(settingService.createOrReplace).not.toHaveBeenCalled()
+  })
+
   it('should update a bytes used setting if one does exist', async () => {
     settingService.findSetting = jest.fn().mockReturnValue({
       value: 345,
