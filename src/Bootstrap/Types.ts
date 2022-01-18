@@ -103,6 +103,7 @@ const TYPES = {
   SubscriptionSyncRequestedEventHandler: Symbol.for('SubscriptionSyncRequestedEventHandler'),
   ExtensionKeyGrantedEventHandler: Symbol.for('ExtensionKeyGrantedEventHandler'),
   UserEmailChangedEventHandler: Symbol.for('UserEmailChangedEventHandler'),
+  FileUploadedEventHandler: Symbol.for('FileUploadedEventHandler'),
   // Services
   DeviceDetector: Symbol.for('DeviceDetector'),
   SessionService: Symbol.for('SessionService'),
@@ -133,7 +134,7 @@ const TYPES = {
   WebSocketsClientService: Symbol.for('WebSocketClientService'),
   RoleService: Symbol.for('RoleService'),
   RoleToSubscriptionMap: Symbol.for('RoleToSubscriptionMap'),
-  SettingToSubscriptionMap: Symbol.for('SettingToSubscriptionMap'),
+  SettingsAssociationService: Symbol.for('SettingsAssociationService'),
   FeatureService: Symbol.for('FeatureService'),
 }
 

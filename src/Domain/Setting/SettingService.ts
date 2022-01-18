@@ -16,7 +16,7 @@ import { Setting } from './Setting'
 import { SettingFactory } from './SettingFactory'
 import { SettingRepositoryInterface } from './SettingRepositoryInterface'
 import { SettingServiceInterface } from './SettingServiceInterface'
-import { SettingToSubscriptionMapInterface } from './SettingToSubscriptionMapInterface'
+import { SettingsAssociationServiceInterface } from './SettingsAssociationServiceInterface'
 
 @injectable()
 export class SettingService implements SettingServiceInterface {
@@ -25,7 +25,7 @@ export class SettingService implements SettingServiceInterface {
     @inject(TYPES.SettingRepository) private settingRepository: SettingRepositoryInterface,
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
     @inject(TYPES.Crypter) private crypter: CrypterInterface,
-    @inject(TYPES.SettingToSubscriptionMap) private settingToSubscriptionMap: SettingToSubscriptionMapInterface,
+    @inject(TYPES.SettingsAssociationService) private settingsAssociationService: SettingsAssociationServiceInterface,
     @inject(TYPES.DomainEventPublisher) private domainEventPublisher: DomainEventPublisherInterface,
     @inject(TYPES.DomainEventFactory) private domainEventFactory: DomainEventFactoryInterface,
     @inject(TYPES.Logger) private logger: Logger,
@@ -51,7 +51,7 @@ export class SettingService implements SettingServiceInterface {
   ]
 
   async applyDefaultSettingsForSubscription(user: User, subscriptionName: SubscriptionName): Promise<void> {
-    const defaultSettingsWithValues = this.settingToSubscriptionMap.getDefaultSettingsAndValuesForSubscriptionName(subscriptionName)
+    const defaultSettingsWithValues = await this.settingsAssociationService.getDefaultSettingsAndValuesForSubscriptionName(subscriptionName)
     if (defaultSettingsWithValues === undefined) {
       this.logger.warn(`Could not find settings for subscription: ${subscriptionName}`)
 

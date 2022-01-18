@@ -8,7 +8,7 @@ import { RoleServiceInterface } from '../../Role/RoleServiceInterface'
 
 import { Setting } from '../../Setting/Setting'
 import { SettingServiceInterface } from '../../Setting/SettingServiceInterface'
-import { SettingToSubscriptionMapInterface } from '../../Setting/SettingToSubscriptionMapInterface'
+import { SettingsAssociationServiceInterface } from '../../Setting/SettingsAssociationServiceInterface'
 import { SimpleSetting } from '../../Setting/SimpleSetting'
 import { User } from '../../User/User'
 import { UserRepositoryInterface } from '../../User/UserRepositoryInterface'
@@ -19,7 +19,7 @@ describe('UpdateSetting', () => {
   let settingService: SettingServiceInterface
   let settingProjection: SimpleSetting
   let settingProjector: SettingProjector
-  let settingToSubscriptionMap: SettingToSubscriptionMapInterface
+  let settingsAssociationService: SettingsAssociationServiceInterface
   let setting: Setting
   let user: User
   let userRepository: UserRepositoryInterface
@@ -29,7 +29,7 @@ describe('UpdateSetting', () => {
   const createUseCase = () => new UpdateSetting(
     settingService,
     settingProjector,
-    settingToSubscriptionMap,
+    settingsAssociationService,
     userRepository,
     roleService,
     logger
@@ -49,10 +49,11 @@ describe('UpdateSetting', () => {
     userRepository = {} as jest.Mocked<UserRepositoryInterface>
     userRepository.findOneByUuid = jest.fn().mockReturnValue(user)
 
-    settingToSubscriptionMap = {} as jest.Mocked<SettingToSubscriptionMapInterface>
-    settingToSubscriptionMap.getPermissionAssociatedWithSetting = jest.fn().mockReturnValue(undefined)
-    settingToSubscriptionMap.getEncryptionVersionForSetting = jest.fn().mockReturnValue(EncryptionVersion.Default)
-    settingToSubscriptionMap.getSensitivityForSetting = jest.fn().mockReturnValue(false)
+    settingsAssociationService = {} as jest.Mocked<SettingsAssociationServiceInterface>
+    settingsAssociationService.getPermissionAssociatedWithSetting = jest.fn().mockReturnValue(undefined)
+    settingsAssociationService.getEncryptionVersionForSetting = jest.fn().mockReturnValue(EncryptionVersion.Default)
+    settingsAssociationService.getSensitivityForSetting = jest.fn().mockReturnValue(false)
+    settingsAssociationService.isSettingMutableByClient = jest.fn().mockReturnValue(true)
 
     roleService = {} as jest.Mocked<RoleServiceInterface>
     roleService.addUserRole = jest.fn()
@@ -134,9 +135,32 @@ describe('UpdateSetting', () => {
   })
 
   it('should not create a setting if user is not permitted to', async () => {
-    settingToSubscriptionMap.getPermissionAssociatedWithSetting = jest.fn().mockReturnValue(PermissionName.DailyEmailBackup)
+    settingsAssociationService.getPermissionAssociatedWithSetting = jest.fn().mockReturnValue(PermissionName.DailyEmailBackup)
 
     roleService.userHasPermission = jest.fn().mockReturnValue(false)
+
+    const props = {
+      name: SettingName.ExtensionKey,
+      unencryptedValue: 'test-setting-value',
+      serverEncryptionVersion: EncryptionVersion.Unencrypted,
+      sensitive: false,
+    }
+
+    const response = await createUseCase().execute({ props, userUuid: '1-2-3' })
+
+    expect(settingService.createOrReplace).not.toHaveBeenCalled()
+
+    expect(response).toEqual({
+      success: false,
+      error: {
+        message: 'User 1-2-3 is not permitted to change the setting.',
+      },
+      statusCode: 401,
+    })
+  })
+
+  it('should not create a setting if setting is not mutable by the client', async () => {
+    settingsAssociationService.isSettingMutableByClient = jest.fn().mockReturnValue(false)
 
     const props = {
       name: SettingName.ExtensionKey,
