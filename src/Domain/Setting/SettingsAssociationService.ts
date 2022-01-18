@@ -60,7 +60,7 @@ export class SettingsAssociationService implements SettingsAssociationServiceInt
     ])],
   ])
 
-  isSettingClientMutable(settingName: SettingName): boolean {
+  isSettingMutableByClient(settingName: SettingName): boolean {
     if (this.CLIENT_IMMUTABLE_SETTINGS.includes(settingName)) {
       return false
     }
@@ -104,6 +104,8 @@ export class SettingsAssociationService implements SettingsAssociationServiceInt
       serverEncryptionVersion: EncryptionVersion.Unencrypted,
       value: (await this.getFileUploadLimit(subscriptionName)).toString(),
     })
+
+    return defaultSettings
   }
 
   private async getFileUploadLimit(subscriptionName: SubscriptionName): Promise<number> {

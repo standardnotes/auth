@@ -91,7 +91,12 @@ export class UpdateSetting implements UseCaseInterface {
   }
 
   private async userHasPermissionToUpdateSetting(user: User, settingName: SettingName): Promise<boolean> {
-    const permissionAssociatedWithSetting = await this.settingsAssociationService.getPermissionAssociatedWithSetting(settingName)
+    const settingIsMutableByClient = await this.settingsAssociationService.isSettingMutableByClient(settingName)
+    if (!settingIsMutableByClient) {
+      return false
+    }
+
+    const permissionAssociatedWithSetting = this.settingsAssociationService.getPermissionAssociatedWithSetting(settingName)
     if (permissionAssociatedWithSetting === undefined) {
       return true
     }

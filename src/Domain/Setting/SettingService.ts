@@ -51,7 +51,7 @@ export class SettingService implements SettingServiceInterface {
   ]
 
   async applyDefaultSettingsForSubscription(user: User, subscriptionName: SubscriptionName): Promise<void> {
-    const defaultSettingsWithValues = this.settingsAssociationService.getDefaultSettingsAndValuesForSubscriptionName(subscriptionName)
+    const defaultSettingsWithValues = await this.settingsAssociationService.getDefaultSettingsAndValuesForSubscriptionName(subscriptionName)
     if (defaultSettingsWithValues === undefined) {
       this.logger.warn(`Could not find settings for subscription: ${subscriptionName}`)
 

@@ -8,5 +8,5 @@ export interface SettingsAssociationServiceInterface {
   getPermissionAssociatedWithSetting(settingName: SettingName): PermissionName | undefined
   getEncryptionVersionForSetting(settingName: SettingName): EncryptionVersion
   getSensitivityForSetting(settingName: SettingName): boolean
-  isSettingClientMutable(settingName: SettingName): boolean
+  isSettingMutableByClient(settingName: SettingName): boolean
 }

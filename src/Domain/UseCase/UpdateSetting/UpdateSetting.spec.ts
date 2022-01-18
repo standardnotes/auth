@@ -53,6 +53,7 @@ describe('UpdateSetting', () => {
     settingsAssociationService.getPermissionAssociatedWithSetting = jest.fn().mockReturnValue(undefined)
     settingsAssociationService.getEncryptionVersionForSetting = jest.fn().mockReturnValue(EncryptionVersion.Default)
     settingsAssociationService.getSensitivityForSetting = jest.fn().mockReturnValue(false)
+    settingsAssociationService.isSettingMutableByClient = jest.fn().mockReturnValue(true)
 
     roleService = {} as jest.Mocked<RoleServiceInterface>
     roleService.addUserRole = jest.fn()
@@ -137,6 +138,29 @@ describe('UpdateSetting', () => {
     settingsAssociationService.getPermissionAssociatedWithSetting = jest.fn().mockReturnValue(PermissionName.DailyEmailBackup)
 
     roleService.userHasPermission = jest.fn().mockReturnValue(false)
+
+    const props = {
+      name: SettingName.ExtensionKey,
+      unencryptedValue: 'test-setting-value',
+      serverEncryptionVersion: EncryptionVersion.Unencrypted,
+      sensitive: false,
+    }
+
+    const response = await createUseCase().execute({ props, userUuid: '1-2-3' })
+
+    expect(settingService.createOrReplace).not.toHaveBeenCalled()
+
+    expect(response).toEqual({
+      success: false,
+      error: {
+        message: 'User 1-2-3 is not permitted to change the setting.',
+      },
+      statusCode: 401,
+    })
+  })
+
+  it('should not create a setting if setting is not mutable by the client', async () => {
+    settingsAssociationService.isSettingMutableByClient = jest.fn().mockReturnValue(false)
 
     const props = {
       name: SettingName.ExtensionKey,
