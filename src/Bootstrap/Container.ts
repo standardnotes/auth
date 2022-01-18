@@ -124,6 +124,7 @@ import { SettingsAssociationService } from '../Domain/Setting/SettingsAssociatio
 import { MuteFailedBackupsEmails } from '../Domain/UseCase/MuteFailedBackupsEmails/MuteFailedBackupsEmails'
 import { SubscriptionSyncRequestedEventHandler } from '../Domain/Handler/SubscriptionSyncRequestedEventHandler'
 import { CrossServiceTokenData, OfflineUserTokenData, SessionTokenData, TokenDecoder, TokenDecoderInterface, TokenEncoder, TokenEncoderInterface } from '@standardnotes/auth'
+import { FileUploadedEventHandler } from '../Domain/Handler/FileUploadedEventHandler'
 
 export class ContainerConfigLoader {
   async load(): Promise<Container> {
@@ -319,6 +320,7 @@ export class ContainerConfigLoader {
     container.bind<ExtensionKeyGrantedEventHandler>(TYPES.ExtensionKeyGrantedEventHandler).to(ExtensionKeyGrantedEventHandler)
     container.bind<SubscriptionReassignedEventHandler>(TYPES.SubscriptionReassignedEventHandler).to(SubscriptionReassignedEventHandler)
     container.bind<UserEmailChangedEventHandler>(TYPES.UserEmailChangedEventHandler).to(UserEmailChangedEventHandler)
+    container.bind<FileUploadedEventHandler>(TYPES.FileUploadedEventHandler).to(FileUploadedEventHandler)
 
     // Services
     container.bind<UAParser>(TYPES.DeviceDetector).toConstantValue(new UAParser())
@@ -378,6 +380,7 @@ export class ContainerConfigLoader {
       ['EXTENSION_KEY_GRANTED', container.get(TYPES.ExtensionKeyGrantedEventHandler)],
       ['SUBSCRIPTION_REASSIGNED', container.get(TYPES.SubscriptionReassignedEventHandler)],
       ['USER_EMAIL_CHANGED', container.get(TYPES.UserEmailChangedEventHandler)],
+      ['FILE_UPLOADED', container.get(TYPES.FileUploadedEventHandler)],
     ])
 
     if (env.get('SQS_QUEUE_URL', true)) {
