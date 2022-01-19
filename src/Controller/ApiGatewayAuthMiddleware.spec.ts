@@ -3,11 +3,10 @@ import 'reflect-metadata'
 import { ApiGatewayAuthMiddleware } from './ApiGatewayAuthMiddleware'
 import { NextFunction, Request, Response } from 'express'
 import { Logger } from 'winston'
-import { TokenDecoderInterface } from '../Domain/Auth/TokenDecoderInterface'
-import { RoleName } from '@standardnotes/auth'
+import { CrossServiceTokenData, RoleName, TokenDecoderInterface } from '@standardnotes/auth'
 
 describe('ApiGatewayAuthMiddleware', () => {
-  let tokenDecoder: TokenDecoderInterface
+  let tokenDecoder: TokenDecoderInterface<CrossServiceTokenData>
   let request: Request
   let response: Response
   let next: NextFunction
@@ -22,8 +21,8 @@ describe('ApiGatewayAuthMiddleware', () => {
   )
 
   beforeEach(() => {
-    tokenDecoder = {} as jest.Mocked<TokenDecoderInterface>
-    tokenDecoder.decodeCrossServiceCommunicationToken = jest.fn().mockReturnValue({
+    tokenDecoder = {} as jest.Mocked<TokenDecoderInterface<CrossServiceTokenData>>
+    tokenDecoder.decodeToken = jest.fn().mockReturnValue({
       user: {
         uuid: '1-2-3',
         email: 'test@test.te',
@@ -76,7 +75,7 @@ describe('ApiGatewayAuthMiddleware', () => {
   it('should not authorize if auth jwt token is malformed', async () => {
     request.headers['x-auth-token'] = 'auth-jwt-token'
 
-    tokenDecoder.decodeCrossServiceCommunicationToken = jest.fn().mockReturnValue(undefined)
+    tokenDecoder.decodeToken = jest.fn().mockReturnValue(undefined)
 
     await createMiddleware().handler(request, response, next)
 
@@ -89,7 +88,7 @@ describe('ApiGatewayAuthMiddleware', () => {
 
     const error = new Error('Ooops')
 
-    tokenDecoder.decodeCrossServiceCommunicationToken = jest.fn().mockImplementation(() => {
+    tokenDecoder.decodeToken = jest.fn().mockImplementation(() => {
       throw error
     })
 

@@ -1,3 +1,8 @@
+import {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  SessionTokenData,
+  TokenEncoderInterface,
+} from '@standardnotes/auth'
 import { inject, injectable } from 'inversify'
 import { Logger } from 'winston'
 import TYPES from '../../Bootstrap/Types'
@@ -16,12 +21,12 @@ export class AuthResponseFactory20200115 extends AuthResponseFactory20190520 {
     @inject(TYPES.SessionService) private sessionService: SessionServiceInterace,
     @inject(TYPES.KeyParamsFactory) private keyParamsFactory: KeyParamsFactoryInterface,
     @inject(TYPES.UserProjector) userProjector: ProjectorInterface<User>,
-    @inject(TYPES.JWT_SECRET) jwtSecret: string,
+    @inject(TYPES.SessionTokenEncoder) protected tokenEncoder: TokenEncoderInterface<SessionTokenData>,
     @inject(TYPES.Logger) logger: Logger
   ) {
     super(
       userProjector,
-      jwtSecret,
+      tokenEncoder,
       logger
     )
   }

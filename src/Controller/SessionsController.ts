@@ -8,7 +8,6 @@ import {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   results,
 } from 'inversify-express-utils'
-import { sign } from 'jsonwebtoken'
 import TYPES from '../Bootstrap/Types'
 import { Session } from '../Domain/Session/Session'
 import { AuthenticateRequest } from '../Domain/UseCase/AuthenticateRequest'
@@ -17,7 +16,7 @@ import { Role } from '../Domain/Role/Role'
 import { User } from '../Domain/User/User'
 import { ProjectorInterface } from '../Projection/ProjectorInterface'
 import { SessionProjector } from '../Projection/SessionProjector'
-import { RoleName, Token } from '@standardnotes/auth'
+import { CrossServiceTokenData, RoleName, TokenEncoderInterface } from '@standardnotes/auth'
 
 @controller('/sessions')
 export class SessionsController extends BaseHttpController {
@@ -27,7 +26,7 @@ export class SessionsController extends BaseHttpController {
     @inject(TYPES.UserProjector) private userProjector: ProjectorInterface<User>,
     @inject(TYPES.SessionProjector) private sessionProjector: ProjectorInterface<Session>,
     @inject(TYPES.RoleProjector) private roleProjector: ProjectorInterface<Role>,
-    @inject(TYPES.AUTH_JWT_SECRET) private jwtSecret: string,
+    @inject(TYPES.CrossServiceTokenEncoder) private tokenEncoder: TokenEncoderInterface<CrossServiceTokenData>,
     @inject(TYPES.AUTH_JWT_TTL) private jwtTTL: number,
   ) {
     super()
@@ -50,7 +49,7 @@ export class SessionsController extends BaseHttpController {
 
     const roles = await (<User> authenticateRequestResponse.user).roles
 
-    const authTokenData: Token = {
+    const authTokenData: CrossServiceTokenData = {
       user: this.projectUser(<User> authenticateRequestResponse.user),
       roles: this.projectRoles(roles),
     }
@@ -59,7 +58,7 @@ export class SessionsController extends BaseHttpController {
       authTokenData.session = this.projectSession(authenticateRequestResponse.session)
     }
 
-    const authToken = sign(authTokenData, this.jwtSecret, { algorithm: 'HS256', expiresIn: this.jwtTTL })
+    const authToken = this.tokenEncoder.encodeExpirableToken(authTokenData, this.jwtTTL)
 
     return this.json({ authToken })
   }

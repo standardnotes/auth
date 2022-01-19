@@ -16,7 +16,6 @@ import { GetUserKeyParams } from '../Domain/UseCase/GetUserKeyParams/GetUserKeyP
 import { User } from '../Domain/User/User'
 import { Session } from '../Domain/Session/Session'
 import { Register } from '../Domain/UseCase/Register'
-import { GetAuthMethods } from '../Domain/UseCase/GetAuthMethods/GetAuthMethods'
 import { DomainEventFactoryInterface } from '../Domain/Event/DomainEventFactoryInterface'
 
 describe('AuthController', () => {
@@ -35,7 +34,6 @@ describe('AuthController', () => {
   let user: User
   let session: Session
   let logger: Logger
-  let getAuthMethods: GetAuthMethods
 
   const createController = () => new AuthController(
     sessionService,
@@ -48,7 +46,6 @@ describe('AuthController', () => {
     domainEventPublisher,
     domainEventFactory,
     logger,
-    getAuthMethods,
   )
 
   beforeEach(() => {
@@ -88,9 +85,6 @@ describe('AuthController', () => {
 
     domainEventFactory = {} as jest.Mocked<DomainEventFactoryInterface>
     domainEventFactory.createUserRegisteredEvent = jest.fn().mockReturnValue(event)
-
-    getAuthMethods = {} as jest.Mocked<GetAuthMethods>
-    getAuthMethods.execute = jest.fn()
 
     request = {
       headers: {},
@@ -417,37 +411,5 @@ describe('AuthController', () => {
     const result = await httpResponse.executeAsync()
 
     expect(result.statusCode).toEqual(401)
-  })
-
-  it('should return 200 if get auth methods succeeds', async () => {
-    getAuthMethods.execute = jest.fn().mockReturnValue({
-      success: true,
-    })
-
-    const result = await createController().methods({
-      query: { email: 'test' },
-    } as unknown as express.Request)
-
-    expect(result.statusCode).toEqual(200)
-  })
-
-  it('should return 400 if get auth methods fails', async () => {
-    getAuthMethods.execute = jest.fn().mockReturnValue({
-      success: false,
-    })
-
-    const result = await createController().methods({
-      query: { email: 'test' },
-    } as unknown as express.Request)
-
-    expect(result.statusCode).toEqual(400)
-  })
-
-  it('should return 400 if email invalid when getting auth methods', async () => {
-    const result = await createController().methods({
-      query: { email: undefined },
-    } as unknown as express.Request)
-
-    expect(result.statusCode).toEqual(400)
   })
 })

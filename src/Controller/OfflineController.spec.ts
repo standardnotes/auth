@@ -11,7 +11,7 @@ import { CreateOfflineSubscriptionTokenResponse } from '../Domain/UseCase/Create
 import { AuthenticateOfflineSubscriptionToken } from '../Domain/UseCase/AuthenticateOfflineSubscriptionToken/AuthenticateOfflineSubscriptionToken'
 import { OfflineUserSubscription } from '../Domain/Subscription/OfflineUserSubscription'
 import { GetUserOfflineSubscription } from '../Domain/UseCase/GetUserOfflineSubscription/GetUserOfflineSubscription'
-import { SubscriptionName } from '@standardnotes/auth'
+import { OfflineUserTokenData, SubscriptionName, TokenEncoderInterface } from '@standardnotes/auth'
 import { Logger } from 'winston'
 
 describe('OfflineController', () => {
@@ -20,7 +20,7 @@ describe('OfflineController', () => {
   let createOfflineSubscriptionToken: CreateOfflineSubscriptionToken
   let authenticateToken: AuthenticateOfflineSubscriptionToken
   let logger: Logger
-  const jwtSecret = 'auth_jwt_secret'
+  let tokenEncoder: TokenEncoderInterface<OfflineUserTokenData>
   const jwtTTL = 60
 
   let request: express.Request
@@ -32,7 +32,7 @@ describe('OfflineController', () => {
     getUserOfflineSubscription,
     createOfflineSubscriptionToken,
     authenticateToken,
-    jwtSecret,
+    tokenEncoder,
     jwtTTL,
     logger
   )
@@ -69,6 +69,9 @@ describe('OfflineController', () => {
 
     logger = {} as jest.Mocked<Logger>
     logger.debug = jest.fn()
+
+    tokenEncoder = {} as jest.Mocked<TokenEncoderInterface<OfflineUserTokenData>>
+    tokenEncoder.encodeExpirableToken = jest.fn().mockReturnValue('foobar')
 
     request = {
       headers: {},

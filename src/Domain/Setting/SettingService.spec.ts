@@ -14,7 +14,7 @@ import { SettingFactory } from './SettingFactory'
 import { SettingRepositoryInterface } from './SettingRepositoryInterface'
 
 import { SettingService } from './SettingService'
-import { SettingToSubscriptionMapInterface } from './SettingToSubscriptionMapInterface'
+import { SettingsAssociationServiceInterface } from './SettingsAssociationServiceInterface'
 
 describe('SettingService', () => {
   let setting: Setting
@@ -23,7 +23,7 @@ describe('SettingService', () => {
   let settingRepository: SettingRepositoryInterface
   let userRepository: UserRepositoryInterface
   let crypter: CrypterInterface
-  let settingToSubscriptionMap: SettingToSubscriptionMapInterface
+  let settingsAssociationService: SettingsAssociationServiceInterface
   let domainEventPublisher: DomainEventPublisherInterface
   let domainEventFactory: DomainEventFactoryInterface
   let logger: Logger
@@ -33,7 +33,7 @@ describe('SettingService', () => {
     settingRepository,
     userRepository,
     crypter,
-    settingToSubscriptionMap,
+    settingsAssociationService,
     domainEventPublisher,
     domainEventFactory,
     logger
@@ -55,8 +55,8 @@ describe('SettingService', () => {
     settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue(undefined)
     settingRepository.save = jest.fn().mockImplementation(setting => setting)
 
-    settingToSubscriptionMap = {} as jest.Mocked<SettingToSubscriptionMapInterface>
-    settingToSubscriptionMap.getDefaultSettingsAndValuesForSubscriptionName = jest.fn().mockReturnValue(new Map([
+    settingsAssociationService = {} as jest.Mocked<SettingsAssociationServiceInterface>
+    settingsAssociationService.getDefaultSettingsAndValuesForSubscriptionName = jest.fn().mockReturnValue(new Map([
       [SettingName.EmailBackupFrequency,
         {
           value: EmailBackupFrequency.Weekly,
@@ -91,7 +91,7 @@ describe('SettingService', () => {
   })
 
   it ('should not create default settings for a subscription if subscription has no defaults', async () => {
-    settingToSubscriptionMap.getDefaultSettingsAndValuesForSubscriptionName = jest.fn().mockReturnValue(undefined)
+    settingsAssociationService.getDefaultSettingsAndValuesForSubscriptionName = jest.fn().mockReturnValue(undefined)
 
     await createService().applyDefaultSettingsForSubscription(user, SubscriptionName.PlusPlan)
 
