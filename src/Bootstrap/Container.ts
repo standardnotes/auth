@@ -123,8 +123,9 @@ import { SettingsAssociationServiceInterface } from '../Domain/Setting/SettingsA
 import { SettingsAssociationService } from '../Domain/Setting/SettingsAssociationService'
 import { MuteFailedBackupsEmails } from '../Domain/UseCase/MuteFailedBackupsEmails/MuteFailedBackupsEmails'
 import { SubscriptionSyncRequestedEventHandler } from '../Domain/Handler/SubscriptionSyncRequestedEventHandler'
-import { CrossServiceTokenData, OfflineUserTokenData, SessionTokenData, TokenDecoder, TokenDecoderInterface, TokenEncoder, TokenEncoderInterface } from '@standardnotes/auth'
+import { CrossServiceTokenData, OfflineUserTokenData, SessionTokenData, TokenDecoder, TokenDecoderInterface, TokenEncoder, TokenEncoderInterface, ValetTokenData } from '@standardnotes/auth'
 import { FileUploadedEventHandler } from '../Domain/Handler/FileUploadedEventHandler'
+import { CreateValetToken } from '../Domain/UseCase/CreateValetToken/CreateValetToken'
 
 export class ContainerConfigLoader {
   async load(): Promise<Container> {
@@ -255,6 +256,8 @@ export class ContainerConfigLoader {
     container.bind(TYPES.LEGACY_JWT_SECRET).toConstantValue(env.get('LEGACY_JWT_SECRET'))
     container.bind(TYPES.AUTH_JWT_SECRET).toConstantValue(env.get('AUTH_JWT_SECRET'))
     container.bind(TYPES.AUTH_JWT_TTL).toConstantValue(env.get('AUTH_JWT_TTL'))
+    container.bind(TYPES.VALET_TOKEN_SECRET).toConstantValue(env.get('VALET_TOKEN_SECRET'))
+    container.bind(TYPES.VALET_TOKEN_TTL).toConstantValue(+env.get('VALET_TOKEN_TTL'))
     container.bind(TYPES.ENCRYPTION_SERVER_KEY).toConstantValue(env.get('ENCRYPTION_SERVER_KEY'))
     container.bind(TYPES.ACCESS_TOKEN_AGE).toConstantValue(env.get('ACCESS_TOKEN_AGE'))
     container.bind(TYPES.REFRESH_TOKEN_AGE).toConstantValue(env.get('REFRESH_TOKEN_AGE'))
@@ -307,6 +310,7 @@ export class ContainerConfigLoader {
     container.bind<AuthenticateOfflineSubscriptionToken>(TYPES.AuthenticateOfflineSubscriptionToken).to(AuthenticateOfflineSubscriptionToken)
     container.bind<CreateOfflineSubscriptionToken>(TYPES.CreateOfflineSubscriptionToken).to(CreateOfflineSubscriptionToken)
     container.bind<MuteFailedBackupsEmails>(TYPES.MuteFailedBackupsEmails).to(MuteFailedBackupsEmails)
+    container.bind<CreateValetToken>(TYPES.CreateValetToken).to(CreateValetToken)
 
     // Handlers
     container.bind<UserRegisteredEventHandler>(TYPES.UserRegisteredEventHandler).to(UserRegisteredEventHandler)
@@ -337,6 +341,7 @@ export class ContainerConfigLoader {
     container.bind<TokenEncoderInterface<OfflineUserTokenData>>(TYPES.OfflineUserTokenEncoder).toConstantValue(new TokenEncoder<OfflineUserTokenData>(container.get(TYPES.AUTH_JWT_SECRET)))
     container.bind<TokenEncoderInterface<SessionTokenData>>(TYPES.SessionTokenEncoder).toConstantValue(new TokenEncoder<SessionTokenData>(container.get(TYPES.JWT_SECRET)))
     container.bind<TokenEncoderInterface<CrossServiceTokenData>>(TYPES.CrossServiceTokenEncoder).toConstantValue(new TokenEncoder<CrossServiceTokenData>(container.get(TYPES.AUTH_JWT_SECRET)))
+    container.bind<TokenEncoderInterface<ValetTokenData>>(TYPES.ValetTokenEncoder).toConstantValue(new TokenEncoder<ValetTokenData>(container.get(TYPES.VALET_TOKEN_SECRET)))
     container.bind<AuthenticationMethodResolver>(TYPES.AuthenticationMethodResolver).to(AuthenticationMethodResolver)
     container.bind<DomainEventFactory>(TYPES.DomainEventFactory).to(DomainEventFactory)
     container.bind<AxiosInstance>(TYPES.HTTPClient).toConstantValue(axios.create())

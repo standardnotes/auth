@@ -754,14 +754,6 @@
   resolved "https://registry.yarnpkg.com/@sqltools/formatter/-/formatter-1.2.2.tgz#9390a8127c0dcba61ebd7fdcc748655e191bdd68"
   integrity sha512-/5O7Fq6Vnv8L6ucmPjaWbVG1XkP4FO+w5glqfkIsq3Xw4oyNAdJddbnYodNDAfjVUvo/rrSCTom4kAND7T1o5Q==
 
-"@standardnotes/auth@3.15.1":
-  version "3.15.1"
-  resolved "https://registry.yarnpkg.com/@standardnotes/auth/-/auth-3.15.1.tgz#5aba596a58a1a4262668bde4bba620bc05ce5493"
-  integrity sha512-Uk2l2Hax28MyGXr25UUOeUS+kdU3GFcORmIMJagNkl4bljPfz5yFpRRLAP/Hi9yISecti7/tSP7epcwyzZ87Aw==
-  dependencies:
-    "@standardnotes/common" "^1.8.0"
-    jsonwebtoken "^8.5.1"
-
 "@standardnotes/auth@3.8.3":
   version "3.8.3"
   resolved "https://registry.yarnpkg.com/@standardnotes/auth/-/auth-3.8.3.tgz#6e627c1a1a9ebf91d97f52950d099bf7704382e3"
@@ -780,6 +772,14 @@
   version "3.15.2"
   resolved "https://registry.yarnpkg.com/@standardnotes/auth/-/auth-3.15.2.tgz#63a47785191e2a9f6761320375c76d9b3a0caf64"
   integrity sha512-fN497p0eyG4mp13vvhRD6ULyPMT7QAl3wRyBZMsNlNBuGQJNMS1rfSsU9u59AeAifkyARnfl+8SzVtwXKHlSSg==
+  dependencies:
+    "@standardnotes/common" "^1.8.0"
+    jsonwebtoken "^8.5.1"
+
+"@standardnotes/auth@^3.15.3":
+  version "3.15.3"
+  resolved "https://registry.yarnpkg.com/@standardnotes/auth/-/auth-3.15.3.tgz#bf77332e0ac3d846acc45f25083459e42f4a4374"
+  integrity sha512-16wgMl0qmq8w+HUktfQ7ODoprkngSs0vsSF5G9aHM1L+lFMwlGeVOztHH2zwG91pFkl7BaK6LcEimoYiml6VAw==
   dependencies:
     "@standardnotes/common" "^1.8.0"
     jsonwebtoken "^8.5.1"
