@@ -42,7 +42,6 @@ export class CreateValetToken implements UseCaseInterface {
       uploadBytesLimit = +(uploadBytesLimitSetting.value as string)
     }
 
-
     const tokenData: ValetTokenData = {
       userUuid: dto.userUuid,
       permittedOperation: dto.operation,
