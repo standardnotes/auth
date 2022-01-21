@@ -8,17 +8,36 @@ import { UseCaseInterface } from '../UseCaseInterface'
 import TYPES from '../../../Bootstrap/Types'
 import { SettingServiceInterface } from '../../Setting/SettingServiceInterface'
 import { SettingName } from '@standardnotes/settings'
+import { UserSubscriptionRepositoryInterface } from '../../Subscription/UserSubscriptionRepositoryInterface'
+import { TimerInterface } from '@standardnotes/time'
 
 @injectable()
 export class CreateValetToken implements UseCaseInterface {
   constructor(
     @inject(TYPES.ValetTokenEncoder) private tokenEncoder: TokenEncoderInterface<ValetTokenData>,
     @inject(TYPES.SettingService) private settingService: SettingServiceInterface,
+    @inject(TYPES.UserSubscriptionRepository) private userSubscriptionRepository: UserSubscriptionRepositoryInterface,
+    @inject(TYPES.Timer) private timer: TimerInterface,
     @inject(TYPES.VALET_TOKEN_TTL) private valetTokenTTL: number,
   ) {
   }
 
   async execute(dto: CreateValetTokenDTO): Promise<CreateValetTokenResponse> {
+    const userSubscription = await this.userSubscriptionRepository.findOneByUserUuid(dto.userUuid)
+    if (userSubscription === undefined) {
+      return {
+        success: false,
+        reason: 'no-subscription',
+      }
+    }
+
+    if (userSubscription.endsAt < this.timer.getTimestampInMicroseconds()) {
+      return {
+        success: false,
+        reason: 'expired-subscription',
+      }
+    }
+
     let permittedResources = dto.resources ?? []
     if (dto.operation === 'write') {
       permittedResources = [ uuid() ]
