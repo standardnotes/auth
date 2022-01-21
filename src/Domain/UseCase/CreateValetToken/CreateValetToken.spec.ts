@@ -84,13 +84,14 @@ describe('CreateValetToken', () => {
   it('should create a write valet token', async () => {
     const response = await createUseCase().execute({
       operation: 'write',
+      resources: ['2-3-4'],
       userUuid: '1-2-3',
     })
 
     expect(tokenEncoder.encodeExpirableToken).toHaveBeenCalledWith({
       permittedOperation: 'write',
       permittedResources:  [
-        expect.any(String),
+        '2-3-4',
       ],
       userUuid: '1-2-3',
       uploadBytesUsed: 123,
@@ -109,12 +110,13 @@ describe('CreateValetToken', () => {
     const response = await createUseCase().execute({
       operation: 'write',
       userUuid: '1-2-3',
+      resources: ['2-3-4'],
     })
 
     expect(tokenEncoder.encodeExpirableToken).toHaveBeenCalledWith({
       permittedOperation: 'write',
       permittedResources:  [
-        expect.any(String),
+        '2-3-4',
       ],
       userUuid: '1-2-3',
       uploadBytesUsed: 0,

@@ -1,4 +1,3 @@
-import { v4 as uuid } from 'uuid'
 import { inject, injectable } from 'inversify'
 import { TokenEncoderInterface, ValetTokenData } from '@standardnotes/auth'
 
@@ -38,11 +37,6 @@ export class CreateValetToken implements UseCaseInterface {
       }
     }
 
-    let permittedResources = dto.resources ?? []
-    if (dto.operation === 'write') {
-      permittedResources = [ uuid() ]
-    }
-
     let uploadBytesUsed = 0
     const uploadBytesUsedSetting = await this.settingService.findSetting({
       userUuid: dto.userUuid,
@@ -64,7 +58,7 @@ export class CreateValetToken implements UseCaseInterface {
     const tokenData: ValetTokenData = {
       userUuid: dto.userUuid,
       permittedOperation: dto.operation,
-      permittedResources,
+      permittedResources: dto.resources,
       uploadBytesUsed,
       uploadBytesLimit,
     }
