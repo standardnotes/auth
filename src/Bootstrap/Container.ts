@@ -210,7 +210,7 @@ export class ContainerConfigLoader {
       }))
     }
 
-    if (env.get('SQS_AWS_REGION', true)) {
+    if (env.get('SQS_QUEUE_URL', true)) {
       container.bind<AWS.SQS>(TYPES.SQS).toConstantValue(new AWS.SQS({
         apiVersion: 'latest',
         region: env.get('SQS_AWS_REGION', true),
