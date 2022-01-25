@@ -211,10 +211,17 @@ export class ContainerConfigLoader {
     }
 
     if (env.get('SQS_QUEUE_URL', true)) {
-      container.bind<AWS.SQS>(TYPES.SQS).toConstantValue(new AWS.SQS({
+      const sqsConfig: AWS.SQS.Types.ClientConfiguration = {
         apiVersion: 'latest',
         region: env.get('SQS_AWS_REGION', true),
-      }))
+      }
+      if (env.get('SQS_ACCESS_KEY_ID', true) && env.get('SQS_SECRET_ACCESS_KEY', true)) {
+        sqsConfig.credentials = {
+          accessKeyId: env.get('SQS_ACCESS_KEY_ID', true),
+          secretAccessKey: env.get('SQS_SECRET_ACCESS_KEY', true),
+        }
+      }
+      container.bind<AWS.SQS>(TYPES.SQS).toConstantValue(new AWS.SQS(sqsConfig))
     }
 
     // Repositories
