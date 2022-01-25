@@ -39,7 +39,6 @@ export class SettingsAssociationService implements SettingsAssociationServiceInt
   ]
 
   private readonly CLIENT_IMMUTABLE_SETTINGS = [
-    SettingName.ExtensionKey,
     SettingName.FileUploadBytesLimit,
     SettingName.FileUploadBytesUsed,
   ]
