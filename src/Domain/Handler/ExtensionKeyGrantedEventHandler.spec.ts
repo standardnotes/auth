@@ -56,6 +56,7 @@ describe('ExtensionKeyGrantedEventHandler', () => {
       offlineFeaturesToken: 'test',
       subscriptionName: SubscriptionName.ProPlan,
       origin: 'update-subscription',
+      subscriptionFeatures: [],
       timestamp,
       payAmount: 1000,
       billingEveryNMonths: 1,
