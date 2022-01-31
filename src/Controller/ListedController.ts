@@ -6,7 +6,7 @@ import TYPES from '../Bootstrap/Types'
 import { CreateListedAccount } from '../Domain/UseCase/CreateListedAccount/CreateListedAccount'
 
 @controller('/listed')
-export class InternalController extends BaseHttpController {
+export class ListedController extends BaseHttpController {
   constructor(
     @inject(TYPES.CreateListedAccount) private doCreateListedAccount: CreateListedAccount,
   ) {

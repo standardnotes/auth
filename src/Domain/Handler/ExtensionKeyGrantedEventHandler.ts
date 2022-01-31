@@ -29,7 +29,7 @@ export class ExtensionKeyGrantedEventHandler implements DomainEventHandlerInterf
   async handle(event: ExtensionKeyGrantedEvent): Promise<void> {
     if (event.payload.offline) {
       const offlineFeaturesTokenDecoded =
-        this.contentDecoder.decode(event.payload.offlineFeaturesToken, 0) as OfflineFeaturesTokenData
+        this.contentDecoder.decode(event.payload.offlineFeaturesToken as string, 0) as OfflineFeaturesTokenData
 
       if (!offlineFeaturesTokenDecoded.extensionKey) {
         this.logger.warn('Could not decode offline features token')
