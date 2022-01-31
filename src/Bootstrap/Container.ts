@@ -126,6 +126,8 @@ import { SubscriptionSyncRequestedEventHandler } from '../Domain/Handler/Subscri
 import { CrossServiceTokenData, OfflineUserTokenData, SessionTokenData, TokenDecoder, TokenDecoderInterface, TokenEncoder, TokenEncoderInterface, ValetTokenData } from '@standardnotes/auth'
 import { FileUploadedEventHandler } from '../Domain/Handler/FileUploadedEventHandler'
 import { CreateValetToken } from '../Domain/UseCase/CreateValetToken/CreateValetToken'
+import { CreateListedAccount } from '../Domain/UseCase/CreateListedAccount/CreateListedAccount'
+import { ListedAccountCreatedEventHandler } from '../Domain/Handler/ListedAccountCreatedEventHandler'
 
 export class ContainerConfigLoader {
   async load(): Promise<Container> {
@@ -318,6 +320,7 @@ export class ContainerConfigLoader {
     container.bind<CreateOfflineSubscriptionToken>(TYPES.CreateOfflineSubscriptionToken).to(CreateOfflineSubscriptionToken)
     container.bind<MuteFailedBackupsEmails>(TYPES.MuteFailedBackupsEmails).to(MuteFailedBackupsEmails)
     container.bind<CreateValetToken>(TYPES.CreateValetToken).to(CreateValetToken)
+    container.bind<CreateListedAccount>(TYPES.CreateListedAccount).to(CreateListedAccount)
 
     // Handlers
     container.bind<UserRegisteredEventHandler>(TYPES.UserRegisteredEventHandler).to(UserRegisteredEventHandler)
@@ -332,6 +335,7 @@ export class ContainerConfigLoader {
     container.bind<SubscriptionReassignedEventHandler>(TYPES.SubscriptionReassignedEventHandler).to(SubscriptionReassignedEventHandler)
     container.bind<UserEmailChangedEventHandler>(TYPES.UserEmailChangedEventHandler).to(UserEmailChangedEventHandler)
     container.bind<FileUploadedEventHandler>(TYPES.FileUploadedEventHandler).to(FileUploadedEventHandler)
+    container.bind<ListedAccountCreatedEventHandler>(TYPES.ListedAccountCreatedEventHandler).to(ListedAccountCreatedEventHandler)
 
     // Services
     container.bind<UAParser>(TYPES.DeviceDetector).toConstantValue(new UAParser())
@@ -393,6 +397,7 @@ export class ContainerConfigLoader {
       ['SUBSCRIPTION_REASSIGNED', container.get(TYPES.SubscriptionReassignedEventHandler)],
       ['USER_EMAIL_CHANGED', container.get(TYPES.UserEmailChangedEventHandler)],
       ['FILE_UPLOADED', container.get(TYPES.FileUploadedEventHandler)],
+      ['LISTED_ACCOUNT_CREATED', container.get(TYPES.ListedAccountCreatedEventHandler)],
     ])
 
     if (env.get('SQS_QUEUE_URL', true)) {
