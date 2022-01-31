@@ -768,14 +768,6 @@
   dependencies:
     "@standardnotes/common" "1.2.1"
 
-"@standardnotes/auth@^3.15.2":
-  version "3.15.2"
-  resolved "https://registry.yarnpkg.com/@standardnotes/auth/-/auth-3.15.2.tgz#63a47785191e2a9f6761320375c76d9b3a0caf64"
-  integrity sha512-fN497p0eyG4mp13vvhRD6ULyPMT7QAl3wRyBZMsNlNBuGQJNMS1rfSsU9u59AeAifkyARnfl+8SzVtwXKHlSSg==
-  dependencies:
-    "@standardnotes/common" "^1.8.0"
-    jsonwebtoken "^8.5.1"
-
 "@standardnotes/auth@^3.15.3":
   version "3.15.3"
   resolved "https://registry.yarnpkg.com/@standardnotes/auth/-/auth-3.15.3.tgz#bf77332e0ac3d846acc45f25083459e42f4a4374"
@@ -827,12 +819,13 @@
   dependencies:
     "@standardnotes/auth" "^3.12.0"
 
-"@standardnotes/domain-events@^2.17.0":
-  version "2.17.0"
-  resolved "https://registry.yarnpkg.com/@standardnotes/domain-events/-/domain-events-2.17.0.tgz#e44f7927ccae9440d5ecc3d947ad0c47f4255cab"
-  integrity sha512-N7KCp4QplDdDVu8icnKQEYH2T0dHJJOMyanw4aSsQdK3FIqVnZE/oP3+kcNoPRwbX0m+HSiGkZYGRKQgOvNdiQ==
+"@standardnotes/domain-events@^2.20.1":
+  version "2.20.1"
+  resolved "https://registry.yarnpkg.com/@standardnotes/domain-events/-/domain-events-2.20.1.tgz#3d6af041d20029b791877dc4d99a815ffa149474"
+  integrity sha512-UmkeF2nS2mFnR5OntT3d8My8CYaVth631B3hSGh7C8wVa3MSs2A9y+Ko2/JL92QxQa7/V5vt/rvPQKnLjT3YBg==
   dependencies:
-    "@standardnotes/auth" "^3.15.2"
+    "@standardnotes/auth" "^3.15.3"
+    "@standardnotes/features" "^1.26.1"
 
 "@standardnotes/features@1.20.4":
   version "1.20.4"
@@ -841,6 +834,14 @@
   dependencies:
     "@standardnotes/auth" "3.8.3"
     "@standardnotes/common" "1.2.1"
+
+"@standardnotes/features@^1.26.1":
+  version "1.26.1"
+  resolved "https://registry.yarnpkg.com/@standardnotes/features/-/features-1.26.1.tgz#d4e4aed2ba91e40c407484e569a96c339477bba2"
+  integrity sha512-zxoeH9fjQtcTUbc5qaYD7AZETKDniM+tIvmLrWqwSC9B6/IL0R39G51BEkOzen+KhR/WgH3itHDVM+zrSMg53Q==
+  dependencies:
+    "@standardnotes/auth" "^3.15.3"
+    "@standardnotes/common" "^1.8.0"
 
 "@standardnotes/settings@^1.10.0":
   version "1.10.0"
