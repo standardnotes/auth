@@ -17,6 +17,24 @@ describe('DomainEventFactory', () => {
     timer.getTimestampInMicroseconds = jest.fn().mockReturnValue(1)
   })
 
+  it('should create a LISTED_ACCOUNT_REQUESTED event', () => {
+    expect(createFactory().createListedAccountRequestedEvent('1-2-3', 'test@test.te'))
+      .toEqual({
+        createdAt: expect.any(Date),
+        meta: {
+          correlation: {
+            userIdentifier: '1-2-3',
+            userIdentifierType: 'uuid',
+          },
+        },
+        payload: {
+          userUuid: '1-2-3',
+          userEmail: 'test@test.te',
+        },
+        type: 'LISTED_ACCOUNT_REQUESTED',
+      })
+  })
+
   it('should create a USER_REGISTERED event', () => {
     expect(createFactory().createUserRegisteredEvent('1-2-3', 'test@test.te'))
       .toEqual({

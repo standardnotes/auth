@@ -94,6 +94,7 @@ const TYPES = {
   AuthenticateOfflineSubscriptionToken: Symbol.for('AuthenticateOfflineSubscriptionToken'),
   MuteFailedBackupsEmails: Symbol.for('MuteFailedBackupsEmails'),
   CreateValetToken: Symbol.for('CreateValetToken'),
+  CreateListedAccount: Symbol.for('CreateListedAccount'),
   // Handlers
   UserRegisteredEventHandler: Symbol.for('UserRegisteredEventHandler'),
   AccountDeletionRequestedEventHandler: Symbol.for('AccountDeletionRequestedEventHandler'),
@@ -107,6 +108,8 @@ const TYPES = {
   ExtensionKeyGrantedEventHandler: Symbol.for('ExtensionKeyGrantedEventHandler'),
   UserEmailChangedEventHandler: Symbol.for('UserEmailChangedEventHandler'),
   FileUploadedEventHandler: Symbol.for('FileUploadedEventHandler'),
+  ListedAccountCreatedEventHandler: Symbol.for('ListedAccountCreatedEventHandler'),
+  ListedAccountDeletedEventHandler: Symbol.for('ListedAccountDeletedEventHandler'),
   // Services
   DeviceDetector: Symbol.for('DeviceDetector'),
   SessionService: Symbol.for('SessionService'),
