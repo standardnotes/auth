@@ -1,21 +1,21 @@
 import 'reflect-metadata'
-import { ListedAccountCreatedEvent } from '@standardnotes/domain-events'
+import { ListedAccountDeletedEvent } from '@standardnotes/domain-events'
 import { Logger } from 'winston'
 
-import { ListedAccountCreatedEventHandler } from './ListedAccountCreatedEventHandler'
+import { ListedAccountDeletedEventHandler } from './ListedAccountDeletedEventHandler'
 import { SettingServiceInterface } from '../Setting/SettingServiceInterface'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { User } from '../User/User'
 import { Setting } from '../Setting/Setting'
 
-describe('ListedAccountCreatedEventHandler', () => {
+describe('ListedAccountDeletedEventHandler', () => {
   let settingService: SettingServiceInterface
   let userRepository: UserRepositoryInterface
-  let event: ListedAccountCreatedEvent
+  let event: ListedAccountDeletedEvent
   let user: User
   let logger: Logger
 
-  const createHandler = () => new ListedAccountCreatedEventHandler(
+  const createHandler = () => new ListedAccountDeletedEventHandler(
     userRepository,
     settingService,
     logger
@@ -28,22 +28,24 @@ describe('ListedAccountCreatedEventHandler', () => {
     userRepository.findOneByEmail = jest.fn().mockReturnValue(user)
 
     settingService = {} as jest.Mocked<SettingServiceInterface>
-    settingService.findSetting = jest.fn().mockReturnValue(undefined)
+    settingService.findSetting = jest.fn().mockReturnValue({
+      value: '{"secrets":[{"authorId":1,"secret":"my-secret"}]}',
+    } as jest.Mocked<Setting>)
     settingService.createOrReplace = jest.fn()
 
-    event = {} as jest.Mocked<ListedAccountCreatedEvent>
+    event = {} as jest.Mocked<ListedAccountDeletedEvent>
     event.payload = {
       userEmail: 'test@test.com',
       userId: 1,
       userName: 'testuser',
-      secret: 'new-secret',
+      secret: 'my-secret',
     }
 
     logger = {} as jest.Mocked<Logger>
     logger.warn = jest.fn()
   })
 
-  it('should not save the listed secret if user is not found', async () => {
+  it('should not remove the listed secret if user is not found', async () => {
     userRepository.findOneByEmail = jest.fn().mockReturnValue(undefined)
 
     await createHandler().handle(event)
@@ -51,7 +53,15 @@ describe('ListedAccountCreatedEventHandler', () => {
     expect(settingService.createOrReplace).not.toHaveBeenCalled()
   })
 
-  it('should save the listed secret as a user setting', async () => {
+  it('should not remove the listed secret if setting is not found', async () => {
+    settingService.findSetting = jest.fn().mockReturnValue(undefined)
+
+    await createHandler().handle(event)
+
+    expect(settingService.createOrReplace).not.toHaveBeenCalled()
+  })
+
+  it('should remove the listed secret from the user setting', async () => {
     await createHandler().handle(event)
 
     expect(settingService.createOrReplace).toHaveBeenCalledWith({
@@ -59,14 +69,14 @@ describe('ListedAccountCreatedEventHandler', () => {
       props: {
         name: 'LISTED_AUTHOR_SECRETS',
         sensitive: false,
-        unencryptedValue: '{"secrets":[{"authorId":1,"secret":"new-secret"}]}',
+        unencryptedValue: '{"secrets":[]}',
       },
     })
   })
 
-  it('should add the listed secret as a user setting to an existing list of secrets', async () => {
+  it('should remove the listed secret from an existing list of secrets', async () => {
     settingService.findSetting = jest.fn().mockReturnValue({
-      value: '{"secrets":[{"authorId":2,"secret":"old-secret"}]}',
+      value: '{"secrets":[{"authorId":2,"secret":"old-secret"},{"authorId":1,"secret":"my-secret"}]}',
     } as jest.Mocked<Setting>)
 
     await createHandler().handle(event)
@@ -76,7 +86,7 @@ describe('ListedAccountCreatedEventHandler', () => {
       props: {
         name: 'LISTED_AUTHOR_SECRETS',
         sensitive: false,
-        unencryptedValue: '{"secrets":[{"authorId":2,"secret":"old-secret"},{"authorId":1,"secret":"new-secret"}]}',
+        unencryptedValue: '{"secrets":[{"authorId":2,"secret":"old-secret"}]}',
       },
     })
   })

@@ -36,11 +36,13 @@ export class SettingsAssociationService implements SettingsAssociationServiceInt
     SettingName.EmailBackupFrequency,
     SettingName.MuteFailedBackupsEmails,
     SettingName.MuteFailedCloudBackupsEmails,
+    SettingName.ListedAuthorSecrets,
   ]
 
   private readonly CLIENT_IMMUTABLE_SETTINGS = [
     SettingName.FileUploadBytesLimit,
     SettingName.FileUploadBytesUsed,
+    SettingName.ListedAuthorSecrets,
   ]
 
   private readonly permissionsAssociatedWithSettings = new Map<SettingName, PermissionName>([

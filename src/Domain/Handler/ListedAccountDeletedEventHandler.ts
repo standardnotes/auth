@@ -1,4 +1,4 @@
-import { DomainEventHandlerInterface, ListedAccountCreatedEvent } from '@standardnotes/domain-events'
+import { DomainEventHandlerInterface, ListedAccountDeletedEvent } from '@standardnotes/domain-events'
 import { ListedAuthorSecretsData, SettingName } from '@standardnotes/settings'
 import { inject, injectable } from 'inversify'
 import { Logger } from 'winston'
@@ -8,7 +8,7 @@ import { SettingServiceInterface } from '../Setting/SettingServiceInterface'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 
 @injectable()
-export class ListedAccountCreatedEventHandler implements DomainEventHandlerInterface {
+export class ListedAccountDeletedEventHandler implements DomainEventHandlerInterface {
   constructor (
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
     @inject(TYPES.SettingService) private settingService: SettingServiceInterface,
@@ -16,7 +16,7 @@ export class ListedAccountCreatedEventHandler implements DomainEventHandlerInter
   ) {
   }
 
-  async handle(event: ListedAccountCreatedEvent): Promise<void> {
+  async handle(event: ListedAccountDeletedEvent): Promise<void> {
     const user = await this.userRepository.findOneByEmail(event.payload.userEmail)
     if (user === undefined) {
       this.logger.warn(`Could not find user with email ${event.payload.userEmail}`)
@@ -24,25 +24,24 @@ export class ListedAccountCreatedEventHandler implements DomainEventHandlerInter
       return
     }
 
-    const newSecret = { authorId: event.payload.userId, secret: event.payload.secret }
-
-    let authSecrets: ListedAuthorSecretsData = { secrets: [ newSecret ] }
-
     const listedAuthorSecretsSetting = await this.settingService.findSetting({
       settingName: SettingName.ListedAuthorSecrets,
       userUuid: user.uuid,
     })
-    if (listedAuthorSecretsSetting !== undefined) {
-      const existingSecrets: ListedAuthorSecretsData = JSON.parse(listedAuthorSecretsSetting.value as string)
-      existingSecrets.secrets.push(newSecret)
-      authSecrets = { secrets: existingSecrets.secrets }
+    if (listedAuthorSecretsSetting === undefined) {
+      this.logger.warn(`Could not find listed secrets setting for user ${user.uuid}`)
+
+      return
     }
+
+    const existingSecrets: ListedAuthorSecretsData = JSON.parse(listedAuthorSecretsSetting.value as string)
+    const filteredSecrets = { secrets: existingSecrets.secrets.filter(secret => secret.authorId !== event.payload.userId) }
 
     await this.settingService.createOrReplace({
       user,
       props: {
         name: SettingName.ListedAuthorSecrets,
-        unencryptedValue: JSON.stringify(authSecrets),
+        unencryptedValue: JSON.stringify(filteredSecrets),
         sensitive: false,
       },
     })

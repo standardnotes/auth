@@ -128,6 +128,7 @@ import { FileUploadedEventHandler } from '../Domain/Handler/FileUploadedEventHan
 import { CreateValetToken } from '../Domain/UseCase/CreateValetToken/CreateValetToken'
 import { CreateListedAccount } from '../Domain/UseCase/CreateListedAccount/CreateListedAccount'
 import { ListedAccountCreatedEventHandler } from '../Domain/Handler/ListedAccountCreatedEventHandler'
+import { ListedAccountDeletedEventHandler } from '../Domain/Handler/ListedAccountDeletedEventHandler'
 
 export class ContainerConfigLoader {
   async load(): Promise<Container> {
@@ -336,6 +337,7 @@ export class ContainerConfigLoader {
     container.bind<UserEmailChangedEventHandler>(TYPES.UserEmailChangedEventHandler).to(UserEmailChangedEventHandler)
     container.bind<FileUploadedEventHandler>(TYPES.FileUploadedEventHandler).to(FileUploadedEventHandler)
     container.bind<ListedAccountCreatedEventHandler>(TYPES.ListedAccountCreatedEventHandler).to(ListedAccountCreatedEventHandler)
+    container.bind<ListedAccountDeletedEventHandler>(TYPES.ListedAccountDeletedEventHandler).to(ListedAccountDeletedEventHandler)
 
     // Services
     container.bind<UAParser>(TYPES.DeviceDetector).toConstantValue(new UAParser())
@@ -398,6 +400,7 @@ export class ContainerConfigLoader {
       ['USER_EMAIL_CHANGED', container.get(TYPES.UserEmailChangedEventHandler)],
       ['FILE_UPLOADED', container.get(TYPES.FileUploadedEventHandler)],
       ['LISTED_ACCOUNT_CREATED', container.get(TYPES.ListedAccountCreatedEventHandler)],
+      ['LISTED_ACCOUNT_DELETED', container.get(TYPES.ListedAccountDeletedEventHandler)],
     ])
 
     if (env.get('SQS_QUEUE_URL', true)) {
