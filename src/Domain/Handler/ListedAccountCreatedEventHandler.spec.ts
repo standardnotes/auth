@@ -37,6 +37,7 @@ describe('ListedAccountCreatedEventHandler', () => {
       userId: 1,
       userName: 'testuser',
       secret: 'new-secret',
+      hostUrl: 'https://dev.listed.to',
     }
 
     logger = {} as jest.Mocked<Logger>
@@ -59,14 +60,14 @@ describe('ListedAccountCreatedEventHandler', () => {
       props: {
         name: 'LISTED_AUTHOR_SECRETS',
         sensitive: false,
-        unencryptedValue: '{"secrets":[{"authorId":1,"secret":"new-secret"}]}',
+        unencryptedValue: '[{"authorId":1,"secret":"new-secret","hostUrl":"https://dev.listed.to"}]',
       },
     })
   })
 
   it('should add the listed secret as a user setting to an existing list of secrets', async () => {
     settingService.findSetting = jest.fn().mockReturnValue({
-      value: '{"secrets":[{"authorId":2,"secret":"old-secret"}]}',
+      value: '[{"authorId":2,"secret":"old-secret","hostUrl":"https://dev.listed.to"}]',
     } as jest.Mocked<Setting>)
 
     await createHandler().handle(event)
@@ -76,7 +77,7 @@ describe('ListedAccountCreatedEventHandler', () => {
       props: {
         name: 'LISTED_AUTHOR_SECRETS',
         sensitive: false,
-        unencryptedValue: '{"secrets":[{"authorId":2,"secret":"old-secret"},{"authorId":1,"secret":"new-secret"}]}',
+        unencryptedValue: '[{"authorId":2,"secret":"old-secret","hostUrl":"https://dev.listed.to"},{"authorId":1,"secret":"new-secret","hostUrl":"https://dev.listed.to"}]',
       },
     })
   })
