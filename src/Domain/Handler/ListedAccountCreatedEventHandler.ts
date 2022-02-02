@@ -24,9 +24,9 @@ export class ListedAccountCreatedEventHandler implements DomainEventHandlerInter
       return
     }
 
-    const newSecret = { authorId: event.payload.userId, secret: event.payload.secret }
+    const newSecret = { authorId: event.payload.userId, secret: event.payload.secret, hostUrl: event.payload.hostUrl }
 
-    let authSecrets: ListedAuthorSecretsData = { secrets: [ newSecret ] }
+    let authSecrets: ListedAuthorSecretsData = [ newSecret ]
 
     const listedAuthorSecretsSetting = await this.settingService.findSetting({
       settingName: SettingName.ListedAuthorSecrets,
@@ -34,8 +34,8 @@ export class ListedAccountCreatedEventHandler implements DomainEventHandlerInter
     })
     if (listedAuthorSecretsSetting !== undefined) {
       const existingSecrets: ListedAuthorSecretsData = JSON.parse(listedAuthorSecretsSetting.value as string)
-      existingSecrets.secrets.push(newSecret)
-      authSecrets = { secrets: existingSecrets.secrets }
+      existingSecrets.push(newSecret)
+      authSecrets = existingSecrets
     }
 
     await this.settingService.createOrReplace({
