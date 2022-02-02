@@ -35,7 +35,10 @@ export class ListedAccountDeletedEventHandler implements DomainEventHandlerInter
     }
 
     const existingSecrets: ListedAuthorSecretsData = JSON.parse(listedAuthorSecretsSetting.value as string)
-    const filteredSecrets = { secrets: existingSecrets.secrets.filter(secret => secret.authorId !== event.payload.userId) }
+    const filteredSecrets = existingSecrets.filter(
+      secret => secret.authorId !== event.payload.userId ||
+      secret.authorId === event.payload.userId && secret.hostUrl !== event.payload.hostUrl
+    )
 
     await this.settingService.createOrReplace({
       user,
