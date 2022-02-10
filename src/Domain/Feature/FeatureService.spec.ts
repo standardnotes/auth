@@ -57,7 +57,7 @@ describe('FeatureService', () => {
     }
     permission2 = {
       uuid: 'permission-2-2-2',
-      name: PermissionName.CloudLink,
+      name: PermissionName.BoldEditor,
     }
     permission3 = {
       uuid: 'permission-3-3-3',
@@ -273,7 +273,7 @@ describe('FeatureService', () => {
             expires_at: 555,
           }),
           expect.objectContaining({
-            identifier: 'org.standardnotes.cloudlink',
+            identifier: 'org.standardnotes.bold-editor',
             expires_at: 777,
           }),
         ])
@@ -305,7 +305,7 @@ describe('FeatureService', () => {
             expires_at: longestExpireAt,
           }),
           expect.objectContaining({
-            identifier: 'org.standardnotes.cloudlink',
+            identifier: 'org.standardnotes.bold-editor',
             expires_at: longestExpireAt,
           }),
         ])
@@ -338,7 +338,7 @@ describe('FeatureService', () => {
             expires_at: 555,
           }),
           expect.objectContaining({
-            identifier: 'org.standardnotes.cloudlink',
+            identifier: 'org.standardnotes.bold-editor',
             expires_at: lesserExpireAt,
           }),
         ])

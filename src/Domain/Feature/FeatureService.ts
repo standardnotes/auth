@@ -1,5 +1,5 @@
 import { SubscriptionName } from '@standardnotes/auth'
-import { FeatureDescription, Features } from '@standardnotes/features'
+import { FeatureDescription, GetFeatures } from '@standardnotes/features'
 import { inject, injectable } from 'inversify'
 import TYPES from '../../Bootstrap/Types'
 import { RoleToSubscriptionMapInterface } from '../Role/RoleToSubscriptionMapInterface'
@@ -69,7 +69,7 @@ export class FeatureService implements FeatureServiceInterface {
       const rolePermissions = await role.permissions
 
       for (const rolePermission of rolePermissions) {
-        const featureForPermission = Features.find(feature => feature.permission_name === rolePermission.name) as FeatureDescription
+        const featureForPermission = GetFeatures().find(feature => feature.permission_name === rolePermission.name) as FeatureDescription
         if (featureForPermission === undefined) {
           continue
         }
