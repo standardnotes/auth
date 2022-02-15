@@ -68,6 +68,7 @@ describe('SignIn', () => {
 
     logger = {} as jest.Mocked<Logger>
     logger.debug = jest.fn()
+    logger.error = jest.fn()
   })
 
   it('should sign in a user', async () => {
@@ -93,6 +94,23 @@ describe('SignIn', () => {
       userUuid: '1-2-3',
     })
     expect(domainEventPublisher.publish).toHaveBeenCalled()
+  })
+
+  it('should sign in a user even if publishing a sign in event fails', async () => {
+    domainEventPublisher.publish = jest.fn().mockImplementation(() => {
+      throw new Error('Oops')
+    })
+
+    expect(await createUseCase().execute({
+      email: 'test@test.te',
+      password: 'qweqwe123123',
+      userAgent: 'Google Chrome',
+      apiVersion: '20190520',
+      ephemeralSession: false,
+    })).toEqual({
+      success: true,
+      authResponse: { foo: 'bar' },
+    })
   })
 
   it('should not sign in a user with wrong credentials', async () => {

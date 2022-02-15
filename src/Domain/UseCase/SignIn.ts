@@ -49,17 +49,21 @@ export class SignIn implements UseCaseInterface {
 
     const authResponseFactory = this.authResponseFactoryResolver.resolveAuthResponseFactoryVersion(dto.apiVersion)
 
-    const userRoles = await user.roles
+    try {
+      const userRoles = await user.roles
 
-    await this.domainEventPublisher.publish(
-      this.domainEventFactory.createUserSignedInEvent({
-        userUuid: user.uuid,
-        userEmail: user.email,
-        userRoles: userRoles.map(userRole => userRole.name as RoleName),
-        device: this.sessionService.getOperatingSystemInfoFromUserAgent(dto.userAgent),
-        browser: this.sessionService.getBrowserInfoFromUserAgent(dto.userAgent),
-      })
-    )
+      await this.domainEventPublisher.publish(
+        this.domainEventFactory.createUserSignedInEvent({
+          userUuid: user.uuid,
+          userEmail: user.email,
+          userRoles: userRoles.map(userRole => userRole.name as RoleName),
+          device: this.sessionService.getOperatingSystemInfoFromUserAgent(dto.userAgent),
+          browser: this.sessionService.getBrowserInfoFromUserAgent(dto.userAgent),
+        })
+      )
+    } catch (error) {
+      this.logger.error(`Could not publish sign in event: ${error.message}`)
+    }
 
     return {
       success: true,
