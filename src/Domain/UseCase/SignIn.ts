@@ -1,9 +1,13 @@
+import { RoleName } from '@standardnotes/auth'
+import { DomainEventPublisherInterface } from '@standardnotes/domain-events'
 import * as bcrypt from 'bcryptjs'
 
 import { inject, injectable } from 'inversify'
 import { Logger } from 'winston'
 import TYPES from '../../Bootstrap/Types'
 import { AuthResponseFactoryResolverInterface } from '../Auth/AuthResponseFactoryResolverInterface'
+import { DomainEventFactoryInterface } from '../Event/DomainEventFactoryInterface'
+import { SessionServiceInterface } from '../Session/SessionServiceInterface'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { SignInDTO } from './SignInDTO'
 import { SignInResponse } from './SignInResponse'
@@ -14,6 +18,9 @@ export class SignIn implements UseCaseInterface {
   constructor(
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
     @inject(TYPES.AuthResponseFactoryResolver) private authResponseFactoryResolver: AuthResponseFactoryResolverInterface,
+    @inject(TYPES.DomainEventPublisher) private domainEventPublisher: DomainEventPublisherInterface,
+    @inject(TYPES.DomainEventFactory) private domainEventFactory: DomainEventFactoryInterface,
+    @inject(TYPES.SessionService) private sessionService: SessionServiceInterface,
     @inject(TYPES.Logger) private logger: Logger
   ){
   }
@@ -41,6 +48,22 @@ export class SignIn implements UseCaseInterface {
     }
 
     const authResponseFactory = this.authResponseFactoryResolver.resolveAuthResponseFactoryVersion(dto.apiVersion)
+
+    try {
+      const userRoles = await user.roles
+
+      await this.domainEventPublisher.publish(
+        this.domainEventFactory.createUserSignedInEvent({
+          userUuid: user.uuid,
+          userEmail: user.email,
+          userRoles: userRoles.map(userRole => userRole.name as RoleName),
+          device: this.sessionService.getOperatingSystemInfoFromUserAgent(dto.userAgent),
+          browser: this.sessionService.getBrowserInfoFromUserAgent(dto.userAgent),
+        })
+      )
+    } catch (error) {
+      this.logger.error(`Could not publish sign in event: ${error.message}`)
+    }
 
     return {
       success: true,

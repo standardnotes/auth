@@ -1,13 +1,13 @@
 import 'reflect-metadata'
 import { Session } from '../Session/Session'
 import { SessionRepositoryInterface } from '../Session/SessionRepositoryInterface'
-import { SessionServiceInterace } from '../Session/SessionServiceInterface'
+import { SessionServiceInterface } from '../Session/SessionServiceInterface'
 
 import { DeletePreviousSessionsForUser } from './DeletePreviousSessionsForUser'
 
 describe('DeletePreviousSessionsForUser', () => {
   let sessionRepository: SessionRepositoryInterface
-  let sessionService: SessionServiceInterace
+  let sessionService: SessionServiceInterface
   let session: Session
   let currentSession: Session
 
@@ -24,7 +24,7 @@ describe('DeletePreviousSessionsForUser', () => {
     sessionRepository.deleteAllByUserUuid = jest.fn()
     sessionRepository.findAllByUserUuid = jest.fn().mockReturnValue([ session, currentSession ])
 
-    sessionService = {} as jest.Mocked<SessionServiceInterace>
+    sessionService = {} as jest.Mocked<SessionServiceInterface>
     sessionService.createRevokedSession = jest.fn()
   })
 

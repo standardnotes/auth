@@ -4,13 +4,13 @@ import { Logger } from 'winston'
 
 import { ProjectorInterface } from '../../Projection/ProjectorInterface'
 import { SessionPayload } from '../Session/SessionPayload'
-import { SessionServiceInterace } from '../Session/SessionServiceInterface'
+import { SessionServiceInterface } from '../Session/SessionServiceInterface'
 import { KeyParamsFactoryInterface } from '../User/KeyParamsFactoryInterface'
 import { User } from '../User/User'
 import { AuthResponseFactory20200115 } from './AuthResponseFactory20200115'
 
 describe('AuthResponseFactory20200115', () => {
-  let sessionService: SessionServiceInterace
+  let sessionService: SessionServiceInterface
   let keyParamsFactory: KeyParamsFactoryInterface
   let userProjector: ProjectorInterface<User>
   let user: User
@@ -37,7 +37,7 @@ describe('AuthResponseFactory20200115', () => {
       refresh_expiration: 234,
     }
 
-    sessionService = {} as jest.Mocked<SessionServiceInterace>
+    sessionService = {} as jest.Mocked<SessionServiceInterface>
     sessionService.createNewSessionForUser = jest.fn().mockReturnValue(sessionPayload)
     sessionService.createNewEphemeralSessionForUser = jest.fn().mockReturnValue(sessionPayload)
 

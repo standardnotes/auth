@@ -3,7 +3,7 @@ import { RevokedSession } from './RevokedSession'
 import { Session } from './Session'
 import { SessionPayload } from './SessionPayload'
 
-export interface SessionServiceInterace {
+export interface SessionServiceInterface {
   createNewSessionForUser(user: User, apiVersion: string, userAgent: string): Promise<SessionPayload>
   createNewEphemeralSessionForUser(user: User, apiVersion: string, userAgent: string): Promise<SessionPayload>
   refreshTokens(session: Session): Promise<SessionPayload>
@@ -13,5 +13,7 @@ export interface SessionServiceInterace {
   deleteSessionByToken(token: string): Promise<void>
   isRefreshTokenValid(session: Session, token: string): boolean
   getDeviceInfo(session: Session): string
+  getOperatingSystemInfoFromUserAgent(userAgent: string): string
+  getBrowserInfoFromUserAgent(userAgent: string): string
   createRevokedSession(session: Session): Promise<RevokedSession>
 }

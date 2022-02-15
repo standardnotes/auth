@@ -2,14 +2,14 @@ import * as dayjs from 'dayjs'
 
 import { inject, injectable } from 'inversify'
 import TYPES from '../../Bootstrap/Types'
-import { SessionServiceInterace } from '../Session/SessionServiceInterface'
+import { SessionServiceInterface } from '../Session/SessionServiceInterface'
 import { RefreshSessionTokenResponse } from './RefreshSessionTokenResponse'
 import { RefreshSessionTokenDTO } from './RefreshSessionTokenDTO'
 
 @injectable()
 export class RefreshSessionToken {
   constructor(
-    @inject(TYPES.SessionService) private sessionService: SessionServiceInterace,
+    @inject(TYPES.SessionService) private sessionService: SessionServiceInterface,
   ) {
   }
 

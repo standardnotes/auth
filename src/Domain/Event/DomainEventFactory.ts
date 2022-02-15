@@ -1,7 +1,6 @@
 import { RoleName } from '@standardnotes/auth'
-import { AccountDeletionRequestedEvent, UserEmailChangedEvent, UserRegisteredEvent, UserRolesChangedEvent, OfflineSubscriptionTokenCreatedEvent, EmailBackupRequestedEvent, CloudBackupRequestedEvent, ListedAccountRequestedEvent } from '@standardnotes/domain-events'
+import { AccountDeletionRequestedEvent, UserEmailChangedEvent, UserRegisteredEvent, UserRolesChangedEvent, OfflineSubscriptionTokenCreatedEvent, EmailBackupRequestedEvent, CloudBackupRequestedEvent, ListedAccountRequestedEvent, UserSignedInEvent } from '@standardnotes/domain-events'
 import { TimerInterface } from '@standardnotes/time'
-import * as dayjs from 'dayjs'
 import { inject, injectable } from 'inversify'
 import TYPES from '../../Bootstrap/Types'
 import { DomainEventFactoryInterface } from './DomainEventFactoryInterface'
@@ -13,10 +12,24 @@ export class DomainEventFactory implements DomainEventFactoryInterface {
   ) {
   }
 
+  createUserSignedInEvent(dto: { userUuid: string, userEmail: string, userRoles: RoleName[], device: string, browser: string }): UserSignedInEvent {
+    return {
+      type: 'USER_SIGNED_IN',
+      createdAt: this.timer.getUTCDate(),
+      meta: {
+        correlation: {
+          userIdentifier: dto.userUuid,
+          userIdentifierType: 'uuid',
+        },
+      },
+      payload: dto,
+    }
+  }
+
   createListedAccountRequestedEvent(userUuid: string, userEmail: string): ListedAccountRequestedEvent {
     return {
       type: 'LISTED_ACCOUNT_REQUESTED',
-      createdAt: dayjs.utc().toDate(),
+      createdAt: this.timer.getUTCDate(),
       meta: {
         correlation: {
           userIdentifier: userUuid,
@@ -33,7 +46,7 @@ export class DomainEventFactory implements DomainEventFactoryInterface {
   createCloudBackupRequestedEvent(cloudProvider: 'DROPBOX' | 'ONE_DRIVE' | 'GOOGLE_DRIVE', cloudProviderToken: string, userUuid: string, muteEmailsSettingUuid: string, userHasEmailsMuted: boolean): CloudBackupRequestedEvent {
     return {
       type: 'CLOUD_BACKUP_REQUESTED',
-      createdAt: dayjs.utc().toDate(),
+      createdAt: this.timer.getUTCDate(),
       meta: {
         correlation: {
           userIdentifier: userUuid,
@@ -53,7 +66,7 @@ export class DomainEventFactory implements DomainEventFactoryInterface {
   createEmailBackupRequestedEvent(userUuid: string, muteEmailsSettingUuid: string, userHasEmailsMuted: boolean): EmailBackupRequestedEvent {
     return {
       type: 'EMAIL_BACKUP_REQUESTED',
-      createdAt: dayjs.utc().toDate(),
+      createdAt: this.timer.getUTCDate(),
       meta: {
         correlation: {
           userIdentifier: userUuid,
@@ -71,7 +84,7 @@ export class DomainEventFactory implements DomainEventFactoryInterface {
   createAccountDeletionRequestedEvent(userUuid: string): AccountDeletionRequestedEvent {
     return {
       type: 'ACCOUNT_DELETION_REQUESTED',
-      createdAt: dayjs.utc().toDate(),
+      createdAt: this.timer.getUTCDate(),
       meta: {
         correlation: {
           userIdentifier: userUuid,
@@ -87,7 +100,7 @@ export class DomainEventFactory implements DomainEventFactoryInterface {
   createOfflineSubscriptionTokenCreatedEvent(token: string, email: string): OfflineSubscriptionTokenCreatedEvent {
     return {
       type: 'OFFLINE_SUBSCRIPTION_TOKEN_CREATED',
-      createdAt: dayjs.utc().toDate(),
+      createdAt: this.timer.getUTCDate(),
       meta: {
         correlation: {
           userIdentifier: email,
@@ -104,7 +117,7 @@ export class DomainEventFactory implements DomainEventFactoryInterface {
   createUserRegisteredEvent(userUuid: string, email: string): UserRegisteredEvent {
     return {
       type: 'USER_REGISTERED',
-      createdAt: dayjs.utc().toDate(),
+      createdAt: this.timer.getUTCDate(),
       meta: {
         correlation: {
           userIdentifier: userUuid,
@@ -121,7 +134,7 @@ export class DomainEventFactory implements DomainEventFactoryInterface {
   createUserEmailChangedEvent(userUuid: string, fromEmail: string, toEmail: string): UserEmailChangedEvent {
     return {
       type: 'USER_EMAIL_CHANGED',
-      createdAt: dayjs.utc().toDate(),
+      createdAt: this.timer.getUTCDate(),
       meta: {
         correlation: {
           userIdentifier: userUuid,
@@ -139,7 +152,7 @@ export class DomainEventFactory implements DomainEventFactoryInterface {
   createUserRolesChangedEvent(userUuid: string, email: string, currentRoles: RoleName[]): UserRolesChangedEvent {
     return {
       type: 'USER_ROLES_CHANGED',
-      createdAt: dayjs.utc().toDate(),
+      createdAt: this.timer.getUTCDate(),
       meta: {
         correlation: {
           userIdentifier: userUuid,

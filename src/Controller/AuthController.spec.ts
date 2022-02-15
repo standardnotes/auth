@@ -6,7 +6,7 @@ import { DomainEventInterface, DomainEventPublisherInterface } from '@standardno
 
 import { AuthController } from './AuthController'
 import { results } from 'inversify-express-utils'
-import { SessionServiceInterace } from '../Domain/Session/SessionServiceInterface'
+import { SessionServiceInterface } from '../Domain/Session/SessionServiceInterface'
 import { VerifyMFA } from '../Domain/UseCase/VerifyMFA'
 import { SignIn } from '../Domain/UseCase/SignIn'
 import { ClearLoginAttempts } from '../Domain/UseCase/ClearLoginAttempts'
@@ -19,7 +19,7 @@ import { Register } from '../Domain/UseCase/Register'
 import { DomainEventFactoryInterface } from '../Domain/Event/DomainEventFactoryInterface'
 
 describe('AuthController', () => {
-  let sessionService: SessionServiceInterace
+  let sessionService: SessionServiceInterface
   let verifyMFA: VerifyMFA
   let signIn: SignIn
   let getUserKeyParams: GetUserKeyParams
@@ -52,7 +52,7 @@ describe('AuthController', () => {
     logger = {} as jest.Mocked<Logger>
     logger.debug = jest.fn()
 
-    sessionService = {} as jest.Mocked<SessionServiceInterace>
+    sessionService = {} as jest.Mocked<SessionServiceInterface>
     sessionService.deleteSessionByToken = jest.fn()
 
     verifyMFA = {} as jest.Mocked<VerifyMFA>
