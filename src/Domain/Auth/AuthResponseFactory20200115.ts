@@ -8,7 +8,7 @@ import { Logger } from 'winston'
 import TYPES from '../../Bootstrap/Types'
 import { ProjectorInterface } from '../../Projection/ProjectorInterface'
 import { SessionPayload } from '../Session/SessionPayload'
-import { SessionServiceInterace } from '../Session/SessionServiceInterface'
+import { SessionServiceInterface } from '../Session/SessionServiceInterface'
 import { KeyParamsFactoryInterface } from '../User/KeyParamsFactoryInterface'
 import { User } from '../User/User'
 import { AuthResponse20161215 } from './AuthResponse20161215'
@@ -18,7 +18,7 @@ import { AuthResponseFactory20190520 } from './AuthResponseFactory20190520'
 @injectable()
 export class AuthResponseFactory20200115 extends AuthResponseFactory20190520 {
   constructor(
-    @inject(TYPES.SessionService) private sessionService: SessionServiceInterace,
+    @inject(TYPES.SessionService) private sessionService: SessionServiceInterface,
     @inject(TYPES.KeyParamsFactory) private keyParamsFactory: KeyParamsFactoryInterface,
     @inject(TYPES.UserProjector) userProjector: ProjectorInterface<User>,
     @inject(TYPES.SessionTokenEncoder) protected tokenEncoder: TokenEncoderInterface<SessionTokenData>,

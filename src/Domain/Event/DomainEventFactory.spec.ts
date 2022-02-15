@@ -15,6 +15,34 @@ describe('DomainEventFactory', () => {
   beforeEach(() => {
     timer = {} as jest.Mocked<TimerInterface>
     timer.getTimestampInMicroseconds = jest.fn().mockReturnValue(1)
+    timer.getUTCDate = jest.fn().mockReturnValue(new Date(1))
+  })
+
+  it('should create a USER_SIGNED_IN event', () => {
+    expect(createFactory().createUserSignedInEvent({
+      browser: 'Firefox 1',
+      device: 'iOS 1',
+      userEmail: 'test@test.te',
+      userUuid: '1-2-3',
+      userRoles: [ RoleName.BasicUser, RoleName.CoreUser ],
+    }))
+      .toEqual({
+        createdAt: expect.any(Date),
+        meta: {
+          correlation: {
+            userIdentifier: '1-2-3',
+            userIdentifierType: 'uuid',
+          },
+        },
+        payload: {
+          userUuid: '1-2-3',
+          userEmail: 'test@test.te',
+          browser: 'Firefox 1',
+          device: 'iOS 1',
+          userRoles: [ RoleName.BasicUser, RoleName.CoreUser ],
+        },
+        type: 'USER_SIGNED_IN',
+      })
   })
 
   it('should create a LISTED_ACCOUNT_REQUESTED event', () => {

@@ -1,14 +1,14 @@
 import 'reflect-metadata'
 import * as dayjs from 'dayjs'
 
-import { SessionServiceInterace } from '../Domain/Session/SessionServiceInterface'
+import { SessionServiceInterface } from '../Domain/Session/SessionServiceInterface'
 import { SessionProjector } from './SessionProjector'
 import { Session } from '../Domain/Session/Session'
 
 describe('SessionProjector', () => {
   let session: Session
   let currentSession: Session
-  let sessionService: SessionServiceInterace
+  let sessionService: SessionServiceInterface
 
   const createProjector = () => new SessionProjector(sessionService)
 
@@ -24,7 +24,7 @@ describe('SessionProjector', () => {
     currentSession = new Session()
     currentSession.uuid = '234'
 
-    sessionService = {} as jest.Mocked<SessionServiceInterace>
+    sessionService = {} as jest.Mocked<SessionServiceInterface>
     sessionService.getDeviceInfo = jest.fn().mockReturnValue('Some Device Info')
   })
 

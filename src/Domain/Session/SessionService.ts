@@ -10,7 +10,7 @@ import { TimerInterface } from '@standardnotes/time'
 import TYPES from '../../Bootstrap/Types'
 import { Session } from './Session'
 import { SessionRepositoryInterface } from './SessionRepositoryInterface'
-import { SessionServiceInterace } from './SessionServiceInterface'
+import { SessionServiceInterface } from './SessionServiceInterface'
 import { SessionPayload } from './SessionPayload'
 import { User } from '../User/User'
 import { EphemeralSessionRepositoryInterface } from './EphemeralSessionRepositoryInterface'
@@ -19,7 +19,7 @@ import { RevokedSession } from './RevokedSession'
 import { RevokedSessionRepositoryInterface } from './RevokedSessionRepositoryInterface'
 
 @injectable()
-export class SessionService implements SessionServiceInterace {
+export class SessionService implements SessionServiceInterface {
   static readonly SESSION_TOKEN_VERSION = 1
 
   constructor (
@@ -84,41 +84,62 @@ export class SessionService implements SessionServiceInterace {
     return crypto.timingSafeEqual(Buffer.from(hashedRefreshToken), Buffer.from(session.hashedRefreshToken))
   }
 
-  getDeviceInfo(session: Session): string {
+  getOperatingSystemInfoFromUserAgent(userAgent: string): string {
     try {
-      const userAgentParsed = this.deviceDetector.setUA(session.userAgent).getResult()
+      const userAgentParsed = this.deviceDetector.setUA(userAgent).getResult()
 
       const osInfo = `${userAgentParsed.os.name ?? ''} ${userAgentParsed.os.version ?? ''}`.trim()
-      let clientInfo = `${userAgentParsed.browser.name ?? ''} ${userAgentParsed.browser.version ?? ''}`.trim()
 
       if (userAgentParsed.ua.toLowerCase().indexOf('okhttp') >= 0) {
         return 'Android'
       }
+
+      return osInfo
+    }
+    catch (error) {
+      this.logger.warning(`Could not parse operating system info. User agent: ${userAgent}: ${error.message}`)
+
+      return 'Unknown OS'
+    }
+  }
+
+  getBrowserInfoFromUserAgent(userAgent: string): string {
+    try {
+      const userAgentParsed = this.deviceDetector.setUA(userAgent).getResult()
+
+      let clientInfo = `${userAgentParsed.browser.name ?? ''} ${userAgentParsed.browser.version ?? ''}`.trim()
 
       const desktopAppMatches = [...userAgentParsed.ua.matchAll(/(.*)StandardNotes\/((0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*))/g)]
       if (desktopAppMatches[0] && desktopAppMatches[0][2]) {
         clientInfo = `Standard Notes Desktop ${desktopAppMatches[0][2]}`
       }
 
-      if (osInfo && clientInfo) {
-        return `${clientInfo} on ${osInfo}`
-      }
-
-      if (osInfo) {
-        return osInfo
-      }
-
-      if (clientInfo) {
-        return clientInfo
-      }
-
-      return 'Unknown Client on Unknown OS'
+      return clientInfo
     }
     catch (error) {
-      this.logger.warning(`Could not parse session device info. User agent: ${session.userAgent}: ${error.message}`)
+      this.logger.warning(`Could not parse browser info. User agent: ${userAgent}: ${error.message}`)
 
-      return session.userAgent
+      return 'Unknown Client'
     }
+  }
+
+  getDeviceInfo(session: Session): string {
+    const browserInfo = this.getBrowserInfoFromUserAgent(session.userAgent)
+    const osInfo = this.getOperatingSystemInfoFromUserAgent(session.userAgent)
+
+    if (osInfo && !browserInfo) {
+      return osInfo
+    }
+
+    if (browserInfo && !osInfo) {
+      return browserInfo
+    }
+
+    if (!browserInfo && !osInfo) {
+      return 'Unknown Client on Unknown OS'
+    }
+
+    return `${browserInfo} on ${osInfo}`
   }
 
   async getSessionFromToken(token: string): Promise<Session | undefined> {

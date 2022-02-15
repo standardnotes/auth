@@ -328,12 +328,12 @@ describe('SessionService', () => {
     expect(createService().getDeviceInfo(session)).toEqual('Standard Notes Desktop 3.5.18 on Mac OS 10.16.0')
   })
 
-  it('should return device info fallback to user agent', () => {
+  it('should return unknown device info as fallback', () => {
     deviceDetector.getResult = jest.fn().mockImplementation(() => {
       throw new Error('something bad happened')
     })
 
-    expect(createService().getDeviceInfo(session)).toEqual('Chrome')
+    expect(createService().getDeviceInfo(session)).toEqual('Unknown Client on Unknown OS')
   })
 
   it('should retrieve a session from a session token', async () => {

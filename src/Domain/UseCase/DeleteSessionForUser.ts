@@ -4,7 +4,7 @@ import { EphemeralSession } from '../Session/EphemeralSession'
 import { EphemeralSessionRepositoryInterface } from '../Session/EphemeralSessionRepositoryInterface'
 import { Session } from '../Session/Session'
 import { SessionRepositoryInterface } from '../Session/SessionRepositoryInterface'
-import { SessionServiceInterace } from '../Session/SessionServiceInterface'
+import { SessionServiceInterface } from '../Session/SessionServiceInterface'
 import { DeleteSessionForUserDTO } from './DeleteSessionForUserDTO'
 import { DeleteSessionForUserResponse } from './DeleteSessionForUserResponse'
 import { UseCaseInterface } from './UseCaseInterface'
@@ -14,7 +14,7 @@ export class DeleteSessionForUser implements UseCaseInterface {
   constructor(
     @inject(TYPES.SessionRepository) private sessionRepository: SessionRepositoryInterface,
     @inject(TYPES.EphemeralSessionRepository) private ephemeralSessionRepository: EphemeralSessionRepositoryInterface,
-    @inject(TYPES.SessionService) private sessionService: SessionServiceInterace
+    @inject(TYPES.SessionService) private sessionService: SessionServiceInterface
   ) {
   }
 

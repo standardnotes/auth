@@ -1,7 +1,7 @@
 import { SessionTokenData, TokenDecoderInterface } from '@standardnotes/auth'
 import { inject, injectable } from 'inversify'
 import TYPES from '../../Bootstrap/Types'
-import { SessionServiceInterace } from '../Session/SessionServiceInterface'
+import { SessionServiceInterface } from '../Session/SessionServiceInterface'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { AuthenticationMethod } from './AuthenticationMethod'
 import { AuthenticationMethodResolverInterface } from './AuthenticationMethodResolverInterface'
@@ -10,7 +10,7 @@ import { AuthenticationMethodResolverInterface } from './AuthenticationMethodRes
 export class AuthenticationMethodResolver implements AuthenticationMethodResolverInterface {
   constructor(
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
-    @inject(TYPES.SessionService) private sessionService: SessionServiceInterace,
+    @inject(TYPES.SessionService) private sessionService: SessionServiceInterface,
     @inject(TYPES.SessionTokenDecoder) private sessionTokenDecoder: TokenDecoderInterface<SessionTokenData>,
     @inject(TYPES.FallbackSessionTokenDecoder) private fallbackSessionTokenDecoder: TokenDecoderInterface<SessionTokenData>
   ) {

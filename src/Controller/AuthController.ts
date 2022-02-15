@@ -11,7 +11,7 @@ import {
 import { DomainEventPublisherInterface } from '@standardnotes/domain-events'
 
 import TYPES from '../Bootstrap/Types'
-import { SessionServiceInterace } from '../Domain/Session/SessionServiceInterface'
+import { SessionServiceInterface } from '../Domain/Session/SessionServiceInterface'
 import { SignIn } from '../Domain/UseCase/SignIn'
 import { ClearLoginAttempts } from '../Domain/UseCase/ClearLoginAttempts'
 import { VerifyMFA } from '../Domain/UseCase/VerifyMFA'
@@ -24,7 +24,7 @@ import { DomainEventFactoryInterface } from '../Domain/Event/DomainEventFactoryI
 @controller('/auth')
 export class AuthController extends BaseHttpController {
   constructor(
-    @inject(TYPES.SessionService) private sessionService: SessionServiceInterace,
+    @inject(TYPES.SessionService) private sessionService: SessionServiceInterface,
     @inject(TYPES.VerifyMFA) private verifyMFA: VerifyMFA,
     @inject(TYPES.SignIn) private signInUseCase: SignIn,
     @inject(TYPES.GetUserKeyParams) private getUserKeyParams: GetUserKeyParams,

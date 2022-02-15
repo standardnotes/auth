@@ -4,14 +4,14 @@ import { EphemeralSessionRepositoryInterface } from '../Session/EphemeralSession
 
 import { Session } from '../Session/Session'
 import { SessionRepositoryInterface } from '../Session/SessionRepositoryInterface'
-import { SessionServiceInterace } from '../Session/SessionServiceInterface'
+import { SessionServiceInterface } from '../Session/SessionServiceInterface'
 
 import { DeleteSessionForUser } from './DeleteSessionForUser'
 
 describe('DeleteSessionForUser', () => {
   let sessionRepository: SessionRepositoryInterface
   let ephemeralSessionRepository: EphemeralSessionRepositoryInterface
-  let sessionService: SessionServiceInterace
+  let sessionService: SessionServiceInterface
   let session: Session
   let ephemeralSession: EphemeralSession
 
@@ -34,7 +34,7 @@ describe('DeleteSessionForUser', () => {
     ephemeralSessionRepository.deleteOne = jest.fn()
     ephemeralSessionRepository.findOneByUuidAndUserUuid = jest.fn().mockReturnValue(session)
 
-    sessionService = {} as jest.Mocked<SessionServiceInterace>
+    sessionService = {} as jest.Mocked<SessionServiceInterface>
     sessionService.createRevokedSession = jest.fn()
   })
 
