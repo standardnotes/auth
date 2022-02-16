@@ -2,7 +2,7 @@ import { inject, injectable } from 'inversify'
 import TYPES from '../../Bootstrap/Types'
 import { Session } from '../Session/Session'
 import { SessionRepositoryInterface } from '../Session/SessionRepositoryInterface'
-import { SessionServiceInterace } from '../Session/SessionServiceInterface'
+import { SessionServiceInterface } from '../Session/SessionServiceInterface'
 import { DeletePreviousSessionsForUserDTO } from './DeletePreviousSessionsForUserDTO'
 import { DeletePreviousSessionsForUserResponse } from './DeletePreviousSessionsForUserResponse'
 import { UseCaseInterface } from './UseCaseInterface'
@@ -11,7 +11,7 @@ import { UseCaseInterface } from './UseCaseInterface'
 export class DeletePreviousSessionsForUser implements UseCaseInterface {
   constructor (
     @inject(TYPES.SessionRepository) private sessionRepository: SessionRepositoryInterface,
-    @inject(TYPES.SessionService) private sessionService: SessionServiceInterace
+    @inject(TYPES.SessionService) private sessionService: SessionServiceInterface
   ) {
   }
 

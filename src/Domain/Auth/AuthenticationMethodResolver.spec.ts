@@ -4,7 +4,7 @@ import { SessionTokenData, TokenDecoderInterface } from '@standardnotes/auth'
 
 import { RevokedSession } from '../Session/RevokedSession'
 import { Session } from '../Session/Session'
-import { SessionServiceInterace } from '../Session/SessionServiceInterface'
+import { SessionServiceInterface } from '../Session/SessionServiceInterface'
 import { User } from '../User/User'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 
@@ -12,7 +12,7 @@ import { AuthenticationMethodResolver } from './AuthenticationMethodResolver'
 
 describe('AuthenticationMethodResolver', () => {
   let userRepository: UserRepositoryInterface
-  let sessionService: SessionServiceInterace
+  let sessionService: SessionServiceInterface
   let sessionTokenDecoder: TokenDecoderInterface<SessionTokenData>
   let fallbackTokenDecoder: TokenDecoderInterface<SessionTokenData>
   let user: User
@@ -31,7 +31,7 @@ describe('AuthenticationMethodResolver', () => {
     userRepository = {} as jest.Mocked<UserRepositoryInterface>
     userRepository.findOneByUuid = jest.fn().mockReturnValue(user)
 
-    sessionService = {} as jest.Mocked<SessionServiceInterace>
+    sessionService = {} as jest.Mocked<SessionServiceInterface>
     sessionService.getSessionFromToken = jest.fn()
     sessionService.getRevokedSessionFromToken = jest.fn()
     sessionService.markRevokedSessionAsReceived = jest.fn().mockReturnValue(revokedSession)

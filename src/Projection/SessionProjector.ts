@@ -3,7 +3,7 @@ import * as dayjs from 'dayjs'
 import TYPES from '../Bootstrap/Types'
 
 import { Session } from '../Domain/Session/Session'
-import { SessionServiceInterace } from '../Domain/Session/SessionServiceInterface'
+import { SessionServiceInterface } from '../Domain/Session/SessionServiceInterface'
 import { ProjectorInterface } from './ProjectorInterface'
 
 @injectable()
@@ -11,7 +11,7 @@ export class SessionProjector implements ProjectorInterface<Session> {
   static readonly CURRENT_SESSION_PROJECTION = 'CURRENT_SESSION_PROJECTION'
 
   constructor(
-    @inject(TYPES.SessionService) private sessionService: SessionServiceInterace
+    @inject(TYPES.SessionService) private sessionService: SessionServiceInterface
   ) {
   }
 
