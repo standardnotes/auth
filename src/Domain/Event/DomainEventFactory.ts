@@ -12,7 +12,14 @@ export class DomainEventFactory implements DomainEventFactoryInterface {
   ) {
   }
 
-  createUserSignedInEvent(dto: { userUuid: string, userEmail: string, userRoles: RoleName[], device: string, browser: string }): UserSignedInEvent {
+  createUserSignedInEvent(dto: {
+    userUuid: string,
+    userEmail: string,
+    userRoles: RoleName[],
+    device: string,
+    browser: string,
+    signInAlertEnabled: boolean,
+  }): UserSignedInEvent {
     return {
       type: 'USER_SIGNED_IN',
       createdAt: this.timer.getUTCDate(),
