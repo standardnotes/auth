@@ -5,7 +5,6 @@ export interface DomainEventFactoryInterface {
   createUserSignedInEvent(dto: {
     userUuid: string,
     userEmail: string,
-    userRoles: RoleName[],
     device: string,
     browser: string,
     signInAlertEnabled: boolean,
