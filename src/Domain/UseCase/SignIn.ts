@@ -1,4 +1,3 @@
-import { RoleName } from '@standardnotes/auth'
 import { DomainEventPublisherInterface } from '@standardnotes/domain-events'
 import { PermissionName } from '@standardnotes/features'
 import * as bcrypt from 'bcryptjs'
@@ -53,13 +52,10 @@ export class SignIn implements UseCaseInterface {
     const authResponseFactory = this.authResponseFactoryResolver.resolveAuthResponseFactoryVersion(dto.apiVersion)
 
     try {
-      const userRoles = await user.roles
-
       await this.domainEventPublisher.publish(
         this.domainEventFactory.createUserSignedInEvent({
           userUuid: user.uuid,
           userEmail: user.email,
-          userRoles: userRoles.map(userRole => userRole.name as RoleName),
           device: this.sessionService.getOperatingSystemInfoFromUserAgent(dto.userAgent),
           browser: this.sessionService.getBrowserInfoFromUserAgent(dto.userAgent),
           signInAlertEnabled: await this.roleService.userHasPermission(user.uuid, PermissionName.SignInAlerts),

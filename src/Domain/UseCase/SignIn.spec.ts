@@ -10,8 +10,6 @@ import { SessionServiceInterface } from '../Session/SessionServiceInterface'
 import { User } from '../User/User'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { SignIn } from './SignIn'
-import { RoleName } from '@standardnotes/auth'
-import { Role } from '../Role/Role'
 import { RoleServiceInterface } from '../Role/RoleServiceInterface'
 
 describe('SignIn', () => {
@@ -40,14 +38,6 @@ describe('SignIn', () => {
       uuid: '1-2-3',
       email: 'test@test.com',
     } as jest.Mocked<User>
-    user.roles = Promise.resolve([
-      {
-        name: RoleName.BasicUser,
-      } as Role,
-      {
-        name: RoleName.CoreUser,
-      } as Role,
-    ])
     user.encryptedPassword = '$2a$11$K3g6XoTau8VmLJcai1bB0eD9/YvBSBRtBhMprJOaVZ0U3SgasZH3a'
 
     userRepository = {} as jest.Mocked<UserRepositoryInterface>
@@ -93,10 +83,6 @@ describe('SignIn', () => {
       browser: 'Firefox 1',
       device: 'iOS 1',
       userEmail: 'test@test.com',
-      userRoles: [
-        'BASIC_USER',
-        'CORE_USER',
-      ],
       userUuid: '1-2-3',
       signInAlertEnabled: true,
     })
