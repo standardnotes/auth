@@ -25,6 +25,7 @@ describe('DomainEventFactory', () => {
       userEmail: 'test@test.te',
       userUuid: '1-2-3',
       userRoles: [ RoleName.BasicUser, RoleName.CoreUser ],
+      signInAlertEnabled: true,
     }))
       .toEqual({
         createdAt: expect.any(Date),
@@ -40,6 +41,7 @@ describe('DomainEventFactory', () => {
           browser: 'Firefox 1',
           device: 'iOS 1',
           userRoles: [ RoleName.BasicUser, RoleName.CoreUser ],
+          signInAlertEnabled: true,
         },
         type: 'USER_SIGNED_IN',
       })

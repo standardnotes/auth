@@ -12,6 +12,7 @@ import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { SignIn } from './SignIn'
 import { RoleName } from '@standardnotes/auth'
 import { Role } from '../Role/Role'
+import { RoleServiceInterface } from '../Role/RoleServiceInterface'
 
 describe('SignIn', () => {
   let user: User
@@ -21,6 +22,7 @@ describe('SignIn', () => {
   let domainEventPublisher: DomainEventPublisherInterface
   let domainEventFactory: DomainEventFactoryInterface
   let sessionService: SessionServiceInterface
+  let roleService: RoleServiceInterface
   let logger: Logger
 
   const createUseCase = () => new SignIn(
@@ -29,6 +31,7 @@ describe('SignIn', () => {
     domainEventPublisher,
     domainEventFactory,
     sessionService,
+    roleService,
     logger
   )
 
@@ -66,6 +69,9 @@ describe('SignIn', () => {
     sessionService.getOperatingSystemInfoFromUserAgent = jest.fn().mockReturnValue('iOS 1')
     sessionService.getBrowserInfoFromUserAgent = jest.fn().mockReturnValue('Firefox 1')
 
+    roleService = {} as jest.Mocked<RoleServiceInterface>
+    roleService.userHasPermission = jest.fn().mockReturnValue(true)
+
     logger = {} as jest.Mocked<Logger>
     logger.debug = jest.fn()
     logger.error = jest.fn()
@@ -92,6 +98,7 @@ describe('SignIn', () => {
         'CORE_USER',
       ],
       userUuid: '1-2-3',
+      signInAlertEnabled: true,
     })
     expect(domainEventPublisher.publish).toHaveBeenCalled()
   })
