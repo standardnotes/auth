@@ -2,7 +2,14 @@ import { RoleName } from '@standardnotes/auth'
 import { AccountDeletionRequestedEvent, CloudBackupRequestedEvent, UserRegisteredEvent, UserRolesChangedEvent, UserEmailChangedEvent, OfflineSubscriptionTokenCreatedEvent, EmailBackupRequestedEvent, ListedAccountRequestedEvent, UserSignedInEvent } from '@standardnotes/domain-events'
 
 export interface DomainEventFactoryInterface {
-  createUserSignedInEvent(dto: { userUuid: string, userEmail: string, userRoles: RoleName[], device: string, browser: string }): UserSignedInEvent
+  createUserSignedInEvent(dto: {
+    userUuid: string,
+    userEmail: string,
+    userRoles: RoleName[],
+    device: string,
+    browser: string,
+    signInAlertEnabled: boolean,
+  }): UserSignedInEvent
   createListedAccountRequestedEvent(userUuid: string, userEmail: string): ListedAccountRequestedEvent
   createUserRegisteredEvent(userUuid: string, email: string): UserRegisteredEvent
   createEmailBackupRequestedEvent(userUuid: string, muteEmailsSettingUuid: string, userHasEmailsMuted: boolean): EmailBackupRequestedEvent

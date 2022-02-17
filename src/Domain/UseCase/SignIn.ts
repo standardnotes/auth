@@ -1,5 +1,6 @@
 import { RoleName } from '@standardnotes/auth'
 import { DomainEventPublisherInterface } from '@standardnotes/domain-events'
+import { PermissionName } from '@standardnotes/features'
 import * as bcrypt from 'bcryptjs'
 
 import { inject, injectable } from 'inversify'
@@ -7,6 +8,7 @@ import { Logger } from 'winston'
 import TYPES from '../../Bootstrap/Types'
 import { AuthResponseFactoryResolverInterface } from '../Auth/AuthResponseFactoryResolverInterface'
 import { DomainEventFactoryInterface } from '../Event/DomainEventFactoryInterface'
+import { RoleServiceInterface } from '../Role/RoleServiceInterface'
 import { SessionServiceInterface } from '../Session/SessionServiceInterface'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { SignInDTO } from './SignInDTO'
@@ -21,6 +23,7 @@ export class SignIn implements UseCaseInterface {
     @inject(TYPES.DomainEventPublisher) private domainEventPublisher: DomainEventPublisherInterface,
     @inject(TYPES.DomainEventFactory) private domainEventFactory: DomainEventFactoryInterface,
     @inject(TYPES.SessionService) private sessionService: SessionServiceInterface,
+    @inject(TYPES.RoleService) private roleService: RoleServiceInterface,
     @inject(TYPES.Logger) private logger: Logger
   ){
   }
@@ -59,6 +62,7 @@ export class SignIn implements UseCaseInterface {
           userRoles: userRoles.map(userRole => userRole.name as RoleName),
           device: this.sessionService.getOperatingSystemInfoFromUserAgent(dto.userAgent),
           browser: this.sessionService.getBrowserInfoFromUserAgent(dto.userAgent),
+          signInAlertEnabled: await this.roleService.userHasPermission(user.uuid, PermissionName.SignInAlerts),
         })
       )
     } catch (error) {
