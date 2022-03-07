@@ -109,7 +109,7 @@ export class SettingsAssociationService implements SettingsAssociationServiceInt
     return defaultSettings
   }
 
-  private async getFileUploadLimit(subscriptionName: SubscriptionName): Promise<number> {
+  async getFileUploadLimit(subscriptionName: SubscriptionName): Promise<number> {
     const roleName = this.roleToSubscriptionMap.getRoleNameForSubscriptionName(subscriptionName)
 
     const role = await this.roleRepository.findOneByName(roleName as RoleName)

@@ -6,10 +6,12 @@ import { SettingServiceInterface } from '../../Setting/SettingServiceInterface'
 import { UserSubscriptionRepositoryInterface } from '../../Subscription/UserSubscriptionRepositoryInterface'
 import { TimerInterface } from '@standardnotes/time'
 import { UserSubscription } from '../../Subscription/UserSubscription'
+import { SettingsAssociationServiceInterface } from '../../Setting/SettingsAssociationServiceInterface'
 
 describe('CreateValetToken', () => {
   let tokenEncoder: TokenEncoderInterface<ValetTokenData>
   let settingService: SettingServiceInterface
+  let settingsAssociationService: SettingsAssociationServiceInterface
   let userSubscriptionRepository: UserSubscriptionRepositoryInterface
   let timer: TimerInterface
   const valetTokenTTL = 123
@@ -17,6 +19,7 @@ describe('CreateValetToken', () => {
   const createUseCase = () => new CreateValetToken(
     tokenEncoder,
     settingService,
+    settingsAssociationService,
     userSubscriptionRepository,
     timer,
     valetTokenTTL
@@ -30,6 +33,9 @@ describe('CreateValetToken', () => {
     settingService.findSetting = jest.fn().mockReturnValue({
       value: '123',
     })
+
+    settingsAssociationService = {} as jest.Mocked<SettingsAssociationServiceInterface>
+    settingsAssociationService.getFileUploadLimit = jest.fn().mockReturnValue(5_368_709_120)
 
     userSubscriptionRepository = {} as jest.Mocked<UserSubscriptionRepositoryInterface>
     userSubscriptionRepository.findOneByUserUuid = jest.fn().mockReturnValue({ endsAt: 123 } as jest.Mocked<UserSubscription>)
@@ -104,7 +110,7 @@ describe('CreateValetToken', () => {
     })
   })
 
-  it('should create a write valet token if upload bytes settings do not exist', async () => {
+  it('should create a write valet token with default subscription upload limit if upload bytes settings do not exist', async () => {
     settingService.findSetting = jest.fn().mockReturnValue(undefined)
 
     const response = await createUseCase().execute({
@@ -120,7 +126,7 @@ describe('CreateValetToken', () => {
       ],
       userUuid: '1-2-3',
       uploadBytesUsed: 0,
-      uploadBytesLimit: 0,
+      uploadBytesLimit: 5368709120,
     }, 123)
 
     expect(response).toEqual({
