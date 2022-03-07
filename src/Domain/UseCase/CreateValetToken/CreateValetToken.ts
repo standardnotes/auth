@@ -1,5 +1,5 @@
 import { inject, injectable } from 'inversify'
-import { TokenEncoderInterface, ValetTokenData } from '@standardnotes/auth'
+import { SubscriptionName, TokenEncoderInterface, ValetTokenData } from '@standardnotes/auth'
 
 import { CreateValetTokenDTO } from './CreateValetTokenDTO'
 import { CreateValetTokenResponse } from './CreateValetTokenResponse'
@@ -9,12 +9,14 @@ import { SettingServiceInterface } from '../../Setting/SettingServiceInterface'
 import { SettingName } from '@standardnotes/settings'
 import { UserSubscriptionRepositoryInterface } from '../../Subscription/UserSubscriptionRepositoryInterface'
 import { TimerInterface } from '@standardnotes/time'
+import { SettingsAssociationServiceInterface } from '../../Setting/SettingsAssociationServiceInterface'
 
 @injectable()
 export class CreateValetToken implements UseCaseInterface {
   constructor(
     @inject(TYPES.ValetTokenEncoder) private tokenEncoder: TokenEncoderInterface<ValetTokenData>,
     @inject(TYPES.SettingService) private settingService: SettingServiceInterface,
+    @inject(TYPES.SettingsAssociationService) private settingsAssociationService: SettingsAssociationServiceInterface,
     @inject(TYPES.UserSubscriptionRepository) private userSubscriptionRepository: UserSubscriptionRepositoryInterface,
     @inject(TYPES.Timer) private timer: TimerInterface,
     @inject(TYPES.VALET_TOKEN_TTL) private valetTokenTTL: number,
@@ -46,13 +48,14 @@ export class CreateValetToken implements UseCaseInterface {
       uploadBytesUsed = +(uploadBytesUsedSetting.value as string)
     }
 
-    let uploadBytesLimit = 0
-    const uploadBytesLimitSetting = await this.settingService.findSetting({
+    const defaultUploadBytesLimitForSubscription = await this.settingsAssociationService.getFileUploadLimit(userSubscription.planName as SubscriptionName)
+    let uploadBytesLimit = defaultUploadBytesLimitForSubscription
+    const overwriteWithUserUploadBytesLimitSetting = await this.settingService.findSetting({
       userUuid: dto.userUuid,
       settingName: SettingName.FileUploadBytesLimit,
     })
-    if (uploadBytesLimitSetting !== undefined) {
-      uploadBytesLimit = +(uploadBytesLimitSetting.value as string)
+    if (overwriteWithUserUploadBytesLimitSetting !== undefined) {
+      uploadBytesLimit = +(overwriteWithUserUploadBytesLimitSetting.value as string)
     }
 
     const tokenData: ValetTokenData = {

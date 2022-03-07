@@ -9,4 +9,5 @@ export interface SettingsAssociationServiceInterface {
   getEncryptionVersionForSetting(settingName: SettingName): EncryptionVersion
   getSensitivityForSetting(settingName: SettingName): boolean
   isSettingMutableByClient(settingName: SettingName): boolean
+  getFileUploadLimit(subscriptionName: SubscriptionName): Promise<number>
 }
