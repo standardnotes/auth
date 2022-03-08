@@ -66,7 +66,7 @@ export class SignIn implements UseCaseInterface {
           userEmail: user.email,
           device: this.sessionService.getOperatingSystemInfoFromUserAgent(dto.userAgent),
           browser: this.sessionService.getBrowserInfoFromUserAgent(dto.userAgent),
-          signInAlertEnabled: await this.roleService.userHasPermission(user.uuid, PermissionName.SignInAlerts),
+          signInAlertEnabled: await this.roleService.userHasPermission(user.uuid, PermissionName.SignInAlerts) && muteSignInEmailsSetting.value === MuteSignInEmailsOption.NotMuted,
           muteSignInEmailsSettingUuid: muteSignInEmailsSetting.uuid,
         })
       )
