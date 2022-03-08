@@ -7,10 +7,14 @@ import { results } from 'inversify-express-utils'
 import { User } from '../Domain/User/User'
 import { GetUserFeatures } from '../Domain/UseCase/GetUserFeatures/GetUserFeatures'
 import { GetSetting } from '../Domain/UseCase/GetSetting/GetSetting'
+import { MuteFailedBackupsEmails } from '../Domain/UseCase/MuteFailedBackupsEmails/MuteFailedBackupsEmails'
+import { MuteSignInEmails } from '../Domain/UseCase/MuteSignInEmails/MuteSignInEmails'
 
 describe('InternalController', () => {
   let getUserFeatures: GetUserFeatures
   let getSetting: GetSetting
+  let muteFailedBackupsEmails: MuteFailedBackupsEmails
+  let muteSignInEmails: MuteSignInEmails
 
   let request: express.Request
   let user: User
@@ -18,6 +22,8 @@ describe('InternalController', () => {
   const createController = () => new InternalController(
     getUserFeatures,
     getSetting,
+    muteFailedBackupsEmails,
+    muteSignInEmails,
   )
 
   beforeEach(() => {
@@ -29,6 +35,12 @@ describe('InternalController', () => {
 
     getSetting = {} as jest.Mocked<GetSetting>
     getSetting.execute = jest.fn()
+
+    muteFailedBackupsEmails = {} as jest.Mocked<MuteFailedBackupsEmails>
+    muteFailedBackupsEmails.execute = jest.fn()
+
+    muteSignInEmails = {} as jest.Mocked<MuteSignInEmails>
+    muteSignInEmails.execute = jest.fn()
 
     request = {
       headers: {},
@@ -100,5 +112,57 @@ describe('InternalController', () => {
     })
 
     expect(result.statusCode).toEqual(400)
+  })
+
+  it('should mute failed backup emails user setting', async () => {
+    request.params.settingUuid = '1-2-3'
+
+    muteFailedBackupsEmails.execute = jest.fn().mockReturnValue({ success: true })
+
+    const httpResponse = <results.JsonResult> await createController().muteFailedBackupsEmails(request)
+    const result = await httpResponse.executeAsync()
+
+    expect(muteFailedBackupsEmails.execute).toHaveBeenCalledWith({ settingUuid: '1-2-3' })
+
+    expect(result.statusCode).toEqual(200)
+  })
+
+  it('should not mute failed backup emails user setting if it does not exist', async () => {
+    request.params.settingUuid = '1-2-3'
+
+    muteFailedBackupsEmails.execute = jest.fn().mockReturnValue({ success: false })
+
+    const httpResponse = <results.JsonResult> await createController().muteFailedBackupsEmails(request)
+    const result = await httpResponse.executeAsync()
+
+    expect(muteFailedBackupsEmails.execute).toHaveBeenCalledWith({ settingUuid: '1-2-3' })
+
+    expect(result.statusCode).toEqual(404)
+  })
+
+  it('should mute sign in emails user setting', async () => {
+    request.params.settingUuid = '1-2-3'
+
+    muteSignInEmails.execute = jest.fn().mockReturnValue({ success: true })
+
+    const httpResponse = <results.JsonResult> await createController().muteSignInEmails(request)
+    const result = await httpResponse.executeAsync()
+
+    expect(muteSignInEmails.execute).toHaveBeenCalledWith({ settingUuid: '1-2-3' })
+
+    expect(result.statusCode).toEqual(200)
+  })
+
+  it('should not mute sign in emails user setting if it does not exist', async () => {
+    request.params.settingUuid = '1-2-3'
+
+    muteSignInEmails.execute = jest.fn().mockReturnValue({ success: false })
+
+    const httpResponse = <results.JsonResult> await createController().muteSignInEmails(request)
+    const result = await httpResponse.executeAsync()
+
+    expect(muteSignInEmails.execute).toHaveBeenCalledWith({ settingUuid: '1-2-3' })
+
+    expect(result.statusCode).toEqual(404)
   })
 })
