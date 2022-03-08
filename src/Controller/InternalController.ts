@@ -10,12 +10,16 @@ import {
 import TYPES from '../Bootstrap/Types'
 import { GetSetting } from '../Domain/UseCase/GetSetting/GetSetting'
 import { GetUserFeatures } from '../Domain/UseCase/GetUserFeatures/GetUserFeatures'
+import { MuteFailedBackupsEmails } from '../Domain/UseCase/MuteFailedBackupsEmails/MuteFailedBackupsEmails'
+import { MuteSignInEmails } from '../Domain/UseCase/MuteSignInEmails/MuteSignInEmails'
 
 @controller('/internal')
 export class InternalController extends BaseHttpController {
   constructor(
     @inject(TYPES.GetUserFeatures) private doGetUserFeatures: GetUserFeatures,
     @inject(TYPES.GetSetting) private doGetSetting: GetSetting,
+    @inject(TYPES.MuteFailedBackupsEmails) private doMuteFailedBackupsEmails: MuteFailedBackupsEmails,
+    @inject(TYPES.MuteSignInEmails) private doMuteSignInEmails: MuteSignInEmails,
   ) {
     super()
   }
@@ -47,5 +51,33 @@ export class InternalController extends BaseHttpController {
     }
 
     return this.json(result, 400)
+  }
+
+  @httpGet('/settings/email_backup/:settingUuid/mute')
+  async muteFailedBackupsEmails(request: Request): Promise<results.JsonResult> {
+    const { settingUuid } = request.params
+    const result = await this.doMuteFailedBackupsEmails.execute({
+      settingUuid,
+    })
+
+    if (result.success) {
+      return this.json({ message: result.message })
+    }
+
+    return this.json({ message: result.message }, 404)
+  }
+
+  @httpGet('/settings/sign_in/:settingUuid/mute')
+  async muteSignInEmails(request: Request): Promise<results.JsonResult> {
+    const { settingUuid } = request.params
+    const result = await this.doMuteSignInEmails.execute({
+      settingUuid,
+    })
+
+    if (result.success) {
+      return this.json({ message: result.message })
+    }
+
+    return this.json({ message: result.message }, 404)
   }
 }
