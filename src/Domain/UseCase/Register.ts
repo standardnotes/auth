@@ -13,6 +13,7 @@ import { AuthResponseFactoryResolverInterface } from '../Auth/AuthResponseFactor
 import { RoleRepositoryInterface } from '../Role/RoleRepositoryInterface'
 import { CrypterInterface } from '../Encryption/CrypterInterface'
 import { TimerInterface } from '@standardnotes/time'
+import { SettingServiceInterface } from '../Setting/SettingServiceInterface'
 
 @injectable()
 export class Register implements UseCaseInterface {
@@ -22,6 +23,7 @@ export class Register implements UseCaseInterface {
     @inject(TYPES.AuthResponseFactoryResolver) private authResponseFactoryResolver: AuthResponseFactoryResolverInterface,
     @inject(TYPES.Crypter) private crypter: CrypterInterface,
     @inject(TYPES.DISABLE_USER_REGISTRATION) private disableUserRegistration: boolean,
+    @inject(TYPES.SettingService) private settingService: SettingServiceInterface,
     @inject(TYPES.Timer) private timer: TimerInterface,
   ) {
   }
@@ -62,6 +64,8 @@ export class Register implements UseCaseInterface {
     Object.assign(user, registrationFields)
 
     user = await this.userRepository.save(user)
+
+    await this.settingService.applyDefaultSettingsUponRegistration(user)
 
     const authResponseFactory = this.authResponseFactoryResolver.resolveAuthResponseFactoryVersion(apiVersion)
 

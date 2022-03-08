@@ -73,6 +73,24 @@ export class SettingService implements SettingServiceInterface {
     }
   }
 
+  async applyDefaultSettingsUponRegistration(user: User): Promise<void> {
+    const defaultSettingsWithValues = this.settingsAssociationService.getDefaultSettingsAndValuesForNewUser()
+
+    for (const settingName of defaultSettingsWithValues.keys()) {
+      const setting = defaultSettingsWithValues.get(settingName) as { value: string, sensitive: boolean, serverEncryptionVersion: number }
+
+      await this.createOrReplace({
+        user,
+        props: {
+          name: settingName,
+          unencryptedValue: setting.value,
+          serverEncryptionVersion: setting.serverEncryptionVersion,
+          sensitive: setting.sensitive,
+        },
+      })
+    }
+  }
+
   async findSetting(dto: FindSettingDTO): Promise<Setting | undefined> {
     let setting: Setting | undefined
     if (dto.settingUuid !== undefined) {

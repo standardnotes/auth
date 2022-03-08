@@ -2,7 +2,7 @@ import 'reflect-metadata'
 
 import { SubscriptionName } from '@standardnotes/auth'
 import { CloudBackupRequestedEvent, DomainEventPublisherInterface, EmailBackupRequestedEvent } from '@standardnotes/domain-events'
-import { EmailBackupFrequency, OneDriveBackupFrequency, SettingName } from '@standardnotes/settings'
+import { EmailBackupFrequency, MuteSignInEmailsOption, OneDriveBackupFrequency, SettingName } from '@standardnotes/settings'
 import { Logger } from 'winston'
 import { CrypterInterface } from '../Encryption/CrypterInterface'
 import { EncryptionVersion } from '../Encryption/EncryptionVersion'
@@ -64,6 +64,9 @@ describe('SettingService', () => {
           serverEncryptionVersion: EncryptionVersion.Unencrypted,
         }],
     ]))
+    settingsAssociationService.getDefaultSettingsAndValuesForNewUser = jest.fn().mockReturnValue(new Map([
+      [SettingName.MuteSignInEmails, { value: MuteSignInEmailsOption.NotMuted, sensitive: 0, serverEncryptionVersion: EncryptionVersion.Unencrypted }],
+    ]))
 
     userRepository = {} as jest.Mocked<UserRepositoryInterface>
     userRepository.findOneByUuid = jest.fn().mockReturnValue(user)
@@ -82,6 +85,12 @@ describe('SettingService', () => {
     logger.debug = jest.fn()
     logger.warn = jest.fn()
     logger.error = jest.fn()
+  })
+
+  it ('should create default settings for a newly registered user', async () => {
+    await createService().applyDefaultSettingsUponRegistration(user)
+
+    expect(settingRepository.save).toHaveBeenCalledWith(setting)
   })
 
   it ('should create default settings for a subscription', async () => {

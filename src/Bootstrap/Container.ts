@@ -129,6 +129,7 @@ import { CreateValetToken } from '../Domain/UseCase/CreateValetToken/CreateValet
 import { CreateListedAccount } from '../Domain/UseCase/CreateListedAccount/CreateListedAccount'
 import { ListedAccountCreatedEventHandler } from '../Domain/Handler/ListedAccountCreatedEventHandler'
 import { ListedAccountDeletedEventHandler } from '../Domain/Handler/ListedAccountDeletedEventHandler'
+import { MuteSignInEmails } from '../Domain/UseCase/MuteSignInEmails/MuteSignInEmails'
 
 export class ContainerConfigLoader {
   async load(): Promise<Container> {
@@ -320,6 +321,7 @@ export class ContainerConfigLoader {
     container.bind<AuthenticateOfflineSubscriptionToken>(TYPES.AuthenticateOfflineSubscriptionToken).to(AuthenticateOfflineSubscriptionToken)
     container.bind<CreateOfflineSubscriptionToken>(TYPES.CreateOfflineSubscriptionToken).to(CreateOfflineSubscriptionToken)
     container.bind<MuteFailedBackupsEmails>(TYPES.MuteFailedBackupsEmails).to(MuteFailedBackupsEmails)
+    container.bind<MuteSignInEmails>(TYPES.MuteSignInEmails).to(MuteSignInEmails)
     container.bind<CreateValetToken>(TYPES.CreateValetToken).to(CreateValetToken)
     container.bind<CreateListedAccount>(TYPES.CreateListedAccount).to(CreateListedAccount)
 

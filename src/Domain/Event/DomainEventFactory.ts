@@ -1,4 +1,5 @@
 import { RoleName } from '@standardnotes/auth'
+import { Uuid } from '@standardnotes/common'
 import { AccountDeletionRequestedEvent, UserEmailChangedEvent, UserRegisteredEvent, UserRolesChangedEvent, OfflineSubscriptionTokenCreatedEvent, EmailBackupRequestedEvent, CloudBackupRequestedEvent, ListedAccountRequestedEvent, UserSignedInEvent } from '@standardnotes/domain-events'
 import { TimerInterface } from '@standardnotes/time'
 import { inject, injectable } from 'inversify'
@@ -18,6 +19,7 @@ export class DomainEventFactory implements DomainEventFactoryInterface {
     device: string,
     browser: string,
     signInAlertEnabled: boolean,
+    muteSignInEmailsSettingUuid: Uuid,
   }): UserSignedInEvent {
     return {
       type: 'USER_SIGNED_IN',
