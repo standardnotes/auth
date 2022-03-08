@@ -53,6 +53,14 @@ describe('SettingsAssociationService', () => {
     expect(createService().getSensitivityForSetting(SettingName.DropboxBackupFrequency)).toBeFalsy()
   })
 
+  it('should return the default set of settings for a newly registered user', () => {
+    const settings = createService().getDefaultSettingsAndValuesForNewUser()
+    const flatSettings = [...(settings as Map<SettingName, { value: string, sensitive: boolean, serverEncryptionVersion: number }>).keys()]
+    expect(flatSettings).toEqual([
+      'MUTE_SIGN_IN_EMAILS',
+    ])
+  })
+
   it('should return the default set of setting values for a core subscription', async () => {
     const permission = {
       name: PermissionName.Files5GB,

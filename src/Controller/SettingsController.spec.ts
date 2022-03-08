@@ -11,6 +11,7 @@ import { UpdateSetting } from '../Domain/UseCase/UpdateSetting/UpdateSetting'
 import { DeleteSetting } from '../Domain/UseCase/DeleteSetting/DeleteSetting'
 import { EncryptionVersion } from '../Domain/Encryption/EncryptionVersion'
 import { MuteFailedBackupsEmails } from '../Domain/UseCase/MuteFailedBackupsEmails/MuteFailedBackupsEmails'
+import { MuteSignInEmails } from '../Domain/UseCase/MuteSignInEmails/MuteSignInEmails'
 
 describe('SettingsController', () => {
   let deleteSetting: DeleteSetting
@@ -18,6 +19,7 @@ describe('SettingsController', () => {
   let getSetting: GetSetting
   let updateSetting: UpdateSetting
   let muteFailedBackupsEmails: MuteFailedBackupsEmails
+  let muteSignInEmails: MuteSignInEmails
 
   let request: express.Request
   let response: express.Response
@@ -29,6 +31,7 @@ describe('SettingsController', () => {
     updateSetting,
     deleteSetting,
     muteFailedBackupsEmails,
+    muteSignInEmails,
   )
 
   beforeEach(() => {
@@ -49,6 +52,9 @@ describe('SettingsController', () => {
 
     muteFailedBackupsEmails = {} as jest.Mocked<MuteFailedBackupsEmails>
     muteFailedBackupsEmails.execute = jest.fn()
+
+    muteSignInEmails = {} as jest.Mocked<MuteSignInEmails>
+    muteSignInEmails.execute = jest.fn()
 
     request = {
       headers: {},
@@ -324,6 +330,32 @@ describe('SettingsController', () => {
     const result = await httpResponse.executeAsync()
 
     expect(muteFailedBackupsEmails.execute).toHaveBeenCalledWith({ settingUuid: '1-2-3' })
+
+    expect(result.statusCode).toEqual(404)
+  })
+
+  it('should mute sign in emails user setting', async () => {
+    request.params.settingUuid = '1-2-3'
+
+    muteSignInEmails.execute = jest.fn().mockReturnValue({ success: true })
+
+    const httpResponse = <results.JsonResult> await createController().muteSignInEmails(request)
+    const result = await httpResponse.executeAsync()
+
+    expect(muteSignInEmails.execute).toHaveBeenCalledWith({ settingUuid: '1-2-3' })
+
+    expect(result.statusCode).toEqual(200)
+  })
+
+  it('should not mute sign in emails user setting if it does not exist', async () => {
+    request.params.settingUuid = '1-2-3'
+
+    muteSignInEmails.execute = jest.fn().mockReturnValue({ success: false })
+
+    const httpResponse = <results.JsonResult> await createController().muteSignInEmails(request)
+    const result = await httpResponse.executeAsync()
+
+    expect(muteSignInEmails.execute).toHaveBeenCalledWith({ settingUuid: '1-2-3' })
 
     expect(result.statusCode).toEqual(404)
   })
