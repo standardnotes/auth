@@ -1,4 +1,5 @@
 import { RoleName } from '@standardnotes/auth'
+import { Uuid } from '@standardnotes/common'
 import { AccountDeletionRequestedEvent, CloudBackupRequestedEvent, UserRegisteredEvent, UserRolesChangedEvent, UserEmailChangedEvent, OfflineSubscriptionTokenCreatedEvent, EmailBackupRequestedEvent, ListedAccountRequestedEvent, UserSignedInEvent } from '@standardnotes/domain-events'
 
 export interface DomainEventFactoryInterface {
@@ -8,6 +9,7 @@ export interface DomainEventFactoryInterface {
     device: string,
     browser: string,
     signInAlertEnabled: boolean,
+    muteSignInEmailsSettingUuid: Uuid,
   }): UserSignedInEvent
   createListedAccountRequestedEvent(userUuid: string, userEmail: string): ListedAccountRequestedEvent
   createUserRegisteredEvent(userUuid: string, email: string): UserRegisteredEvent

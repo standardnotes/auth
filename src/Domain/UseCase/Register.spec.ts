@@ -9,12 +9,14 @@ import { User } from '../User/User'
 
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { Register } from './Register'
+import { SettingServiceInterface } from '../Setting/SettingServiceInterface'
 
 describe('Register', () => {
   let userRepository: UserRepositoryInterface
   let roleRepository: RoleRepositoryInterface
   let authResponseFactoryResolver: AuthResponseFactoryResolverInterface
   let authResponseFactory: AuthResponseFactoryInterface
+  let settingService: SettingServiceInterface
   let user: User
   let crypter: CrypterInterface
   let timer: TimerInterface
@@ -25,6 +27,7 @@ describe('Register', () => {
     authResponseFactoryResolver,
     crypter,
     false,
+    settingService,
     timer
   )
 
@@ -46,6 +49,9 @@ describe('Register', () => {
     crypter.generateEncryptedUserServerKey = jest.fn().mockReturnValue('test')
 
     user = {} as jest.Mocked<User>
+
+    settingService = {} as jest.Mocked<SettingServiceInterface>
+    settingService.applyDefaultSettingsUponRegistration = jest.fn()
 
     timer = {} as jest.Mocked<TimerInterface>
     timer.getUTCDate = jest.fn().mockReturnValue(new Date(1))
@@ -79,6 +85,8 @@ describe('Register', () => {
       updatedAt: new Date(1),
       SESSIONS_PROTOCOL_VERSION: 4,
     })
+
+    expect(settingService.applyDefaultSettingsUponRegistration).toHaveBeenCalled()
   })
 
   it('should register a new user with default role', async () => {
@@ -140,7 +148,7 @@ describe('Register', () => {
   it('should fail to register if a registration is disabled', async () => {
     userRepository.findOneByEmail = jest.fn().mockReturnValue(user)
 
-    expect(await new Register(userRepository, roleRepository, authResponseFactoryResolver, crypter, true, timer).execute({
+    expect(await new Register(userRepository, roleRepository, authResponseFactoryResolver, crypter, true, settingService, timer).execute({
       email: 'test@test.te',
       password: 'asdzxc',
       updatedWithUserAgent: 'Mozilla',

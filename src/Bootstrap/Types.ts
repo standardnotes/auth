@@ -93,6 +93,7 @@ const TYPES = {
   CreateOfflineSubscriptionToken: Symbol.for('CreateOfflineSubscriptionToken'),
   AuthenticateOfflineSubscriptionToken: Symbol.for('AuthenticateOfflineSubscriptionToken'),
   MuteFailedBackupsEmails: Symbol.for('MuteFailedBackupsEmails'),
+  MuteSignInEmails: Symbol.for('MuteSignInEmails'),
   CreateValetToken: Symbol.for('CreateValetToken'),
   CreateListedAccount: Symbol.for('CreateListedAccount'),
   // Handlers

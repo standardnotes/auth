@@ -1,6 +1,6 @@
 import { RoleName, SubscriptionName } from '@standardnotes/auth'
 import { PermissionName } from '@standardnotes/features'
-import { SettingName } from '@standardnotes/settings'
+import { MuteSignInEmailsOption, SettingName } from '@standardnotes/settings'
 import { inject, injectable } from 'inversify'
 import TYPES from '../../Bootstrap/Types'
 import { EncryptionVersion } from '../Encryption/EncryptionVersion'
@@ -22,6 +22,7 @@ export class SettingsAssociationService implements SettingsAssociationServiceInt
     SettingName.EmailBackupFrequency,
     SettingName.MuteFailedBackupsEmails,
     SettingName.MuteFailedCloudBackupsEmails,
+    SettingName.MuteSignInEmails,
     SettingName.DropboxBackupFrequency,
     SettingName.GoogleDriveBackupFrequency,
     SettingName.OneDriveBackupFrequency,
@@ -36,6 +37,7 @@ export class SettingsAssociationService implements SettingsAssociationServiceInt
     SettingName.EmailBackupFrequency,
     SettingName.MuteFailedBackupsEmails,
     SettingName.MuteFailedCloudBackupsEmails,
+    SettingName.MuteSignInEmails,
     SettingName.ListedAuthorSecrets,
   ]
 
@@ -59,6 +61,10 @@ export class SettingsAssociationService implements SettingsAssociationServiceInt
     [SubscriptionName.ProPlan, new Map([
       [SettingName.FileUploadBytesUsed, { sensitive: false, serverEncryptionVersion: EncryptionVersion.Unencrypted, value: '0' }],
     ])],
+  ])
+
+  private readonly defaultSettings = new Map<SettingName, { value: string, sensitive: boolean, serverEncryptionVersion: EncryptionVersion }>([
+    [SettingName.MuteSignInEmails, { sensitive: false, serverEncryptionVersion: EncryptionVersion.Unencrypted, value: MuteSignInEmailsOption.NotMuted }],
   ])
 
   isSettingMutableByClient(settingName: SettingName): boolean {
@@ -107,6 +113,10 @@ export class SettingsAssociationService implements SettingsAssociationServiceInt
     })
 
     return defaultSettings
+  }
+
+  getDefaultSettingsAndValuesForNewUser(): Map<SettingName, { value: string, sensitive: boolean, serverEncryptionVersion: EncryptionVersion }> {
+    return this.defaultSettings
   }
 
   async getFileUploadLimit(subscriptionName: SubscriptionName): Promise<number> {
