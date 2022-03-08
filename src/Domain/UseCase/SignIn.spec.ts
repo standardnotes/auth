@@ -13,6 +13,7 @@ import { SignIn } from './SignIn'
 import { RoleServiceInterface } from '../Role/RoleServiceInterface'
 import { SettingServiceInterface } from '../Setting/SettingServiceInterface'
 import { Setting } from '../Setting/Setting'
+import { MuteSignInEmailsOption } from '@standardnotes/settings'
 
 describe('SignIn', () => {
   let user: User
@@ -69,6 +70,7 @@ describe('SignIn', () => {
 
     setting = {
       uuid: '3-4-5',
+      value: MuteSignInEmailsOption.NotMuted,
     } as jest.Mocked<Setting>
 
     settingService = {} as jest.Mocked<SettingServiceInterface>
@@ -101,6 +103,36 @@ describe('SignIn', () => {
       userEmail: 'test@test.com',
       userUuid: '1-2-3',
       signInAlertEnabled: true,
+      muteSignInEmailsSettingUuid: '3-4-5',
+    })
+    expect(domainEventPublisher.publish).toHaveBeenCalled()
+  })
+
+  it('should sign in a user and disable sign in alert if setting is configured', async () => {
+    setting = {
+      uuid: '3-4-5',
+      value: MuteSignInEmailsOption.Muted,
+    } as jest.Mocked<Setting>
+
+    settingService.findSetting = jest.fn().mockReturnValue(setting)
+
+    expect(await createUseCase().execute({
+      email: 'test@test.te',
+      password: 'qweqwe123123',
+      userAgent: 'Google Chrome',
+      apiVersion: '20190520',
+      ephemeralSession: false,
+    })).toEqual({
+      success: true,
+      authResponse: { foo: 'bar' },
+    })
+
+    expect(domainEventFactory.createUserSignedInEvent).toHaveBeenCalledWith({
+      browser: 'Firefox 1',
+      device: 'iOS 1',
+      userEmail: 'test@test.com',
+      userUuid: '1-2-3',
+      signInAlertEnabled: false,
       muteSignInEmailsSettingUuid: '3-4-5',
     })
     expect(domainEventPublisher.publish).toHaveBeenCalled()
