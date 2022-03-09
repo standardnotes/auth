@@ -1,8 +1,8 @@
-import { KeyParams } from '@standardnotes/auth'
+import { KeyParamsData } from '@standardnotes/responses'
 
 import { User } from './User'
 
 export interface KeyParamsFactoryInterface {
-  create(user: User, authenticated: boolean): KeyParams
-  createPseudoParams(email: string): KeyParams
+  create(user: User, authenticated: boolean): KeyParamsData
+  createPseudoParams(email: string): KeyParamsData
 }

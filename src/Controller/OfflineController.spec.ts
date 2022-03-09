@@ -11,7 +11,8 @@ import { CreateOfflineSubscriptionTokenResponse } from '../Domain/UseCase/Create
 import { AuthenticateOfflineSubscriptionToken } from '../Domain/UseCase/AuthenticateOfflineSubscriptionToken/AuthenticateOfflineSubscriptionToken'
 import { OfflineUserSubscription } from '../Domain/Subscription/OfflineUserSubscription'
 import { GetUserOfflineSubscription } from '../Domain/UseCase/GetUserOfflineSubscription/GetUserOfflineSubscription'
-import { OfflineUserTokenData, SubscriptionName, TokenEncoderInterface } from '@standardnotes/auth'
+import { OfflineUserTokenData, TokenEncoderInterface } from '@standardnotes/auth'
+import { SubscriptionName } from '@standardnotes/common'
 import { Logger } from 'winston'
 
 describe('OfflineController', () => {

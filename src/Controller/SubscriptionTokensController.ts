@@ -1,4 +1,5 @@
-import { CrossServiceTokenData, RoleName, TokenEncoderInterface } from '@standardnotes/auth'
+import { CrossServiceTokenData, TokenEncoderInterface } from '@standardnotes/auth'
+import { RoleName } from '@standardnotes/common'
 import { SettingName } from '@standardnotes/settings'
 import { Request, Response } from 'express'
 import { inject } from 'inversify'

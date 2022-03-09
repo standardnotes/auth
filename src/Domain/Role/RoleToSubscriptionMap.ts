@@ -1,4 +1,4 @@
-import { RoleName, SubscriptionName } from '@standardnotes/auth'
+import { RoleName, SubscriptionName } from '@standardnotes/common'
 import { injectable } from 'inversify'
 
 import { RoleToSubscriptionMapInterface } from './RoleToSubscriptionMapInterface'

@@ -1,5 +1,4 @@
-import { RoleName } from '@standardnotes/auth'
-import { Uuid } from '@standardnotes/common'
+import { Uuid, RoleName } from '@standardnotes/common'
 import { AccountDeletionRequestedEvent, CloudBackupRequestedEvent, UserRegisteredEvent, UserRolesChangedEvent, UserEmailChangedEvent, OfflineSubscriptionTokenCreatedEvent, EmailBackupRequestedEvent, ListedAccountRequestedEvent, UserSignedInEvent } from '@standardnotes/domain-events'
 
 export interface DomainEventFactoryInterface {

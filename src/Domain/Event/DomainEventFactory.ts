@@ -1,4 +1,4 @@
-import { RoleName } from '@standardnotes/auth'
+import { RoleName } from '@standardnotes/common'
 import { Uuid } from '@standardnotes/common'
 import { AccountDeletionRequestedEvent, UserEmailChangedEvent, UserRegisteredEvent, UserRolesChangedEvent, OfflineSubscriptionTokenCreatedEvent, EmailBackupRequestedEvent, CloudBackupRequestedEvent, ListedAccountRequestedEvent, UserSignedInEvent } from '@standardnotes/domain-events'
 import { TimerInterface } from '@standardnotes/time'

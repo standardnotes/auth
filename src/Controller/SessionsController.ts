@@ -16,7 +16,8 @@ import { Role } from '../Domain/Role/Role'
 import { User } from '../Domain/User/User'
 import { ProjectorInterface } from '../Projection/ProjectorInterface'
 import { SessionProjector } from '../Projection/SessionProjector'
-import { CrossServiceTokenData, RoleName, TokenEncoderInterface } from '@standardnotes/auth'
+import { CrossServiceTokenData, TokenEncoderInterface } from '@standardnotes/auth'
+import { RoleName } from '@standardnotes/common'
 
 @controller('/sessions')
 export class SessionsController extends BaseHttpController {

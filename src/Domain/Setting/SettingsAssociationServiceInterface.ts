@@ -1,4 +1,4 @@
-import { SubscriptionName } from '@standardnotes/auth'
+import { SubscriptionName } from '@standardnotes/common'
 import { PermissionName } from '@standardnotes/features'
 import { SettingName } from '@standardnotes/settings'
 import { EncryptionVersion } from '../Encryption/EncryptionVersion'

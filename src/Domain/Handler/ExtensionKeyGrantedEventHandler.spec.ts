@@ -10,7 +10,7 @@ import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { ExtensionKeyGrantedEventHandler } from './ExtensionKeyGrantedEventHandler'
 import { SettingServiceInterface } from '../Setting/SettingServiceInterface'
 import { OfflineSettingServiceInterface } from '../Setting/OfflineSettingServiceInterface'
-import { SubscriptionName } from '@standardnotes/auth'
+import { SubscriptionName } from '@standardnotes/common'
 import { ContentDecoderInterface } from '@standardnotes/common'
 
 describe('ExtensionKeyGrantedEventHandler', () => {

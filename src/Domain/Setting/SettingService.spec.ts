@@ -1,6 +1,6 @@
 import 'reflect-metadata'
 
-import { SubscriptionName } from '@standardnotes/auth'
+import { SubscriptionName } from '@standardnotes/common'
 import { CloudBackupRequestedEvent, DomainEventPublisherInterface, EmailBackupRequestedEvent } from '@standardnotes/domain-events'
 import { EmailBackupFrequency, MuteSignInEmailsOption, OneDriveBackupFrequency, SettingName } from '@standardnotes/settings'
 import { Logger } from 'winston'

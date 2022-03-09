@@ -1,4 +1,4 @@
-import { SubscriptionName } from '@standardnotes/auth'
+import { SubscriptionName } from '@standardnotes/common'
 import { DomainEventPublisherInterface } from '@standardnotes/domain-events'
 import { DropboxBackupFrequency, EmailBackupFrequency, GoogleDriveBackupFrequency, MuteFailedBackupsEmailsOption, MuteFailedCloudBackupsEmailsOption, OneDriveBackupFrequency, SettingName } from '@standardnotes/settings'
 import { inject, injectable } from 'inversify'

@@ -1,4 +1,4 @@
-import { RoleName, SubscriptionName } from '@standardnotes/auth'
+import { RoleName, SubscriptionName } from '@standardnotes/common'
 import { PermissionName } from '@standardnotes/features'
 import { MuteSignInEmailsOption, SettingName } from '@standardnotes/settings'
 import { inject, injectable } from 'inversify'
