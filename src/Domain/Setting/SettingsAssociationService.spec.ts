@@ -1,6 +1,6 @@
 import 'reflect-metadata'
 
-import { RoleName, SubscriptionName } from '@standardnotes/auth'
+import { RoleName, SubscriptionName } from '@standardnotes/common'
 import { SettingName } from '@standardnotes/settings'
 
 import { SettingsAssociationService } from './SettingsAssociationService'

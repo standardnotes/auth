@@ -1,9 +1,9 @@
 import 'reflect-metadata'
 
 import { UserRolesChangedEvent } from '@standardnotes/domain-events'
-import { User } from '../../Domain/User/User'
-import { RoleName } from '@standardnotes/auth'
+import { RoleName } from '@standardnotes/common'
 
+import { User } from '../../Domain/User/User'
 import { WebSocketsClientService } from './WebSocketsClientService'
 import { WebSocketsConnectionRepositoryInterface } from '../../Domain/WebSockets/WebSocketsConnectionRepositoryInterface'
 import { DomainEventFactoryInterface } from '../../Domain/Event/DomainEventFactoryInterface'

@@ -130,6 +130,7 @@ import { CreateListedAccount } from '../Domain/UseCase/CreateListedAccount/Creat
 import { ListedAccountCreatedEventHandler } from '../Domain/Handler/ListedAccountCreatedEventHandler'
 import { ListedAccountDeletedEventHandler } from '../Domain/Handler/ListedAccountDeletedEventHandler'
 import { MuteSignInEmails } from '../Domain/UseCase/MuteSignInEmails/MuteSignInEmails'
+import { FileRemovedEventHandler } from '../Domain/Handler/FileRemovedEventHandler'
 
 export class ContainerConfigLoader {
   async load(): Promise<Container> {
@@ -338,6 +339,7 @@ export class ContainerConfigLoader {
     container.bind<SubscriptionReassignedEventHandler>(TYPES.SubscriptionReassignedEventHandler).to(SubscriptionReassignedEventHandler)
     container.bind<UserEmailChangedEventHandler>(TYPES.UserEmailChangedEventHandler).to(UserEmailChangedEventHandler)
     container.bind<FileUploadedEventHandler>(TYPES.FileUploadedEventHandler).to(FileUploadedEventHandler)
+    container.bind<FileRemovedEventHandler>(TYPES.FileRemovedEventHandler).to(FileRemovedEventHandler)
     container.bind<ListedAccountCreatedEventHandler>(TYPES.ListedAccountCreatedEventHandler).to(ListedAccountCreatedEventHandler)
     container.bind<ListedAccountDeletedEventHandler>(TYPES.ListedAccountDeletedEventHandler).to(ListedAccountDeletedEventHandler)
 
@@ -401,6 +403,7 @@ export class ContainerConfigLoader {
       ['SUBSCRIPTION_REASSIGNED', container.get(TYPES.SubscriptionReassignedEventHandler)],
       ['USER_EMAIL_CHANGED', container.get(TYPES.UserEmailChangedEventHandler)],
       ['FILE_UPLOADED', container.get(TYPES.FileUploadedEventHandler)],
+      ['FILE_REMOVED', container.get(TYPES.FileRemovedEventHandler)],
       ['LISTED_ACCOUNT_CREATED', container.get(TYPES.ListedAccountCreatedEventHandler)],
       ['LISTED_ACCOUNT_DELETED', container.get(TYPES.ListedAccountDeletedEventHandler)],
     ])

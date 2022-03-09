@@ -1,5 +1,5 @@
-import { KeyParams } from '@standardnotes/auth'
+import { KeyParamsData } from '@standardnotes/responses'
 
 export type GetUserKeyParamsResponse = {
-  keyParams: KeyParams
+  keyParams: KeyParamsData
 }

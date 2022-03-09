@@ -1,6 +1,6 @@
 import 'reflect-metadata'
 
-import { RoleName } from '@standardnotes/auth'
+import { RoleName } from '@standardnotes/common'
 import { TimerInterface } from '@standardnotes/time'
 
 import { DomainEventFactory } from './DomainEventFactory'

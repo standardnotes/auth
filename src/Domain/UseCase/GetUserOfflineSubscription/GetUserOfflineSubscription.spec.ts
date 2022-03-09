@@ -1,7 +1,7 @@
 import 'reflect-metadata'
 
 import { GetUserOfflineSubscription } from './GetUserOfflineSubscription'
-import { SubscriptionName } from '@standardnotes/auth'
+import { SubscriptionName } from '@standardnotes/common'
 import { OfflineUserSubscriptionRepositoryInterface } from '../../Subscription/OfflineUserSubscriptionRepositoryInterface'
 import { OfflineUserSubscription } from '../../Subscription/OfflineUserSubscription'
 

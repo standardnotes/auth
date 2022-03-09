@@ -1,6 +1,6 @@
 import 'reflect-metadata'
 
-import { RoleName, SubscriptionName } from '@standardnotes/auth'
+import { RoleName, SubscriptionName } from '@standardnotes/common'
 import { SubscriptionRenewedEvent } from '@standardnotes/domain-events'
 
 import * as dayjs from 'dayjs'
