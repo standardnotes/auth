@@ -1,6 +1,7 @@
 import 'reflect-metadata'
 
-import { Role, RoleName, SubscriptionName } from '@standardnotes/auth'
+import { Role } from '@standardnotes/auth'
+import { RoleName, SubscriptionName } from '@standardnotes/common'
 
 import { RoleToSubscriptionMapInterface } from '../Role/RoleToSubscriptionMapInterface'
 import { User } from '../User/User'

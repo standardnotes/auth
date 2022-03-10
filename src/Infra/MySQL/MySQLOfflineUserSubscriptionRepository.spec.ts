@@ -1,6 +1,6 @@
 import 'reflect-metadata'
 
-import { SubscriptionName } from '@standardnotes/auth'
+import { SubscriptionName } from '@standardnotes/common'
 
 import { SelectQueryBuilder, UpdateQueryBuilder } from 'typeorm'
 

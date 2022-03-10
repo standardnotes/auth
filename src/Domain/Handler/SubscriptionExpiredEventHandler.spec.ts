@@ -1,6 +1,6 @@
 import 'reflect-metadata'
 
-import { RoleName, SubscriptionName } from '@standardnotes/auth'
+import { RoleName, SubscriptionName } from '@standardnotes/common'
 import { SubscriptionExpiredEvent } from '@standardnotes/domain-events'
 import { Logger } from 'winston'
 

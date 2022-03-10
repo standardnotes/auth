@@ -1,5 +1,6 @@
 import * as crypto from 'crypto'
-import { KeyParams } from '@standardnotes/auth'
+import { KeyParamsData } from '@standardnotes/responses'
+import { KeyParamsOrigination, ProtocolVersion } from '@standardnotes/common'
 
 import { inject, injectable } from 'inversify'
 import TYPES from '../../Bootstrap/Types'
@@ -13,17 +14,17 @@ export class KeyParamsFactory implements KeyParamsFactoryInterface {
   ) {
   }
 
-  createPseudoParams(email: string): KeyParams {
+  createPseudoParams(email: string): KeyParamsData {
     return this.sortKeys({
       identifier: email,
       pw_nonce: crypto.createHash('sha256').update(`${email}${this.pseudoKeyParamsKey}`).digest('hex'),
-      version: '004',
+      version: ProtocolVersion.V004,
     })
   }
 
-  create(user: User, authenticated: boolean): KeyParams {
-    const keyParams: KeyParams = {
-      version: user.version,
+  create(user: User, authenticated: boolean): KeyParamsData {
+    const keyParams: KeyParamsData = {
+      version: user.version as ProtocolVersion,
       identifier: user.email,
     }
 
@@ -31,7 +32,7 @@ export class KeyParamsFactory implements KeyParamsFactoryInterface {
     case '004':
       if (authenticated) {
         keyParams.created = user.kpCreated
-        keyParams.origination = user.kpOrigination
+        keyParams.origination = user.kpOrigination as KeyParamsOrigination
       }
       keyParams.pw_nonce = user.pwNonce
       break
@@ -57,13 +58,14 @@ export class KeyParamsFactory implements KeyParamsFactoryInterface {
     return this.sortKeys(keyParams)
   }
 
-  private sortKeys(keyParams: KeyParams): KeyParams {
+  private sortKeys(keyParams: KeyParamsData): KeyParamsData {
     const sortedKeyParams: {[key: string]: string | number | undefined } = {}
 
     Object.keys(keyParams).sort().forEach(key => {
-      sortedKeyParams[key] = keyParams[key]
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      sortedKeyParams[key] = (keyParams as any)[key]
     })
 
-    return <KeyParams> sortedKeyParams
+    return <KeyParamsData> sortedKeyParams
   }
 }

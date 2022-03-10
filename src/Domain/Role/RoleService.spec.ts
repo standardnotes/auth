@@ -4,7 +4,7 @@ import { Logger } from 'winston'
 import { User } from '../User/User'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { RoleRepositoryInterface } from '../Role/RoleRepositoryInterface'
-import { RoleName, SubscriptionName } from '@standardnotes/auth'
+import { RoleName, SubscriptionName } from '@standardnotes/common'
 import { Role } from '../Role/Role'
 
 import { ClientServiceInterface } from '../Client/ClientServiceInterface'

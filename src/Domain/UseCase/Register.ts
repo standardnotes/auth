@@ -1,5 +1,5 @@
 import * as bcrypt from 'bcryptjs'
-import { RoleName } from '@standardnotes/auth'
+import { RoleName } from '@standardnotes/common'
 
 import { v4 as uuidv4 } from 'uuid'
 import { inject, injectable } from 'inversify'

@@ -1,4 +1,4 @@
-import { SubscriptionName } from '@standardnotes/auth'
+import { SubscriptionName } from '@standardnotes/common'
 import { User } from '../User/User'
 import { CreateOrReplaceSettingDto } from './CreateOrReplaceSettingDto'
 import { CreateOrReplaceSettingResponse } from './CreateOrReplaceSettingResponse'

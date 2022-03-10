@@ -4,7 +4,7 @@ import { UserRepositoryInterface } from '../../User/UserRepositoryInterface'
 import { User } from '../../User/User'
 import { UserSubscriptionRepositoryInterface } from '../../Subscription/UserSubscriptionRepositoryInterface'
 import { UserSubscription } from '../../Subscription/UserSubscription'
-import { SubscriptionName } from '@standardnotes/auth'
+import { SubscriptionName } from '@standardnotes/common'
 
 describe('GetUserSubscription', () => {
   let user: User

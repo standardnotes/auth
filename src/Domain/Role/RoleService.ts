@@ -1,4 +1,4 @@
-import { SubscriptionName } from '@standardnotes/auth'
+import { SubscriptionName } from '@standardnotes/common'
 import { PermissionName } from '@standardnotes/features'
 import { inject, injectable } from 'inversify'
 import { Logger } from 'winston'

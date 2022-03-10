@@ -1,4 +1,5 @@
 import { AxiosInstance } from 'axios'
+import { RoleName } from '@standardnotes/common'
 import { inject, injectable } from 'inversify'
 import { Logger } from 'winston'
 
@@ -7,7 +8,7 @@ import { DomainEventFactoryInterface } from '../../Domain/Event/DomainEventFacto
 import { User } from '../../Domain/User/User'
 import { WebSocketsConnectionRepositoryInterface } from '../../Domain/WebSockets/WebSocketsConnectionRepositoryInterface'
 import { ClientServiceInterface } from '../../Domain/Client/ClientServiceInterface'
-import { RoleName } from '@standardnotes/auth'
+
 
 @injectable()
 export class WebSocketsClientService implements ClientServiceInterface {

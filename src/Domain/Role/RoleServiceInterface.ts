@@ -1,4 +1,4 @@
-import { SubscriptionName } from '@standardnotes/auth'
+import { SubscriptionName } from '@standardnotes/common'
 import { PermissionName } from '@standardnotes/features'
 import { OfflineUserSubscription } from '../Subscription/OfflineUserSubscription'
 import { User } from '../User/User'

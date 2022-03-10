@@ -109,6 +109,7 @@ const TYPES = {
   ExtensionKeyGrantedEventHandler: Symbol.for('ExtensionKeyGrantedEventHandler'),
   UserEmailChangedEventHandler: Symbol.for('UserEmailChangedEventHandler'),
   FileUploadedEventHandler: Symbol.for('FileUploadedEventHandler'),
+  FileRemovedEventHandler: Symbol.for('FileRemovedEventHandler'),
   ListedAccountCreatedEventHandler: Symbol.for('ListedAccountCreatedEventHandler'),
   ListedAccountDeletedEventHandler: Symbol.for('ListedAccountDeletedEventHandler'),
   // Services
