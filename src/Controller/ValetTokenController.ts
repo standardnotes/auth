@@ -7,6 +7,8 @@ import {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   results,
 } from 'inversify-express-utils'
+import { CreateValetTokenPayload } from '@standardnotes/payloads'
+
 import TYPES from '../Bootstrap/Types'
 import { CreateValetToken } from '../Domain/UseCase/CreateValetToken/CreateValetToken'
 
@@ -20,10 +22,12 @@ export class ValetTokenController extends BaseHttpController {
 
   @httpPost('/')
   public async create(request: Request, response: Response): Promise<results.JsonResult> {
+    const payload: CreateValetTokenPayload = request.body
+
     const createValetKeyResponse = await this.createValetKey.execute({
       userUuid: response.locals.user.uuid,
-      operation: request.body.operation,
-      resources: request.body.resources,
+      operation: payload.operation,
+      resources: payload.resources,
     })
 
     if (!createValetKeyResponse.success) {

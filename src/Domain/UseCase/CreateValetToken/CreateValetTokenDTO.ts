@@ -1,5 +1,5 @@
-export type CreateValetTokenDTO = {
+import { CreateValetTokenPayload } from '@standardnotes/payloads'
+
+export type CreateValetTokenDTO = CreateValetTokenPayload & {
   userUuid: string,
-  operation: 'read' | 'write' | 'delete',
-  resources: Array<string>
 }
