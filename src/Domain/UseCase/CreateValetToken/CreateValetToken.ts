@@ -1,8 +1,9 @@
 import { inject, injectable } from 'inversify'
 import { TokenEncoderInterface, ValetTokenData } from '@standardnotes/auth'
+import { CreateValetTokenPayload } from '@standardnotes/payloads'
+import { CreateValetTokenResponseData } from '@standardnotes/responses'
 
 import { CreateValetTokenDTO } from './CreateValetTokenDTO'
-import { CreateValetTokenResponse } from './CreateValetTokenResponse'
 import { UseCaseInterface } from '../UseCaseInterface'
 import TYPES from '../../../Bootstrap/Types'
 import { SettingServiceInterface } from '../../Setting/SettingServiceInterface'
@@ -24,8 +25,9 @@ export class CreateValetToken implements UseCaseInterface {
   ) {
   }
 
-  async execute(dto: CreateValetTokenDTO): Promise<CreateValetTokenResponse> {
-    const userSubscription = await this.userSubscriptionRepository.findOneByUserUuid(dto.userUuid)
+  async execute(dto: CreateValetTokenDTO): Promise<CreateValetTokenResponseData> {
+    const { userUuid, ...payload } = dto
+    const userSubscription = await this.userSubscriptionRepository.findOneByUserUuid(userUuid)
     if (userSubscription === undefined) {
       return {
         success: false,
@@ -37,6 +39,13 @@ export class CreateValetToken implements UseCaseInterface {
       return {
         success: false,
         reason: 'expired-subscription',
+      }
+    }
+
+    if (!this.isValidWritePayload(payload)) {
+      return {
+        success: false,
+        reason: 'invalid-parameters',
       }
     }
 
@@ -70,5 +79,17 @@ export class CreateValetToken implements UseCaseInterface {
     const valetToken = this.tokenEncoder.encodeExpirableToken(tokenData, this.valetTokenTTL)
 
     return { success: true, valetToken }
+  }
+
+  private isValidWritePayload(payload: CreateValetTokenPayload) {
+    if (payload.operation === 'write') {
+      for (const resource of payload.resources) {
+        if (resource.unencryptedFileSize === undefined) {
+          return false
+        }
+      }
+    }
+
+    return true
   }
 }
