@@ -48,7 +48,12 @@ describe('CreateValetToken', () => {
     const response = await createUseCase().execute({
       operation: 'read',
       userUuid: '1-2-3',
-      resources: ['1-2-3/2-3-4'],
+      resources: [
+        {
+          remoteIdentifier: '1-2-3/2-3-4',
+          unencryptedFileSize: 123,
+        },
+      ],
     })
 
     expect(response).toEqual({
@@ -63,7 +68,12 @@ describe('CreateValetToken', () => {
     const response = await createUseCase().execute({
       operation: 'read',
       userUuid: '1-2-3',
-      resources: ['1-2-3/2-3-4'],
+      resources: [
+        {
+          remoteIdentifier: '1-2-3/2-3-4',
+          unencryptedFileSize: 123,
+        },
+      ],
     })
 
     expect(response).toEqual({
@@ -78,7 +88,12 @@ describe('CreateValetToken', () => {
     const response = await createUseCase().execute({
       operation: 'read',
       userUuid: '1-2-3',
-      resources: ['1-2-3/2-3-4'],
+      resources: [
+        {
+          remoteIdentifier: '1-2-3/2-3-4',
+          unencryptedFileSize: 123,
+        },
+      ],
     })
 
     expect(response).toEqual({
@@ -87,17 +102,42 @@ describe('CreateValetToken', () => {
     })
   })
 
+  it('should not create a write valet token if unencrypted file size has not been provided for a resource', async () => {
+    const response = await createUseCase().execute({
+      operation: 'write',
+      resources: [
+        {
+          remoteIdentifier: '2-3-4',
+        },
+      ],
+      userUuid: '1-2-3',
+    })
+
+    expect(response).toEqual({
+      success: false,
+      reason: 'invalid-parameters',
+    })
+  })
+
   it('should create a write valet token', async () => {
     const response = await createUseCase().execute({
       operation: 'write',
-      resources: ['2-3-4'],
+      resources: [
+        {
+          remoteIdentifier: '2-3-4',
+          unencryptedFileSize: 123,
+        },
+      ],
       userUuid: '1-2-3',
     })
 
     expect(tokenEncoder.encodeExpirableToken).toHaveBeenCalledWith({
       permittedOperation: 'write',
       permittedResources:  [
-        '2-3-4',
+        {
+          remoteIdentifier: '2-3-4',
+          unencryptedFileSize: 123,
+        },
       ],
       userUuid: '1-2-3',
       uploadBytesUsed: 123,
@@ -116,13 +156,21 @@ describe('CreateValetToken', () => {
     const response = await createUseCase().execute({
       operation: 'write',
       userUuid: '1-2-3',
-      resources: ['2-3-4'],
+      resources: [
+        {
+          remoteIdentifier: '2-3-4',
+          unencryptedFileSize: 123,
+        },
+      ],
     })
 
     expect(tokenEncoder.encodeExpirableToken).toHaveBeenCalledWith({
       permittedOperation: 'write',
       permittedResources:  [
-        '2-3-4',
+        {
+          remoteIdentifier: '2-3-4',
+          unencryptedFileSize: 123,
+        },
       ],
       userUuid: '1-2-3',
       uploadBytesUsed: 0,
