@@ -100,10 +100,7 @@ describe('SettingsAssociationService', () => {
   })
 
   it('should return the default set of setting values for a pro subscription', async () => {
-    const permission = {
-      name: PermissionName.Files,
-    } as jest.Mocked<Permission>
-    role.permissions = Promise.resolve([ permission ])
+    role.permissions = Promise.resolve([])
     roleRepository.findOneByName = jest.fn().mockReturnValue(role)
 
     const settings = await createService().getDefaultSettingsAndValuesForSubscriptionName(SubscriptionName.ProPlan)
@@ -115,7 +112,7 @@ describe('SettingsAssociationService', () => {
       'FILE_UPLOAD_BYTES_USED',
       'FILE_UPLOAD_BYTES_LIMIT',
     ])
-    expect(settings?.get(SettingName.FileUploadBytesLimit)).toEqual({ sensitive: false, serverEncryptionVersion: 0, value: '-1' })
+    expect(settings?.get(SettingName.FileUploadBytesLimit)).toEqual({ sensitive: false, serverEncryptionVersion: 0, value: '0' })
   })
 
   it('should throw error if a role is not found when getting default setting values for a subscription', async () => {
@@ -124,23 +121,6 @@ describe('SettingsAssociationService', () => {
     } as jest.Mocked<Permission>
     role.permissions = Promise.resolve([ permission ])
     roleRepository.findOneByName = jest.fn().mockReturnValue(undefined)
-
-    let caughtError = null
-    try {
-      await createService().getDefaultSettingsAndValuesForSubscriptionName(SubscriptionName.ProPlan)
-    } catch (error) {
-      caughtError = error
-    }
-
-    expect(caughtError).not.toBeNull()
-  })
-
-  it('should throw error if a file upload setting is not found when getting default setting values for a subscription', async () => {
-    const permission = {
-      name: PermissionName.FocusMode,
-    } as jest.Mocked<Permission>
-    role.permissions = Promise.resolve([ permission ])
-    roleRepository.findOneByName = jest.fn().mockReturnValue(role)
 
     let caughtError = null
     try {
