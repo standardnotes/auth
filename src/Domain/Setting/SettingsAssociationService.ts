@@ -139,11 +139,6 @@ export class SettingsAssociationService implements SettingsAssociationServiceInt
       return 26_843_545_600
     }
 
-    const unlimitedUpload = permissions.find((permission: Permission) => permission.name === PermissionName.Files)
-    if (unlimitedUpload !== undefined) {
-      return -1
-    }
-
-    throw new Error(`Could not find a defined file upload limit for subscription ${subscriptionName}`)
+    return 0
   }
 }
