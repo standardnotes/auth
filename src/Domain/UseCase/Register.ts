@@ -51,7 +51,6 @@ export class Register implements UseCaseInterface {
     user.email = email
     user.createdAt = this.timer.getUTCDate()
     user.updatedAt = this.timer.getUTCDate()
-    user.updatedWithUserAgent = dto.updatedWithUserAgent
     user.encryptedPassword = await bcrypt.hash(password, User.PASSWORD_HASH_COST)
     user.encryptedServerKey = await this.crypter.generateEncryptedUserServerKey()
     user.serverEncryptionVersion = User.DEFAULT_ENCRYPTION_VERSION

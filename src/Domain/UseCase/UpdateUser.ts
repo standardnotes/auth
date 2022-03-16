@@ -28,7 +28,6 @@ export class UpdateUser implements UseCaseInterface {
     Object.assign(user, updateFields)
 
     user.updatedAt = this.timer.getUTCDate()
-    user.updatedWithUserAgent = dto.updatedWithUserAgent
 
     await this.userRepository.save(user)
 
