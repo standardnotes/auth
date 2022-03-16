@@ -892,10 +892,10 @@
     "@standardnotes/features" "^1.34.9"
     "@standardnotes/payloads" "^1.4.8"
 
-"@standardnotes/settings@^1.12.0":
-  version "1.12.0"
-  resolved "https://registry.yarnpkg.com/@standardnotes/settings/-/settings-1.12.0.tgz#43f3dd7f015f726b1ed88a48fcc3737899116cd5"
-  integrity sha512-w6S5TT7KRpvUb+JsXZ7ucWPjlWRtpKQdsyT7cLs66ynKRXxUn40hf4kA8T9FhuLAKbG+wIYDrAZl3FRk+HvDWQ==
+"@standardnotes/settings@^1.13.0":
+  version "1.13.0"
+  resolved "https://registry.yarnpkg.com/@standardnotes/settings/-/settings-1.13.0.tgz#dccd585ded6d556144a9063914b80154b79ea6d9"
+  integrity sha512-IMX9R6Zcnol0Ub6ja/K/v1fD2bIp71OTjDSxHw85vNUpcHqVjv7E2u4Zh6kRb2imPhHIY5E6WGoZ5IBtIdJV+Q==
 
 "@standardnotes/sncrypto-common@1.3.0", "@standardnotes/sncrypto-common@^1.3.0":
   version "1.3.0"
