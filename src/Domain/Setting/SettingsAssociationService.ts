@@ -1,6 +1,6 @@
 import { RoleName, SubscriptionName } from '@standardnotes/common'
 import { PermissionName } from '@standardnotes/features'
-import { MuteSignInEmailsOption, SettingName } from '@standardnotes/settings'
+import { LogSessionUserAgentOption, MuteSignInEmailsOption, SettingName } from '@standardnotes/settings'
 import { inject, injectable } from 'inversify'
 import TYPES from '../../Bootstrap/Types'
 import { EncryptionVersion } from '../Encryption/EncryptionVersion'
@@ -65,6 +65,7 @@ export class SettingsAssociationService implements SettingsAssociationServiceInt
 
   private readonly defaultSettings = new Map<SettingName, { value: string, sensitive: boolean, serverEncryptionVersion: EncryptionVersion }>([
     [SettingName.MuteSignInEmails, { sensitive: false, serverEncryptionVersion: EncryptionVersion.Unencrypted, value: MuteSignInEmailsOption.NotMuted }],
+    [SettingName.LogSessionUserAgent, { sensitive: false, serverEncryptionVersion: EncryptionVersion.Unencrypted, value: LogSessionUserAgentOption.Enabled }],
   ])
 
   isSettingMutableByClient(settingName: SettingName): boolean {

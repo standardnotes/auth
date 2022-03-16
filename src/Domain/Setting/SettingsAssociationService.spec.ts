@@ -58,6 +58,7 @@ describe('SettingsAssociationService', () => {
     const flatSettings = [...(settings as Map<SettingName, { value: string, sensitive: boolean, serverEncryptionVersion: number }>).keys()]
     expect(flatSettings).toEqual([
       'MUTE_SIGN_IN_EMAILS',
+      'LOG_SESSION_USER_AGENT',
     ])
   })
 
