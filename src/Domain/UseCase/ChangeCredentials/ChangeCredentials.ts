@@ -48,7 +48,6 @@ export class ChangeCredentials implements UseCaseInterface {
       dto.user.email = dto.newEmail
     }
 
-    dto.user.updatedWithUserAgent = dto.updatedWithUserAgent
     dto.user.pwNonce = dto.pwNonce
     if (dto.protocolVersion) {
       dto.user.version = dto.protocolVersion
