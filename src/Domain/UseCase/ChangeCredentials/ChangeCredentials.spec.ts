@@ -73,7 +73,6 @@ describe('ChangeCredentials', () => {
 
     expect(userRepository.save).toHaveBeenCalledWith({
       encryptedPassword: expect.any(String),
-      updatedWithUserAgent: 'Google Chrome',
       pwNonce: 'asdzxc',
       kpCreated: '123',
       email: 'test@test.te',
@@ -109,7 +108,6 @@ describe('ChangeCredentials', () => {
       encryptedPassword: expect.any(String),
       email: 'new@test.te',
       uuid: '1-2-3',
-      updatedWithUserAgent: 'Google Chrome',
       pwNonce: 'asdzxc',
       kpCreated: '123',
       kpOrigination: 'password-change',
@@ -176,7 +174,6 @@ describe('ChangeCredentials', () => {
 
     expect(userRepository.save).toHaveBeenCalledWith({
       encryptedPassword: expect.any(String),
-      updatedWithUserAgent: 'Google Chrome',
       pwNonce: 'asdzxc',
       version: '004',
       email: 'test@test.te',
