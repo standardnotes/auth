@@ -2,7 +2,7 @@ import 'reflect-metadata'
 
 import { SubscriptionName } from '@standardnotes/common'
 import { CloudBackupRequestedEvent, DomainEventPublisherInterface, EmailBackupRequestedEvent } from '@standardnotes/domain-events'
-import { EmailBackupFrequency, MuteSignInEmailsOption, OneDriveBackupFrequency, SettingName } from '@standardnotes/settings'
+import { EmailBackupFrequency, LogSessionUserAgentOption, MuteSignInEmailsOption, OneDriveBackupFrequency, SettingName } from '@standardnotes/settings'
 import { Logger } from 'winston'
 import { CrypterInterface } from '../Encryption/CrypterInterface'
 import { EncryptionVersion } from '../Encryption/EncryptionVersion'
@@ -43,6 +43,7 @@ describe('SettingService', () => {
     user = {
       uuid: '4-5-6',
     } as jest.Mocked<User>
+    user.isPotentiallyAVaultAccount = jest.fn().mockReturnValue(false)
 
     setting = {} as jest.Mocked<Setting>
 
@@ -68,6 +69,10 @@ describe('SettingService', () => {
       [SettingName.MuteSignInEmails, { value: MuteSignInEmailsOption.NotMuted, sensitive: 0, serverEncryptionVersion: EncryptionVersion.Unencrypted }],
     ]))
 
+    settingsAssociationService.getDefaultSettingsAndValuesForNewVaultAccount = jest.fn().mockReturnValue(new Map([
+      [SettingName.LogSessionUserAgent, { sensitive: false, serverEncryptionVersion: EncryptionVersion.Unencrypted, value: LogSessionUserAgentOption.Disabled }],
+    ]))
+
     userRepository = {} as jest.Mocked<UserRepositoryInterface>
     userRepository.findOneByUuid = jest.fn().mockReturnValue(user)
 
@@ -88,6 +93,14 @@ describe('SettingService', () => {
   })
 
   it ('should create default settings for a newly registered user', async () => {
+    await createService().applyDefaultSettingsUponRegistration(user)
+
+    expect(settingRepository.save).toHaveBeenCalledWith(setting)
+  })
+
+  it ('should create default settings for a newly registered vault account', async () => {
+    user.isPotentiallyAVaultAccount = jest.fn().mockReturnValue(true)
+
     await createService().applyDefaultSettingsUponRegistration(user)
 
     expect(settingRepository.save).toHaveBeenCalledWith(setting)

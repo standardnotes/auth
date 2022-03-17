@@ -74,7 +74,10 @@ export class SettingService implements SettingServiceInterface {
   }
 
   async applyDefaultSettingsUponRegistration(user: User): Promise<void> {
-    const defaultSettingsWithValues = this.settingsAssociationService.getDefaultSettingsAndValuesForNewUser()
+    let defaultSettingsWithValues = this.settingsAssociationService.getDefaultSettingsAndValuesForNewUser()
+    if (user.isPotentiallyAVaultAccount()) {
+      defaultSettingsWithValues = this.settingsAssociationService.getDefaultSettingsAndValuesForNewVaultAccount()
+    }
 
     for (const settingName of defaultSettingsWithValues.keys()) {
       const setting = defaultSettingsWithValues.get(settingName) as { value: string, sensitive: boolean, serverEncryptionVersion: number }

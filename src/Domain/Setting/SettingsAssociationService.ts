@@ -7,6 +7,7 @@ import { EncryptionVersion } from '../Encryption/EncryptionVersion'
 import { Permission } from '../Permission/Permission'
 import { RoleRepositoryInterface } from '../Role/RoleRepositoryInterface'
 import { RoleToSubscriptionMapInterface } from '../Role/RoleToSubscriptionMapInterface'
+import { SettingDescription } from './SettingDescription'
 
 import { SettingsAssociationServiceInterface } from './SettingsAssociationServiceInterface'
 
@@ -51,7 +52,7 @@ export class SettingsAssociationService implements SettingsAssociationServiceInt
     [SettingName.EmailBackupFrequency, PermissionName.DailyEmailBackup],
   ])
 
-  private readonly settingsToSubscriptionNameMap = new Map<SubscriptionName, Map<SettingName, { value: string, sensitive: boolean, serverEncryptionVersion: EncryptionVersion }>>([
+  private readonly settingsToSubscriptionNameMap = new Map<SubscriptionName, Map<SettingName, SettingDescription>>([
     [SubscriptionName.CorePlan, new Map([
       [SettingName.FileUploadBytesUsed, { sensitive: false, serverEncryptionVersion: EncryptionVersion.Unencrypted, value: '0' }],
     ])],
@@ -63,9 +64,13 @@ export class SettingsAssociationService implements SettingsAssociationServiceInt
     ])],
   ])
 
-  private readonly defaultSettings = new Map<SettingName, { value: string, sensitive: boolean, serverEncryptionVersion: EncryptionVersion }>([
+  private readonly defaultSettings = new Map<SettingName, SettingDescription>([
     [SettingName.MuteSignInEmails, { sensitive: false, serverEncryptionVersion: EncryptionVersion.Unencrypted, value: MuteSignInEmailsOption.NotMuted }],
     [SettingName.LogSessionUserAgent, { sensitive: false, serverEncryptionVersion: EncryptionVersion.Unencrypted, value: LogSessionUserAgentOption.Enabled }],
+  ])
+
+  private readonly vaultAccountDefaultSettingsOverwrites = new Map<SettingName, SettingDescription>([
+    [SettingName.LogSessionUserAgent, { sensitive: false, serverEncryptionVersion: EncryptionVersion.Unencrypted, value: LogSessionUserAgentOption.Disabled }],
   ])
 
   isSettingMutableByClient(settingName: SettingName): boolean {
@@ -100,7 +105,7 @@ export class SettingsAssociationService implements SettingsAssociationServiceInt
     return this.permissionsAssociatedWithSettings.get(settingName)
   }
 
-  async getDefaultSettingsAndValuesForSubscriptionName(subscriptionName: SubscriptionName): Promise<Map<SettingName, { value: string, sensitive: boolean, serverEncryptionVersion: EncryptionVersion }> | undefined> {
+  async getDefaultSettingsAndValuesForSubscriptionName(subscriptionName: SubscriptionName): Promise<Map<SettingName, SettingDescription> | undefined> {
     const defaultSettings = this.settingsToSubscriptionNameMap.get(subscriptionName)
 
     if (defaultSettings === undefined) {
@@ -116,8 +121,21 @@ export class SettingsAssociationService implements SettingsAssociationServiceInt
     return defaultSettings
   }
 
-  getDefaultSettingsAndValuesForNewUser(): Map<SettingName, { value: string, sensitive: boolean, serverEncryptionVersion: EncryptionVersion }> {
+  getDefaultSettingsAndValuesForNewUser(): Map<SettingName, SettingDescription> {
     return this.defaultSettings
+  }
+
+  getDefaultSettingsAndValuesForNewVaultAccount(): Map<SettingName, SettingDescription> {
+    const defaultVaultSettings = new Map(this.defaultSettings)
+
+    for (const vaultAccountDefaultSettingOverwriteKey of this.vaultAccountDefaultSettingsOverwrites.keys()) {
+      defaultVaultSettings.set(
+        vaultAccountDefaultSettingOverwriteKey,
+        this.vaultAccountDefaultSettingsOverwrites.get(vaultAccountDefaultSettingOverwriteKey) as SettingDescription
+      )
+    }
+
+    return defaultVaultSettings
   }
 
   async getFileUploadLimit(subscriptionName: SubscriptionName): Promise<number> {

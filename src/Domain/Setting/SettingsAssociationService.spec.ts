@@ -10,6 +10,7 @@ import { RoleRepositoryInterface } from '../Role/RoleRepositoryInterface'
 import { RoleToSubscriptionMapInterface } from '../Role/RoleToSubscriptionMapInterface'
 import { Role } from '../Role/Role'
 import { Permission } from '../Permission/Permission'
+import { SettingDescription } from './SettingDescription'
 
 describe('SettingsAssociationService', () => {
   let roleToSubscriptionMap: RoleToSubscriptionMapInterface
@@ -55,11 +56,22 @@ describe('SettingsAssociationService', () => {
 
   it('should return the default set of settings for a newly registered user', () => {
     const settings = createService().getDefaultSettingsAndValuesForNewUser()
-    const flatSettings = [...(settings as Map<SettingName, { value: string, sensitive: boolean, serverEncryptionVersion: number }>).keys()]
+    const flatSettings = [...(settings as Map<SettingName, SettingDescription>).keys()]
     expect(flatSettings).toEqual([
       'MUTE_SIGN_IN_EMAILS',
       'LOG_SESSION_USER_AGENT',
     ])
+  })
+
+  it('should return the default set of settings for a newly registered vault account', () => {
+    const settings = createService().getDefaultSettingsAndValuesForNewVaultAccount()
+    const flatSettings = [...(settings as Map<SettingName, SettingDescription>).keys()]
+    expect(flatSettings).toEqual([
+      'MUTE_SIGN_IN_EMAILS',
+      'LOG_SESSION_USER_AGENT',
+    ])
+
+    expect(settings.get(SettingName.LogSessionUserAgent)?.value).toEqual('disabled')
   })
 
   it('should return the default set of setting values for a core subscription', async () => {
@@ -73,7 +85,7 @@ describe('SettingsAssociationService', () => {
 
     expect(settings).not.toBeUndefined()
 
-    const flatSettings = [...(settings as Map<SettingName, { value: string, sensitive: boolean, serverEncryptionVersion: number }>).keys()]
+    const flatSettings = [...(settings as Map<SettingName, SettingDescription>).keys()]
     expect(flatSettings).toEqual([
       'FILE_UPLOAD_BYTES_USED',
       'FILE_UPLOAD_BYTES_LIMIT',
