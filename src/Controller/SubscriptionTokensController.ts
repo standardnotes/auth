@@ -61,7 +61,7 @@ export class SubscriptionTokensController extends BaseHttpController {
 
     const user = authenticateTokenResponse.user as User
     let extensionKey = undefined
-    const extensionKeySetting = await this.settingService.findSetting({
+    const extensionKeySetting = await this.settingService.findSettingWithDecryptedValue({
       settingName: SettingName.ExtensionKey,
       userUuid: user.uuid,
     })

@@ -28,7 +28,7 @@ export class ListedAccountCreatedEventHandler implements DomainEventHandlerInter
 
     let authSecrets: ListedAuthorSecretsData = [ newSecret ]
 
-    const listedAuthorSecretsSetting = await this.settingService.findSetting({
+    const listedAuthorSecretsSetting = await this.settingService.findSettingWithDecryptedValue({
       settingName: SettingName.ListedAuthorSecrets,
       userUuid: user.uuid,
     })

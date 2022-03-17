@@ -24,7 +24,7 @@ export class ListedAccountDeletedEventHandler implements DomainEventHandlerInter
       return
     }
 
-    const listedAuthorSecretsSetting = await this.settingService.findSetting({
+    const listedAuthorSecretsSetting = await this.settingService.findSettingWithDecryptedValue({
       settingName: SettingName.ListedAuthorSecrets,
       userUuid: user.uuid,
     })

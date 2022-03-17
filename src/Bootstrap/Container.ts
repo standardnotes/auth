@@ -132,6 +132,10 @@ import { ListedAccountDeletedEventHandler } from '../Domain/Handler/ListedAccoun
 import { MuteSignInEmails } from '../Domain/UseCase/MuteSignInEmails/MuteSignInEmails'
 import { FileRemovedEventHandler } from '../Domain/Handler/FileRemovedEventHandler'
 import { UserDisabledSessionUserAgentLoggingEventHandler } from '../Domain/Handler/UserDisabledSessionUserAgentLoggingEventHandler'
+import { SettingInterpreterInterface } from '../Domain/Setting/SettingInterpreterInterface'
+import { SettingInterpreter } from '../Domain/Setting/SettingInterpreter'
+import { SettingDecrypterInterface } from '../Domain/Setting/SettingDecrypterInterface'
+import { SettingDecrypter } from '../Domain/Setting/SettingDecrypter'
 
 export class ContainerConfigLoader {
   async load(): Promise<Container> {
@@ -375,6 +379,8 @@ export class ContainerConfigLoader {
     container.bind<RoleToSubscriptionMapInterface>(TYPES.RoleToSubscriptionMap).to(RoleToSubscriptionMap)
     container.bind<SettingsAssociationServiceInterface>(TYPES.SettingsAssociationService).to(SettingsAssociationService)
     container.bind<FeatureServiceInterface>(TYPES.FeatureService).to(FeatureService)
+    container.bind<SettingInterpreterInterface>(TYPES.SettingInterpreter).to(SettingInterpreter)
+    container.bind<SettingDecrypterInterface>(TYPES.SettingDecrypter).to(SettingDecrypter)
 
     if (env.get('SNS_TOPIC_ARN', true)) {
       container.bind<SNSDomainEventPublisher>(TYPES.DomainEventPublisher).toConstantValue(

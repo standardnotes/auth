@@ -28,7 +28,7 @@ describe('ListedAccountDeletedEventHandler', () => {
     userRepository.findOneByEmail = jest.fn().mockReturnValue(user)
 
     settingService = {} as jest.Mocked<SettingServiceInterface>
-    settingService.findSetting = jest.fn().mockReturnValue({
+    settingService.findSettingWithDecryptedValue = jest.fn().mockReturnValue({
       value: '[{"authorId":1,"secret":"my-secret","hostUrl":"https://dev.listed.to"}]',
     } as jest.Mocked<Setting>)
     settingService.createOrReplace = jest.fn()
@@ -55,7 +55,7 @@ describe('ListedAccountDeletedEventHandler', () => {
   })
 
   it('should not remove the listed secret if setting is not found', async () => {
-    settingService.findSetting = jest.fn().mockReturnValue(undefined)
+    settingService.findSettingWithDecryptedValue = jest.fn().mockReturnValue(undefined)
 
     await createHandler().handle(event)
 
@@ -76,7 +76,7 @@ describe('ListedAccountDeletedEventHandler', () => {
   })
 
   it('should remove the listed secret from an existing list of secrets', async () => {
-    settingService.findSetting = jest.fn().mockReturnValue({
+    settingService.findSettingWithDecryptedValue = jest.fn().mockReturnValue({
       value: '[{"authorId":2,"secret":"old-secret","hostUrl":"https://dev.listed.to"},{"authorId":1,"secret":"my-secret","hostUrl":"https://dev.listed.to"},{"authorId":1,"secret":"my-secret","hostUrl":"https://local.listed.to"}]',
     } as jest.Mocked<Setting>)
 
