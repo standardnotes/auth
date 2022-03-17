@@ -124,8 +124,8 @@ export class SessionService implements SessionServiceInterface {
   }
 
   getDeviceInfo(session: Session): string {
-    const browserInfo = this.getBrowserInfoFromUserAgent(session.userAgent)
-    const osInfo = this.getOperatingSystemInfoFromUserAgent(session.userAgent)
+    const browserInfo = this.getBrowserInfoFromUserAgent(session.userAgent as string)
+    const osInfo = this.getOperatingSystemInfoFromUserAgent(session.userAgent as string)
 
     if (osInfo && !browserInfo) {
       return osInfo

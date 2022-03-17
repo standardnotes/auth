@@ -112,6 +112,7 @@ const TYPES = {
   FileRemovedEventHandler: Symbol.for('FileRemovedEventHandler'),
   ListedAccountCreatedEventHandler: Symbol.for('ListedAccountCreatedEventHandler'),
   ListedAccountDeletedEventHandler: Symbol.for('ListedAccountDeletedEventHandler'),
+  UserDisabledSessionUserAgentLoggingEventHandler: Symbol.for('UserDisabledSessionUserAgentLoggingEventHandler'),
   // Services
   DeviceDetector: Symbol.for('DeviceDetector'),
   SessionService: Symbol.for('SessionService'),
