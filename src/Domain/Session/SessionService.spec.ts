@@ -92,7 +92,7 @@ describe('SessionService', () => {
     })
 
     logger = {} as jest.Mocked<winston.Logger>
-    logger.warning = jest.fn()
+    logger.warn = jest.fn()
     logger.error = jest.fn()
     logger.debug = jest.fn()
   })

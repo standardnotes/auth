@@ -100,7 +100,7 @@ export class SessionService implements SessionServiceInterface {
       return osInfo
     }
     catch (error) {
-      this.logger.warning(`Could not parse operating system info. User agent: ${userAgent}: ${error.message}`)
+      this.logger.warn(`Could not parse operating system info. User agent: ${userAgent}: ${error.message}`)
 
       return 'Unknown OS'
     }
@@ -120,7 +120,7 @@ export class SessionService implements SessionServiceInterface {
       return clientInfo
     }
     catch (error) {
-      this.logger.warning(`Could not parse browser info. User agent: ${userAgent}: ${error.message}`)
+      this.logger.warn(`Could not parse browser info. User agent: ${userAgent}: ${error.message}`)
 
       return 'Unknown Client'
     }
