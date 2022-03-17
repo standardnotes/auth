@@ -17,6 +17,8 @@ import { EphemeralSessionRepositoryInterface } from './EphemeralSessionRepositor
 import { EphemeralSession } from './EphemeralSession'
 import { RevokedSession } from './RevokedSession'
 import { RevokedSessionRepositoryInterface } from './RevokedSessionRepositoryInterface'
+import { SettingServiceInterface } from '../Setting/SettingServiceInterface'
+import { LogSessionUserAgentOption, SettingName } from '@standardnotes/settings'
 
 @injectable()
 export class SessionService implements SessionServiceInterface {
@@ -30,12 +32,13 @@ export class SessionService implements SessionServiceInterface {
     @inject(TYPES.Timer) private timer: TimerInterface,
     @inject(TYPES.Logger) private logger: winston.Logger,
     @inject(TYPES.ACCESS_TOKEN_AGE) private accessTokenAge: number,
-    @inject(TYPES.REFRESH_TOKEN_AGE) private refreshTokenAge: number
+    @inject(TYPES.REFRESH_TOKEN_AGE) private refreshTokenAge: number,
+    @inject(TYPES.SettingService) private settingService: SettingServiceInterface,
   ) {
   }
 
   async createNewSessionForUser(user: User, apiVersion: string, userAgent: string): Promise<SessionPayload> {
-    const session = this.createSession(user, apiVersion, userAgent, false)
+    const session = await this.createSession(user, apiVersion, userAgent, false)
 
     const sessionPayload = await this.createTokens(session)
 
@@ -45,7 +48,7 @@ export class SessionService implements SessionServiceInterface {
   }
 
   async createNewEphemeralSessionForUser(user: User, apiVersion: string, userAgent: string): Promise<SessionPayload> {
-    const ephemeralSession = this.createSession(user, apiVersion, userAgent, true)
+    const ephemeralSession = await this.createSession(user, apiVersion, userAgent, true)
 
     const sessionPayload = await this.createTokens(ephemeralSession)
 
@@ -197,7 +200,7 @@ export class SessionService implements SessionServiceInterface {
     return this.revokedSessionRepository.save(revokedSession)
   }
 
-  private createSession(user: User, apiVersion: string, userAgent: string, ephemeral: boolean): Session {
+  private async createSession(user: User, apiVersion: string, userAgent: string, ephemeral: boolean): Promise<Session> {
     let session = new Session()
     if (ephemeral) {
       session = new EphemeralSession()
@@ -205,7 +208,9 @@ export class SessionService implements SessionServiceInterface {
     session.uuid = uuidv4()
     session.userUuid = user.uuid
     session.apiVersion = apiVersion
-    session.userAgent = userAgent
+    if (await this.isLoggingUserAgentEnabledOnSessions(user)) {
+      session.userAgent = userAgent
+    }
     session.createdAt = dayjs.utc().toDate()
     session.updatedAt = dayjs.utc().toDate()
 
@@ -242,5 +247,18 @@ export class SessionService implements SessionServiceInterface {
       access_expiration: this.timer.convertStringDateToMilliseconds(accessTokenExpiration.toString()),
       refresh_expiration: this.timer.convertStringDateToMilliseconds(refreshTokenExpiration.toString()),
     }
+  }
+
+  private async isLoggingUserAgentEnabledOnSessions(user: User): Promise<boolean> {
+    const loggingSetting = await this.settingService.findSettingWithDecryptedValue({
+      settingName: SettingName.LogSessionUserAgent,
+      userUuid: user.uuid,
+    })
+
+    if (loggingSetting === undefined) {
+      return true
+    }
+
+    return loggingSetting.value === LogSessionUserAgentOption.Enabled
   }
 }

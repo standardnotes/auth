@@ -10,6 +10,9 @@ import { EphemeralSessionRepositoryInterface } from './EphemeralSessionRepositor
 import { EphemeralSession } from './EphemeralSession'
 import { RevokedSessionRepositoryInterface } from './RevokedSessionRepositoryInterface'
 import { RevokedSession } from './RevokedSession'
+import { SettingServiceInterface } from '../Setting/SettingServiceInterface'
+import { LogSessionUserAgentOption } from '@standardnotes/settings'
+import { Setting } from '../Setting/Setting'
 
 describe('SessionService', () => {
   let sessionRepository: SessionRepositoryInterface
@@ -18,6 +21,7 @@ describe('SessionService', () => {
   let session: Session
   let ephemeralSession: EphemeralSession
   let revokedSession: RevokedSession
+  let settingService: SettingServiceInterface
   let deviceDetector: UAParser
   let timer: TimerInterface
   let logger: winston.Logger
@@ -30,7 +34,8 @@ describe('SessionService', () => {
     timer,
     logger,
     123,
-    234
+    234,
+    settingService
   )
 
   beforeEach(() => {
@@ -50,6 +55,9 @@ describe('SessionService', () => {
     sessionRepository.save = jest.fn().mockReturnValue(session)
     sessionRepository.updateHashedTokens = jest.fn()
     sessionRepository.updatedTokenExpirationDates = jest.fn()
+
+    settingService = {} as jest.Mocked<SettingServiceInterface>
+    settingService.findSettingWithDecryptedValue = jest.fn().mockReturnValue(undefined)
 
     ephemeralSessionRepository = {} as jest.Mocked<EphemeralSessionRepositoryInterface>
     ephemeralSessionRepository.save = jest.fn()
@@ -126,6 +134,37 @@ describe('SessionService', () => {
       refreshExpiration: expect.any(Date),
       updatedAt: expect.any(Date),
       userAgent: 'Google Chrome',
+      userUuid: '123',
+      uuid: expect.any(String),
+    })
+
+    expect(sessionPayload).toEqual({
+      access_expiration: 123,
+      access_token: expect.any(String),
+      refresh_expiration: 123,
+      refresh_token: expect.any(String),
+    })
+  })
+
+  it('should create new session for a user with disabled user agent logging', async () => {
+    const user = {} as jest.Mocked<User>
+    user.uuid = '123'
+
+    settingService.findSettingWithDecryptedValue = jest.fn().mockReturnValue({
+      value: LogSessionUserAgentOption.Disabled,
+    } as jest.Mocked<Setting>)
+
+    const sessionPayload = await createService().createNewSessionForUser(user, '003', 'Google Chrome')
+
+    expect(sessionRepository.save).toHaveBeenCalledWith(expect.any(Session))
+    expect(sessionRepository.save).toHaveBeenCalledWith({
+      accessExpiration: expect.any(Date),
+      apiVersion: '003',
+      createdAt: expect.any(Date),
+      hashedAccessToken: expect.any(String),
+      hashedRefreshToken: expect.any(String),
+      refreshExpiration: expect.any(Date),
+      updatedAt: expect.any(Date),
       userUuid: '123',
       uuid: expect.any(String),
     })
