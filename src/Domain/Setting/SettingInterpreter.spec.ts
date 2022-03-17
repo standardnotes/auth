@@ -1,5 +1,5 @@
-import { CloudBackupRequestedEvent, DomainEventPublisherInterface, EmailBackupRequestedEvent } from '@standardnotes/domain-events'
-import { EmailBackupFrequency, OneDriveBackupFrequency, SettingName } from '@standardnotes/settings'
+import { CloudBackupRequestedEvent, DomainEventPublisherInterface, EmailBackupRequestedEvent, UserDisabledSessionUserAgentLoggingEvent } from '@standardnotes/domain-events'
+import { EmailBackupFrequency, LogSessionUserAgentOption, OneDriveBackupFrequency, SettingName } from '@standardnotes/settings'
 import 'reflect-metadata'
 import { Logger } from 'winston'
 import { DomainEventFactoryInterface } from '../Event/DomainEventFactoryInterface'
@@ -29,6 +29,7 @@ describe('SettingInterpreter', () => {
   beforeEach(() => {
     user = {
       uuid: '4-5-6',
+      email: 'test@test.te',
     } as jest.Mocked<User>
 
     settingRepository = {} as jest.Mocked<SettingRepositoryInterface>
@@ -44,11 +45,27 @@ describe('SettingInterpreter', () => {
     domainEventFactory = {} as jest.Mocked<DomainEventFactoryInterface>
     domainEventFactory.createEmailBackupRequestedEvent = jest.fn().mockReturnValue({} as jest.Mocked<EmailBackupRequestedEvent>)
     domainEventFactory.createCloudBackupRequestedEvent = jest.fn().mockReturnValue({} as jest.Mocked<CloudBackupRequestedEvent>)
+    domainEventFactory.createUserDisabledSessionUserAgentLoggingEvent = jest.fn().mockReturnValue({} as jest.Mocked<UserDisabledSessionUserAgentLoggingEvent>)
 
     logger = {} as jest.Mocked<Logger>
     logger.debug = jest.fn()
     logger.warn = jest.fn()
     logger.error = jest.fn()
+  })
+
+  it ('should trigger session cleanup if user is disabling session user agent logging', async () => {
+    const setting = {
+      name: SettingName.LogSessionUserAgent,
+      value: LogSessionUserAgentOption.Disabled,
+    } as jest.Mocked<Setting>
+
+    await createInterpreter().interpretSettingUpdated(setting, user, LogSessionUserAgentOption.Disabled)
+
+    expect(domainEventPublisher.publish).toHaveBeenCalled()
+    expect(domainEventFactory.createUserDisabledSessionUserAgentLoggingEvent).toHaveBeenCalledWith({
+      userUuid: '4-5-6',
+      email: 'test@test.te',
+    })
   })
 
   it ('should trigger backup if email backup setting is created - emails not muted', async () => {

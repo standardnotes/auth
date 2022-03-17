@@ -1,5 +1,5 @@
 import { DomainEventPublisherInterface } from '@standardnotes/domain-events'
-import { DropboxBackupFrequency, EmailBackupFrequency, GoogleDriveBackupFrequency, MuteFailedBackupsEmailsOption, MuteFailedCloudBackupsEmailsOption, OneDriveBackupFrequency, SettingName } from '@standardnotes/settings'
+import { DropboxBackupFrequency, EmailBackupFrequency, GoogleDriveBackupFrequency, LogSessionUserAgentOption, MuteFailedBackupsEmailsOption, MuteFailedCloudBackupsEmailsOption, OneDriveBackupFrequency, SettingName } from '@standardnotes/settings'
 import { inject, injectable } from 'inversify'
 import { Logger } from 'winston'
 import TYPES from '../../Bootstrap/Types'
@@ -47,6 +47,10 @@ export class SettingInterpreter implements SettingInterpreterInterface {
     if (this.isEnablingCloudBackupSetting(updatedSetting)) {
       await this.triggerCloudBackup(updatedSetting, user.uuid, unencryptedValue)
     }
+
+    if (this.isDisablingSessionUserAgentLogging(updatedSetting)) {
+      await this.triggerSessionUserAgentCleanup(user)
+    }
   }
 
   private async triggerEmailBackup(userUuid: string): Promise<void> {
@@ -75,6 +79,19 @@ export class SettingInterpreter implements SettingInterpreterInterface {
     return (this.cloudBackupFrequencySettings.includes(setting.name as SettingName)
       || this.cloudBackupTokenSettings.includes(setting.name as SettingName))
       && !this.cloudBackupFrequencyDisabledValues.includes(setting.value as DropboxBackupFrequency | OneDriveBackupFrequency | GoogleDriveBackupFrequency)
+  }
+
+  private isDisablingSessionUserAgentLogging(setting: Setting): boolean {
+    return SettingName.LogSessionUserAgent === setting.name && LogSessionUserAgentOption.Disabled === setting.value
+  }
+
+  private async triggerSessionUserAgentCleanup(user: User) {
+    await this.domainEventPublisher.publish(
+      this.domainEventFactory.createUserDisabledSessionUserAgentLoggingEvent({
+        userUuid: user.uuid,
+        email: user.email,
+      })
+    )
   }
 
   private async triggerCloudBackup(setting: Setting, userUuid: string, unencryptedValue: string | null): Promise<void> {
