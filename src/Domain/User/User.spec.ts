@@ -16,4 +16,18 @@ describe('User', () => {
 
     expect(user.supportsSessions()).toBeFalsy()
   })
+
+  it('should indicate if the user is potentially a vault account', () => {
+    const user = createUser()
+    user.email = 'asdasdasdasdasdasdasdasdasdasdas'
+
+    expect(user.isPotentiallyAVaultAccount()).toBeTruthy()
+  })
+
+  it('should indicate if the user is not a vault account', () => {
+    const user = createUser()
+    user.email = 'test@test.te'
+
+    expect(user.isPotentiallyAVaultAccount()).toBeFalsy()
+  })
 })
