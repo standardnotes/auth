@@ -29,7 +29,7 @@ export class FileUploadedEventHandler implements DomainEventHandlerInterface {
     }
 
     let bytesUsed = '0'
-    const bytesUsedSetting = await this.settingService.findSetting({
+    const bytesUsedSetting = await this.settingService.findSettingWithDecryptedValue({
       userUuid: event.payload.userUuid,
       settingName: SettingName.FileUploadBytesUsed,
     })

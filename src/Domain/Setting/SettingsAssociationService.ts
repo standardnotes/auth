@@ -29,6 +29,7 @@ export class SettingsAssociationService implements SettingsAssociationServiceInt
     SettingName.OneDriveBackupFrequency,
     SettingName.FileUploadBytesLimit,
     SettingName.FileUploadBytesUsed,
+    SettingName.LogSessionUserAgent,
   ]
 
   private readonly UNSENSITIVE_SETTINGS = [
@@ -40,6 +41,7 @@ export class SettingsAssociationService implements SettingsAssociationServiceInt
     SettingName.MuteFailedCloudBackupsEmails,
     SettingName.MuteSignInEmails,
     SettingName.ListedAuthorSecrets,
+    SettingName.LogSessionUserAgent,
   ]
 
   private readonly CLIENT_IMMUTABLE_SETTINGS = [

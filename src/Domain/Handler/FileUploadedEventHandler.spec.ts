@@ -30,7 +30,7 @@ describe('FileUploadedEventHandler', () => {
     userRepository.findOneByUuid = jest.fn().mockReturnValue(user)
 
     settingService = {} as jest.Mocked<SettingServiceInterface>
-    settingService.findSetting = jest.fn().mockReturnValue(undefined)
+    settingService.findSettingWithDecryptedValue = jest.fn().mockReturnValue(undefined)
     settingService.createOrReplace = jest.fn()
 
     event = {} as jest.Mocked<FileUploadedEvent>
@@ -70,7 +70,7 @@ describe('FileUploadedEventHandler', () => {
   })
 
   it('should update a bytes used setting if one does exist', async () => {
-    settingService.findSetting = jest.fn().mockReturnValue({
+    settingService.findSettingWithDecryptedValue = jest.fn().mockReturnValue({
       value: 345,
     })
     await createHandler().handle(event)

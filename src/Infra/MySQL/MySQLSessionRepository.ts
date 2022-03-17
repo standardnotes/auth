@@ -9,6 +9,16 @@ import { SessionRepositoryInterface } from '../../Domain/Session/SessionReposito
 @injectable()
 @EntityRepository(Session)
 export class MySQLSessionRepository extends Repository<Session> implements SessionRepositoryInterface {
+  async clearUserAgentByUserUuid(userUuid: string): Promise<void> {
+    await this.createQueryBuilder('session')
+      .update()
+      .set({
+        userAgent: null,
+      })
+      .where('user_uuid = :userUuid', { userUuid })
+      .execute()
+  }
+
   async updateHashedTokens(uuid: string, hashedAccessToken: string, hashedRefreshToken: string): Promise<void> {
     await this.createQueryBuilder('session')
       .update()

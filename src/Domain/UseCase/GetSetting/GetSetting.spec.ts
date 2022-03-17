@@ -17,7 +17,7 @@ describe('GetSetting', () => {
     setting = {} as jest.Mocked<Setting>
 
     settingService = {} as jest.Mocked<SettingServiceInterface>
-    settingService.findSetting = jest.fn().mockReturnValue(setting)
+    settingService.findSettingWithDecryptedValue = jest.fn().mockReturnValue(setting)
 
     settingProjector = {} as jest.Mocked<SettingProjector>
     settingProjector.projectSimple = jest.fn().mockReturnValue({ foo: 'bar' })
@@ -32,7 +32,7 @@ describe('GetSetting', () => {
   })
 
   it('should not get a setting for user if it does not exist', async () => {
-    settingService.findSetting = jest.fn().mockReturnValue(undefined)
+    settingService.findSettingWithDecryptedValue = jest.fn().mockReturnValue(undefined)
 
     expect(await createUseCase().execute({ userUuid: '1-2-3', settingName: 'test' })).toEqual({
       success: false,
@@ -48,7 +48,7 @@ describe('GetSetting', () => {
       name: SettingName.MfaSecret,
     } as jest.Mocked<Setting>
 
-    settingService.findSetting = jest.fn().mockReturnValue(setting)
+    settingService.findSettingWithDecryptedValue = jest.fn().mockReturnValue(setting)
 
     expect(await createUseCase().execute({ userUuid: '1-2-3', settingName: SettingName.MfaSecret })).toEqual({
       success: true,
@@ -62,7 +62,7 @@ describe('GetSetting', () => {
       name: SettingName.MfaSecret,
     } as jest.Mocked<Setting>
 
-    settingService.findSetting = jest.fn().mockReturnValue(setting)
+    settingService.findSettingWithDecryptedValue = jest.fn().mockReturnValue(setting)
 
     expect(await createUseCase().execute({ userUuid: '1-2-3', settingName: 'MFA_SECRET', allowSensitiveRetrieval: true })).toEqual({
       success: true,

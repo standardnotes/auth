@@ -30,7 +30,7 @@ describe('CreateValetToken', () => {
     tokenEncoder.encodeExpirableToken = jest.fn().mockReturnValue('foobar')
 
     settingService = {} as jest.Mocked<SettingServiceInterface>
-    settingService.findSetting = jest.fn().mockReturnValue({
+    settingService.findSettingWithDecryptedValue = jest.fn().mockReturnValue({
       value: '123',
     })
 
@@ -151,7 +151,7 @@ describe('CreateValetToken', () => {
   })
 
   it('should create a write valet token with default subscription upload limit if upload bytes settings do not exist', async () => {
-    settingService.findSetting = jest.fn().mockReturnValue(undefined)
+    settingService.findSettingWithDecryptedValue = jest.fn().mockReturnValue(undefined)
 
     const response = await createUseCase().execute({
       operation: 'write',

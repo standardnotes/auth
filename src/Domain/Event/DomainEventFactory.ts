@@ -1,6 +1,6 @@
 import { RoleName } from '@standardnotes/common'
 import { Uuid } from '@standardnotes/common'
-import { AccountDeletionRequestedEvent, UserEmailChangedEvent, UserRegisteredEvent, UserRolesChangedEvent, OfflineSubscriptionTokenCreatedEvent, EmailBackupRequestedEvent, CloudBackupRequestedEvent, ListedAccountRequestedEvent, UserSignedInEvent } from '@standardnotes/domain-events'
+import { AccountDeletionRequestedEvent, UserEmailChangedEvent, UserRegisteredEvent, UserRolesChangedEvent, OfflineSubscriptionTokenCreatedEvent, EmailBackupRequestedEvent, CloudBackupRequestedEvent, ListedAccountRequestedEvent, UserSignedInEvent, UserDisabledSessionUserAgentLoggingEvent } from '@standardnotes/domain-events'
 import { TimerInterface } from '@standardnotes/time'
 import { inject, injectable } from 'inversify'
 import TYPES from '../../Bootstrap/Types'
@@ -11,6 +11,20 @@ export class DomainEventFactory implements DomainEventFactoryInterface {
   constructor (
     @inject(TYPES.Timer) private timer: TimerInterface,
   ) {
+  }
+
+  createUserDisabledSessionUserAgentLoggingEvent(dto: { userUuid: string; email: string }): UserDisabledSessionUserAgentLoggingEvent {
+    return {
+      type: 'USER_DISABLED_SESSION_USER_AGENT_LOGGING',
+      createdAt: this.timer.getUTCDate(),
+      meta: {
+        correlation: {
+          userIdentifier: dto.userUuid,
+          userIdentifierType: 'uuid',
+        },
+      },
+      payload: dto,
+    }
   }
 
   createUserSignedInEvent(dto: {

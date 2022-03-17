@@ -30,7 +30,7 @@ describe('FileRemovedEventHandler', () => {
     userRepository.findOneByUuid = jest.fn().mockReturnValue(user)
 
     settingService = {} as jest.Mocked<SettingServiceInterface>
-    settingService.findSetting = jest.fn().mockReturnValue(undefined)
+    settingService.findSettingWithDecryptedValue = jest.fn().mockReturnValue(undefined)
     settingService.createOrReplace = jest.fn()
 
     event = {} as jest.Mocked<FileRemovedEvent>
@@ -61,7 +61,7 @@ describe('FileRemovedEventHandler', () => {
   })
 
   it('should update a bytes used setting', async () => {
-    settingService.findSetting = jest.fn().mockReturnValue({
+    settingService.findSettingWithDecryptedValue = jest.fn().mockReturnValue({
       value: 345,
     })
     await createHandler().handle(event)

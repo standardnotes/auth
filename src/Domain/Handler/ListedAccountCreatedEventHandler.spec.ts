@@ -28,7 +28,7 @@ describe('ListedAccountCreatedEventHandler', () => {
     userRepository.findOneByEmail = jest.fn().mockReturnValue(user)
 
     settingService = {} as jest.Mocked<SettingServiceInterface>
-    settingService.findSetting = jest.fn().mockReturnValue(undefined)
+    settingService.findSettingWithDecryptedValue = jest.fn().mockReturnValue(undefined)
     settingService.createOrReplace = jest.fn()
 
     event = {} as jest.Mocked<ListedAccountCreatedEvent>
@@ -66,7 +66,7 @@ describe('ListedAccountCreatedEventHandler', () => {
   })
 
   it('should add the listed secret as a user setting to an existing list of secrets', async () => {
-    settingService.findSetting = jest.fn().mockReturnValue({
+    settingService.findSettingWithDecryptedValue = jest.fn().mockReturnValue({
       value: '[{"authorId":2,"secret":"old-secret","hostUrl":"https://dev.listed.to"}]',
     } as jest.Mocked<Setting>)
 

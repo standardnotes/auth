@@ -74,7 +74,7 @@ describe('SignIn', () => {
     } as jest.Mocked<Setting>
 
     settingService = {} as jest.Mocked<SettingServiceInterface>
-    settingService.findSetting = jest.fn().mockReturnValue(setting)
+    settingService.findSettingWithDecryptedValue = jest.fn().mockReturnValue(setting)
     settingService.createOrReplace = jest.fn().mockReturnValue({
       status: 'created',
       setting,
@@ -114,7 +114,7 @@ describe('SignIn', () => {
       value: MuteSignInEmailsOption.Muted,
     } as jest.Mocked<Setting>
 
-    settingService.findSetting = jest.fn().mockReturnValue(setting)
+    settingService.findSettingWithDecryptedValue = jest.fn().mockReturnValue(setting)
 
     expect(await createUseCase().execute({
       email: 'test@test.te',
@@ -139,7 +139,7 @@ describe('SignIn', () => {
   })
 
   it('should sign in a user and create mute sign in email setting if it does not exist', async () => {
-    settingService.findSetting = jest.fn().mockReturnValue(undefined)
+    settingService.findSettingWithDecryptedValue = jest.fn().mockReturnValue(undefined)
 
     expect(await createUseCase().execute({
       email: 'test@test.te',

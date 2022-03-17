@@ -86,7 +86,7 @@ export class SignIn implements UseCaseInterface {
   }
 
   private async findOrCreateMuteSignInEmailsSetting(user: User): Promise<Setting> {
-    const existingMuteSignInEmailsSetting = await this.settingService.findSetting({
+    const existingMuteSignInEmailsSetting = await this.settingService.findSettingWithDecryptedValue({
       userUuid: user.uuid,
       settingName: SettingName.MuteSignInEmails,
     })

@@ -69,7 +69,7 @@ describe('SubscriptionTokensController', () => {
     } as jest.Mocked<Setting>
 
     settingService = {} as jest.Mocked<SettingServiceInterface>
-    settingService.findSetting = jest.fn().mockReturnValue(extensionKeySetting)
+    settingService.findSettingWithDecryptedValue = jest.fn().mockReturnValue(extensionKeySetting)
 
     tokenEncoder = {} as jest.Mocked<TokenEncoderInterface<CrossServiceTokenData>>
     tokenEncoder.encodeExpirableToken = jest.fn().mockReturnValue('foobar')
@@ -118,7 +118,7 @@ describe('SubscriptionTokensController', () => {
   it('should validate an subscription token for user without an extension key setting', async () => {
     request.params.token = 'test'
 
-    settingService.findSetting = jest.fn().mockReturnValue(undefined)
+    settingService.findSettingWithDecryptedValue = jest.fn().mockReturnValue(undefined)
 
     const httpResponse = <results.JsonResult> await createController().validate(request)
     const result = await httpResponse.executeAsync()

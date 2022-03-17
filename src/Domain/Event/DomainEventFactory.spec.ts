@@ -18,6 +18,27 @@ describe('DomainEventFactory', () => {
     timer.getUTCDate = jest.fn().mockReturnValue(new Date(1))
   })
 
+  it('should create a USER_DISABLED_SESSION_USER_AGENT_LOGGING event', () => {
+    expect(createFactory().createUserDisabledSessionUserAgentLoggingEvent({
+      email: 'test@test.te',
+      userUuid: '1-2-3',
+    }))
+      .toEqual({
+        createdAt: expect.any(Date),
+        meta: {
+          correlation: {
+            userIdentifier: '1-2-3',
+            userIdentifierType: 'uuid',
+          },
+        },
+        payload: {
+          userUuid: '1-2-3',
+          email: 'test@test.te',
+        },
+        type: 'USER_DISABLED_SESSION_USER_AGENT_LOGGING',
+      })
+  })
+
   it('should create a USER_SIGNED_IN event', () => {
     expect(createFactory().createUserSignedInEvent({
       browser: 'Firefox 1',

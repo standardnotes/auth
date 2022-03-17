@@ -9,5 +9,5 @@ export interface SettingServiceInterface {
   applyDefaultSettingsForSubscription(user: User, subscriptionName: SubscriptionName): Promise<void>
   applyDefaultSettingsUponRegistration(user: User): Promise<void>
   createOrReplace(dto: CreateOrReplaceSettingDto): Promise<CreateOrReplaceSettingResponse>
-  findSetting(dto: FindSettingDTO): Promise<Setting | undefined>
+  findSettingWithDecryptedValue(dto: FindSettingDTO): Promise<Setting | undefined>
 }

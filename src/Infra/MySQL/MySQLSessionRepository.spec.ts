@@ -24,6 +24,29 @@ describe('MySQLSessionRepository', () => {
     repository.createQueryBuilder = jest.fn().mockImplementation(() => queryBuilder)
   })
 
+  it('should clear user agent data on all user sessions', async () => {
+    repository.createQueryBuilder = jest.fn().mockImplementation(() => updateQueryBuilder)
+
+    updateQueryBuilder.update = jest.fn().mockReturnThis()
+    updateQueryBuilder.set = jest.fn().mockReturnThis()
+    updateQueryBuilder.where = jest.fn().mockReturnThis()
+    updateQueryBuilder.execute = jest.fn()
+
+    await repository.clearUserAgentByUserUuid('1-2-3')
+
+    expect(updateQueryBuilder.update).toHaveBeenCalled()
+    expect(updateQueryBuilder.set).toHaveBeenCalledWith(
+      {
+        userAgent: null,
+      }
+    )
+    expect(updateQueryBuilder.where).toHaveBeenCalledWith(
+      'user_uuid = :userUuid',
+      { userUuid: '1-2-3' }
+    )
+    expect(updateQueryBuilder.execute).toHaveBeenCalled()
+  })
+
   it('should update hashed tokens on a session', async () => {
     repository.createQueryBuilder = jest.fn().mockImplementation(() => updateQueryBuilder)
 

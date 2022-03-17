@@ -99,7 +99,7 @@ const requestBackups = async (
           return
         }
 
-        const cloudBackupProviderToken = await settingService.findSetting({
+        const cloudBackupProviderToken = await settingService.findSettingWithDecryptedValue({
           settingName: providerTokenSettingName,
           userUuid: setting.setting_user_uuid,
         })

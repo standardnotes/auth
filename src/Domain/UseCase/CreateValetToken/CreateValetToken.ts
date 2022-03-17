@@ -50,7 +50,7 @@ export class CreateValetToken implements UseCaseInterface {
     }
 
     let uploadBytesUsed = 0
-    const uploadBytesUsedSetting = await this.settingService.findSetting({
+    const uploadBytesUsedSetting = await this.settingService.findSettingWithDecryptedValue({
       userUuid: dto.userUuid,
       settingName: SettingName.FileUploadBytesUsed,
     })
@@ -60,7 +60,7 @@ export class CreateValetToken implements UseCaseInterface {
 
     const defaultUploadBytesLimitForSubscription = await this.settingsAssociationService.getFileUploadLimit(userSubscription.planName as SubscriptionName)
     let uploadBytesLimit = defaultUploadBytesLimitForSubscription
-    const overwriteWithUserUploadBytesLimitSetting = await this.settingService.findSetting({
+    const overwriteWithUserUploadBytesLimitSetting = await this.settingService.findSettingWithDecryptedValue({
       userUuid: dto.userUuid,
       settingName: SettingName.FileUploadBytesLimit,
     })
