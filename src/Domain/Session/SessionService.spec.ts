@@ -274,6 +274,12 @@ describe('SessionService', () => {
     expect(createService().getDeviceInfo(session)).toEqual('Chrome 69.0')
   })
 
+  it('should return unknown client and os if user agent is cleaned out', () => {
+    session.userAgent = null
+
+    expect(createService().getDeviceInfo(session)).toEqual('Unknown Client on Unknown OS')
+  })
+
   it('should return a shorter info based on partial os in user agent', () => {
     deviceDetector.getResult = jest.fn().mockReturnValue({
       ua: 'dummy-data',

@@ -19,7 +19,7 @@ describe('User', () => {
 
   it('should indicate if the user is potentially a vault account', () => {
     const user = createUser()
-    user.email = 'asdasdasdasdasdasdasdasdasdasdas'
+    user.email = 'a75a31ce95365904ef0e0a8e6cefc1f5e99adfef81bbdb6d4499eeb10ae0ff67'
 
     expect(user.isPotentiallyAVaultAccount()).toBeTruthy()
   })

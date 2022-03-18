@@ -127,8 +127,12 @@ export class SessionService implements SessionServiceInterface {
   }
 
   getDeviceInfo(session: Session): string {
-    const browserInfo = this.getBrowserInfoFromUserAgent(session.userAgent as string)
-    const osInfo = this.getOperatingSystemInfoFromUserAgent(session.userAgent as string)
+    if (session.userAgent === null) {
+      return 'Unknown Client on Unknown OS'
+    }
+
+    const browserInfo = this.getBrowserInfoFromUserAgent(session.userAgent)
+    const osInfo = this.getOperatingSystemInfoFromUserAgent(session.userAgent)
 
     if (osInfo && !browserInfo) {
       return osInfo

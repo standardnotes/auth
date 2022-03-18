@@ -178,6 +178,6 @@ export class User {
   }
 
   isPotentiallyAVaultAccount(): boolean {
-    return this.email.length === 32 && !this.email.includes('@')
+    return this.email.length === 64 && !this.email.includes('@')
   }
 }
