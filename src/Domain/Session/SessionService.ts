@@ -34,8 +34,16 @@ export class SessionService implements SessionServiceInterface {
   ) {
   }
 
-  async createNewSessionForUser(user: User, apiVersion: string, userAgent: string): Promise<SessionBody> {
-    const session = this.createSession(user, apiVersion, userAgent, false)
+  async createNewSessionForUser(dto: {
+    user: User,
+    apiVersion: string,
+    userAgent: string,
+    readonlyAccess: boolean,
+  }): Promise<SessionBody> {
+    const session = this.createSession({
+      ephemeral: false,
+      ...dto,
+    })
 
     const sessionPayload = await this.createTokens(session)
 
@@ -44,8 +52,16 @@ export class SessionService implements SessionServiceInterface {
     return sessionPayload
   }
 
-  async createNewEphemeralSessionForUser(user: User, apiVersion: string, userAgent: string): Promise<SessionBody> {
-    const ephemeralSession = this.createSession(user, apiVersion, userAgent, true)
+  async createNewEphemeralSessionForUser(dto: {
+    user: User,
+    apiVersion: string,
+    userAgent: string,
+    readonlyAccess: boolean,
+  }): Promise<SessionBody> {
+    const ephemeralSession = this.createSession({
+      ephemeral: true,
+      ...dto,
+    })
 
     const sessionPayload = await this.createTokens(ephemeralSession)
 
@@ -197,17 +213,24 @@ export class SessionService implements SessionServiceInterface {
     return this.revokedSessionRepository.save(revokedSession)
   }
 
-  private createSession(user: User, apiVersion: string, userAgent: string, ephemeral: boolean): Session {
+  private createSession(dto: {
+    user: User,
+    apiVersion: string,
+    userAgent: string,
+    ephemeral: boolean,
+    readonlyAccess: boolean,
+  }): Session {
     let session = new Session()
-    if (ephemeral) {
+    if (dto.ephemeral) {
       session = new EphemeralSession()
     }
     session.uuid = uuidv4()
-    session.userUuid = user.uuid
-    session.apiVersion = apiVersion
-    session.userAgent = userAgent
+    session.userUuid = dto.user.uuid
+    session.apiVersion = dto.apiVersion
+    session.userAgent = dto.userAgent
     session.createdAt = dayjs.utc().toDate()
     session.updatedAt = dayjs.utc().toDate()
+    session.readonlyAccess = dto.readonlyAccess
 
     return session
   }

@@ -70,12 +70,13 @@ export class Register implements UseCaseInterface {
 
     return {
       success: true,
-      authResponse: await authResponseFactory.createResponse(
+      authResponse: await authResponseFactory.createResponse({
         user,
         apiVersion,
-        dto.updatedWithUserAgent,
-        ephemeralSession
-      ),
+        userAgent: dto.updatedWithUserAgent,
+        ephemeralSession,
+        readonlyAccess: false,
+      }),
     }
   }
 }

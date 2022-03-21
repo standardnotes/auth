@@ -76,12 +76,13 @@ export class SignIn implements UseCaseInterface {
 
     return {
       success: true,
-      authResponse: await authResponseFactory.createResponse(
+      authResponse: await authResponseFactory.createResponse({
         user,
-        dto.apiVersion,
-        dto.userAgent,
-        dto.ephemeralSession
-      ),
+        apiVersion: dto.apiVersion,
+        userAgent: dto.userAgent,
+        ephemeralSession: dto.ephemeralSession,
+        readonlyAccess: false,
+      }),
     }
   }
 

@@ -20,20 +20,26 @@ export class AuthResponseFactory20161215 implements AuthResponseFactoryInterface
   ) {
   }
 
-  async createResponse(user: User, ..._args: any[]): Promise<AuthResponse20161215 | AuthResponse20200115> {
-    this.logger.debug(`Creating JWT auth response for user ${user.uuid}`)
+  async createResponse(dto: {
+    user: User,
+    apiVersion: string,
+    userAgent: string,
+    ephemeralSession: boolean,
+    readonlyAccess: boolean,
+  }): Promise<AuthResponse20161215 | AuthResponse20200115> {
+    this.logger.debug(`Creating JWT auth response for user ${dto.user.uuid}`)
 
     const data: SessionTokenData = {
-      user_uuid: user.uuid,
-      pw_hash: crypto.createHash('sha256').update(user.encryptedPassword).digest('hex'),
+      user_uuid: dto.user.uuid,
+      pw_hash: crypto.createHash('sha256').update(dto.user.encryptedPassword).digest('hex'),
     }
 
     const token = this.tokenEncoder.encodeToken(data)
 
-    this.logger.debug(`Created JWT token for user ${user.uuid}: ${token}`)
+    this.logger.debug(`Created JWT token for user ${dto.user.uuid}: ${token}`)
 
     return {
-      user: this.userProjector.projectSimple(user),
+      user: this.userProjector.projectSimple(dto.user),
       token,
     }
   }
