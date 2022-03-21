@@ -31,29 +31,41 @@ export class AuthResponseFactory20200115 extends AuthResponseFactory20190520 {
     )
   }
 
-  async createResponse(user: User, apiVersion: string, userAgent: string, ephemeralSession: boolean): Promise<AuthResponse20161215 | AuthResponse20200115> {
-    if (!user.supportsSessions()) {
-      this.logger.debug(`User ${user.uuid} does not support sessions. Falling back to JWT auth response`)
+  async createResponse(dto: {
+    user: User,
+    apiVersion: string,
+    userAgent: string,
+    ephemeralSession: boolean,
+    readonlyAccess: boolean,
+  }): Promise<AuthResponse20161215 | AuthResponse20200115> {
+    if (!dto.user.supportsSessions()) {
+      this.logger.debug(`User ${dto.user.uuid} does not support sessions. Falling back to JWT auth response`)
 
-      return super.createResponse(user)
+      return super.createResponse(dto)
     }
 
-    const sessionPayload = await this.createSession(user, apiVersion, userAgent, ephemeralSession)
+    const sessionPayload = await this.createSession(dto)
 
-    this.logger.debug('Created session payload for user %s: %O', user.uuid, sessionPayload)
+    this.logger.debug('Created session payload for user %s: %O', dto.user.uuid, sessionPayload)
 
     return {
       session: sessionPayload,
-      key_params: this.keyParamsFactory.create(user, true),
-      user: this.userProjector.projectSimple(user),
+      key_params: this.keyParamsFactory.create(dto.user, true),
+      user: this.userProjector.projectSimple(dto.user),
     }
   }
 
-  private async createSession(user: User, apiVersion: string, userAgent: string, ephemeralSession: boolean): Promise<SessionBody> {
-    if (ephemeralSession) {
-      return this.sessionService.createNewEphemeralSessionForUser(user, apiVersion, userAgent)
+  private async createSession(dto: {
+    user: User,
+    apiVersion: string,
+    userAgent: string,
+    ephemeralSession: boolean,
+    readonlyAccess: boolean,
+  }): Promise<SessionBody> {
+    if (dto.ephemeralSession) {
+      return this.sessionService.createNewEphemeralSessionForUser(dto)
     }
 
-    return this.sessionService.createNewSessionForUser(user, apiVersion, userAgent)
+    return this.sessionService.createNewSessionForUser(dto)
   }
 }

@@ -70,7 +70,13 @@ export class ChangeCredentials implements UseCaseInterface {
 
     return {
       success: true,
-      authResponse: await authResponseFactory.createResponse(updatedUser, dto.apiVersion, dto.updatedWithUserAgent),
+      authResponse: await authResponseFactory.createResponse({
+        user: updatedUser,
+        apiVersion: dto.apiVersion,
+        userAgent: dto.updatedWithUserAgent,
+        ephemeralSession: false,
+        readonlyAccess: false,
+      }),
     }
   }
 }
