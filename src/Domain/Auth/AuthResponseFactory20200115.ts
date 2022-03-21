@@ -3,11 +3,11 @@ import {
   SessionTokenData,
   TokenEncoderInterface,
 } from '@standardnotes/auth'
+import { SessionBody } from '@standardnotes/responses'
 import { inject, injectable } from 'inversify'
 import { Logger } from 'winston'
 import TYPES from '../../Bootstrap/Types'
 import { ProjectorInterface } from '../../Projection/ProjectorInterface'
-import { SessionPayload } from '../Session/SessionPayload'
 import { SessionServiceInterface } from '../Session/SessionServiceInterface'
 import { KeyParamsFactoryInterface } from '../User/KeyParamsFactoryInterface'
 import { User } from '../User/User'
@@ -49,7 +49,7 @@ export class AuthResponseFactory20200115 extends AuthResponseFactory20190520 {
     }
   }
 
-  private async createSession(user: User, apiVersion: string, userAgent: string, ephemeralSession: boolean): Promise<SessionPayload> {
+  private async createSession(user: User, apiVersion: string, userAgent: string, ephemeralSession: boolean): Promise<SessionBody> {
     if (ephemeralSession) {
       return this.sessionService.createNewEphemeralSessionForUser(user, apiVersion, userAgent)
     }

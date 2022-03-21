@@ -11,7 +11,6 @@ import TYPES from '../../Bootstrap/Types'
 import { Session } from './Session'
 import { SessionRepositoryInterface } from './SessionRepositoryInterface'
 import { SessionServiceInterface } from './SessionServiceInterface'
-import { SessionPayload } from './SessionPayload'
 import { User } from '../User/User'
 import { EphemeralSessionRepositoryInterface } from './EphemeralSessionRepositoryInterface'
 import { EphemeralSession } from './EphemeralSession'
@@ -19,6 +18,7 @@ import { RevokedSession } from './RevokedSession'
 import { RevokedSessionRepositoryInterface } from './RevokedSessionRepositoryInterface'
 import { SettingServiceInterface } from '../Setting/SettingServiceInterface'
 import { LogSessionUserAgentOption, SettingName } from '@standardnotes/settings'
+import { SessionBody } from '@standardnotes/responses'
 
 @injectable()
 export class SessionService implements SessionServiceInterface {
@@ -37,7 +37,7 @@ export class SessionService implements SessionServiceInterface {
   ) {
   }
 
-  async createNewSessionForUser(user: User, apiVersion: string, userAgent: string): Promise<SessionPayload> {
+  async createNewSessionForUser(user: User, apiVersion: string, userAgent: string): Promise<SessionBody> {
     const session = await this.createSession(user, apiVersion, userAgent, false)
 
     const sessionPayload = await this.createTokens(session)
@@ -47,7 +47,7 @@ export class SessionService implements SessionServiceInterface {
     return sessionPayload
   }
 
-  async createNewEphemeralSessionForUser(user: User, apiVersion: string, userAgent: string): Promise<SessionPayload> {
+  async createNewEphemeralSessionForUser(user: User, apiVersion: string, userAgent: string): Promise<SessionBody> {
     const ephemeralSession = await this.createSession(user, apiVersion, userAgent, true)
 
     const sessionPayload = await this.createTokens(ephemeralSession)
@@ -57,7 +57,7 @@ export class SessionService implements SessionServiceInterface {
     return sessionPayload
   }
 
-  async refreshTokens(session: Session): Promise<SessionPayload> {
+  async refreshTokens(session: Session): Promise<SessionBody> {
     const sessionPayload = await this.createTokens(session)
 
     await this.sessionRepository.updateHashedTokens(session.uuid, session.hashedAccessToken, session.hashedRefreshToken)
@@ -231,7 +231,7 @@ export class SessionService implements SessionServiceInterface {
     return session
   }
 
-  private async createTokens(session: Session): Promise<SessionPayload> {
+  private async createTokens(session: Session): Promise<SessionBody> {
     const accessToken = cryptoRandomString({ length: 16, type: 'url-safe' })
     const refreshToken = cryptoRandomString({ length: 16, type: 'url-safe' })
 
@@ -250,6 +250,7 @@ export class SessionService implements SessionServiceInterface {
       refresh_token: `${SessionService.SESSION_TOKEN_VERSION}:${session.uuid}:${refreshToken}`,
       access_expiration: this.timer.convertStringDateToMilliseconds(accessTokenExpiration.toString()),
       refresh_expiration: this.timer.convertStringDateToMilliseconds(refreshTokenExpiration.toString()),
+      readonly_access: false,
     }
   }
 

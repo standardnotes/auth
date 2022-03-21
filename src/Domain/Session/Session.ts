@@ -66,4 +66,13 @@ export class Session {
   })
   @Index('index_sessions_on_updated_at')
   updatedAt: Date
+
+  @Column({
+    name: 'readonly_access',
+    type: 'tinyint',
+    width: 1,
+    nullable: false,
+    default: 0,
+  })
+  readonlyAccess: boolean
 }
