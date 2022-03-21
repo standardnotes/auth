@@ -1,8 +1,8 @@
-import { SessionPayload } from '../Session/SessionPayload'
+import { SessionBody } from '@standardnotes/responses'
 
 export type RefreshSessionTokenResponse = {
   success: boolean,
   errorTag?: string,
   errorMessage?: string,
-  sessionPayload?: SessionPayload
+  sessionPayload?: SessionBody
 }

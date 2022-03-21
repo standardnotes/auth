@@ -104,6 +104,7 @@ describe('SessionService', () => {
       access_token: expect.any(String),
       refresh_token: expect.any(String),
       refresh_expiration: 123,
+      readonly_access: false,
     })
 
     expect(sessionRepository.updateHashedTokens).toHaveBeenCalled()
@@ -135,6 +136,7 @@ describe('SessionService', () => {
       access_token: expect.any(String),
       refresh_expiration: 123,
       refresh_token: expect.any(String),
+      readonly_access: false,
     })
   })
 
@@ -163,6 +165,7 @@ describe('SessionService', () => {
       access_token: expect.any(String),
       refresh_expiration: 123,
       refresh_token: expect.any(String),
+      readonly_access: false,
     })
   })
 

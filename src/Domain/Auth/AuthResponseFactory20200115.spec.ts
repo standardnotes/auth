@@ -1,9 +1,10 @@
-import { SessionTokenData, TokenEncoderInterface } from '@standardnotes/auth'
 import 'reflect-metadata'
+
+import { SessionTokenData, TokenEncoderInterface } from '@standardnotes/auth'
+import { SessionBody } from '@standardnotes/responses'
 import { Logger } from 'winston'
 
 import { ProjectorInterface } from '../../Projection/ProjectorInterface'
-import { SessionPayload } from '../Session/SessionPayload'
 import { SessionServiceInterface } from '../Session/SessionServiceInterface'
 import { KeyParamsFactoryInterface } from '../User/KeyParamsFactoryInterface'
 import { User } from '../User/User'
@@ -14,7 +15,7 @@ describe('AuthResponseFactory20200115', () => {
   let keyParamsFactory: KeyParamsFactoryInterface
   let userProjector: ProjectorInterface<User>
   let user: User
-  let sessionPayload: SessionPayload
+  let sessionPayload: SessionBody
   let logger: Logger
   let tokenEncoder: TokenEncoderInterface<SessionTokenData>
 
@@ -35,6 +36,7 @@ describe('AuthResponseFactory20200115', () => {
       refresh_token: 'refresh_token',
       access_expiration: 123,
       refresh_expiration: 234,
+      readonly_access: false,
     }
 
     sessionService = {} as jest.Mocked<SessionServiceInterface>
@@ -83,6 +85,7 @@ describe('AuthResponseFactory20200115', () => {
         refresh_token: 'refresh_token',
         access_expiration: 123,
         refresh_expiration: 234,
+        readonly_access: false,
       },
       user: {
         foo: 'bar',
@@ -105,6 +108,7 @@ describe('AuthResponseFactory20200115', () => {
         refresh_token: 'refresh_token',
         access_expiration: 123,
         refresh_expiration: 234,
+        readonly_access: false,
       },
       user: {
         foo: 'bar',
