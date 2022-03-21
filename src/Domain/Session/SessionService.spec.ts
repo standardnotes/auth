@@ -162,7 +162,12 @@ describe('SessionService', () => {
       value: LogSessionUserAgentOption.Disabled,
     } as jest.Mocked<Setting>)
 
-    const sessionPayload = await createService().createNewSessionForUser(user, '003', 'Google Chrome')
+    const sessionPayload = await createService().createNewSessionForUser({
+      user,
+      apiVersion: '003',
+      userAgent: 'Google Chrome',
+      readonlyAccess: false,
+    })
 
     expect(sessionRepository.save).toHaveBeenCalledWith(expect.any(Session))
     expect(sessionRepository.save).toHaveBeenCalledWith({
@@ -175,6 +180,7 @@ describe('SessionService', () => {
       updatedAt: expect.any(Date),
       userUuid: '123',
       uuid: expect.any(String),
+      readonlyAccess: false,
     })
 
     expect(sessionPayload).toEqual({
