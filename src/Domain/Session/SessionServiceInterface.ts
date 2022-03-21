@@ -1,12 +1,12 @@
+import { SessionBody } from '@standardnotes/responses'
 import { User } from '../User/User'
 import { RevokedSession } from './RevokedSession'
 import { Session } from './Session'
-import { SessionPayload } from './SessionPayload'
 
 export interface SessionServiceInterface {
-  createNewSessionForUser(user: User, apiVersion: string, userAgent: string): Promise<SessionPayload>
-  createNewEphemeralSessionForUser(user: User, apiVersion: string, userAgent: string): Promise<SessionPayload>
-  refreshTokens(session: Session): Promise<SessionPayload>
+  createNewSessionForUser(user: User, apiVersion: string, userAgent: string): Promise<SessionBody>
+  createNewEphemeralSessionForUser(user: User, apiVersion: string, userAgent: string): Promise<SessionBody>
+  refreshTokens(session: Session): Promise<SessionBody>
   getSessionFromToken(token: string): Promise<Session | undefined>
   getRevokedSessionFromToken(token: string): Promise<RevokedSession | undefined>
   markRevokedSessionAsReceived(revokedSession: RevokedSession): Promise<RevokedSession>
