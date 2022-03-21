@@ -20,6 +20,7 @@ describe('SessionProjector', () => {
     session.apiVersion = '004'
     session.createdAt = dayjs.utc('2020-11-26 13:34').toDate()
     session.updatedAt = dayjs.utc('2020-11-26 13:34').toDate()
+    session.readonlyAccess = false
 
     currentSession = new Session()
     currentSession.uuid = '234'
@@ -36,6 +37,7 @@ describe('SessionProjector', () => {
       created_at: '2020-11-26T13:34:00.000Z',
       updated_at: '2020-11-26T13:34:00.000Z',
       device_info: 'Some Device Info',
+      readonly_access: false,
     })
   })
 
@@ -53,6 +55,7 @@ describe('SessionProjector', () => {
       updated_at: '2020-11-26T13:34:00.000Z',
       device_info: 'Some Device Info',
       current: false,
+      readonly_access: false,
     })
   })
 
@@ -72,6 +75,7 @@ describe('SessionProjector', () => {
       updated_at: '2020-11-26T13:34:00.000Z',
       device_info: 'Some Device Info',
       current: true,
+      readonly_access: false,
     })
   })
 
