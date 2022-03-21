@@ -176,6 +176,7 @@ describe('SessionService', () => {
       access_token: expect.any(String),
       refresh_expiration: 123,
       refresh_token: expect.any(String),
+      readonly_access: false,
     })
   })
 
