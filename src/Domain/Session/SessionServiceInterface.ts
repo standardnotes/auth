@@ -4,8 +4,18 @@ import { RevokedSession } from './RevokedSession'
 import { Session } from './Session'
 
 export interface SessionServiceInterface {
-  createNewSessionForUser(user: User, apiVersion: string, userAgent: string): Promise<SessionBody>
-  createNewEphemeralSessionForUser(user: User, apiVersion: string, userAgent: string): Promise<SessionBody>
+  createNewSessionForUser(dto: {
+    user: User,
+    apiVersion: string,
+    userAgent: string,
+    readonlyAccess: boolean,
+  }): Promise<SessionBody>
+  createNewEphemeralSessionForUser(dto: {
+    user: User,
+    apiVersion: string,
+    userAgent: string,
+    readonlyAccess: boolean,
+  }): Promise<SessionBody>
   refreshTokens(session: Session): Promise<SessionBody>
   getSessionFromToken(token: string): Promise<Session | undefined>
   getRevokedSessionFromToken(token: string): Promise<RevokedSession | undefined>

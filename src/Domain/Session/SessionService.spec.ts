@@ -115,7 +115,12 @@ describe('SessionService', () => {
     const user = {} as jest.Mocked<User>
     user.uuid = '123'
 
-    const sessionPayload = await createService().createNewSessionForUser(user, '003', 'Google Chrome')
+    const sessionPayload = await createService().createNewSessionForUser({
+      user,
+      apiVersion: '003',
+      userAgent: 'Google Chrome',
+      readonlyAccess: false,
+    })
 
     expect(sessionRepository.save).toHaveBeenCalledWith(expect.any(Session))
     expect(sessionRepository.save).toHaveBeenCalledWith({
@@ -129,6 +134,7 @@ describe('SessionService', () => {
       userAgent: 'Google Chrome',
       userUuid: '123',
       uuid: expect.any(String),
+      readonlyAccess: false,
     })
 
     expect(sessionPayload).toEqual({
@@ -144,7 +150,12 @@ describe('SessionService', () => {
     const user = {} as jest.Mocked<User>
     user.uuid = '123'
 
-    const sessionPayload = await createService().createNewEphemeralSessionForUser(user, '003', 'Google Chrome')
+    const sessionPayload = await createService().createNewEphemeralSessionForUser({
+      user,
+      apiVersion: '003',
+      userAgent: 'Google Chrome',
+      readonlyAccess: false,
+    })
 
     expect(ephemeralSessionRepository.save).toHaveBeenCalledWith(expect.any(EphemeralSession))
     expect(ephemeralSessionRepository.save).toHaveBeenCalledWith({
@@ -158,6 +169,7 @@ describe('SessionService', () => {
       userAgent: 'Google Chrome',
       userUuid: '123',
       uuid: expect.any(String),
+      readonlyAccess: false,
     })
 
     expect(sessionPayload).toEqual({
