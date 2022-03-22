@@ -47,6 +47,7 @@ export class ApiGatewayAuthMiddleware extends BaseMiddleware {
       response.locals.user = token.user
       response.locals.roles = token.roles
       response.locals.session = token.session
+      response.locals.readOnlyAccess = token.session?.readonly_access ?? false
 
       return next()
     } catch (error) {

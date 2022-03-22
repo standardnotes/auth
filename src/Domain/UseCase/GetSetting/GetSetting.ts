@@ -18,7 +18,7 @@ export class GetSetting implements UseCaseInterface {
   async execute(dto: GetSettingDto): Promise<GetSettingResponse> {
     const { userUuid, settingName } = dto
 
-    const setting = await this.settingService.findSetting({
+    const setting = await this.settingService.findSettingWithDecryptedValue({
       userUuid,
       settingName: settingName as SettingName,
     })

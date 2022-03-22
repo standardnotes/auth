@@ -31,11 +31,11 @@ describe('VerifyMFA', () => {
     } as jest.Mocked<Setting>
 
     settingService = {} as jest.Mocked<SettingServiceInterface>
-    settingService.findSetting = jest.fn().mockReturnValue(setting)
+    settingService.findSettingWithDecryptedValue = jest.fn().mockReturnValue(setting)
   })
 
   it('should pass MFA verification if user has no MFA enabled', async () => {
-    settingService.findSetting = jest.fn().mockReturnValue(undefined)
+    settingService.findSettingWithDecryptedValue = jest.fn().mockReturnValue(undefined)
 
     expect(await createVerifyMFA().execute({ email: 'test@test.te', requestParams: {} })).toEqual({
       success: true,
@@ -48,7 +48,7 @@ describe('VerifyMFA', () => {
       value: null,
     } as jest.Mocked<Setting>
 
-    settingService.findSetting = jest.fn().mockReturnValue(setting)
+    settingService.findSettingWithDecryptedValue = jest.fn().mockReturnValue(setting)
 
     expect(await createVerifyMFA().execute({ email: 'test@test.te', requestParams: {} })).toEqual({
       success: true,
@@ -75,7 +75,7 @@ describe('VerifyMFA', () => {
     } as jest.Mocked<Setting>
 
     settingService = {} as jest.Mocked<SettingServiceInterface>
-    settingService.findSetting = jest.fn().mockReturnValue(setting)
+    settingService.findSettingWithDecryptedValue = jest.fn().mockReturnValue(setting)
 
     expect(await createVerifyMFA().execute({ email: 'test@test.te', requestParams: { 'mfa_1-2-3': 'test' } })).toEqual({
       success: false,
@@ -95,7 +95,7 @@ describe('VerifyMFA', () => {
   })
 
   it('should throw an error if the error is not handled mfa validation error', async () => {
-    settingService.findSetting = jest.fn().mockImplementation(() => {
+    settingService.findSettingWithDecryptedValue = jest.fn().mockImplementation(() => {
       throw new Error('oops!')
     })
 

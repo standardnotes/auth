@@ -1,5 +1,5 @@
 import { Uuid, RoleName } from '@standardnotes/common'
-import { AccountDeletionRequestedEvent, CloudBackupRequestedEvent, UserRegisteredEvent, UserRolesChangedEvent, UserEmailChangedEvent, OfflineSubscriptionTokenCreatedEvent, EmailBackupRequestedEvent, ListedAccountRequestedEvent, UserSignedInEvent } from '@standardnotes/domain-events'
+import { AccountDeletionRequestedEvent, CloudBackupRequestedEvent, UserRegisteredEvent, UserRolesChangedEvent, UserEmailChangedEvent, OfflineSubscriptionTokenCreatedEvent, EmailBackupRequestedEvent, ListedAccountRequestedEvent, UserSignedInEvent, UserDisabledSessionUserAgentLoggingEvent } from '@standardnotes/domain-events'
 
 export interface DomainEventFactoryInterface {
   createUserSignedInEvent(dto: {
@@ -18,4 +18,8 @@ export interface DomainEventFactoryInterface {
   createUserRolesChangedEvent(userUuid: string, email: string, currentRoles: RoleName[]): UserRolesChangedEvent
   createUserEmailChangedEvent(userUuid: string, fromEmail: string, toEmail: string): UserEmailChangedEvent
   createOfflineSubscriptionTokenCreatedEvent(token: string, email: string): OfflineSubscriptionTokenCreatedEvent
+  createUserDisabledSessionUserAgentLoggingEvent(dto: {
+    userUuid: Uuid,
+    email: string
+  }): UserDisabledSessionUserAgentLoggingEvent
 }

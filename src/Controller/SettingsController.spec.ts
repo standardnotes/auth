@@ -193,6 +193,26 @@ describe('SettingsController', () => {
     expect(result.statusCode).toEqual(200)
   })
 
+  it('should not update user setting if session has read only access', async () => {
+    request.params.userUuid = '1-2-3'
+    response.locals.user = {
+      uuid: '1-2-3',
+    }
+    response.locals.readOnlyAccess = true
+
+    request.body = {
+      name: 'foo',
+      value: 'bar',
+    }
+
+    const httpResponse = <results.JsonResult> await createController().updateSetting(request, response)
+    const result = await httpResponse.executeAsync()
+
+    expect(updateSetting.execute).not.toHaveBeenCalled()
+
+    expect(result.statusCode).toEqual(401)
+  })
+
   it('should not update user setting if not allowed', async () => {
     request.params.userUuid = '1-2-3'
     response.locals.user = {
@@ -260,6 +280,22 @@ describe('SettingsController', () => {
     expect(deleteSetting.execute).toHaveBeenCalledWith({ userUuid: '1-2-3', settingName: 'foo' })
 
     expect(result.statusCode).toEqual(200)
+  })
+
+  it('should not delete user setting if session has read only access', async () => {
+    request.params.userUuid = '1-2-3'
+    request.params.settingName = 'foo'
+    response.locals.user = {
+      uuid: '1-2-3',
+    }
+    response.locals.readOnlyAccess = true
+
+    const httpResponse = <results.JsonResult> await createController().deleteSetting(request, response)
+    const result = await httpResponse.executeAsync()
+
+    expect(deleteSetting.execute).not.toHaveBeenCalled()
+
+    expect(result.statusCode).toEqual(401)
   })
 
   it('should not delete user setting if user is not allowed', async () => {

@@ -28,7 +28,7 @@ export class FileRemovedEventHandler implements DomainEventHandlerInterface {
       return
     }
 
-    const bytesUsedSetting = await this.settingService.findSetting({
+    const bytesUsedSetting = await this.settingService.findSettingWithDecryptedValue({
       userUuid: event.payload.userUuid,
       settingName: SettingName.FileUploadBytesUsed,
     })

@@ -1,3 +1,4 @@
+import { ErrorTag } from '@standardnotes/common'
 import { Request, Response } from 'express'
 import { inject } from 'inversify'
 import {
@@ -65,6 +66,15 @@ export class SettingsController extends BaseHttpController {
 
   @httpPut('/settings', TYPES.ApiGatewayAuthMiddleware)
   async updateSetting(request: Request, response: Response): Promise<results.JsonResult | results.StatusCodeResult> {
+    if (response.locals.readOnlyAccess) {
+      return this.json({
+        error: {
+          tag: ErrorTag.ReadOnlyAccess,
+          message: 'Session has read-only access.',
+        },
+      }, 401)
+    }
+
     if (request.params.userUuid !== response.locals.user.uuid) {
       return this.json({
         error: {
@@ -102,6 +112,15 @@ export class SettingsController extends BaseHttpController {
 
   @httpDelete('/settings/:settingName', TYPES.ApiGatewayAuthMiddleware)
   async deleteSetting(request: Request, response: Response): Promise<results.JsonResult> {
+    if (response.locals.readOnlyAccess) {
+      return this.json({
+        error: {
+          tag: ErrorTag.ReadOnlyAccess,
+          message: 'Session has read-only access.',
+        },
+      }, 401)
+    }
+
     if (request.params.userUuid !== response.locals.user.uuid) {
       return this.json({
         error: {

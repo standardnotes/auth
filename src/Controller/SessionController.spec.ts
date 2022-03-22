@@ -114,6 +114,26 @@ describe('SessionController', () => {
     expect(httpResponse).toBeInstanceOf(results.StatusCodeResult)
   })
 
+  it('should not delete a specific session is current session has read only access', async () => {
+    response.locals = {
+      user: {
+        uuid: '123',
+      },
+      session: {
+        uuid: '234',
+      },
+    }
+    request.body.uuid = '123'
+    response.locals.readOnlyAccess = true
+
+    const httpResponse = await createController().deleteSession(request, response)
+    const result = await httpResponse.executeAsync()
+
+    expect(deleteSessionForUser.execute).not.toHaveBeenCalled()
+
+    expect(result.statusCode).toEqual(401)
+  })
+
   it('should not delete a specific session if request is missing params', async () => {
     response.locals = {
       user: {
@@ -184,6 +204,25 @@ describe('SessionController', () => {
     })
 
     expect(httpResponse).toBeInstanceOf(results.StatusCodeResult)
+  })
+
+  it('should not delete all sessions if current sessions has read only access', async () => {
+    response.locals = {
+      user: {
+        uuid: '123',
+      },
+      session: {
+        uuid: '234',
+      },
+    }
+    response.locals.readOnlyAccess = true
+
+    const httpResponse = await createController().deleteAllSessions(request, response)
+    const result = await httpResponse.executeAsync()
+
+    expect(deletePreviousSessionsForUser.execute).not.toHaveBeenCalled()
+
+    expect(result.statusCode).toEqual(401)
   })
 
   it('should return unauthorized if current user is missing', async () => {

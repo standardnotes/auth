@@ -1,5 +1,5 @@
 import { CrossServiceTokenData, TokenEncoderInterface } from '@standardnotes/auth'
-import { RoleName } from '@standardnotes/common'
+import { ErrorTag, RoleName } from '@standardnotes/common'
 import { SettingName } from '@standardnotes/settings'
 import { Request, Response } from 'express'
 import { inject } from 'inversify'
@@ -35,6 +35,15 @@ export class SubscriptionTokensController extends BaseHttpController {
 
   @httpPost('/', TYPES.ApiGatewayAuthMiddleware)
   async createToken(_request: Request, response: Response): Promise<results.JsonResult> {
+    if (response.locals.readOnlyAccess) {
+      return this.json({
+        error: {
+          tag: ErrorTag.ReadOnlyAccess,
+          message: 'Session has read-only access.',
+        },
+      }, 401)
+    }
+
     const result = await this.createSubscriptionToken.execute({
       userUuid: response.locals.user.uuid,
     })
@@ -61,7 +70,7 @@ export class SubscriptionTokensController extends BaseHttpController {
 
     const user = authenticateTokenResponse.user as User
     let extensionKey = undefined
-    const extensionKeySetting = await this.settingService.findSetting({
+    const extensionKeySetting = await this.settingService.findSettingWithDecryptedValue({
       settingName: SettingName.ExtensionKey,
       userUuid: user.uuid,
     })

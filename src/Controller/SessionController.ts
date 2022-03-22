@@ -1,3 +1,4 @@
+import { ErrorTag } from '@standardnotes/common'
 import { Request, Response } from 'express'
 import { inject } from 'inversify'
 import {
@@ -25,6 +26,15 @@ export class SessionController extends BaseHttpController {
 
   @httpDelete('/', TYPES.AuthMiddleware, TYPES.SessionMiddleware)
   async deleteSession(request: Request, response: Response): Promise<results.JsonResult | results.StatusCodeResult> {
+    if (response.locals.readOnlyAccess) {
+      return this.json({
+        error: {
+          tag: ErrorTag.ReadOnlyAccess,
+          message: 'Session has read-only access.',
+        },
+      }, 401)
+    }
+
     if (!request.body.uuid) {
       return this.json({
         error: {
@@ -59,6 +69,15 @@ export class SessionController extends BaseHttpController {
 
   @httpDelete('/all', TYPES.AuthMiddleware, TYPES.SessionMiddleware)
   async deleteAllSessions(_request: Request, response: Response): Promise<results.JsonResult | results.StatusCodeResult> {
+    if (response.locals.readOnlyAccess) {
+      return this.json({
+        error: {
+          tag: ErrorTag.ReadOnlyAccess,
+          message: 'Session has read-only access.',
+        },
+      }, 401)
+    }
+
     if (!response.locals.user) {
       return this.json(
         {

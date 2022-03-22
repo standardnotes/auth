@@ -18,6 +18,7 @@ import { GetUserSubscription } from '../Domain/UseCase/GetUserSubscription/GetUs
 import { ClearLoginAttempts } from '../Domain/UseCase/ClearLoginAttempts'
 import { IncreaseLoginAttempts } from '../Domain/UseCase/IncreaseLoginAttempts'
 import { ChangeCredentials } from '../Domain/UseCase/ChangeCredentials/ChangeCredentials'
+import { ErrorTag } from '@standardnotes/common'
 
 @controller('/users')
 export class UsersController extends BaseHttpController {
@@ -35,6 +36,15 @@ export class UsersController extends BaseHttpController {
 
   @httpPatch('/:userId', TYPES.ApiGatewayAuthMiddleware)
   async update(request: Request, response: Response): Promise<results.JsonResult> {
+    if (response.locals.readOnlyAccess) {
+      return this.json({
+        error: {
+          tag: ErrorTag.ReadOnlyAccess,
+          message: 'Session has read-only access.',
+        },
+      }, 401)
+    }
+
     if (request.params.userId !== response.locals.user.uuid) {
       return this.json({
         error: {
@@ -123,6 +133,15 @@ export class UsersController extends BaseHttpController {
 
   @httpPut('/:userId/attributes/credentials', TYPES.AuthMiddleware)
   async changeCredentials(request: Request, response: Response): Promise<results.JsonResult> {
+    if (response.locals.readOnlyAccess) {
+      return this.json({
+        error: {
+          tag: ErrorTag.ReadOnlyAccess,
+          message: 'Session has read-only access.',
+        },
+      }, 401)
+    }
+
     if (!request.body.current_password) {
       return this.json({
         error: {

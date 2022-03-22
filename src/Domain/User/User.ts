@@ -176,4 +176,8 @@ export class User {
   supportsSessions(): boolean {
     return parseInt(this.version) >= this.SESSIONS_PROTOCOL_VERSION
   }
+
+  isPotentiallyAVaultAccount(): boolean {
+    return this.email.length === 64 && !this.email.includes('@')
+  }
 }

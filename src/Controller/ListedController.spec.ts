@@ -50,4 +50,19 @@ describe('ListedController', () => {
 
     expect(result.statusCode).toEqual(200)
   })
+
+  it('should not create a listed account if sessions is read only', async () => {
+    response.locals.readOnlyAccess = true
+    response.locals.user = {
+      uuid: '1-2-3',
+      email: 'test@test.com',
+    }
+
+    const httpResponse = <results.JsonResult> await createController().createListedAccount(request, response)
+    const result = await httpResponse.executeAsync()
+
+    expect(createListedAccount.execute).not.toHaveBeenCalled()
+
+    expect(result.statusCode).toEqual(401)
+  })
 })

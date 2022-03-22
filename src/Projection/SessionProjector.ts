@@ -22,6 +22,7 @@ export class SessionProjector implements ProjectorInterface<Session> {
       created_at: dayjs.utc(session.createdAt).toISOString(),
       updated_at: dayjs.utc(session.updatedAt).toISOString(),
       device_info: this.sessionService.getDeviceInfo(session),
+      readonly_access: session.readonlyAccess,
     }
   }
 
@@ -35,6 +36,7 @@ export class SessionProjector implements ProjectorInterface<Session> {
         updated_at: dayjs.utc(session.updatedAt).toISOString(),
         device_info: this.sessionService.getDeviceInfo(session),
         current: session.uuid === currentSession.uuid,
+        readonly_access: session.readonlyAccess,
       }
     default:
       throw new Error(`Not supported projection type: ${projectionType}`)

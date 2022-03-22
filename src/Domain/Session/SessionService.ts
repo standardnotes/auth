@@ -16,6 +16,8 @@ import { EphemeralSessionRepositoryInterface } from './EphemeralSessionRepositor
 import { EphemeralSession } from './EphemeralSession'
 import { RevokedSession } from './RevokedSession'
 import { RevokedSessionRepositoryInterface } from './RevokedSessionRepositoryInterface'
+import { SettingServiceInterface } from '../Setting/SettingServiceInterface'
+import { LogSessionUserAgentOption, SettingName } from '@standardnotes/settings'
 import { SessionBody } from '@standardnotes/responses'
 
 @injectable()
@@ -30,7 +32,8 @@ export class SessionService implements SessionServiceInterface {
     @inject(TYPES.Timer) private timer: TimerInterface,
     @inject(TYPES.Logger) private logger: winston.Logger,
     @inject(TYPES.ACCESS_TOKEN_AGE) private accessTokenAge: number,
-    @inject(TYPES.REFRESH_TOKEN_AGE) private refreshTokenAge: number
+    @inject(TYPES.REFRESH_TOKEN_AGE) private refreshTokenAge: number,
+    @inject(TYPES.SettingService) private settingService: SettingServiceInterface,
   ) {
   }
 
@@ -40,7 +43,7 @@ export class SessionService implements SessionServiceInterface {
     userAgent: string,
     readonlyAccess: boolean,
   }): Promise<SessionBody> {
-    const session = this.createSession({
+    const session = await this.createSession({
       ephemeral: false,
       ...dto,
     })
@@ -58,7 +61,7 @@ export class SessionService implements SessionServiceInterface {
     userAgent: string,
     readonlyAccess: boolean,
   }): Promise<SessionBody> {
-    const ephemeralSession = this.createSession({
+    const ephemeralSession = await this.createSession({
       ephemeral: true,
       ...dto,
     })
@@ -113,7 +116,7 @@ export class SessionService implements SessionServiceInterface {
       return osInfo
     }
     catch (error) {
-      this.logger.warning(`Could not parse operating system info. User agent: ${userAgent}: ${error.message}`)
+      this.logger.warn(`Could not parse operating system info. User agent: ${userAgent}: ${error.message}`)
 
       return 'Unknown OS'
     }
@@ -133,13 +136,17 @@ export class SessionService implements SessionServiceInterface {
       return clientInfo
     }
     catch (error) {
-      this.logger.warning(`Could not parse browser info. User agent: ${userAgent}: ${error.message}`)
+      this.logger.warn(`Could not parse browser info. User agent: ${userAgent}: ${error.message}`)
 
       return 'Unknown Client'
     }
   }
 
   getDeviceInfo(session: Session): string {
+    if (session.userAgent === null) {
+      return 'Unknown Client on Unknown OS'
+    }
+
     const browserInfo = this.getBrowserInfoFromUserAgent(session.userAgent)
     const osInfo = this.getOperatingSystemInfoFromUserAgent(session.userAgent)
 
@@ -213,21 +220,23 @@ export class SessionService implements SessionServiceInterface {
     return this.revokedSessionRepository.save(revokedSession)
   }
 
-  private createSession(dto: {
+  private async createSession(dto: {
     user: User,
     apiVersion: string,
     userAgent: string,
     ephemeral: boolean,
     readonlyAccess: boolean,
-  }): Session {
+  }): Promise<Session> {
     let session = new Session()
     if (dto.ephemeral) {
       session = new EphemeralSession()
     }
     session.uuid = uuidv4()
+    if (await this.isLoggingUserAgentEnabledOnSessions(dto.user)) {
+      session.userAgent = dto.userAgent
+    }
     session.userUuid = dto.user.uuid
     session.apiVersion = dto.apiVersion
-    session.userAgent = dto.userAgent
     session.createdAt = dayjs.utc().toDate()
     session.updatedAt = dayjs.utc().toDate()
     session.readonlyAccess = dto.readonlyAccess
@@ -266,5 +275,18 @@ export class SessionService implements SessionServiceInterface {
       refresh_expiration: this.timer.convertStringDateToMilliseconds(refreshTokenExpiration.toString()),
       readonly_access: false,
     }
+  }
+
+  private async isLoggingUserAgentEnabledOnSessions(user: User): Promise<boolean> {
+    const loggingSetting = await this.settingService.findSettingWithDecryptedValue({
+      settingName: SettingName.LogSessionUserAgent,
+      userUuid: user.uuid,
+    })
+
+    if (loggingSetting === undefined) {
+      return true
+    }
+
+    return loggingSetting.value === LogSessionUserAgentOption.Enabled
   }
 }

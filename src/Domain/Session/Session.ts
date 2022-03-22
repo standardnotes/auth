@@ -52,7 +52,7 @@ export class Session {
     type: 'text',
     nullable: true,
   })
-  userAgent: string
+  userAgent: string | null
 
   @Column({
     name: 'created_at',

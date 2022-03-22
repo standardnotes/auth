@@ -131,6 +131,11 @@ import { ListedAccountCreatedEventHandler } from '../Domain/Handler/ListedAccoun
 import { ListedAccountDeletedEventHandler } from '../Domain/Handler/ListedAccountDeletedEventHandler'
 import { MuteSignInEmails } from '../Domain/UseCase/MuteSignInEmails/MuteSignInEmails'
 import { FileRemovedEventHandler } from '../Domain/Handler/FileRemovedEventHandler'
+import { UserDisabledSessionUserAgentLoggingEventHandler } from '../Domain/Handler/UserDisabledSessionUserAgentLoggingEventHandler'
+import { SettingInterpreterInterface } from '../Domain/Setting/SettingInterpreterInterface'
+import { SettingInterpreter } from '../Domain/Setting/SettingInterpreter'
+import { SettingDecrypterInterface } from '../Domain/Setting/SettingDecrypterInterface'
+import { SettingDecrypter } from '../Domain/Setting/SettingDecrypter'
 
 export class ContainerConfigLoader {
   async load(): Promise<Container> {
@@ -342,6 +347,7 @@ export class ContainerConfigLoader {
     container.bind<FileRemovedEventHandler>(TYPES.FileRemovedEventHandler).to(FileRemovedEventHandler)
     container.bind<ListedAccountCreatedEventHandler>(TYPES.ListedAccountCreatedEventHandler).to(ListedAccountCreatedEventHandler)
     container.bind<ListedAccountDeletedEventHandler>(TYPES.ListedAccountDeletedEventHandler).to(ListedAccountDeletedEventHandler)
+    container.bind<UserDisabledSessionUserAgentLoggingEventHandler>(TYPES.UserDisabledSessionUserAgentLoggingEventHandler).to(UserDisabledSessionUserAgentLoggingEventHandler)
 
     // Services
     container.bind<UAParser>(TYPES.DeviceDetector).toConstantValue(new UAParser())
@@ -373,6 +379,8 @@ export class ContainerConfigLoader {
     container.bind<RoleToSubscriptionMapInterface>(TYPES.RoleToSubscriptionMap).to(RoleToSubscriptionMap)
     container.bind<SettingsAssociationServiceInterface>(TYPES.SettingsAssociationService).to(SettingsAssociationService)
     container.bind<FeatureServiceInterface>(TYPES.FeatureService).to(FeatureService)
+    container.bind<SettingInterpreterInterface>(TYPES.SettingInterpreter).to(SettingInterpreter)
+    container.bind<SettingDecrypterInterface>(TYPES.SettingDecrypter).to(SettingDecrypter)
 
     if (env.get('SNS_TOPIC_ARN', true)) {
       container.bind<SNSDomainEventPublisher>(TYPES.DomainEventPublisher).toConstantValue(
@@ -406,6 +414,7 @@ export class ContainerConfigLoader {
       ['FILE_REMOVED', container.get(TYPES.FileRemovedEventHandler)],
       ['LISTED_ACCOUNT_CREATED', container.get(TYPES.ListedAccountCreatedEventHandler)],
       ['LISTED_ACCOUNT_DELETED', container.get(TYPES.ListedAccountDeletedEventHandler)],
+      ['USER_DISABLED_SESSION_USER_AGENT_LOGGING', container.get(TYPES.UserDisabledSessionUserAgentLoggingEventHandler)],
     ])
 
     if (env.get('SQS_QUEUE_URL', true)) {

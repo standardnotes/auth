@@ -112,6 +112,7 @@ const TYPES = {
   FileRemovedEventHandler: Symbol.for('FileRemovedEventHandler'),
   ListedAccountCreatedEventHandler: Symbol.for('ListedAccountCreatedEventHandler'),
   ListedAccountDeletedEventHandler: Symbol.for('ListedAccountDeletedEventHandler'),
+  UserDisabledSessionUserAgentLoggingEventHandler: Symbol.for('UserDisabledSessionUserAgentLoggingEventHandler'),
   // Services
   DeviceDetector: Symbol.for('DeviceDetector'),
   SessionService: Symbol.for('SessionService'),
@@ -145,6 +146,8 @@ const TYPES = {
   RoleToSubscriptionMap: Symbol.for('RoleToSubscriptionMap'),
   SettingsAssociationService: Symbol.for('SettingsAssociationService'),
   FeatureService: Symbol.for('FeatureService'),
+  SettingDecrypter: Symbol.for('SettingDecrypter'),
+  SettingInterpreter: Symbol.for('SettingInterpreter'),
 }
 
 export default TYPES

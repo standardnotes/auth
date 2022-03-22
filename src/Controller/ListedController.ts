@@ -4,6 +4,7 @@ import { BaseHttpController, controller, httpPost, results } from 'inversify-exp
 import { Request, Response } from 'express'
 import TYPES from '../Bootstrap/Types'
 import { CreateListedAccount } from '../Domain/UseCase/CreateListedAccount/CreateListedAccount'
+import { ErrorTag } from '@standardnotes/common'
 
 @controller('/listed')
 export class ListedController extends BaseHttpController {
@@ -15,6 +16,15 @@ export class ListedController extends BaseHttpController {
 
   @httpPost('/', TYPES.ApiGatewayAuthMiddleware)
   async createListedAccount(_request: Request, response: Response): Promise<results.JsonResult> {
+    if (response.locals.readOnlyAccess) {
+      return this.json({
+        error: {
+          tag: ErrorTag.ReadOnlyAccess,
+          message: 'Session has read-only access.',
+        },
+      }, 401)
+    }
+
     await this.doCreateListedAccount.execute({
       userUuid: response.locals.user.uuid,
       userEmail: response.locals.user.email,
