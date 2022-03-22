@@ -101,6 +101,23 @@ describe('UsersController', () => {
     expect(await result.content.readAsStringAsync()).toEqual('{"foo":"bar"}')
   })
 
+  it('should not update user if session has read only access', async () => {
+    request.body.version = '002'
+    request.body.api = '20190520'
+    request.body.origination = 'test'
+    request.params.userId = '123'
+    request.headers['user-agent'] = 'Google Chrome'
+    response.locals.user = user
+    response.locals.readOnlyAccess = true
+
+    const httpResponse = <results.JsonResult> await createController().update(request, response)
+    const result = await httpResponse.executeAsync()
+
+    expect(updateUser.execute).not.toHaveBeenCalled()
+
+    expect(result.statusCode).toEqual(401)
+  })
+
   it('should not update a user if the procedure fails', async () => {
     request.body.version = '002'
     request.body.api = '20190520'
@@ -303,6 +320,28 @@ describe('UsersController', () => {
 
     expect(result.statusCode).toEqual(200)
     expect(await result.content.readAsStringAsync()).toEqual('{"foo":"bar"}')
+  })
+
+  it('should not change a password if session has read only access', async () => {
+    request.body.version = '004'
+    request.body.api = '20190520'
+    request.body.current_password = 'test123'
+    request.body.new_password = 'test234'
+    request.body.pw_nonce = 'asdzxc'
+    request.body.origination = 'change-password'
+    request.body.created = '123'
+    request.headers['user-agent'] = 'Google Chrome'
+    response.locals.user = user
+    response.locals.readOnlyAccess = true
+
+    const httpResponse = <results.JsonResult> await createController().changeCredentials(request, response)
+    const result = await httpResponse.executeAsync()
+
+    expect(changeCredentials.execute).not.toHaveBeenCalled()
+
+    expect(clearLoginAttempts.execute).not.toHaveBeenCalled()
+
+    expect(result.statusCode).toEqual(401)
   })
 
   it('should indicate if changing a password fails', async () => {

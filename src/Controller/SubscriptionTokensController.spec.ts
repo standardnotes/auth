@@ -100,6 +100,20 @@ describe('SubscriptionTokensController', () => {
     expect(result.statusCode).toEqual(200)
   })
 
+  it('should not create an subscription token if session has read only access', async () => {
+    response.locals.user =  {
+      uuid: '1-2-3',
+    }
+    response.locals.readOnlyAccess = true
+
+    const httpResponse = <results.JsonResult> await createController().createToken(request, response)
+    const result = await httpResponse.executeAsync()
+
+    expect(createSubscriptionToken.execute).not.toHaveBeenCalled()
+
+    expect(result.statusCode).toEqual(401)
+  })
+
   it('should validate an subscription token for user', async () => {
     request.params.token = 'test'
 
