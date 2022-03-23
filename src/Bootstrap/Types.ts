@@ -148,6 +148,7 @@ const TYPES = {
   FeatureService: Symbol.for('FeatureService'),
   SettingDecrypter: Symbol.for('SettingDecrypter'),
   SettingInterpreter: Symbol.for('SettingInterpreter'),
+  ProtocolVersionSelector: Symbol.for('ProtocolVersionSelector'),
 }
 
 export default TYPES
