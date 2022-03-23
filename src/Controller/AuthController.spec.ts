@@ -400,14 +400,17 @@ describe('AuthController', () => {
   it('should delete a session by authorization header token', async () => {
     request.headers.authorization = 'Bearer test'
 
-    const httpResponse = <results.StatusCodeResult> await createController().signOut(request)
+    const httpResponse = <results.StatusCodeResult> await createController().signOut(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(result.statusCode).toEqual(204)
   })
 
-  it('should not delete a session if authorization header is missing', async () => {
-    const httpResponse = <results.JsonResult> await createController().signOut(request)
+  it('should not delete a session if it is read only', async () => {
+    response.locals.readOnlyAccess = true
+    request.headers.authorization = 'Bearer test'
+
+    const httpResponse = <results.StatusCodeResult> await createController().signOut(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(result.statusCode).toEqual(401)
