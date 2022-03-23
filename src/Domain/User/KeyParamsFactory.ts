@@ -6,19 +6,25 @@ import { inject, injectable } from 'inversify'
 import TYPES from '../../Bootstrap/Types'
 import { KeyParamsFactoryInterface } from './KeyParamsFactoryInterface'
 import { User } from './User'
+import { SelectorInterface } from '@standardnotes/auth'
 
 @injectable()
 export class KeyParamsFactory implements KeyParamsFactoryInterface {
   constructor (
-    @inject(TYPES.PSEUDO_KEY_PARAMS_KEY) private pseudoKeyParamsKey: string
+    @inject(TYPES.PSEUDO_KEY_PARAMS_KEY) private pseudoKeyParamsKey: string,
+    @inject(TYPES.ProtocolVersionSelector) private protocolVersionSelector: SelectorInterface<ProtocolVersion>
   ) {
   }
 
   createPseudoParams(email: string): KeyParamsData {
+    const pwNonceHash = crypto.createHash('sha256').update(`${email}${this.pseudoKeyParamsKey}`).digest('hex')
+
+    const version = this.protocolVersionSelector.select(pwNonceHash, Object.values(ProtocolVersion))
+
     return this.sortKeys({
       identifier: email,
-      pw_nonce: crypto.createHash('sha256').update(`${email}${this.pseudoKeyParamsKey}`).digest('hex'),
-      version: ProtocolVersion.V004,
+      pw_nonce: pwNonceHash,
+      version,
     })
   }
 
