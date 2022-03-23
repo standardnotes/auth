@@ -20,6 +20,7 @@ import { Logger } from 'winston'
 import { GetUserKeyParams } from '../Domain/UseCase/GetUserKeyParams/GetUserKeyParams'
 import { Register } from '../Domain/UseCase/Register'
 import { DomainEventFactoryInterface } from '../Domain/Event/DomainEventFactoryInterface'
+import { ErrorTag } from '@standardnotes/common'
 
 @controller('/auth')
 export class AuthController extends BaseHttpController {
@@ -132,20 +133,18 @@ export class AuthController extends BaseHttpController {
     return this.json(signInResult.authResponse)
   }
 
-  @httpPost('/sign_out')
-  async signOut(request: Request): Promise<results.JsonResult | results.StatusCodeResult> {
-    const authorizationHeader = <string> request.headers.authorization
-
-    if (!authorizationHeader) {
-      this.logger.debug('/auth/sign_out request missing authorization header')
-
+  @httpPost('/sign_out', TYPES.AuthMiddleware)
+  async signOut(request: Request, response: Response): Promise<results.JsonResult | results.StatusCodeResult> {
+    if (response.locals.readOnlyAccess) {
       return this.json({
         error: {
-          tag: 'invalid-auth',
-          message: 'Invalid login credentials.',
+          tag: ErrorTag.ReadOnlyAccess,
+          message: 'Session has read-only access.',
         },
       }, 401)
     }
+
+    const authorizationHeader = <string> request.headers.authorization
 
     await this.sessionService.deleteSessionByToken(authorizationHeader.replace('Bearer ', ''))
 
