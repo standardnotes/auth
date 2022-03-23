@@ -115,7 +115,7 @@ import { RedisOfflineSubscriptionTokenRepository } from '../Infra/Redis/RedisOff
 import { CreateOfflineSubscriptionToken } from '../Domain/UseCase/CreateOfflineSubscriptionToken/CreateOfflineSubscriptionToken'
 import { AuthenticateOfflineSubscriptionToken } from '../Domain/UseCase/AuthenticateOfflineSubscriptionToken/AuthenticateOfflineSubscriptionToken'
 import { SubscriptionCancelledEventHandler } from '../Domain/Handler/SubscriptionCancelledEventHandler'
-import { ContentDecoder, ContentDecoderInterface } from '@standardnotes/common'
+import { ContentDecoder, ContentDecoderInterface, ProtocolVersion } from '@standardnotes/common'
 import { GetUserOfflineSubscription } from '../Domain/UseCase/GetUserOfflineSubscription/GetUserOfflineSubscription'
 import { ApiGatewayOfflineAuthMiddleware } from '../Controller/ApiGatewayOfflineAuthMiddleware'
 import { UserEmailChangedEventHandler } from '../Domain/Handler/UserEmailChangedEventHandler'
@@ -123,7 +123,7 @@ import { SettingsAssociationServiceInterface } from '../Domain/Setting/SettingsA
 import { SettingsAssociationService } from '../Domain/Setting/SettingsAssociationService'
 import { MuteFailedBackupsEmails } from '../Domain/UseCase/MuteFailedBackupsEmails/MuteFailedBackupsEmails'
 import { SubscriptionSyncRequestedEventHandler } from '../Domain/Handler/SubscriptionSyncRequestedEventHandler'
-import { CrossServiceTokenData, OfflineUserTokenData, SessionTokenData, TokenDecoder, TokenDecoderInterface, TokenEncoder, TokenEncoderInterface, ValetTokenData } from '@standardnotes/auth'
+import { CrossServiceTokenData, DeterministicSelector, OfflineUserTokenData, SelectorInterface, SessionTokenData, TokenDecoder, TokenDecoderInterface, TokenEncoder, TokenEncoderInterface, ValetTokenData } from '@standardnotes/auth'
 import { FileUploadedEventHandler } from '../Domain/Handler/FileUploadedEventHandler'
 import { CreateValetToken } from '../Domain/UseCase/CreateValetToken/CreateValetToken'
 import { CreateListedAccount } from '../Domain/UseCase/CreateListedAccount/CreateListedAccount'
@@ -381,6 +381,7 @@ export class ContainerConfigLoader {
     container.bind<FeatureServiceInterface>(TYPES.FeatureService).to(FeatureService)
     container.bind<SettingInterpreterInterface>(TYPES.SettingInterpreter).to(SettingInterpreter)
     container.bind<SettingDecrypterInterface>(TYPES.SettingDecrypter).to(SettingDecrypter)
+    container.bind<SelectorInterface<ProtocolVersion>>(TYPES.ProtocolVersionSelector).toConstantValue(new DeterministicSelector<ProtocolVersion>())
 
     if (env.get('SNS_TOPIC_ARN', true)) {
       container.bind<SNSDomainEventPublisher>(TYPES.DomainEventPublisher).toConstantValue(

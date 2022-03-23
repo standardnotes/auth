@@ -1,12 +1,16 @@
 import 'reflect-metadata'
 
+import { SelectorInterface } from '@standardnotes/auth'
+import { ProtocolVersion } from '@standardnotes/common'
+
 import { KeyParamsFactory } from './KeyParamsFactory'
 import { User } from './User'
 
 describe('KeyParamsFactory', () => {
   let user: User
+  let protocolVersionSelector: SelectorInterface<ProtocolVersion>
 
-  const createFactory = () => new KeyParamsFactory('secret_key')
+  const createFactory = () => new KeyParamsFactory('secret_key', protocolVersionSelector)
 
   beforeEach(() => {
     user = new User()
@@ -20,6 +24,9 @@ describe('KeyParamsFactory', () => {
     user.pwAlg = 'pwAlg'
     user.pwFunc = 'pwFunc'
     user.pwKeySize = 2
+
+    protocolVersionSelector = {} as jest.Mocked<SelectorInterface<ProtocolVersion>>
+    protocolVersionSelector.select = jest.fn().mockReturnValue(ProtocolVersion.V004)
   })
 
   it('should create a basic key params structure', () => {
