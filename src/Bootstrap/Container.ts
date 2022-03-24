@@ -382,6 +382,7 @@ export class ContainerConfigLoader {
     container.bind<SettingInterpreterInterface>(TYPES.SettingInterpreter).to(SettingInterpreter)
     container.bind<SettingDecrypterInterface>(TYPES.SettingDecrypter).to(SettingDecrypter)
     container.bind<SelectorInterface<ProtocolVersion>>(TYPES.ProtocolVersionSelector).toConstantValue(new DeterministicSelector<ProtocolVersion>())
+    container.bind<SelectorInterface<boolean>>(TYPES.BooleanSelector).toConstantValue(new DeterministicSelector<boolean>())
 
     if (env.get('SNS_TOPIC_ARN', true)) {
       container.bind<SNSDomainEventPublisher>(TYPES.DomainEventPublisher).toConstantValue(
