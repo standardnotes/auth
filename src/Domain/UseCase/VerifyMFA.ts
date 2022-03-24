@@ -1,8 +1,10 @@
+import * as crypto from 'crypto'
 import { ErrorTag } from '@standardnotes/common'
 import { SettingName } from '@standardnotes/settings'
 import { v4 as uuidv4 } from 'uuid'
 import { inject, injectable } from 'inversify'
 import { authenticator } from 'otplib'
+
 import TYPES from '../../Bootstrap/Types'
 import { MFAValidationError } from '../Error/MFAValidationError'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
@@ -10,12 +12,15 @@ import { UseCaseInterface } from './UseCaseInterface'
 import { VerifyMFADTO } from './VerifyMFADTO'
 import { VerifyMFAResponse } from './VerifyMFAResponse'
 import { SettingServiceInterface } from '../Setting/SettingServiceInterface'
+import { SelectorInterface } from '@standardnotes/auth'
 
 @injectable()
 export class VerifyMFA implements UseCaseInterface {
   constructor(
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
     @inject(TYPES.SettingService) private settingService: SettingServiceInterface,
+    @inject(TYPES.BooleanSelector) private booleanSelector: SelectorInterface<boolean>,
+    @inject(TYPES.PSEUDO_KEY_PARAMS_KEY) private pseudoKeyParamsKey: string,
   ) {
   }
 
@@ -23,7 +28,16 @@ export class VerifyMFA implements UseCaseInterface {
     try {
       const user = await this.userRepository.findOneByEmail(dto.email)
       if (user == undefined) {
-        return {
+        const mfaSelectorHash = crypto.createHash('sha256').update(`mfa-selector-${dto.email}${this.pseudoKeyParamsKey}`).digest('hex')
+
+        const isPseudoMFARequired = this.booleanSelector.select(mfaSelectorHash, [true, false])
+
+        return isPseudoMFARequired ? {
+          success: false,
+          errorTag: ErrorTag.MfaRequired,
+          errorMessage: 'Please enter your two-factor authentication code.',
+          errorPayload: { mfa_key: `mfa_${uuidv4()}` },
+        } : {
           success: true,
         }
       }
