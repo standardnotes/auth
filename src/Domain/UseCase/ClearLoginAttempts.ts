@@ -17,10 +17,12 @@ export class ClearLoginAttempts implements UseCaseInterface {
   }
 
   async execute(dto: ClearLoginAttemptsDTO): Promise<ClearLoginAttemptsResponse> {
+    await this.lockRepository.resetLockCounter(dto.email)
+
     const user = await this.userRepository.findOneByEmail(dto.email)
 
     if (!user) {
-      return { success: false }
+      return { success: true }
     }
 
     this.logger.debug(`Resetting lock counter for user ${user.uuid}`)

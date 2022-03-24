@@ -50,12 +50,13 @@ describe('IncreaseLoginAttempts', () => {
     expect(lockRepository.updateLockCounter).toHaveBeenCalledWith('123', 5)
   })
 
-  it('should fail if user is not found', async () => {
-    userRepository.findOneByEmail = jest.fn().mockReturnValue(null)
+  it('should should update the lock counter based on email if user is not found', async () => {
+    lockRepository.getLockCounter = jest.fn().mockReturnValue(4)
+    userRepository.findOneByEmail = jest.fn().mockReturnValue(undefined)
 
-    expect(await createUseCase().execute({ email: 'test@test.te' })).toEqual({ success: false })
+    expect(await createUseCase().execute({ email: 'test@test.te' })).toEqual({ success: true })
 
     expect(lockRepository.lockUser).not.toHaveBeenCalled()
-    expect(lockRepository.updateLockCounter).not.toHaveBeenCalled()
+    expect(lockRepository.updateLockCounter).toHaveBeenCalledWith('test@test.te', 5)
   })
 })

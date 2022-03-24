@@ -187,6 +187,8 @@ export class AuthController extends BaseHttpController {
       }, 400)
     }
 
+    await this.clearLoginAttempts.execute({ email: registerResult.authResponse.user.email as string })
+
     await this.domainEventPublisher.publish(
       this.domainEventFactory.createUserRegisteredEvent(
         <string> registerResult.authResponse.user.uuid,
