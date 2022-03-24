@@ -28,17 +28,20 @@ describe('ClearLoginAttempts', () => {
     lockRepository.resetLockCounter = jest.fn()
   })
 
-  it('should unlock an user by email', async () => {
+  it('should unlock an user by email and uuid', async () => {
     expect(await createUseCase().execute({ email: 'test@test.te' })).toEqual({ success: true })
 
-    expect(lockRepository.resetLockCounter).toHaveBeenCalledWith('234')
+    expect(lockRepository.resetLockCounter).toHaveBeenCalledTimes(2)
+    expect(lockRepository.resetLockCounter).toHaveBeenNthCalledWith(1, 'test@test.te')
+    expect(lockRepository.resetLockCounter).toHaveBeenNthCalledWith(2, '234')
   })
 
-  it('should unlock an user by email if user does not exist', async () => {
-    userRepository.findOneByEmail = jest.fn().mockReturnValue(null)
+  it('should unlock an user by email and uuid if user does not exist', async () => {
+    userRepository.findOneByEmail = jest.fn().mockReturnValue(undefined)
 
-    expect(await createUseCase().execute({ email: 'test@test.te' })).toEqual({ success: false })
+    expect(await createUseCase().execute({ email: 'test@test.te' })).toEqual({ success: true })
 
-    expect(lockRepository.resetLockCounter).not.toHaveBeenCalled()
+    expect(lockRepository.resetLockCounter).toHaveBeenCalledTimes(1)
+    expect(lockRepository.resetLockCounter).toHaveBeenCalledWith('test@test.te')
   })
 })

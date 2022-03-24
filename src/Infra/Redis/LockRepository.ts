@@ -15,16 +15,16 @@ export class LockRepository implements LockRepositoryInterface {
   ) {
   }
 
-  async resetLockCounter(userUuid: string): Promise<void> {
-    await this.redisClient.del(`${this.PREFIX}:${userUuid}`)
+  async resetLockCounter(userIdentifier: string): Promise<void> {
+    await this.redisClient.del(`${this.PREFIX}:${userIdentifier}`)
   }
 
-  async updateLockCounter(userUuid: string, counter: number): Promise<void> {
-    await this.redisClient.set(`${this.PREFIX}:${userUuid}`, counter)
+  async updateLockCounter(userIdentifier: string, counter: number): Promise<void> {
+    await this.redisClient.set(`${this.PREFIX}:${userIdentifier}`, counter)
   }
 
-  async getLockCounter(userUuid: string): Promise<number> {
-    const counter = await this.redisClient.get(`${this.PREFIX}:${userUuid}`)
+  async getLockCounter(userIdentifier: string): Promise<number> {
+    const counter = await this.redisClient.get(`${this.PREFIX}:${userIdentifier}`)
 
     if (!counter) {
       return 0
@@ -33,12 +33,12 @@ export class LockRepository implements LockRepositoryInterface {
     return +counter
   }
 
-  async lockUser(userUuid: string): Promise<void> {
-    await this.redisClient.expire(`${this.PREFIX}:${userUuid}`, this.failedLoginLockout)
+  async lockUser(userIdentifier: string): Promise<void> {
+    await this.redisClient.expire(`${this.PREFIX}:${userIdentifier}`, this.failedLoginLockout)
   }
 
-  async isUserLocked(userUuid: string): Promise<boolean> {
-    const counter = await this.getLockCounter(userUuid)
+  async isUserLocked(userIdentifier: string): Promise<boolean> {
+    const counter = await this.getLockCounter(userIdentifier)
 
     return counter >= this.maxLoginAttempts
   }

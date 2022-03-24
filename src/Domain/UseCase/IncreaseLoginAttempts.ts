@@ -18,24 +18,23 @@ export class IncreaseLoginAttempts implements UseCaseInterface {
   }
 
   async execute(dto: IncreaseLoginAttemptsDTO): Promise<IncreaseLoginAttemptsResponse> {
-    const user = await this.userRepository.findOneByEmail(dto.email)
+    let identifier = dto.email
 
-    if (!user) {
-      return { success: false }
+    const user = await this.userRepository.findOneByEmail(identifier)
+    if (user !== undefined) {
+      identifier = user.uuid
     }
 
-    let numberOfFailedAttempts = await this.lockRepository.getLockCounter(user.uuid)
+    let numberOfFailedAttempts = await this.lockRepository.getLockCounter(identifier)
 
     numberOfFailedAttempts += 1
 
-    this.logger.debug(`User ${user.uuid} has ${user.numberOfFailedAttempts} failed login attempts`)
-
-    await this.lockRepository.updateLockCounter(user.uuid, numberOfFailedAttempts)
+    await this.lockRepository.updateLockCounter(identifier, numberOfFailedAttempts)
 
     if (numberOfFailedAttempts >= this.maxLoginAttempts) {
-      this.logger.debug(`User ${user.uuid} breached number of allowed login attempts. Locking user.`)
+      this.logger.debug(`User ${identifier} breached number of allowed login attempts. Locking user.`)
 
-      await this.lockRepository.lockUser(user.uuid)
+      await this.lockRepository.lockUser(identifier)
     }
 
     return { success: true }

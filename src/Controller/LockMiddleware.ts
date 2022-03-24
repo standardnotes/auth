@@ -17,12 +17,14 @@ export class LockMiddleware extends BaseMiddleware {
 
   async handler (request: Request, response: Response, next: NextFunction): Promise<void> {
     try {
-      const user = await this.userRepository.findOneByEmail(request.body.email)
-      if (!user) {
-        return next()
+      let identifier = request.body.email
+
+      const user = await this.userRepository.findOneByEmail(identifier)
+      if (user !== undefined) {
+        identifier = user.uuid
       }
 
-      if (await this.lockRepository.isUserLocked(user.uuid)) {
+      if (await this.lockRepository.isUserLocked(identifier)) {
         response.status(423).send({
           error: {
             message: 'Too many successive login requests. Please try your request again later.',
