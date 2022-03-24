@@ -7,16 +7,21 @@ import { VerifyMFA } from './VerifyMFA'
 import { Setting } from '../Setting/Setting'
 import { SettingServiceInterface } from '../Setting/SettingServiceInterface'
 import { SettingName } from '@standardnotes/settings'
+import { SelectorInterface } from '@standardnotes/auth'
 
 describe('VerifyMFA', () => {
   let user: User
   let setting: Setting
   let userRepository: UserRepositoryInterface
   let settingService: SettingServiceInterface
+  let booleanSelector: SelectorInterface<boolean>
+  const pseudoKeyParamsKey = 'foobar'
 
   const createVerifyMFA = () => new VerifyMFA(
     userRepository,
-    settingService
+    settingService,
+    booleanSelector,
+    pseudoKeyParamsKey
   )
 
   beforeEach(() => {
@@ -24,6 +29,9 @@ describe('VerifyMFA', () => {
 
     userRepository = {} as jest.Mocked<UserRepositoryInterface>
     userRepository.findOneByEmail = jest.fn().mockReturnValue(user)
+
+    booleanSelector = {} as jest.Mocked<SelectorInterface<boolean>>
+    booleanSelector.select = jest.fn().mockReturnValue(false)
 
     setting = {
       name: SettingName.MfaSecret,
@@ -55,10 +63,22 @@ describe('VerifyMFA', () => {
     })
   })
 
-  it('should pass MFA verification if user is not found', async () => {
+  it('should pass MFA verification if user is not found and pseudo mfa is not required', async () => {
     userRepository.findOneByEmail = jest.fn().mockReturnValue(undefined)
     expect(await createVerifyMFA().execute({ email: 'test@test.te', requestParams: {} })).toEqual({
       success: true,
+    })
+  })
+
+  it('should not pass MFA verification if user is not found and pseudo mfa is required', async () => {
+    booleanSelector.select = jest.fn().mockReturnValue(true)
+    userRepository.findOneByEmail = jest.fn().mockReturnValue(undefined)
+
+    expect(await createVerifyMFA().execute({ email: 'test@test.te', requestParams: {} })).toEqual({
+      success: false,
+      errorTag: 'mfa-required',
+      errorMessage: 'Please enter your two-factor authentication code.',
+      errorPayload: { mfa_key: expect.stringMatching(/^mfa_/) },
     })
   })
 
