@@ -137,6 +137,9 @@ import { SettingInterpreter } from '../Domain/Setting/SettingInterpreter'
 import { SettingDecrypterInterface } from '../Domain/Setting/SettingDecrypterInterface'
 import { SettingDecrypter } from '../Domain/Setting/SettingDecrypter'
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const newrelicWinstonEnricher = require('@newrelic/winston-enricher')
+
 export class ContainerConfigLoader {
   async load(): Promise<Container> {
     const env: Env = new Env()
@@ -201,12 +204,17 @@ export class ContainerConfigLoader {
 
     container.bind(TYPES.Redis).toConstantValue(redis)
 
+    const winstonFormatters = [
+      winston.format.splat(),
+      winston.format.json(),
+    ]
+    if (env.get('NEW_RELIC_ENABLED', true) === 'true') {
+      winstonFormatters.push(newrelicWinstonEnricher())
+    }
+
     const logger = winston.createLogger({
       level: env.get('LOG_LEVEL') || 'info',
-      format: winston.format.combine(
-        winston.format.splat(),
-        winston.format.json(),
-      ),
+      format: winston.format.combine(...winstonFormatters),
       transports: [
         new winston.transports.Console({ level: env.get('LOG_LEVEL') || 'info' }),
       ],
