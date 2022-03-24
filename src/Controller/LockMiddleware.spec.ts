@@ -52,14 +52,14 @@ describe('LockMiddleware', () => {
     expect(next).toHaveBeenCalled()
   })
 
-  it('should let the request pass if there is no user found', async () => {
-    userRepository.findOneByEmail = jest.fn().mockReturnValue(null)
+  it('should return locked response if user is not found but the email is locked', async () => {
+    userRepository.findOneByEmail = jest.fn().mockReturnValue(undefined)
 
     await createMiddleware().handler(request, response, next)
 
-    expect(response.status).not.toHaveBeenCalled()
+    expect(response.status).toHaveBeenCalledWith(423)
 
-    expect(next).toHaveBeenCalled()
+    expect(next).not.toHaveBeenCalled()
   })
 
   it('should pass the error to next middleware if one occurres', async () => {

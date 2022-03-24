@@ -1,7 +1,7 @@
 export interface LockRepositoryInterface {
-  resetLockCounter(userUuid: string): Promise<void>
-  updateLockCounter(userUuid: string, counter: number): Promise<void>
-  getLockCounter(userUuid: string): Promise<number>
-  lockUser(userUuid: string): Promise<void>
-  isUserLocked(userUuid: string): Promise<boolean>
+  resetLockCounter(userIdentifier: string): Promise<void>
+  updateLockCounter(userIdentifier: string, counter: number): Promise<void>
+  getLockCounter(userIdentifier: string): Promise<number>
+  lockUser(userIdentifier: string): Promise<void>
+  isUserLocked(userIdentifier: string): Promise<boolean>
 }
