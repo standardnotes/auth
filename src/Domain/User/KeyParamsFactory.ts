@@ -17,13 +17,12 @@ export class KeyParamsFactory implements KeyParamsFactoryInterface {
   }
 
   createPseudoParams(email: string): KeyParamsData {
-    const pwNonceHash = crypto.createHash('sha256').update(`${email}${this.pseudoKeyParamsKey}`).digest('hex')
-
-    const version = this.protocolVersionSelector.select(pwNonceHash, Object.values(ProtocolVersion))
+    const versionSelectorHash = crypto.createHash('sha256').update(`version-selector-${email}${this.pseudoKeyParamsKey}`).digest('hex')
+    const version = this.protocolVersionSelector.select(versionSelectorHash, Object.values(ProtocolVersion))
 
     return this.sortKeys({
       identifier: email,
-      pw_nonce: pwNonceHash,
+      pw_nonce: crypto.createHash('sha256').update(`${email}${this.pseudoKeyParamsKey}`).digest('hex'),
       version,
     })
   }
