@@ -139,6 +139,7 @@ import { SettingDecrypter } from '../Domain/Setting/SettingDecrypter'
 import { SharedSubscriptionInvitationRepositoryInterface } from '../Domain/SharedSubscription/SharedSubscriptionInvitationRepositoryInterface'
 import { MySQLSharedSubscriptionInvitationRepository } from '../Infra/MySQL/MySQLSharedSubscriptionInvitationRepository'
 import { InviteToSharedSubscription } from '../Domain/UseCase/InviteToSharedSubscription/InviteToSharedSubscription'
+import { SharedSubscriptionInvitation } from '../Domain/SharedSubscription/SharedSubscriptionInvitation'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const newrelicWinstonEnricher = require('@newrelic/winston-enricher')
@@ -187,6 +188,7 @@ export class ContainerConfigLoader {
         Permission,
         Setting,
         OfflineSetting,
+        SharedSubscriptionInvitation,
       ],
       migrations: [
         env.get('DB_MIGRATIONS_PATH'),
