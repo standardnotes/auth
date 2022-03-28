@@ -261,7 +261,6 @@ export class ContainerConfigLoader {
     container.bind<WebSocketsConnectionRepositoryInterface>(TYPES.WebSocketsConnectionRepository).to(RedisWebSocketsConnectionRepository)
     container.bind<SubscriptionTokenRepositoryInterface>(TYPES.SubscriptionTokenRepository).to(RedisSubscriptionTokenRepository)
     container.bind<OfflineSubscriptionTokenRepositoryInterface>(TYPES.OfflineSubscriptionTokenRepository).to(RedisOfflineSubscriptionTokenRepository)
-    container.bind<OfflineSubscriptionTokenRepositoryInterface>(TYPES.OfflineSubscriptionTokenRepository).to(RedisOfflineSubscriptionTokenRepository)
     container.bind<SharedSubscriptionInvitationRepositoryInterface>(TYPES.SharedSubscriptionInvitationRepository).toConstantValue(connection.getCustomRepository(MySQLSharedSubscriptionInvitationRepository))
 
     // Middleware
