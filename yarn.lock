@@ -804,7 +804,7 @@
     "@standardnotes/common" "^1.15.3"
     jsonwebtoken "^8.5.1"
 
-"@standardnotes/auth@^3.17.7", "@standardnotes/auth@^3.17.9":
+"@standardnotes/auth@^3.17.9":
   version "3.17.9"
   resolved "https://registry.yarnpkg.com/@standardnotes/auth/-/auth-3.17.9.tgz#b4e9bd023500942c4d968d9d1461249ab1a3b4fc"
   integrity sha512-5gDtS4427eSnHvjASnj/Puj4Uby1ycK9vo8cRJtAWjvAD5eBsdaHGxM4fhDeP0oA5c+mHAQL253S43xWLYGpRQ==
@@ -861,13 +861,13 @@
     sqs-consumer "^5.5.0"
     winston "^3.3.3"
 
-"@standardnotes/domain-events@2.25.0":
-  version "2.25.0"
-  resolved "https://registry.yarnpkg.com/@standardnotes/domain-events/-/domain-events-2.25.0.tgz#73d003967cb2b8af8afc6d26360d9af99db928fe"
-  integrity sha512-o9k07Urfs8u04P9TGS7vA/ol5PQ6pi7BeejHWbWInCQ/kXgHcVHJkWBPsEPRxDboLzhju7ivbzUMYlEBmkj1vw==
+"@standardnotes/domain-events@2.26.0":
+  version "2.26.0"
+  resolved "https://registry.yarnpkg.com/@standardnotes/domain-events/-/domain-events-2.26.0.tgz#878b3ced75508ae686cff5f70cf6635575aae889"
+  integrity sha512-sV5Zu2/2xXBGLh1rA7OOJZVKhf+UjSGfKgEQOFKHqQVFTKbWr/XxQX/dNLJsBh+N9NfmPVm5kxZ91m798ulV5g==
   dependencies:
-    "@standardnotes/auth" "^3.17.7"
-    "@standardnotes/features" "^1.35.0"
+    "@standardnotes/auth" "^3.18.0"
+    "@standardnotes/features" "^1.35.6"
 
 "@standardnotes/domain-events@^2.23.8":
   version "2.23.8"
@@ -901,13 +901,21 @@
     "@standardnotes/auth" "^3.17.5"
     "@standardnotes/common" "^1.15.3"
 
-"@standardnotes/features@^1.35.0", "@standardnotes/features@^1.35.2":
+"@standardnotes/features@^1.35.2":
   version "1.35.2"
   resolved "https://registry.yarnpkg.com/@standardnotes/features/-/features-1.35.2.tgz#9df190d89e1387206dd97eecce6bdc370cd2aed7"
   integrity sha512-PbmPym4zlUZgO7tZTBVgyeOYDgOnTSDaEa8vcpnzcxQMCyxSPZ9p+f9ct21+mO/I2kbF8ulKhESJLuUYBSsp0A==
   dependencies:
     "@standardnotes/auth" "^3.17.9"
     "@standardnotes/common" "^1.16.2"
+
+"@standardnotes/features@^1.35.6":
+  version "1.35.6"
+  resolved "https://registry.yarnpkg.com/@standardnotes/features/-/features-1.35.6.tgz#177b34cdb5dc71e13aba0a6b57e5d2ab0849d740"
+  integrity sha512-fiYZvlTpYyBcjnPSs1bN7pvIYWvQevZTEBTjNvOTo5ZqCtLoXu0p0hzU+17J2pYrjkh4vHZhYVxrRLXnyft3ZQ==
+  dependencies:
+    "@standardnotes/auth" "^3.18.0"
+    "@standardnotes/common" "^1.17.0"
 
 "@standardnotes/payloads@^1.4.15":
   version "1.4.15"

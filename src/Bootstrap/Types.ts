@@ -18,6 +18,7 @@ const TYPES = {
   OfflineUserSubscriptionRepository: Symbol.for('OfflineUserSubscriptionRepository'),
   SubscriptionTokenRepository: Symbol.for('SubscriptionTokenRepository'),
   OfflineSubscriptionTokenRepository: Symbol.for('OfflineSubscriptionTokenRepository'),
+  SharedSubscriptionInvitationRepository: Symbol.for('SharedSubscriptionInvitationRepository'),
   // Middleware
   AuthMiddleware: Symbol.for('AuthMiddleware'),
   ApiGatewayAuthMiddleware: Symbol.for('ApiGatewayAuthMiddleware'),
@@ -96,6 +97,7 @@ const TYPES = {
   MuteSignInEmails: Symbol.for('MuteSignInEmails'),
   CreateValetToken: Symbol.for('CreateValetToken'),
   CreateListedAccount: Symbol.for('CreateListedAccount'),
+  InviteToSharedSubscription: Symbol.for('InviteToSharedSubscription'),
   // Handlers
   UserRegisteredEventHandler: Symbol.for('UserRegisteredEventHandler'),
   AccountDeletionRequestedEventHandler: Symbol.for('AccountDeletionRequestedEventHandler'),

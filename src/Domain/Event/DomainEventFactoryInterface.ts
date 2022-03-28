@@ -1,5 +1,6 @@
 import { Uuid, RoleName } from '@standardnotes/common'
-import { AccountDeletionRequestedEvent, CloudBackupRequestedEvent, UserRegisteredEvent, UserRolesChangedEvent, UserEmailChangedEvent, OfflineSubscriptionTokenCreatedEvent, EmailBackupRequestedEvent, ListedAccountRequestedEvent, UserSignedInEvent, UserDisabledSessionUserAgentLoggingEvent } from '@standardnotes/domain-events'
+import { AccountDeletionRequestedEvent, CloudBackupRequestedEvent, UserRegisteredEvent, UserRolesChangedEvent, UserEmailChangedEvent, OfflineSubscriptionTokenCreatedEvent, EmailBackupRequestedEvent, ListedAccountRequestedEvent, UserSignedInEvent, UserDisabledSessionUserAgentLoggingEvent, SharedSubscriptionInvitationCreatedEvent } from '@standardnotes/domain-events'
+import { InviteeIdentifierType } from '../SharedSubscription/InviteeIdentifierType'
 
 export interface DomainEventFactoryInterface {
   createUserSignedInEvent(dto: {
@@ -22,4 +23,11 @@ export interface DomainEventFactoryInterface {
     userUuid: Uuid,
     email: string
   }): UserDisabledSessionUserAgentLoggingEvent
+  createSharedSubscriptionInvitationCreatedEvent(dto: {
+    inviterEmail: string
+    inviterSubscriptionId: number
+    inviteeIdentifier: string
+    inviteeIdentifierType: InviteeIdentifierType
+    sharedSubscriptionInvitationUuid: string
+  }): SharedSubscriptionInvitationCreatedEvent
 }

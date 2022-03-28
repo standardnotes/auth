@@ -136,6 +136,9 @@ import { SettingInterpreterInterface } from '../Domain/Setting/SettingInterprete
 import { SettingInterpreter } from '../Domain/Setting/SettingInterpreter'
 import { SettingDecrypterInterface } from '../Domain/Setting/SettingDecrypterInterface'
 import { SettingDecrypter } from '../Domain/Setting/SettingDecrypter'
+import { SharedSubscriptionInvitationRepositoryInterface } from '../Domain/SharedSubscription/SharedSubscriptionInvitationRepositoryInterface'
+import { MySQLSharedSubscriptionInvitationRepository } from '../Infra/MySQL/MySQLSharedSubscriptionInvitationRepository'
+import { InviteToSharedSubscription } from '../Domain/UseCase/InviteToSharedSubscription/InviteToSharedSubscription'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const newrelicWinstonEnricher = require('@newrelic/winston-enricher')
@@ -256,6 +259,8 @@ export class ContainerConfigLoader {
     container.bind<WebSocketsConnectionRepositoryInterface>(TYPES.WebSocketsConnectionRepository).to(RedisWebSocketsConnectionRepository)
     container.bind<SubscriptionTokenRepositoryInterface>(TYPES.SubscriptionTokenRepository).to(RedisSubscriptionTokenRepository)
     container.bind<OfflineSubscriptionTokenRepositoryInterface>(TYPES.OfflineSubscriptionTokenRepository).to(RedisOfflineSubscriptionTokenRepository)
+    container.bind<OfflineSubscriptionTokenRepositoryInterface>(TYPES.OfflineSubscriptionTokenRepository).to(RedisOfflineSubscriptionTokenRepository)
+    container.bind<SharedSubscriptionInvitationRepositoryInterface>(TYPES.SharedSubscriptionInvitationRepository).toConstantValue(connection.getCustomRepository(MySQLSharedSubscriptionInvitationRepository))
 
     // Middleware
     container.bind<AuthMiddleware>(TYPES.AuthMiddleware).to(AuthMiddleware)
@@ -338,6 +343,7 @@ export class ContainerConfigLoader {
     container.bind<MuteSignInEmails>(TYPES.MuteSignInEmails).to(MuteSignInEmails)
     container.bind<CreateValetToken>(TYPES.CreateValetToken).to(CreateValetToken)
     container.bind<CreateListedAccount>(TYPES.CreateListedAccount).to(CreateListedAccount)
+    container.bind<InviteToSharedSubscription>(TYPES.InviteToSharedSubscription).to(InviteToSharedSubscription)
 
     // Handlers
     container.bind<UserRegisteredEventHandler>(TYPES.UserRegisteredEventHandler).to(UserRegisteredEventHandler)
