@@ -8,7 +8,6 @@ import { Logger } from 'winston'
 
 import TYPES from '../../Bootstrap/Types'
 import { RoleServiceInterface } from '../Role/RoleServiceInterface'
-import { User } from '../User/User'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { UserSubscriptionRepositoryInterface } from '../Subscription/UserSubscriptionRepositoryInterface'
 import { OfflineUserSubscriptionRepositoryInterface } from '../Subscription/OfflineUserSubscriptionRepositoryInterface'
@@ -53,14 +52,17 @@ implements DomainEventHandlerInterface
       event.payload.subscriptionId,
       event.payload.timestamp,
     )
-    await this.removeUserRole(user, event.payload.subscriptionName)
+    await this.removeRoleFromSubscriptionUsers(event.payload.subscriptionId, event.payload.subscriptionName)
   }
 
-  private async removeUserRole(
-    user: User,
+  private async removeRoleFromSubscriptionUsers(
+    subscriptionId: number,
     subscriptionName: SubscriptionName
   ): Promise<void> {
-    await this.roleService.removeUserRole(user, subscriptionName)
+    const userSubscriptions = await this.userSubscriptionRepository.findBySubscriptionId(subscriptionId)
+    for (const userSubscription of userSubscriptions) {
+      await this.roleService.removeUserRole((await userSubscription.user), subscriptionName)
+    }
   }
 
   private async updateSubscriptionEndsAt(

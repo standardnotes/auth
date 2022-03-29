@@ -56,6 +56,7 @@ describe('SubscriptionRenewedEventHandler', () => {
     userSubscriptionRepository = {} as jest.Mocked<UserSubscriptionRepositoryInterface>
     userSubscriptionRepository.updateEndsAt = jest.fn()
     userSubscriptionRepository.save = jest.fn().mockReturnValue(subscription)
+    userSubscriptionRepository.findBySubscriptionId = jest.fn().mockReturnValue([ { user: Promise.resolve(user) } as jest.Mocked<UserSubscription>])
 
     offlineUserSubscription = {} as jest.Mocked<OfflineUserSubscription>
 

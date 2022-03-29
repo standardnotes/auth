@@ -7,7 +7,6 @@ import { inject, injectable } from 'inversify'
 import TYPES from '../../Bootstrap/Types'
 import { UserSubscriptionRepositoryInterface } from '../Subscription/UserSubscriptionRepositoryInterface'
 import { OfflineUserSubscriptionRepositoryInterface } from '../Subscription/OfflineUserSubscriptionRepositoryInterface'
-import { User } from '../User/User'
 import { SubscriptionName } from '@standardnotes/common'
 import { RoleServiceInterface } from '../Role/RoleServiceInterface'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
@@ -63,16 +62,21 @@ implements DomainEventHandlerInterface
       return
     }
 
-    await this.addUserRole(user, event.payload.subscriptionName)
-
-    await this.settingService.applyDefaultSettingsForSubscription(user, event.payload.subscriptionName)
+    await this.addRoleToSubscriptionUsers(event.payload.subscriptionId, event.payload.subscriptionName)
   }
 
-  private async addUserRole(
-    user: User,
+  private async addRoleToSubscriptionUsers(
+    subscriptionId: number,
     subscriptionName: SubscriptionName
   ): Promise<void> {
-    await this.roleService.addUserRole(user, subscriptionName)
+    const userSubscriptions = await this.userSubscriptionRepository.findBySubscriptionId(subscriptionId)
+    for (const userSubscription of userSubscriptions) {
+      const user = await userSubscription.user
+
+      await this.roleService.addUserRole(user, subscriptionName)
+
+      await this.settingService.applyDefaultSettingsForSubscription(user, subscriptionName)
+    }
   }
 
   private async updateSubscriptionEndsAt(
