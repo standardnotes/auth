@@ -143,7 +143,7 @@ export class SessionService implements SessionServiceInterface {
   }
 
   getDeviceInfo(session: Session): string {
-    if (session.userAgent === null) {
+    if (!session.userAgent) {
       return 'Unknown Client on Unknown OS'
     }
 
