@@ -8,11 +8,13 @@ import { User } from '../Domain/User/User'
 import { InviteToSharedSubscription } from '../Domain/UseCase/InviteToSharedSubscription/InviteToSharedSubscription'
 import { AcceptSharedSubscriptionInvitation } from '../Domain/UseCase/AcceptSharedSubscriptionInvitation/AcceptSharedSubscriptionInvitation'
 import { DeclineSharedSubscriptionInvitation } from '../Domain/UseCase/DeclineSharedSubscriptionInvitation/DeclineSharedSubscriptionInvitation'
+import { CancelSharedSubscriptionInvitation } from '../Domain/UseCase/CancelSharedSubscriptionInvitation/CancelSharedSubscriptionInvitation'
 
 describe('SubscriptionInvitesController', () => {
   let inviteToSharedSubscription: InviteToSharedSubscription
   let acceptSharedSubscriptionInvitation: AcceptSharedSubscriptionInvitation
   let declineSharedSubscriptionInvitation: DeclineSharedSubscriptionInvitation
+  let cancelSharedSubscriptionInvitation: CancelSharedSubscriptionInvitation
 
   let request: express.Request
   let response: express.Response
@@ -22,6 +24,7 @@ describe('SubscriptionInvitesController', () => {
     inviteToSharedSubscription,
     acceptSharedSubscriptionInvitation,
     declineSharedSubscriptionInvitation,
+    cancelSharedSubscriptionInvitation
   )
 
   beforeEach(() => {
@@ -38,6 +41,9 @@ describe('SubscriptionInvitesController', () => {
     declineSharedSubscriptionInvitation = {} as jest.Mocked<DeclineSharedSubscriptionInvitation>
     declineSharedSubscriptionInvitation.execute = jest.fn()
 
+    cancelSharedSubscriptionInvitation = {} as jest.Mocked<CancelSharedSubscriptionInvitation>
+    cancelSharedSubscriptionInvitation.execute = jest.fn()
+
     request = {
       headers: {},
       body: {},
@@ -47,6 +53,40 @@ describe('SubscriptionInvitesController', () => {
     response = {
       locals: {},
     } as jest.Mocked<express.Response>
+    response.locals.user = {
+      email: 'test@test.te',
+    }
+  })
+
+  it('should cancel invitation to subscription sharing', async () => {
+    request.params.inviteUuid = '1-2-3'
+
+    cancelSharedSubscriptionInvitation.execute = jest.fn().mockReturnValue({
+      success: true,
+    })
+
+    const httpResponse = <results.JsonResult> await createController().cancelSubscriptionSharing(request, response)
+    const result = await httpResponse.executeAsync()
+
+    expect(cancelSharedSubscriptionInvitation.execute).toHaveBeenCalledWith({
+      sharedSubscriptionInvitationUuid: '1-2-3',
+      inviterEmail: 'test@test.te',
+    })
+
+    expect(result.statusCode).toEqual(200)
+  })
+
+  it('should not cancel invitation to subscription sharing if the workflow fails', async () => {
+    request.params.inviteUuid = '1-2-3'
+
+    cancelSharedSubscriptionInvitation.execute = jest.fn().mockReturnValue({
+      success: false,
+    })
+
+    const httpResponse = <results.JsonResult> await createController().cancelSubscriptionSharing(request, response)
+    const result = await httpResponse.executeAsync()
+
+    expect(result.statusCode).toEqual(400)
   })
 
   it('should decline invitation to subscription sharing', async () => {

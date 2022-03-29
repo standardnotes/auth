@@ -186,4 +186,23 @@ describe('MySQLUserSubscriptionRepository', () => {
     expect(selectQueryBuilder.getMany).toHaveBeenCalled()
     expect(result).toEqual([subscription])
   })
+
+  it('should find one subscription by id and user uuid', async () => {
+    repository.createQueryBuilder = jest.fn().mockImplementation(() => selectQueryBuilder)
+
+    selectQueryBuilder.where = jest.fn().mockReturnThis()
+    selectQueryBuilder.getOne = jest.fn().mockReturnValue(subscription)
+
+    const result = await repository.findOneByUserUuidAndSubscriptionId('1-2-3', 5)
+
+    expect(selectQueryBuilder.where).toHaveBeenCalledWith(
+      'user_uuid = :userUuid AND subscription_id = :subscriptionId',
+      {
+        subscriptionId: 5,
+        userUuid: '1-2-3',
+      },
+    )
+    expect(selectQueryBuilder.getOne).toHaveBeenCalled()
+    expect(result).toEqual(subscription)
+  })
 })

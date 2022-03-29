@@ -25,13 +25,24 @@ describe('MySQLSharedSubscriptionInvitationRepository', () => {
     repository.createQueryBuilder = jest.fn().mockImplementation(() => queryBuilder)
   })
 
-  it('should find one setting by name and user uuid', async () => {
+  it('should find one setting by name and uuid', async () => {
     queryBuilder.where = jest.fn().mockReturnThis()
     queryBuilder.getOne = jest.fn().mockReturnValue(invitation)
 
     const result = await repository.findOneByUuidAndStatus('1-2-3', InvitationStatus.Sent)
 
     expect(queryBuilder.where).toHaveBeenCalledWith('invitation.uuid = :uuid AND invitation.status = :status', { uuid: '1-2-3', status: 'sent' })
+
+    expect(result).toEqual(invitation)
+  })
+
+  it('should find one setting by uuid', async () => {
+    queryBuilder.where = jest.fn().mockReturnThis()
+    queryBuilder.getOne = jest.fn().mockReturnValue(invitation)
+
+    const result = await repository.findOneByUuid('1-2-3')
+
+    expect(queryBuilder.where).toHaveBeenCalledWith('invitation.uuid = :uuid', { uuid: '1-2-3' })
 
     expect(result).toEqual(invitation)
   })

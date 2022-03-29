@@ -142,6 +142,7 @@ import { InviteToSharedSubscription } from '../Domain/UseCase/InviteToSharedSubs
 import { SharedSubscriptionInvitation } from '../Domain/SharedSubscription/SharedSubscriptionInvitation'
 import { AcceptSharedSubscriptionInvitation } from '../Domain/UseCase/AcceptSharedSubscriptionInvitation/AcceptSharedSubscriptionInvitation'
 import { DeclineSharedSubscriptionInvitation } from '../Domain/UseCase/DeclineSharedSubscriptionInvitation/DeclineSharedSubscriptionInvitation'
+import { CancelSharedSubscriptionInvitation } from '../Domain/UseCase/CancelSharedSubscriptionInvitation/CancelSharedSubscriptionInvitation'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const newrelicWinstonEnricher = require('@newrelic/winston-enricher')
@@ -349,6 +350,7 @@ export class ContainerConfigLoader {
     container.bind<InviteToSharedSubscription>(TYPES.InviteToSharedSubscription).to(InviteToSharedSubscription)
     container.bind<AcceptSharedSubscriptionInvitation>(TYPES.AcceptSharedSubscriptionInvitation).to(AcceptSharedSubscriptionInvitation)
     container.bind<DeclineSharedSubscriptionInvitation>(TYPES.DeclineSharedSubscriptionInvitation).to(DeclineSharedSubscriptionInvitation)
+    container.bind<CancelSharedSubscriptionInvitation>(TYPES.CancelSharedSubscriptionInvitation).to(CancelSharedSubscriptionInvitation)
 
     // Handlers
     container.bind<UserRegisteredEventHandler>(TYPES.UserRegisteredEventHandler).to(UserRegisteredEventHandler)

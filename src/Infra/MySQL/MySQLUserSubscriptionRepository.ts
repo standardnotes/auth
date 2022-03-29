@@ -8,6 +8,18 @@ import { UserSubscriptionType } from '../../Domain/Subscription/UserSubscription
 @injectable()
 @EntityRepository(UserSubscription)
 export class MySQLUserSubscriptionRepository extends Repository<UserSubscription> implements UserSubscriptionRepositoryInterface {
+  async findOneByUserUuidAndSubscriptionId(userUuid: string, subscriptionId: number): Promise<UserSubscription | undefined> {
+    return await this.createQueryBuilder()
+      .where(
+        'user_uuid = :userUuid AND subscription_id = :subscriptionId',
+        {
+          userUuid,
+          subscriptionId,
+        }
+      )
+      .getOne()
+  }
+
   async findBySubscriptionIdAndType(subscriptionId: number, type: UserSubscriptionType): Promise<UserSubscription[]> {
     return await this.createQueryBuilder()
       .where(
