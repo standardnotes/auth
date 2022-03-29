@@ -15,6 +15,7 @@ import { UserSubscriptionRepositoryInterface } from '../Subscription/UserSubscri
 import { SettingServiceInterface } from '../Setting/SettingServiceInterface'
 import { SettingName } from '@standardnotes/settings'
 import { EncryptionVersion } from '../Encryption/EncryptionVersion'
+import { UserSubscriptionType } from '../Subscription/UserSubscriptionType'
 
 @injectable()
 export class SubscriptionReassignedEventHandler
@@ -87,6 +88,7 @@ implements DomainEventHandlerInterface
     subscription.endsAt = subscriptionExpiresAt
     subscription.cancelled = false
     subscription.subscriptionId = subscriptionId
+    subscription.subscriptionType = UserSubscriptionType.Regular
 
     await this.userSubscriptionRepository.save(subscription)
   }

@@ -13,6 +13,7 @@ import { UserSubscriptionRepositoryInterface } from '../Subscription/UserSubscri
 import { SubscriptionReassignedEventHandler } from './SubscriptionReassignedEventHandler'
 import { UserSubscription } from '../Subscription/UserSubscription'
 import { SettingServiceInterface } from '../Setting/SettingServiceInterface'
+import { UserSubscriptionType } from '../Subscription/UserSubscriptionType'
 
 describe('SubscriptionReassignedEventHandler', () => {
   let userRepository: UserRepositoryInterface
@@ -42,7 +43,9 @@ describe('SubscriptionReassignedEventHandler', () => {
         name: RoleName.CoreUser,
       }]),
     } as jest.Mocked<User>
-    subscription = {} as jest.Mocked<UserSubscription>
+    subscription = {
+      subscriptionType: UserSubscriptionType.Regular,
+    } as jest.Mocked<UserSubscription>
 
     userRepository = {} as jest.Mocked<UserRepositoryInterface>
     userRepository.findOneByEmail = jest.fn().mockReturnValue(user)

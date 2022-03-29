@@ -12,6 +12,7 @@ import { Permission, PermissionName } from '@standardnotes/features'
 import { OfflineUserSubscriptionRepositoryInterface } from '../Subscription/OfflineUserSubscriptionRepositoryInterface'
 import { TimerInterface } from '@standardnotes/time'
 import { OfflineUserSubscription } from '../Subscription/OfflineUserSubscription'
+import { UserSubscriptionType } from '../Subscription/UserSubscriptionType'
 
 describe('FeatureService', () => {
   let roleToSubscriptionMap: RoleToSubscriptionMapInterface
@@ -89,6 +90,7 @@ describe('FeatureService', () => {
       user: Promise.resolve(user),
       cancelled: false,
       subscriptionId: 1,
+      subscriptionType: UserSubscriptionType.Regular,
     }
 
     subscription2 = {
@@ -100,6 +102,7 @@ describe('FeatureService', () => {
       user: Promise.resolve(user),
       cancelled: false,
       subscriptionId: 2,
+      subscriptionType: UserSubscriptionType.Regular,
     }
 
     subscription3 = {
@@ -111,6 +114,7 @@ describe('FeatureService', () => {
       user: Promise.resolve(user),
       cancelled: true,
       subscriptionId: 3,
+      subscriptionType: UserSubscriptionType.Regular,
     }
 
     subscription4 = {
@@ -122,6 +126,7 @@ describe('FeatureService', () => {
       user: Promise.resolve(user),
       cancelled: true,
       subscriptionId: 4,
+      subscriptionType: UserSubscriptionType.Regular,
     }
 
     user = {
@@ -238,6 +243,7 @@ describe('FeatureService', () => {
         user: Promise.resolve(user),
         cancelled: false,
         subscriptionId: 1,
+        subscriptionType: UserSubscriptionType.Regular,
       }
 
       user = {

@@ -1,5 +1,6 @@
 import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
 import { User } from '../User/User'
+import { UserSubscriptionType } from './UserSubscriptionType'
 
 @Entity({ name: 'user_subscriptions' })
 export class UserSubscription {
@@ -47,6 +48,13 @@ export class UserSubscription {
     nullable: true,
   })
   subscriptionId: number | null
+
+  @Column({
+    name: 'subscription_type',
+    length: 24,
+    type: 'varchar',
+  })
+  subscriptionType: UserSubscriptionType
 
   @ManyToOne(
     /* istanbul ignore next */

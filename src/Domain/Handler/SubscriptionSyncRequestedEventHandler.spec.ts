@@ -17,6 +17,7 @@ import { OfflineUserSubscription } from '../Subscription/OfflineUserSubscription
 import { SettingServiceInterface } from '../Setting/SettingServiceInterface'
 import { OfflineSettingServiceInterface } from '../Setting/OfflineSettingServiceInterface'
 import { ContentDecoderInterface } from '@standardnotes/common'
+import { UserSubscriptionType } from '../Subscription/UserSubscriptionType'
 
 describe('SubscriptionSyncRequestedEventHandler', () => {
   let userRepository: UserRepositoryInterface
@@ -53,7 +54,9 @@ describe('SubscriptionSyncRequestedEventHandler', () => {
         name: RoleName.CoreUser,
       }]),
     } as jest.Mocked<User>
-    subscription = {} as jest.Mocked<UserSubscription>
+    subscription = {
+      subscriptionType: UserSubscriptionType.Regular,
+    } as jest.Mocked<UserSubscription>
 
     userRepository = {} as jest.Mocked<UserRepositoryInterface>
     userRepository.findOneByEmail = jest.fn().mockReturnValue(user)
@@ -61,7 +64,7 @@ describe('SubscriptionSyncRequestedEventHandler', () => {
 
     userSubscriptionRepository = {} as jest.Mocked<UserSubscriptionRepositoryInterface>
     userSubscriptionRepository.save = jest.fn().mockReturnValue(subscription)
-    userSubscriptionRepository.findOneBySubscriptionId = jest.fn().mockReturnValue(undefined)
+    userSubscriptionRepository.findBySubscriptionIdAndType = jest.fn().mockReturnValue([])
 
     offlineUserSubscription = {} as jest.Mocked<OfflineUserSubscription>
 
@@ -174,7 +177,7 @@ describe('SubscriptionSyncRequestedEventHandler', () => {
   })
 
   it('should update an existing subscription', async () => {
-    userSubscriptionRepository.findOneBySubscriptionId = jest.fn().mockReturnValue({} as jest.Mocked<UserSubscription>)
+    userSubscriptionRepository.findBySubscriptionIdAndType = jest.fn().mockReturnValue([{} as jest.Mocked<UserSubscription>])
     await createHandler().handle(event)
 
     subscription.planName = SubscriptionName.ProPlan

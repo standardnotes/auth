@@ -15,6 +15,7 @@ import { UserSubscription } from '../Subscription/UserSubscription'
 import { OfflineUserSubscriptionRepositoryInterface } from '../Subscription/OfflineUserSubscriptionRepositoryInterface'
 import { OfflineUserSubscription } from '../Subscription/OfflineUserSubscription'
 import { SettingServiceInterface } from '../Setting/SettingServiceInterface'
+import { UserSubscriptionType } from '../Subscription/UserSubscriptionType'
 
 describe('SubscriptionPurchasedEventHandler', () => {
   let userRepository: UserRepositoryInterface
@@ -47,7 +48,9 @@ describe('SubscriptionPurchasedEventHandler', () => {
         name: RoleName.CoreUser,
       }]),
     } as jest.Mocked<User>
-    subscription = {} as jest.Mocked<UserSubscription>
+    subscription = {
+      subscriptionType: UserSubscriptionType.Regular,
+    } as jest.Mocked<UserSubscription>
 
     userRepository = {} as jest.Mocked<UserRepositoryInterface>
     userRepository.findOneByEmail = jest.fn().mockReturnValue(user)

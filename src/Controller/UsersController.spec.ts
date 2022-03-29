@@ -36,7 +36,6 @@ describe('UsersController', () => {
     clearLoginAttempts,
     increaseLoginAttempts,
     changeCredentials,
-    inviteToSharedSubscription
   )
 
   beforeEach(() => {
@@ -232,60 +231,6 @@ describe('UsersController', () => {
     const result = await httpResponse.executeAsync()
 
     expect(getUserKeyParams.execute).not.toHaveBeenCalled()
-
-    expect(result.statusCode).toEqual(400)
-  })
-
-  it('should invite to user subscription', async () => {
-    request.body.identifier = 'invitee@test.te'
-    response.locals.user = {
-      uuid: '1-2-3',
-      email: 'test@test.te',
-    }
-
-    inviteToSharedSubscription.execute = jest.fn().mockReturnValue({
-      success: true,
-    })
-
-    const httpResponse = <results.JsonResult> await createController().inviteToSubscriptionSharing(request, response)
-    const result = await httpResponse.executeAsync()
-
-    expect(inviteToSharedSubscription.execute).toHaveBeenCalledWith({
-      inviterEmail: 'test@test.te',
-      inviterUuid: '1-2-3',
-      inviteeIdentifier: 'invitee@test.te',
-    })
-
-    expect(result.statusCode).toEqual(200)
-  })
-
-  it('should not invite to user subscription if the identifier is missing in request', async () => {
-    response.locals.user = {
-      uuid: '1-2-3',
-      email: 'test@test.te',
-    }
-
-    const httpResponse = <results.JsonResult> await createController().inviteToSubscriptionSharing(request, response)
-    const result = await httpResponse.executeAsync()
-
-    expect(inviteToSharedSubscription.execute).not.toHaveBeenCalled()
-
-    expect(result.statusCode).toEqual(400)
-  })
-
-  it('should not invite to user subscription if the workflow does not run', async () => {
-    request.body.identifier = 'invitee@test.te'
-    response.locals.user = {
-      uuid: '1-2-3',
-      email: 'test@test.te',
-    }
-
-    inviteToSharedSubscription.execute = jest.fn().mockReturnValue({
-      success: false,
-    })
-
-    const httpResponse = <results.JsonResult> await createController().inviteToSubscriptionSharing(request, response)
-    const result = await httpResponse.executeAsync()
 
     expect(result.statusCode).toEqual(400)
   })

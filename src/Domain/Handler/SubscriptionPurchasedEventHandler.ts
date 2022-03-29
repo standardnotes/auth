@@ -15,6 +15,7 @@ import { UserSubscriptionRepositoryInterface } from '../Subscription/UserSubscri
 import { OfflineUserSubscription } from '../Subscription/OfflineUserSubscription'
 import { OfflineUserSubscriptionRepositoryInterface } from '../Subscription/OfflineUserSubscriptionRepositoryInterface'
 import { SettingServiceInterface } from '../Setting/SettingServiceInterface'
+import { UserSubscriptionType } from '../Subscription/UserSubscriptionType'
 
 @injectable()
 export class SubscriptionPurchasedEventHandler
@@ -93,6 +94,7 @@ implements DomainEventHandlerInterface
     subscription.endsAt = subscriptionExpiresAt
     subscription.cancelled = false
     subscription.subscriptionId = subscriptionId
+    subscription.subscriptionType = UserSubscriptionType.Regular
 
     await this.userSubscriptionRepository.save(subscription)
   }

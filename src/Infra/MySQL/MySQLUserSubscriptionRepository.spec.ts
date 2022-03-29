@@ -6,6 +6,7 @@ import { SelectQueryBuilder, UpdateQueryBuilder } from 'typeorm'
 import { UserSubscription } from '../../Domain/Subscription/UserSubscription'
 
 import { MySQLUserSubscriptionRepository } from './MySQLUserSubscriptionRepository'
+import { UserSubscriptionType } from '../../Domain/Subscription/UserSubscriptionType'
 
 describe('MySQLUserSubscriptionRepository', () => {
   let repository: MySQLUserSubscriptionRepository
@@ -149,13 +150,13 @@ describe('MySQLUserSubscriptionRepository', () => {
     expect(updateQueryBuilder.execute).toHaveBeenCalled()
   })
 
-  it('should find one user subscription by user subscription id', async () => {
+  it('should find subscriptions by id', async () => {
     repository.createQueryBuilder = jest.fn().mockImplementation(() => selectQueryBuilder)
 
     selectQueryBuilder.where = jest.fn().mockReturnThis()
-    selectQueryBuilder.getOne = jest.fn().mockReturnValue(subscription)
+    selectQueryBuilder.getMany = jest.fn().mockReturnValue([subscription])
 
-    const result = await repository.findOneBySubscriptionId(123)
+    const result = await repository.findBySubscriptionId(123)
 
     expect(selectQueryBuilder.where).toHaveBeenCalledWith(
       'subscription_id = :subscriptionId',
@@ -163,7 +164,26 @@ describe('MySQLUserSubscriptionRepository', () => {
         subscriptionId: 123,
       },
     )
-    expect(selectQueryBuilder.getOne).toHaveBeenCalled()
-    expect(result).toEqual(subscription)
+    expect(selectQueryBuilder.getMany).toHaveBeenCalled()
+    expect(result).toEqual([subscription])
+  })
+
+  it('should find subscriptions by id and type', async () => {
+    repository.createQueryBuilder = jest.fn().mockImplementation(() => selectQueryBuilder)
+
+    selectQueryBuilder.where = jest.fn().mockReturnThis()
+    selectQueryBuilder.getMany = jest.fn().mockReturnValue([subscription])
+
+    const result = await repository.findBySubscriptionIdAndType(123, UserSubscriptionType.Regular)
+
+    expect(selectQueryBuilder.where).toHaveBeenCalledWith(
+      'subscription_id = :subscriptionId AND subscription_type = :type',
+      {
+        subscriptionId: 123,
+        type: 'regular',
+      },
+    )
+    expect(selectQueryBuilder.getMany).toHaveBeenCalled()
+    expect(result).toEqual([subscription])
   })
 })

@@ -6,7 +6,6 @@ import {
   httpDelete,
   httpGet,
   httpPatch,
-  httpPost,
   httpPut,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   results,
@@ -20,7 +19,6 @@ import { ClearLoginAttempts } from '../Domain/UseCase/ClearLoginAttempts'
 import { IncreaseLoginAttempts } from '../Domain/UseCase/IncreaseLoginAttempts'
 import { ChangeCredentials } from '../Domain/UseCase/ChangeCredentials/ChangeCredentials'
 import { ErrorTag } from '@standardnotes/common'
-import { InviteToSharedSubscription } from '../Domain/UseCase/InviteToSharedSubscription/InviteToSharedSubscription'
 
 @controller('/users')
 export class UsersController extends BaseHttpController {
@@ -32,7 +30,6 @@ export class UsersController extends BaseHttpController {
     @inject(TYPES.ClearLoginAttempts) private clearLoginAttempts: ClearLoginAttempts,
     @inject(TYPES.IncreaseLoginAttempts) private increaseLoginAttempts: IncreaseLoginAttempts,
     @inject(TYPES.ChangeCredentials) private changeCredentialsUseCase: ChangeCredentials,
-    @inject(TYPES.InviteToSharedSubscription) private inviteToSharedSubscription: InviteToSharedSubscription,
   ) {
     super()
   }
@@ -125,24 +122,6 @@ export class UsersController extends BaseHttpController {
 
     const result = await this.doGetUserSubscription.execute({
       userUuid: request.params.userUuid,
-    })
-
-    if (result.success) {
-      return this.json(result)
-    }
-
-    return this.json(result, 400)
-  }
-
-  @httpPost('/:userUuid/subscription/invite', TYPES.AuthMiddleware)
-  async inviteToSubscriptionSharing(request: Request, response: Response): Promise<results.JsonResult> {
-    if (!request.body.identifier) {
-      return this.json({ error: { message: 'Missing invitee identifier' } }, 400)
-    }
-    const result = await this.inviteToSharedSubscription.execute({
-      inviterEmail: response.locals.user.email,
-      inviterUuid: response.locals.user.uuid,
-      inviteeIdentifier: request.body.identifier,
     })
 
     if (result.success) {

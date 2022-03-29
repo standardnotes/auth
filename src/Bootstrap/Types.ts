@@ -98,6 +98,7 @@ const TYPES = {
   CreateValetToken: Symbol.for('CreateValetToken'),
   CreateListedAccount: Symbol.for('CreateListedAccount'),
   InviteToSharedSubscription: Symbol.for('InviteToSharedSubscription'),
+  AcceptSharedSubscriptionInvitation: Symbol.for('AcceptSharedSubscriptionInvitation'),
   // Handlers
   UserRegisteredEventHandler: Symbol.for('UserRegisteredEventHandler'),
   AccountDeletionRequestedEventHandler: Symbol.for('AccountDeletionRequestedEventHandler'),

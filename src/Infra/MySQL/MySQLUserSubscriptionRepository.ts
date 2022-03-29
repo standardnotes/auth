@@ -3,11 +3,24 @@ import { EntityRepository, Repository } from 'typeorm'
 
 import { UserSubscription } from '../../Domain/Subscription/UserSubscription'
 import { UserSubscriptionRepositoryInterface } from '../../Domain/Subscription/UserSubscriptionRepositoryInterface'
+import { UserSubscriptionType } from '../../Domain/Subscription/UserSubscriptionType'
 
 @injectable()
 @EntityRepository(UserSubscription)
 export class MySQLUserSubscriptionRepository extends Repository<UserSubscription> implements UserSubscriptionRepositoryInterface {
-  async findOneBySubscriptionId(subscriptionId: number): Promise<UserSubscription | undefined> {
+  async findBySubscriptionIdAndType(subscriptionId: number, type: UserSubscriptionType): Promise<UserSubscription[]> {
+    return await this.createQueryBuilder()
+      .where(
+        'subscription_id = :subscriptionId AND subscription_type = :type',
+        {
+          subscriptionId,
+          type,
+        }
+      )
+      .getMany()
+  }
+
+  async findBySubscriptionId(subscriptionId: number): Promise<UserSubscription[]> {
     return await this.createQueryBuilder()
       .where(
         'subscription_id = :subscriptionId',
@@ -15,7 +28,7 @@ export class MySQLUserSubscriptionRepository extends Repository<UserSubscription
           subscriptionId,
         }
       )
-      .getOne()
+      .getMany()
   }
 
   async findOneByUserUuid(userUuid: string): Promise<UserSubscription | undefined> {

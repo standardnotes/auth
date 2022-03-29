@@ -20,6 +20,7 @@ import { ContentDecoderInterface } from '@standardnotes/common'
 import { OfflineSettingName } from '../Setting/OfflineSettingName'
 import { SettingName } from '@standardnotes/settings'
 import { EncryptionVersion } from '../Encryption/EncryptionVersion'
+import { UserSubscriptionType } from '../Subscription/UserSubscriptionType'
 
 @injectable()
 export class SubscriptionSyncRequestedEventHandler
@@ -113,9 +114,12 @@ implements DomainEventHandlerInterface
     subscriptionExpiresAt: number,
     timestamp: number,
   ): Promise<void> {
-    let subscription = await this.userSubscriptionRepository.findOneBySubscriptionId(subscriptionId)
-    if (subscription === undefined) {
-      subscription = new UserSubscription()
+    let subscription = new UserSubscription()
+
+    const subscriptions = await this.userSubscriptionRepository
+      .findBySubscriptionIdAndType(subscriptionId, UserSubscriptionType.Regular)
+    if (subscriptions.length === 1) {
+      subscription = subscriptions[0]
     }
 
     subscription.planName = subscriptionName
@@ -125,6 +129,7 @@ implements DomainEventHandlerInterface
     subscription.endsAt = subscriptionExpiresAt
     subscription.cancelled = canceled
     subscription.subscriptionId = subscriptionId
+    subscription.subscriptionType = UserSubscriptionType.Regular
 
     await this.userSubscriptionRepository.save(subscription)
   }
