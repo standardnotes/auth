@@ -3,6 +3,7 @@ import { inject } from 'inversify'
 import {
   BaseHttpController,
   controller,
+  httpGet,
   httpPost,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   results,
@@ -23,7 +24,7 @@ export class SubscriptionInvitesController extends BaseHttpController {
     super()
   }
 
-  @httpPost('/:inviteUuid/accept')
+  @httpGet('/:inviteUuid/accept')
   async acceptInvite(request: Request): Promise<results.JsonResult> {
     const result = await this.acceptSharedSubscriptionInvitation.execute({
       sharedSubscriptionInvitationUuid: request.params.inviteUuid,
@@ -36,7 +37,7 @@ export class SubscriptionInvitesController extends BaseHttpController {
     return this.json(result, 400)
   }
 
-  @httpPost('/:inviteUuid/decline')
+  @httpGet('/:inviteUuid/decline')
   async declineInvite(request: Request): Promise<results.JsonResult> {
     const result = await this.declineSharedSubscriptionInvitation.execute({
       sharedSubscriptionInvitationUuid: request.params.inviteUuid,
