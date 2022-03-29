@@ -10,13 +10,15 @@ import {
 
 import TYPES from '../Bootstrap/Types'
 import { AcceptSharedSubscriptionInvitation } from '../Domain/UseCase/AcceptSharedSubscriptionInvitation/AcceptSharedSubscriptionInvitation'
+import { DeclineSharedSubscriptionInvitation } from '../Domain/UseCase/DeclineSharedSubscriptionInvitation/DeclineSharedSubscriptionInvitation'
 import { InviteToSharedSubscription } from '../Domain/UseCase/InviteToSharedSubscription/InviteToSharedSubscription'
 
 @controller('/subscription-invites')
 export class SubscriptionInvitesController extends BaseHttpController {
   constructor(
     @inject(TYPES.InviteToSharedSubscription) private inviteToSharedSubscription: InviteToSharedSubscription,
-    @inject(TYPES.AcceptSharedSubscriptionInvitation) private acceptSharedSubscriptionInvitation: AcceptSharedSubscriptionInvitation
+    @inject(TYPES.AcceptSharedSubscriptionInvitation) private acceptSharedSubscriptionInvitation: AcceptSharedSubscriptionInvitation,
+    @inject(TYPES.DeclineSharedSubscriptionInvitation) private declineSharedSubscriptionInvitation: DeclineSharedSubscriptionInvitation
   ) {
     super()
   }
@@ -24,6 +26,19 @@ export class SubscriptionInvitesController extends BaseHttpController {
   @httpPost('/:inviteUuid/accept')
   async acceptInvite(request: Request): Promise<results.JsonResult> {
     const result = await this.acceptSharedSubscriptionInvitation.execute({
+      sharedSubscriptionInvitationUuid: request.params.inviteUuid,
+    })
+
+    if (result.success) {
+      return this.json(result)
+    }
+
+    return this.json(result, 400)
+  }
+
+  @httpPost('/:inviteUuid/decline')
+  async declineInvite(request: Request): Promise<results.JsonResult> {
+    const result = await this.declineSharedSubscriptionInvitation.execute({
       sharedSubscriptionInvitationUuid: request.params.inviteUuid,
     })
 
