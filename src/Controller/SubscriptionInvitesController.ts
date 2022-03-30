@@ -1,3 +1,4 @@
+import { Role } from '@standardnotes/auth'
 import { Request, Response } from 'express'
 import { inject } from 'inversify'
 import {
@@ -53,7 +54,7 @@ export class SubscriptionInvitesController extends BaseHttpController {
     return this.json(result, 400)
   }
 
-  @httpPost('/', TYPES.AuthMiddleware)
+  @httpPost('/', TYPES.ApiGatewayAuthMiddleware)
   async inviteToSubscriptionSharing(request: Request, response: Response): Promise<results.JsonResult> {
     if (!request.body.identifier) {
       return this.json({ error: { message: 'Missing invitee identifier' } }, 400)
@@ -62,6 +63,7 @@ export class SubscriptionInvitesController extends BaseHttpController {
       inviterEmail: response.locals.user.email,
       inviterUuid: response.locals.user.uuid,
       inviteeIdentifier: request.body.identifier,
+      inviterRoles: response.locals.roles.map((role: Role) => role.name),
     })
 
     if (result.success) {
@@ -71,7 +73,7 @@ export class SubscriptionInvitesController extends BaseHttpController {
     return this.json(result, 400)
   }
 
-  @httpDelete('/:inviteUuid', TYPES.AuthMiddleware)
+  @httpDelete('/:inviteUuid', TYPES.ApiGatewayAuthMiddleware)
   async cancelSubscriptionSharing(request: Request, response: Response): Promise<results.JsonResult> {
     const result = await this.cancelSharedSubscriptionInvitation.execute({
       sharedSubscriptionInvitationUuid: request.params.inviteUuid,

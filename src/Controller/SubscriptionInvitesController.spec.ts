@@ -9,6 +9,7 @@ import { InviteToSharedSubscription } from '../Domain/UseCase/InviteToSharedSubs
 import { AcceptSharedSubscriptionInvitation } from '../Domain/UseCase/AcceptSharedSubscriptionInvitation/AcceptSharedSubscriptionInvitation'
 import { DeclineSharedSubscriptionInvitation } from '../Domain/UseCase/DeclineSharedSubscriptionInvitation/DeclineSharedSubscriptionInvitation'
 import { CancelSharedSubscriptionInvitation } from '../Domain/UseCase/CancelSharedSubscriptionInvitation/CancelSharedSubscriptionInvitation'
+import { RoleName } from '@standardnotes/common'
 
 describe('SubscriptionInvitesController', () => {
   let inviteToSharedSubscription: InviteToSharedSubscription
@@ -56,6 +57,12 @@ describe('SubscriptionInvitesController', () => {
     response.locals.user = {
       email: 'test@test.te',
     }
+    response.locals.roles = [
+      {
+        uuid: '1-2-3',
+        name: RoleName.CoreUser,
+      },
+    ]
   })
 
   it('should cancel invitation to subscription sharing', async () => {
@@ -175,6 +182,7 @@ describe('SubscriptionInvitesController', () => {
       inviterEmail: 'test@test.te',
       inviterUuid: '1-2-3',
       inviteeIdentifier: 'invitee@test.te',
+      inviterRoles: ['CORE_USER'],
     })
 
     expect(result.statusCode).toEqual(200)

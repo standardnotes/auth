@@ -8,6 +8,7 @@ import { SharedSubscriptionInvitationRepositoryInterface } from '../../SharedSub
 import { InviteToSharedSubscription } from './InviteToSharedSubscription'
 import { UserSubscriptionRepositoryInterface } from '../../Subscription/UserSubscriptionRepositoryInterface'
 import { UserSubscription } from '../../Subscription/UserSubscription'
+import { RoleName } from '@standardnotes/common'
 
 describe('InviteToSharedSubscription', () => {
   let userSubscriptionRepository: UserSubscriptionRepositoryInterface
@@ -33,6 +34,7 @@ describe('InviteToSharedSubscription', () => {
 
     sharedSubscriptionInvitationRepository = {} as jest.Mocked<SharedSubscriptionInvitationRepositoryInterface>
     sharedSubscriptionInvitationRepository.save = jest.fn().mockImplementation(same => ({ uuid: '1-2-3', ...same }))
+    sharedSubscriptionInvitationRepository.countByInviterEmailAndStatus = jest.fn().mockReturnValue(2)
 
     domainEventPublisher = {} as jest.Mocked<DomainEventPublisherInterface>
     domainEventPublisher.publish = jest.fn()
@@ -49,6 +51,41 @@ describe('InviteToSharedSubscription', () => {
       inviteeIdentifier: 'invitee@test.te',
       inviterUuid: '1-2-3',
       inviterEmail: 'inviter@test.te',
+      inviterRoles: [RoleName.ProUser],
+    })
+
+    expect(sharedSubscriptionInvitationRepository.save).not.toHaveBeenCalled()
+
+    expect(domainEventFactory.createSharedSubscriptionInvitationCreatedEvent).not.toHaveBeenCalled()
+    expect(domainEventPublisher.publish).not.toHaveBeenCalled()
+  })
+
+  it('should not create an inivitation if user is not a pro user', async () => {
+    expect(await createUseCase().execute({
+      inviteeIdentifier: 'invitee@test.te',
+      inviterUuid: '1-2-3',
+      inviterEmail: 'inviter@test.te',
+      inviterRoles: [RoleName.PlusUser],
+    })).toEqual({
+      success: false,
+    })
+
+    expect(sharedSubscriptionInvitationRepository.save).not.toHaveBeenCalled()
+
+    expect(domainEventFactory.createSharedSubscriptionInvitationCreatedEvent).not.toHaveBeenCalled()
+    expect(domainEventPublisher.publish).not.toHaveBeenCalled()
+  })
+
+  it('should not create an inivitation if user is already reached the max limit of invites', async () => {
+    sharedSubscriptionInvitationRepository.countByInviterEmailAndStatus = jest.fn().mockReturnValue(5)
+
+    expect(await createUseCase().execute({
+      inviteeIdentifier: 'invitee@test.te',
+      inviterUuid: '1-2-3',
+      inviterEmail: 'inviter@test.te',
+      inviterRoles: [RoleName.ProUser],
+    })).toEqual({
+      success: false,
     })
 
     expect(sharedSubscriptionInvitationRepository.save).not.toHaveBeenCalled()
@@ -62,6 +99,7 @@ describe('InviteToSharedSubscription', () => {
       inviteeIdentifier: 'invitee@test.te',
       inviterUuid: '1-2-3',
       inviterEmail: 'inviter@test.te',
+      inviterRoles: [RoleName.ProUser],
     })
 
     expect(sharedSubscriptionInvitationRepository.save).toHaveBeenCalledWith({
@@ -90,6 +128,7 @@ describe('InviteToSharedSubscription', () => {
       inviteeIdentifier: 'a75a31ce95365904ef0e0a8e6cefc1f5e99adfef81bbdb6d4499eeb10ae0ff67',
       inviterEmail: 'inviter@test.te',
       inviterUuid: '1-2-3',
+      inviterRoles: [RoleName.ProUser],
     })
 
     expect(sharedSubscriptionInvitationRepository.save).toHaveBeenCalledWith({

@@ -1,3 +1,4 @@
+import { RoleName } from '@standardnotes/common'
 import { DomainEventPublisherInterface } from '@standardnotes/domain-events'
 import { TimerInterface } from '@standardnotes/time'
 import { inject, injectable } from 'inversify'
@@ -17,6 +18,7 @@ import { InviteToSharedSubscriptionResult } from './InviteToSharedSubscriptionRe
 
 @injectable()
 export class InviteToSharedSubscription implements UseCaseInterface {
+  private readonly MAX_NUMBER_OF_INVITES = 5
   constructor(
     @inject(TYPES.UserSubscriptionRepository) private userSubscriptionRepository: UserSubscriptionRepositoryInterface,
     @inject(TYPES.Timer) private timer: TimerInterface,
@@ -27,6 +29,20 @@ export class InviteToSharedSubscription implements UseCaseInterface {
   }
 
   async execute(dto: InviteToSharedSubscriptionDTO): Promise<InviteToSharedSubscriptionResult> {
+    if (!dto.inviterRoles.includes(RoleName.ProUser)) {
+      return {
+        success: false,
+      }
+    }
+
+    const numberOfUsedInvites = await this.sharedSubscriptionInvitationRepository
+      .countByInviterEmailAndStatus(dto.inviterEmail, [InvitationStatus.Sent, InvitationStatus.Accepted])
+    if (numberOfUsedInvites >= this.MAX_NUMBER_OF_INVITES) {
+      return {
+        success: false,
+      }
+    }
+
     const inviterUserSubscription = await this.userSubscriptionRepository.findOneByUserUuid(dto.inviterUuid)
     if (inviterUserSubscription === undefined) {
       return {
