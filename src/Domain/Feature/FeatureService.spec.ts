@@ -38,6 +38,7 @@ describe('FeatureService', () => {
 
   beforeEach(() => {
     roleToSubscriptionMap = {} as jest.Mocked<RoleToSubscriptionMapInterface>
+    roleToSubscriptionMap.filterNonSubscriptionRoles = jest.fn().mockReturnValue([])
     roleToSubscriptionMap.getRoleNameForSubscriptionName = jest.fn().mockImplementation((subscriptionName: SubscriptionName) => {
       if (subscriptionName === SubscriptionName.CorePlan) {
         return RoleName.CoreUser
@@ -276,6 +277,48 @@ describe('FeatureService', () => {
           expect.objectContaining({
             identifier: 'org.standardnotes.bold-editor',
             expires_at: 777,
+          }),
+        ])
+      )
+    })
+
+    it('should return user features along with features related to non subscription roles', async () => {
+      const nonSubscriptionPermission = {
+        uuid: 'files-beta-permission-1-1-1',
+        name: PermissionName.FilesBeta,
+      } as jest.Mocked<Permission>
+
+      const nonSubscriptionRole = {
+        name: RoleName.FilesBetaUser,
+        uuid: 'role-files-beta',
+        permissions: Promise.resolve([ nonSubscriptionPermission ]),
+      } as jest.Mocked<Role>
+
+      roleToSubscriptionMap.filterNonSubscriptionRoles = jest.fn().mockReturnValue([ nonSubscriptionRole ])
+      roleToSubscriptionMap.getSubscriptionNameForRoleName = jest.fn()
+        .mockReturnValueOnce(SubscriptionName.CorePlan)
+        .mockReturnValueOnce(SubscriptionName.ProPlan)
+
+      user = {
+        uuid: 'user-1-1-1',
+        roles: Promise.resolve([role1, role2, nonSubscriptionRole]),
+        subscriptions: Promise.resolve([subscription1, subscription2]),
+      } as jest.Mocked<User>
+
+      const features = await createService().getFeaturesForUser(user)
+      expect(features).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            identifier: 'org.standardnotes.theme-autobiography',
+            expires_at: 555,
+          }),
+          expect.objectContaining({
+            identifier: 'org.standardnotes.bold-editor',
+            expires_at: 777,
+          }),
+          expect.objectContaining({
+            identifier: 'org.standardnotes.files-beta',
+            expires_at: undefined,
           }),
         ])
       )
