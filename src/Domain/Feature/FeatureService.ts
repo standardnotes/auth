@@ -1,4 +1,4 @@
-import { SubscriptionName } from '@standardnotes/common'
+import { RoleName, SubscriptionName } from '@standardnotes/common'
 import { FeatureDescription, GetFeatures } from '@standardnotes/features'
 import { inject, injectable } from 'inversify'
 import TYPES from '../../Bootstrap/Types'
@@ -45,6 +45,30 @@ export class FeatureService implements FeatureServiceInterface {
     userRoles: Array<Role>,
   ): Promise<Array<FeatureDescription>> {
     const userFeatures: Map<string, FeatureDescription> = new Map()
+
+    await this.appendFeaturesBasedOnSubscriptions(userSubscriptions, userRoles, userFeatures)
+
+    await this.appendFeaturesBasedOnNonSubscriptionRoles(userRoles, userFeatures)
+
+    return [...userFeatures.values()]
+  }
+
+  private async appendFeaturesBasedOnNonSubscriptionRoles(
+    userRoles: Array<Role>,
+    userFeatures: Map<string, FeatureDescription>
+  ): Promise<void> {
+    const nonSubscriptionRolesOfUser = this.roleToSubscriptionMap.filterNonSubscriptionRoles(userRoles)
+
+    for (const nonSubscriptionRole of nonSubscriptionRolesOfUser) {
+      await this.appendFeaturesAssociatedWithRole(nonSubscriptionRole, userFeatures)
+    }
+  }
+
+  private async appendFeaturesBasedOnSubscriptions(
+    userSubscriptions: Array<UserSubscription | OfflineUserSubscription>,
+    userRoles: Array<Role>,
+    userFeatures: Map<string, FeatureDescription>
+  ): Promise<void> {
     const userSubscriptionNames: Array<SubscriptionName> = []
 
     userSubscriptions.map((userSubscription: UserSubscription) => {
@@ -66,35 +90,40 @@ export class FeatureService implements FeatureServiceInterface {
 
       const longestLastingSubscription = this.getLongestLastingSubscription(userSubscriptions, userSubscriptionName)
 
-      const rolePermissions = await role.permissions
-
-      for (const rolePermission of rolePermissions) {
-        const featureForPermission = GetFeatures().find(feature => feature.permission_name === rolePermission.name) as FeatureDescription
-        if (featureForPermission === undefined) {
-          continue
-        }
-
-        const alreadyAddedFeature = userFeatures.get(rolePermission.name)
-        if (alreadyAddedFeature === undefined) {
-          userFeatures.set(rolePermission.name, {
-            ...featureForPermission,
-            expires_at: longestLastingSubscription.endsAt,
-            role_name: roleName,
-          })
-
-          continue
-        }
-
-        if (longestLastingSubscription.endsAt > (alreadyAddedFeature.expires_at as number)) {
-          alreadyAddedFeature.expires_at = longestLastingSubscription.endsAt
-        }
-      }
+      await this.appendFeaturesAssociatedWithRole(role, userFeatures, longestLastingSubscription)
     }
-
-    return [...userFeatures.values()]
   }
 
-  private getLongestLastingSubscription(userSubscriptions: Array<UserSubscription | OfflineUserSubscription>, subscriptionName?: SubscriptionName) {
+  private async appendFeaturesAssociatedWithRole(
+    role: Role,
+    userFeatures: Map<string, FeatureDescription>,
+    longestLastingSubscription?: UserSubscription | OfflineUserSubscription
+  ): Promise<void> {
+    const rolePermissions = await role.permissions
+    for (const rolePermission of rolePermissions) {
+      const featureForPermission = GetFeatures().find(feature => feature.permission_name === rolePermission.name) as FeatureDescription
+      if (featureForPermission === undefined) {
+        continue
+      }
+
+      const alreadyAddedFeature = userFeatures.get(rolePermission.name)
+      if (alreadyAddedFeature === undefined) {
+        userFeatures.set(rolePermission.name, {
+          ...featureForPermission,
+          expires_at: longestLastingSubscription ? longestLastingSubscription.endsAt : undefined,
+          role_name: role.name as RoleName,
+        })
+
+        continue
+      }
+
+      if (longestLastingSubscription !== undefined && longestLastingSubscription.endsAt > (alreadyAddedFeature.expires_at as number)) {
+        alreadyAddedFeature.expires_at = longestLastingSubscription.endsAt
+      }
+    }
+  }
+
+  private getLongestLastingSubscription(userSubscriptions: Array<UserSubscription | OfflineUserSubscription>, subscriptionName?: SubscriptionName): UserSubscription | OfflineUserSubscription {
     return userSubscriptions
       .filter(subscription => subscription.planName === subscriptionName)
       .sort((a, b) => {
