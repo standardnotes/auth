@@ -62,6 +62,7 @@ export class AuthController extends BaseHttpController {
     const verifyMFAResponse = await this.verifyMFA.execute({
       email: <string> request.query.email,
       requestParams: request.query,
+      source: 'auth-params',
     })
 
     if (!verifyMFAResponse.success) {
@@ -98,6 +99,7 @@ export class AuthController extends BaseHttpController {
     const verifyMFAResponse = await this.verifyMFA.execute({
       email: request.body.email,
       requestParams: request.body,
+      source: 'sign-in',
     })
 
     if (!verifyMFAResponse.success) {
