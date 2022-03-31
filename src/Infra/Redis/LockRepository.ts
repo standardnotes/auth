@@ -7,12 +7,23 @@ import { LockRepositoryInterface } from '../../Domain/User/LockRepositoryInterfa
 @injectable()
 export class LockRepository implements LockRepositoryInterface {
   private readonly PREFIX = 'lock'
+  private readonly OTP_PREFIX = 'otp-lock'
 
   constructor(
     @inject(TYPES.Redis) private redisClient: IORedis.Redis,
     @inject(TYPES.MAX_LOGIN_ATTEMPTS) private maxLoginAttempts: number,
     @inject(TYPES.FAILED_LOGIN_LOCKOUT) private failedLoginLockout: number
   ) {
+  }
+
+  async lockSuccessfullOTP(userIdentifier: string, otp: string): Promise<void> {
+    await this.redisClient.setex(`${this.OTP_PREFIX}:${userIdentifier}`, 60, otp)
+  }
+
+  async isOTPLocked(userIdentifier: string, otp: string): Promise<boolean> {
+    const lock = await this.redisClient.get(`${this.OTP_PREFIX}:${userIdentifier}`)
+
+    return lock === otp
   }
 
   async resetLockCounter(userIdentifier: string): Promise<void> {
