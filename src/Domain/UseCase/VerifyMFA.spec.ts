@@ -9,7 +9,6 @@ import { SettingServiceInterface } from '../Setting/SettingServiceInterface'
 import { SettingName } from '@standardnotes/settings'
 import { SelectorInterface } from '@standardnotes/auth'
 import { LockRepositoryInterface } from '../User/LockRepositoryInterface'
-import { Logger } from 'winston'
 
 describe('VerifyMFA', () => {
   let user: User
@@ -19,7 +18,6 @@ describe('VerifyMFA', () => {
   let booleanSelector: SelectorInterface<boolean>
   let lockRepository: LockRepositoryInterface
   const pseudoKeyParamsKey = 'foobar'
-  let logger: Logger
 
   const createVerifyMFA = () => new VerifyMFA(
     userRepository,
@@ -27,7 +25,6 @@ describe('VerifyMFA', () => {
     booleanSelector,
     lockRepository,
     pseudoKeyParamsKey,
-    logger
   )
 
   beforeEach(() => {
@@ -50,15 +47,12 @@ describe('VerifyMFA', () => {
 
     settingService = {} as jest.Mocked<SettingServiceInterface>
     settingService.findSettingWithDecryptedValue = jest.fn().mockReturnValue(setting)
-
-    logger = {} as jest.Mocked<Logger>
-    logger.debug = jest.fn()
   })
 
   it('should pass MFA verification if user has no MFA enabled', async () => {
     settingService.findSettingWithDecryptedValue = jest.fn().mockReturnValue(undefined)
 
-    expect(await createVerifyMFA().execute({ email: 'test@test.te', requestParams: {} })).toEqual({
+    expect(await createVerifyMFA().execute({ email: 'test@test.te', requestParams: {}, source: 'sign-in' })).toEqual({
       success: true,
     })
 
@@ -73,7 +67,7 @@ describe('VerifyMFA', () => {
 
     settingService.findSettingWithDecryptedValue = jest.fn().mockReturnValue(setting)
 
-    expect(await createVerifyMFA().execute({ email: 'test@test.te', requestParams: {} })).toEqual({
+    expect(await createVerifyMFA().execute({ email: 'test@test.te', requestParams: {}, source: 'sign-in' })).toEqual({
       success: true,
     })
 
@@ -82,7 +76,7 @@ describe('VerifyMFA', () => {
 
   it('should pass MFA verification if user is not found and pseudo mfa is not required', async () => {
     userRepository.findOneByEmail = jest.fn().mockReturnValue(undefined)
-    expect(await createVerifyMFA().execute({ email: 'test@test.te', requestParams: {} })).toEqual({
+    expect(await createVerifyMFA().execute({ email: 'test@test.te', requestParams: {}, source: 'sign-in' })).toEqual({
       success: true,
     })
 
@@ -93,7 +87,7 @@ describe('VerifyMFA', () => {
     booleanSelector.select = jest.fn().mockReturnValue(true)
     userRepository.findOneByEmail = jest.fn().mockReturnValue(undefined)
 
-    expect(await createVerifyMFA().execute({ email: 'test@test.te', requestParams: {} })).toEqual({
+    expect(await createVerifyMFA().execute({ email: 'test@test.te', requestParams: {}, source: 'sign-in' })).toEqual({
       success: false,
       errorTag: 'mfa-required',
       errorMessage: 'Please enter your two-factor authentication code.',
@@ -102,17 +96,25 @@ describe('VerifyMFA', () => {
   })
 
   it('should pass MFA verification if mfa key is correctly encrypted', async () => {
-    expect(await createVerifyMFA().execute({ email: 'test@test.te', requestParams: { 'mfa_1-2-3': authenticator.generate('shhhh') } })).toEqual({
+    expect(await createVerifyMFA().execute({ email: 'test@test.te', requestParams: { 'mfa_1-2-3': authenticator.generate('shhhh') }, source: 'sign-in' })).toEqual({
       success: true,
     })
 
     expect(lockRepository.lockSuccessfullOTP).toHaveBeenCalledWith('test@test.te', expect.any(String))
   })
 
+  it('should pass MFA verification without locking otp in auth-params mode', async () => {
+    expect(await createVerifyMFA().execute({ email: 'test@test.te', requestParams: { 'mfa_1-2-3': authenticator.generate('shhhh') }, source: 'auth-params' })).toEqual({
+      success: true,
+    })
+
+    expect(lockRepository.lockSuccessfullOTP).not.toHaveBeenCalled()
+  })
+
   it('should not pass MFA verification if otp is already used within lock out period', async () => {
     lockRepository.isOTPLocked = jest.fn().mockReturnValue(true)
 
-    expect(await createVerifyMFA().execute({ email: 'test@test.te', requestParams: { 'mfa_1-2-3': authenticator.generate('shhhh') } })).toEqual({
+    expect(await createVerifyMFA().execute({ email: 'test@test.te', requestParams: { 'mfa_1-2-3': authenticator.generate('shhhh') }, source: 'sign-in' })).toEqual({
       success: false,
       errorTag: 'mfa-invalid',
       errorMessage: 'The two-factor authentication code you entered has been already utilized. Please try again in a while.',
@@ -131,7 +133,7 @@ describe('VerifyMFA', () => {
     settingService = {} as jest.Mocked<SettingServiceInterface>
     settingService.findSettingWithDecryptedValue = jest.fn().mockReturnValue(setting)
 
-    expect(await createVerifyMFA().execute({ email: 'test@test.te', requestParams: { 'mfa_1-2-3': 'test' } })).toEqual({
+    expect(await createVerifyMFA().execute({ email: 'test@test.te', requestParams: { 'mfa_1-2-3': 'test' }, source: 'sign-in' })).toEqual({
       success: false,
       errorTag: 'mfa-invalid',
       errorMessage: 'The two-factor authentication code you entered is incorrect. Please try again.',
@@ -140,7 +142,7 @@ describe('VerifyMFA', () => {
   })
 
   it('should not pass MFA verification if no mfa param is found in the request', async () => {
-    expect(await createVerifyMFA().execute({ email: 'test@test.te', requestParams: { 'foo': 'bar' } })).toEqual({
+    expect(await createVerifyMFA().execute({ email: 'test@test.te', requestParams: { 'foo': 'bar' }, source: 'sign-in' })).toEqual({
       success: false,
       errorTag: 'mfa-required',
       errorMessage: 'Please enter your two-factor authentication code.',
@@ -155,7 +157,7 @@ describe('VerifyMFA', () => {
 
     let error = null
     try {
-      await createVerifyMFA().execute({ email: 'test@test.te', requestParams: { 'mfa_1-2-3': 'test' } })
+      await createVerifyMFA().execute({ email: 'test@test.te', requestParams: { 'mfa_1-2-3': 'test' }, source: 'sign-in' })
     } catch (caughtError) {
       error = caughtError
     }
