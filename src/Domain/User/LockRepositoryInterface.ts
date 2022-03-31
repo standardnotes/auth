@@ -4,4 +4,6 @@ export interface LockRepositoryInterface {
   getLockCounter(userIdentifier: string): Promise<number>
   lockUser(userIdentifier: string): Promise<void>
   isUserLocked(userIdentifier: string): Promise<boolean>
+  lockSuccessfullOTP(userIdentifier: string, otp: string): Promise<void>
+  isOTPLocked(userIdentifier: string, otp: string): Promise<boolean>
 }

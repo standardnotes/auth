@@ -16,6 +16,25 @@ describe('LockRepository', () => {
     redisClient.del = jest.fn()
     redisClient.get = jest.fn()
     redisClient.set = jest.fn()
+    redisClient.setex = jest.fn()
+  })
+
+  it('should lock a successfully used OTP for the lockout period', async () => {
+    await createRepository().lockSuccessfullOTP('test@test.te', '123456')
+
+    expect(redisClient.setex).toHaveBeenCalledWith('otp-lock:test@test.te', 60, '123456')
+  })
+
+  it('should indicate if an OTP was already used in the lockout period', async () => {
+    redisClient.get = jest.fn().mockReturnValue('123456')
+
+    expect(await createRepository().isOTPLocked('test@test.te', '123456')).toEqual(true)
+  })
+
+  it('should indicate if an OTP was not already used in the lockout period', async () => {
+    redisClient.get = jest.fn().mockReturnValue('654321')
+
+    expect(await createRepository().isOTPLocked('test@test.te', '123456')).toEqual(false)
   })
 
   it('should lock a user for the lockout period', async () => {
