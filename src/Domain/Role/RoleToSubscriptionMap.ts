@@ -1,5 +1,6 @@
 import { RoleName, SubscriptionName } from '@standardnotes/common'
 import { injectable } from 'inversify'
+import { Role } from './Role'
 
 import { RoleToSubscriptionMapInterface } from './RoleToSubscriptionMapInterface'
 
@@ -10,6 +11,14 @@ export class RoleToSubscriptionMap implements RoleToSubscriptionMapInterface {
     [RoleName.PlusUser, SubscriptionName.PlusPlan],
     [RoleName.ProUser, SubscriptionName.ProPlan],
   ])
+
+  private readonly nonSubscriptionRoles = [
+    RoleName.FilesBetaUser,
+  ]
+
+  filterNonSubscriptionRoles(roles: Role[]): Array<Role> {
+    return roles.filter(role => this.nonSubscriptionRoles.includes(role.name as RoleName))
+  }
 
   getSubscriptionNameForRoleName(roleName: RoleName): SubscriptionName | undefined {
     return this.roleNameToSubscriptionNameMap.get(roleName)
