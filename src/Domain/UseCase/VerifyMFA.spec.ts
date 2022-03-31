@@ -9,6 +9,7 @@ import { SettingServiceInterface } from '../Setting/SettingServiceInterface'
 import { SettingName } from '@standardnotes/settings'
 import { SelectorInterface } from '@standardnotes/auth'
 import { LockRepositoryInterface } from '../User/LockRepositoryInterface'
+import { Logger } from 'winston'
 
 describe('VerifyMFA', () => {
   let user: User
@@ -18,13 +19,15 @@ describe('VerifyMFA', () => {
   let booleanSelector: SelectorInterface<boolean>
   let lockRepository: LockRepositoryInterface
   const pseudoKeyParamsKey = 'foobar'
+  let logger: Logger
 
   const createVerifyMFA = () => new VerifyMFA(
     userRepository,
     settingService,
     booleanSelector,
     lockRepository,
-    pseudoKeyParamsKey
+    pseudoKeyParamsKey,
+    logger
   )
 
   beforeEach(() => {
@@ -47,6 +50,9 @@ describe('VerifyMFA', () => {
 
     settingService = {} as jest.Mocked<SettingServiceInterface>
     settingService.findSettingWithDecryptedValue = jest.fn().mockReturnValue(setting)
+
+    logger = {} as jest.Mocked<Logger>
+    logger.debug = jest.fn()
   })
 
   it('should pass MFA verification if user has no MFA enabled', async () => {

@@ -14,6 +14,7 @@ import { VerifyMFAResponse } from './VerifyMFAResponse'
 import { SettingServiceInterface } from '../Setting/SettingServiceInterface'
 import { SelectorInterface } from '@standardnotes/auth'
 import { LockRepositoryInterface } from '../User/LockRepositoryInterface'
+import { Logger } from 'winston'
 
 @injectable()
 export class VerifyMFA implements UseCaseInterface {
@@ -23,6 +24,7 @@ export class VerifyMFA implements UseCaseInterface {
     @inject(TYPES.BooleanSelector) private booleanSelector: SelectorInterface<boolean>,
     @inject(TYPES.LockRepository) private lockRepository: LockRepositoryInterface,
     @inject(TYPES.PSEUDO_KEY_PARAMS_KEY) private pseudoKeyParamsKey: string,
+    @inject(TYPES.Logger) private logger: Logger,
   ) {
   }
 
@@ -98,6 +100,7 @@ export class VerifyMFA implements UseCaseInterface {
     const tokenAndParamKey = this.getMFATokenAndParamKeyFromRequestParams(requestParams)
 
     const isOTPAlreadyUsed = await this.lockRepository.isOTPLocked(email, tokenAndParamKey.token)
+    this.logger.debug(`[Verifying MFA] checking if otp ${tokenAndParamKey.token} is locked for ${email}: ${isOTPAlreadyUsed}`)
     if (isOTPAlreadyUsed) {
       throw new MFAValidationError(
         'The two-factor authentication code you entered has been already utilized. Please try again in a while.',
@@ -113,6 +116,8 @@ export class VerifyMFA implements UseCaseInterface {
         { mfa_key: tokenAndParamKey.key }
       )
     }
+
+    this.logger.debug(`[Verifying MFA] locking otp ${tokenAndParamKey.token} for ${email}`)
 
     await this.lockRepository.lockSuccessfullOTP(email, tokenAndParamKey.token)
 
