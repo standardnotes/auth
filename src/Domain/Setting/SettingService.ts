@@ -1,4 +1,3 @@
-import { SubscriptionName } from '@standardnotes/common'
 import { SettingName } from '@standardnotes/settings'
 import { inject, injectable } from 'inversify'
 import { Logger } from 'winston'
@@ -25,29 +24,6 @@ export class SettingService implements SettingServiceInterface {
     @inject(TYPES.SettingDecrypter) private settingDecrypter: SettingDecrypterInterface,
     @inject(TYPES.Logger) private logger: Logger,
   ) {
-  }
-
-  async applyDefaultSettingsForSubscription(user: User, subscriptionName: SubscriptionName): Promise<void> {
-    const defaultSettingsWithValues = await this.settingsAssociationService.getDefaultSettingsAndValuesForSubscriptionName(subscriptionName)
-    if (defaultSettingsWithValues === undefined) {
-      this.logger.warn(`Could not find settings for subscription: ${subscriptionName}`)
-
-      return
-    }
-
-    for (const settingName of defaultSettingsWithValues.keys()) {
-      const setting = defaultSettingsWithValues.get(settingName) as { value: string, sensitive: boolean, serverEncryptionVersion: number }
-
-      await this.createOrReplace({
-        user,
-        props: {
-          name: settingName,
-          unencryptedValue: setting.value,
-          serverEncryptionVersion: setting.serverEncryptionVersion,
-          sensitive: setting.sensitive,
-        },
-      })
-    }
   }
 
   async applyDefaultSettingsUponRegistration(user: User): Promise<void> {

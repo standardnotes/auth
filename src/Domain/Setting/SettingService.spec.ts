@@ -1,6 +1,5 @@
 import 'reflect-metadata'
 
-import { SubscriptionName } from '@standardnotes/common'
 import { EmailBackupFrequency, LogSessionUserAgentOption, MuteSignInEmailsOption, SettingName } from '@standardnotes/settings'
 import { Logger } from 'winston'
 import { EncryptionVersion } from '../Encryption/EncryptionVersion'
@@ -91,20 +90,6 @@ describe('SettingService', () => {
     await createService().applyDefaultSettingsUponRegistration(user)
 
     expect(settingRepository.save).toHaveBeenCalledWith(setting)
-  })
-
-  it ('should create default settings for a subscription', async () => {
-    await createService().applyDefaultSettingsForSubscription(user, SubscriptionName.PlusPlan)
-
-    expect(settingRepository.save).toHaveBeenCalledWith(setting)
-  })
-
-  it ('should not create default settings for a subscription if subscription has no defaults', async () => {
-    settingsAssociationService.getDefaultSettingsAndValuesForSubscriptionName = jest.fn().mockReturnValue(undefined)
-
-    await createService().applyDefaultSettingsForSubscription(user, SubscriptionName.PlusPlan)
-
-    expect(settingRepository.save).not.toHaveBeenCalled()
   })
 
   it ('should create setting if it doesn\'t exist', async () => {

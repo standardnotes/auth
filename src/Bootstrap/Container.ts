@@ -145,6 +145,8 @@ import { DeclineSharedSubscriptionInvitation } from '../Domain/UseCase/DeclineSh
 import { CancelSharedSubscriptionInvitation } from '../Domain/UseCase/CancelSharedSubscriptionInvitation/CancelSharedSubscriptionInvitation'
 import { SharedSubscriptionInvitationCreatedEventHandler } from '../Domain/Handler/SharedSubscriptionInvitationCreatedEventHandler'
 import { SubscriptionSetting } from '../Domain/Setting/SubscriptionSetting'
+import { SubscriptionSettingServiceInterface } from '../Domain/Setting/SubscriptionSettingServiceInterface'
+import { SubscriptionSettingService } from '../Domain/Setting/SubscriptionSettingService'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const newrelicWinstonEnricher = require('@newrelic/winston-enricher')
@@ -395,6 +397,7 @@ export class ContainerConfigLoader {
     container.bind<AxiosInstance>(TYPES.HTTPClient).toConstantValue(axios.create())
     container.bind<CrypterInterface>(TYPES.Crypter).to(CrypterNode)
     container.bind<SettingServiceInterface>(TYPES.SettingService).to(SettingService)
+    container.bind<SubscriptionSettingServiceInterface>(TYPES.SubscriptionSettingService).to(SubscriptionSettingService)
     container.bind<OfflineSettingServiceInterface>(TYPES.OfflineSettingService).to(OfflineSettingService)
     container.bind<SnCryptoNode>(TYPES.SnCryptoNode).toConstantValue(new SnCryptoNode())
     container.bind<TimerInterface>(TYPES.Timer).toConstantValue(new Timer())

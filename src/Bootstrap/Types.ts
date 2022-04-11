@@ -123,6 +123,7 @@ const TYPES = {
   DeviceDetector: Symbol.for('DeviceDetector'),
   SessionService: Symbol.for('SessionService'),
   SettingService: Symbol.for('SettingService'),
+  SubscriptionSettingService: Symbol.for('SubscriptionSettingService'),
   OfflineSettingService: Symbol.for('OfflineSettingService'),
   AuthResponseFactory20161215: Symbol.for('AuthResponseFactory20161215'),
   AuthResponseFactory20190520: Symbol.for('AuthResponseFactory20190520'),
