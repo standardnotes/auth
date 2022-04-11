@@ -21,7 +21,7 @@ import { SettingFactoryInterface } from './SettingFactoryInterface'
 export class SubscriptionSettingService implements SubscriptionSettingServiceInterface {
   constructor(
     @inject(TYPES.SettingFactory) private factory: SettingFactoryInterface,
-    @inject(TYPES.SettingRepository) private subscriptionSettingRepository: SubscriptionSettingRepositoryInterface,
+    @inject(TYPES.SubscriptionSettingRepository) private subscriptionSettingRepository: SubscriptionSettingRepositoryInterface,
     @inject(TYPES.SettingsAssociationService) private settingsAssociationService: SettingsAssociationServiceInterface,
     @inject(TYPES.SettingDecrypter) private settingDecrypter: SettingDecrypterInterface,
     @inject(TYPES.Logger) private logger: Logger,
