@@ -144,6 +144,7 @@ import { AcceptSharedSubscriptionInvitation } from '../Domain/UseCase/AcceptShar
 import { DeclineSharedSubscriptionInvitation } from '../Domain/UseCase/DeclineSharedSubscriptionInvitation/DeclineSharedSubscriptionInvitation'
 import { CancelSharedSubscriptionInvitation } from '../Domain/UseCase/CancelSharedSubscriptionInvitation/CancelSharedSubscriptionInvitation'
 import { SharedSubscriptionInvitationCreatedEventHandler } from '../Domain/Handler/SharedSubscriptionInvitationCreatedEventHandler'
+import { SubscriptionSetting } from '../Domain/Setting/SubscriptionSetting'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const newrelicWinstonEnricher = require('@newrelic/winston-enricher')
@@ -193,6 +194,7 @@ export class ContainerConfigLoader {
         Setting,
         OfflineSetting,
         SharedSubscriptionInvitation,
+        SubscriptionSetting,
       ],
       migrations: [
         env.get('DB_MIGRATIONS_PATH'),
