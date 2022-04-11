@@ -5,18 +5,18 @@ import { Logger } from 'winston'
 import { EncryptionVersion } from '../Encryption/EncryptionVersion'
 import { User } from '../User/User'
 import { Setting } from './Setting'
-import { SettingFactory } from './SettingFactory'
 import { SettingRepositoryInterface } from './SettingRepositoryInterface'
 
 import { SettingService } from './SettingService'
 import { SettingsAssociationServiceInterface } from './SettingsAssociationServiceInterface'
 import { SettingInterpreterInterface } from './SettingInterpreterInterface'
 import { SettingDecrypterInterface } from './SettingDecrypterInterface'
+import { SettingFactoryInterface } from './SettingFactoryInterface'
 
 describe('SettingService', () => {
   let setting: Setting
   let user: User
-  let factory: SettingFactory
+  let factory: SettingFactoryInterface
   let settingRepository: SettingRepositoryInterface
   let settingsAssociationService: SettingsAssociationServiceInterface
   let settingInterpreter: SettingInterpreterInterface
@@ -40,7 +40,7 @@ describe('SettingService', () => {
 
     setting = {} as jest.Mocked<Setting>
 
-    factory = {} as jest.Mocked<SettingFactory>
+    factory = {} as jest.Mocked<SettingFactoryInterface>
     factory.create = jest.fn().mockReturnValue(setting)
     factory.createReplacement = jest.fn().mockReturnValue(setting)
 

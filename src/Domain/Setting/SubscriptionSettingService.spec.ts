@@ -3,7 +3,6 @@ import 'reflect-metadata'
 import { EmailBackupFrequency, SettingName } from '@standardnotes/settings'
 import { Logger } from 'winston'
 import { EncryptionVersion } from '../Encryption/EncryptionVersion'
-import { SettingFactory } from './SettingFactory'
 
 import { SubscriptionSettingService } from './SubscriptionSettingService'
 import { SettingsAssociationServiceInterface } from './SettingsAssociationServiceInterface'
@@ -13,12 +12,13 @@ import { SubscriptionSetting } from './SubscriptionSetting'
 import { UserSubscription } from '../Subscription/UserSubscription'
 import { SubscriptionName } from '@standardnotes/common'
 import { User } from '../User/User'
+import { SettingFactoryInterface } from './SettingFactoryInterface'
 
 describe('SubscriptionSettingService', () => {
   let setting: SubscriptionSetting
   let user: User
   let userSubscription: UserSubscription
-  let factory: SettingFactory
+  let factory: SettingFactoryInterface
   let subscriptionSettingRepository: SubscriptionSettingRepositoryInterface
   let settingsAssociationService: SettingsAssociationServiceInterface
   let settingDecrypter: SettingDecrypterInterface
@@ -42,7 +42,7 @@ describe('SubscriptionSettingService', () => {
 
     setting = {} as jest.Mocked<SubscriptionSetting>
 
-    factory = {} as jest.Mocked<SettingFactory>
+    factory = {} as jest.Mocked<SettingFactoryInterface>
     factory.createSubscriptionSetting = jest.fn().mockReturnValue(setting)
     factory.createSubscriptionSettingReplacement = jest.fn().mockReturnValue(setting)
 

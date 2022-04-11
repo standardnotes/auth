@@ -7,17 +7,17 @@ import { CreateOrReplaceSettingDto } from './CreateOrReplaceSettingDto'
 import { CreateOrReplaceSettingResponse } from './CreateOrReplaceSettingResponse'
 import { FindSettingDTO } from './FindSettingDTO'
 import { Setting } from './Setting'
-import { SettingFactory } from './SettingFactory'
 import { SettingRepositoryInterface } from './SettingRepositoryInterface'
 import { SettingServiceInterface } from './SettingServiceInterface'
 import { SettingsAssociationServiceInterface } from './SettingsAssociationServiceInterface'
 import { SettingInterpreterInterface } from './SettingInterpreterInterface'
 import { SettingDecrypterInterface } from './SettingDecrypterInterface'
+import { SettingFactoryInterface } from './SettingFactoryInterface'
 
 @injectable()
 export class SettingService implements SettingServiceInterface {
   constructor(
-    @inject(TYPES.SettingFactory) private factory: SettingFactory,
+    @inject(TYPES.SettingFactory) private factory: SettingFactoryInterface,
     @inject(TYPES.SettingRepository) private settingRepository: SettingRepositoryInterface,
     @inject(TYPES.SettingsAssociationService) private settingsAssociationService: SettingsAssociationServiceInterface,
     @inject(TYPES.SettingInterpreter) private settingInterpreter: SettingInterpreterInterface,
