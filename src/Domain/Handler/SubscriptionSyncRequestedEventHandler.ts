@@ -21,6 +21,7 @@ import { OfflineSettingName } from '../Setting/OfflineSettingName'
 import { SettingName } from '@standardnotes/settings'
 import { EncryptionVersion } from '../Encryption/EncryptionVersion'
 import { UserSubscriptionType } from '../Subscription/UserSubscriptionType'
+import { SubscriptionSettingServiceInterface } from '../Setting/SubscriptionSettingServiceInterface'
 
 @injectable()
 export class SubscriptionSyncRequestedEventHandler
@@ -32,6 +33,7 @@ implements DomainEventHandlerInterface
     @inject(TYPES.OfflineUserSubscriptionRepository) private offlineUserSubscriptionRepository: OfflineUserSubscriptionRepositoryInterface,
     @inject(TYPES.RoleService) private roleService: RoleServiceInterface,
     @inject(TYPES.SettingService) private settingService: SettingServiceInterface,
+    @inject(TYPES.SubscriptionSettingService) private subscriptionSettingService: SubscriptionSettingServiceInterface,
     @inject(TYPES.OfflineSettingService) private offlineSettingService: OfflineSettingServiceInterface,
     @inject(TYPES.ContenDecoder) private contentDecoder: ContentDecoderInterface,
     @inject(TYPES.Logger) private logger: Logger
@@ -82,7 +84,7 @@ implements DomainEventHandlerInterface
       return
     }
 
-    await this.createOrUpdateSubscription(
+    const userSubscription = await this.createOrUpdateSubscription(
       event.payload.subscriptionId,
       event.payload.subscriptionName,
       event.payload.canceled,
@@ -93,7 +95,7 @@ implements DomainEventHandlerInterface
 
     await this.roleService.addUserRole(user, event.payload.subscriptionName)
 
-    await this.settingService.applyDefaultSettingsForSubscription(user, event.payload.subscriptionName)
+    await this.subscriptionSettingService.applyDefaultSubscriptionSettingsForSubscription(userSubscription, event.payload.subscriptionName)
 
     await this.settingService.createOrReplace({
       user,
@@ -113,7 +115,7 @@ implements DomainEventHandlerInterface
     user: User,
     subscriptionExpiresAt: number,
     timestamp: number,
-  ): Promise<void> {
+  ): Promise<UserSubscription> {
     let subscription = new UserSubscription()
 
     const subscriptions = await this.userSubscriptionRepository
@@ -131,7 +133,7 @@ implements DomainEventHandlerInterface
     subscription.subscriptionId = subscriptionId
     subscription.subscriptionType = UserSubscriptionType.Regular
 
-    await this.userSubscriptionRepository.save(subscription)
+    return this.userSubscriptionRepository.save(subscription)
   }
 
   private async createOrUpdateOfflineSubscription(

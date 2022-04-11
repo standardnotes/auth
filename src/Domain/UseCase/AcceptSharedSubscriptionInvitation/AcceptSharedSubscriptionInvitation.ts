@@ -4,7 +4,7 @@ import { inject, injectable } from 'inversify'
 
 import TYPES from '../../../Bootstrap/Types'
 import { RoleServiceInterface } from '../../Role/RoleServiceInterface'
-import { SettingServiceInterface } from '../../Setting/SettingServiceInterface'
+import { SubscriptionSettingServiceInterface } from '../../Setting/SubscriptionSettingServiceInterface'
 import { InvitationStatus } from '../../SharedSubscription/InvitationStatus'
 import { SharedSubscriptionInvitationRepositoryInterface } from '../../SharedSubscription/SharedSubscriptionInvitationRepositoryInterface'
 import { UserSubscription } from '../../Subscription/UserSubscription'
@@ -24,7 +24,7 @@ export class AcceptSharedSubscriptionInvitation implements UseCaseInterface {
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
     @inject(TYPES.UserSubscriptionRepository) private userSubscriptionRepository: UserSubscriptionRepositoryInterface,
     @inject(TYPES.RoleService) private roleService: RoleServiceInterface,
-    @inject(TYPES.SettingService) private settingService: SettingServiceInterface,
+    @inject(TYPES.SubscriptionSettingService) private subscriptionSettingService: SubscriptionSettingServiceInterface,
     @inject(TYPES.Timer) private timer: TimerInterface,
   ) {
   }
@@ -61,7 +61,7 @@ export class AcceptSharedSubscriptionInvitation implements UseCaseInterface {
 
     await this.sharedSubscriptionInvitationRepository.save(sharedSubscriptionInvitation)
 
-    await this.createSharedSubscription(
+    const inviteeSubscription = await this.createSharedSubscription(
       sharedSubscriptionInvitation.subscriptionId,
       inviterUserSubscription.planName,
       invitee,
@@ -70,9 +70,9 @@ export class AcceptSharedSubscriptionInvitation implements UseCaseInterface {
 
     await this.addUserRole(invitee, inviterUserSubscription.planName as SubscriptionName)
 
-    await this.settingService.applyDefaultSettingsForSubscription(
-      invitee,
-      inviterUserSubscription.planName as SubscriptionName
+    await this.subscriptionSettingService.applyDefaultSubscriptionSettingsForSubscription(
+      inviteeSubscription,
+      inviteeSubscription.planName as SubscriptionName
     )
 
     return {
@@ -92,7 +92,7 @@ export class AcceptSharedSubscriptionInvitation implements UseCaseInterface {
     subscriptionName: string,
     user: User,
     subscriptionExpiresAt: number,
-  ): Promise<void> {
+  ): Promise<UserSubscription> {
     const subscription = new UserSubscription()
     subscription.planName = subscriptionName
     subscription.user = Promise.resolve(user)
@@ -104,6 +104,6 @@ export class AcceptSharedSubscriptionInvitation implements UseCaseInterface {
     subscription.subscriptionId = subscriptionId
     subscription.subscriptionType = UserSubscriptionType.Shared
 
-    await this.userSubscriptionRepository.save(subscription)
+    return this.userSubscriptionRepository.save(subscription)
   }
 }

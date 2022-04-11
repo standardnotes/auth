@@ -1,53 +1,54 @@
 import 'reflect-metadata'
 
-import { EmailBackupFrequency, LogSessionUserAgentOption, MuteSignInEmailsOption, SettingName } from '@standardnotes/settings'
+import { EmailBackupFrequency, SettingName } from '@standardnotes/settings'
 import { Logger } from 'winston'
 import { EncryptionVersion } from '../Encryption/EncryptionVersion'
-import { User } from '../User/User'
-import { Setting } from './Setting'
-import { SettingRepositoryInterface } from './SettingRepositoryInterface'
 
-import { SettingService } from './SettingService'
+import { SubscriptionSettingService } from './SubscriptionSettingService'
 import { SettingsAssociationServiceInterface } from './SettingsAssociationServiceInterface'
-import { SettingInterpreterInterface } from './SettingInterpreterInterface'
 import { SettingDecrypterInterface } from './SettingDecrypterInterface'
+import { SubscriptionSettingRepositoryInterface } from './SubscriptionSettingRepositoryInterface'
+import { SubscriptionSetting } from './SubscriptionSetting'
+import { UserSubscription } from '../Subscription/UserSubscription'
+import { SubscriptionName } from '@standardnotes/common'
+import { User } from '../User/User'
 import { SettingFactoryInterface } from './SettingFactoryInterface'
 
-describe('SettingService', () => {
-  let setting: Setting
+describe('SubscriptionSettingService', () => {
+  let setting: SubscriptionSetting
   let user: User
+  let userSubscription: UserSubscription
   let factory: SettingFactoryInterface
-  let settingRepository: SettingRepositoryInterface
+  let subscriptionSettingRepository: SubscriptionSettingRepositoryInterface
   let settingsAssociationService: SettingsAssociationServiceInterface
-  let settingInterpreter: SettingInterpreterInterface
   let settingDecrypter: SettingDecrypterInterface
   let logger: Logger
 
-  const createService = () => new SettingService(
+  const createService = () => new SubscriptionSettingService(
     factory,
-    settingRepository,
+    subscriptionSettingRepository,
     settingsAssociationService,
-    settingInterpreter,
     settingDecrypter,
     logger
   )
 
   beforeEach(() => {
-    user = {
-      uuid: '4-5-6',
-    } as jest.Mocked<User>
-    user.isPotentiallyAVaultAccount = jest.fn().mockReturnValue(false)
+    user = {} as jest.Mocked<User>
 
-    setting = {} as jest.Mocked<Setting>
+    userSubscription = {
+      uuid: '1-2-3',
+      user: Promise.resolve(user),
+    } as jest.Mocked<UserSubscription>
+
+    setting = {} as jest.Mocked<SubscriptionSetting>
 
     factory = {} as jest.Mocked<SettingFactoryInterface>
-    factory.create = jest.fn().mockReturnValue(setting)
-    factory.createReplacement = jest.fn().mockReturnValue(setting)
+    factory.createSubscriptionSetting = jest.fn().mockReturnValue(setting)
+    factory.createSubscriptionSettingReplacement = jest.fn().mockReturnValue(setting)
 
-    settingRepository = {} as jest.Mocked<SettingRepositoryInterface>
-    settingRepository.findLastByNameAndUserUuid = jest.fn().mockReturnValue(undefined)
-    settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue(undefined)
-    settingRepository.save = jest.fn().mockImplementation(setting => setting)
+    subscriptionSettingRepository = {} as jest.Mocked<SubscriptionSettingRepositoryInterface>
+    subscriptionSettingRepository.findLastByNameAndUserSubscriptionUuid = jest.fn().mockReturnValue(undefined)
+    subscriptionSettingRepository.save = jest.fn().mockImplementation(setting => setting)
 
     settingsAssociationService = {} as jest.Mocked<SettingsAssociationServiceInterface>
     settingsAssociationService.getDefaultSettingsAndValuesForSubscriptionName = jest.fn().mockReturnValue(new Map([
@@ -58,16 +59,6 @@ describe('SettingService', () => {
           serverEncryptionVersion: EncryptionVersion.Unencrypted,
         }],
     ]))
-    settingsAssociationService.getDefaultSettingsAndValuesForNewUser = jest.fn().mockReturnValue(new Map([
-      [SettingName.MuteSignInEmails, { value: MuteSignInEmailsOption.NotMuted, sensitive: 0, serverEncryptionVersion: EncryptionVersion.Unencrypted }],
-    ]))
-
-    settingsAssociationService.getDefaultSettingsAndValuesForNewVaultAccount = jest.fn().mockReturnValue(new Map([
-      [SettingName.LogSessionUserAgent, { sensitive: false, serverEncryptionVersion: EncryptionVersion.Unencrypted, value: LogSessionUserAgentOption.Disabled }],
-    ]))
-
-    settingInterpreter = {} as jest.Mocked<SettingInterpreterInterface>
-    settingInterpreter.interpretSettingUpdated = jest.fn()
 
     settingDecrypter = {} as jest.Mocked<SettingDecrypterInterface>
     settingDecrypter.decryptSettingValue = jest.fn().mockReturnValue('decrypted')
@@ -78,23 +69,23 @@ describe('SettingService', () => {
     logger.error = jest.fn()
   })
 
-  it ('should create default settings for a newly registered user', async () => {
-    await createService().applyDefaultSettingsUponRegistration(user)
+  it ('should create default settings for a subscription', async () => {
+    await createService().applyDefaultSubscriptionSettingsForSubscription(userSubscription, SubscriptionName.PlusPlan)
 
-    expect(settingRepository.save).toHaveBeenCalledWith(setting)
+    expect(subscriptionSettingRepository.save).toHaveBeenCalledWith(setting)
   })
 
-  it ('should create default settings for a newly registered vault account', async () => {
-    user.isPotentiallyAVaultAccount = jest.fn().mockReturnValue(true)
+  it ('should not create default settings for a subscription if subscription has no defaults', async () => {
+    settingsAssociationService.getDefaultSettingsAndValuesForSubscriptionName = jest.fn().mockReturnValue(undefined)
 
-    await createService().applyDefaultSettingsUponRegistration(user)
+    await createService().applyDefaultSubscriptionSettingsForSubscription(userSubscription, SubscriptionName.PlusPlan)
 
-    expect(settingRepository.save).toHaveBeenCalledWith(setting)
+    expect(subscriptionSettingRepository.save).not.toHaveBeenCalled()
   })
 
   it ('should create setting if it doesn\'t exist', async () => {
     const result = await createService().createOrReplace({
-      user,
+      userSubscription,
       props: {
         name: 'name',
         unencryptedValue: 'value',
@@ -107,10 +98,10 @@ describe('SettingService', () => {
   })
 
   it ('should create setting with a given uuid if it does not exist', async () => {
-    settingRepository.findOneByUuid = jest.fn().mockReturnValue(undefined)
+    subscriptionSettingRepository.findOneByUuid = jest.fn().mockReturnValue(undefined)
 
     const result = await createService().createOrReplace({
-      user,
+      userSubscription,
       props: {
         uuid: '1-2-3',
         name: 'name',
@@ -124,10 +115,10 @@ describe('SettingService', () => {
   })
 
   it ('should replace setting if it does exist', async () => {
-    settingRepository.findLastByNameAndUserUuid = jest.fn().mockReturnValue(setting)
+    subscriptionSettingRepository.findLastByNameAndUserSubscriptionUuid = jest.fn().mockReturnValue(setting)
 
     const result = await createService().createOrReplace({
-      user: user,
+      userSubscription,
       props: {
         ...setting,
         unencryptedValue: 'value',
@@ -139,10 +130,10 @@ describe('SettingService', () => {
   })
 
   it ('should replace setting with a given uuid if it does exist', async () => {
-    settingRepository.findOneByUuid = jest.fn().mockReturnValue(setting)
+    subscriptionSettingRepository.findOneByUuid = jest.fn().mockReturnValue(setting)
 
     const result = await createService().createOrReplace({
-      user: user,
+      userSubscription,
       props: {
         ...setting,
         uuid: '1-2-3',
@@ -158,11 +149,11 @@ describe('SettingService', () => {
     setting = {
       value: 'encrypted',
       serverEncryptionVersion: EncryptionVersion.Default,
-    } as jest.Mocked<Setting>
+    } as jest.Mocked<SubscriptionSetting>
 
-    settingRepository.findLastByNameAndUserUuid = jest.fn().mockReturnValue(setting)
+    subscriptionSettingRepository.findLastByNameAndUserSubscriptionUuid = jest.fn().mockReturnValue(setting)
 
-    expect(await createService().findSettingWithDecryptedValue({ userUuid: '1-2-3', settingName: 'test' as SettingName })).toEqual({
+    expect(await createService().findSubscriptionSettingWithDecryptedValue({ userSubscriptionUuid: '2-3-4', userUuid: '1-2-3', settingName: 'test' as SettingName })).toEqual({
       serverEncryptionVersion: 1,
       value: 'decrypted',
     })

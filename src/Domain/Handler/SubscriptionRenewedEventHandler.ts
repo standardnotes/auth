@@ -11,7 +11,6 @@ import { SubscriptionName } from '@standardnotes/common'
 import { RoleServiceInterface } from '../Role/RoleServiceInterface'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { Logger } from 'winston'
-import { SettingServiceInterface } from '../Setting/SettingServiceInterface'
 import { OfflineUserSubscription } from '../Subscription/OfflineUserSubscription'
 
 @injectable()
@@ -23,7 +22,6 @@ implements DomainEventHandlerInterface
     @inject(TYPES.UserSubscriptionRepository) private userSubscriptionRepository: UserSubscriptionRepositoryInterface,
     @inject(TYPES.OfflineUserSubscriptionRepository) private offlineUserSubscriptionRepository: OfflineUserSubscriptionRepositoryInterface,
     @inject(TYPES.RoleService) private roleService: RoleServiceInterface,
-    @inject(TYPES.SettingService) private settingService: SettingServiceInterface,
     @inject(TYPES.Logger) private logger: Logger
   ) {
   }
@@ -74,8 +72,6 @@ implements DomainEventHandlerInterface
       const user = await userSubscription.user
 
       await this.roleService.addUserRole(user, subscriptionName)
-
-      await this.settingService.applyDefaultSettingsForSubscription(user, subscriptionName)
     }
   }
 

@@ -144,6 +144,12 @@ import { AcceptSharedSubscriptionInvitation } from '../Domain/UseCase/AcceptShar
 import { DeclineSharedSubscriptionInvitation } from '../Domain/UseCase/DeclineSharedSubscriptionInvitation/DeclineSharedSubscriptionInvitation'
 import { CancelSharedSubscriptionInvitation } from '../Domain/UseCase/CancelSharedSubscriptionInvitation/CancelSharedSubscriptionInvitation'
 import { SharedSubscriptionInvitationCreatedEventHandler } from '../Domain/Handler/SharedSubscriptionInvitationCreatedEventHandler'
+import { SubscriptionSetting } from '../Domain/Setting/SubscriptionSetting'
+import { SubscriptionSettingServiceInterface } from '../Domain/Setting/SubscriptionSettingServiceInterface'
+import { SubscriptionSettingService } from '../Domain/Setting/SubscriptionSettingService'
+import { SubscriptionSettingRepositoryInterface } from '../Domain/Setting/SubscriptionSettingRepositoryInterface'
+import { MySQLSubscriptionSettingRepository } from '../Infra/MySQL/MySQLSubscriptionSettingRepository'
+import { SettingFactoryInterface } from '../Domain/Setting/SettingFactoryInterface'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const newrelicWinstonEnricher = require('@newrelic/winston-enricher')
@@ -193,6 +199,7 @@ export class ContainerConfigLoader {
         Setting,
         OfflineSetting,
         SharedSubscriptionInvitation,
+        SubscriptionSetting,
       ],
       migrations: [
         env.get('DB_MIGRATIONS_PATH'),
@@ -256,6 +263,7 @@ export class ContainerConfigLoader {
     container.bind<MySQLRevokedSessionRepository>(TYPES.RevokedSessionRepository).toConstantValue(connection.getCustomRepository(MySQLRevokedSessionRepository))
     container.bind<MySQLUserRepository>(TYPES.UserRepository).toConstantValue(connection.getCustomRepository(MySQLUserRepository))
     container.bind<SettingRepositoryInterface>(TYPES.SettingRepository).toConstantValue(connection.getCustomRepository(MySQLSettingRepository))
+    container.bind<SubscriptionSettingRepositoryInterface>(TYPES.SubscriptionSettingRepository).toConstantValue(connection.getCustomRepository(MySQLSubscriptionSettingRepository))
     container.bind<OfflineSettingRepositoryInterface>(TYPES.OfflineSettingRepository).toConstantValue(connection.getCustomRepository(MySQLOfflineSettingRepository))
     container.bind<MySQLRoleRepository>(TYPES.RoleRepository).toConstantValue(connection.getCustomRepository(MySQLRoleRepository))
     container.bind<UserSubscriptionRepositoryInterface>(TYPES.UserSubscriptionRepository).toConstantValue(connection.getCustomRepository(MySQLUserSubscriptionRepository))
@@ -284,7 +292,7 @@ export class ContainerConfigLoader {
     container.bind<SettingProjector>(TYPES.SettingProjector).to(SettingProjector)
 
     // Factories
-    container.bind<SettingFactory>(TYPES.SettingFactory).to(SettingFactory)
+    container.bind<SettingFactoryInterface>(TYPES.SettingFactory).to(SettingFactory)
 
     // env vars
     container.bind(TYPES.JWT_SECRET).toConstantValue(env.get('JWT_SECRET'))
@@ -393,6 +401,7 @@ export class ContainerConfigLoader {
     container.bind<AxiosInstance>(TYPES.HTTPClient).toConstantValue(axios.create())
     container.bind<CrypterInterface>(TYPES.Crypter).to(CrypterNode)
     container.bind<SettingServiceInterface>(TYPES.SettingService).to(SettingService)
+    container.bind<SubscriptionSettingServiceInterface>(TYPES.SubscriptionSettingService).to(SubscriptionSettingService)
     container.bind<OfflineSettingServiceInterface>(TYPES.OfflineSettingService).to(OfflineSettingService)
     container.bind<SnCryptoNode>(TYPES.SnCryptoNode).toConstantValue(new SnCryptoNode())
     container.bind<TimerInterface>(TYPES.Timer).toConstantValue(new Timer())

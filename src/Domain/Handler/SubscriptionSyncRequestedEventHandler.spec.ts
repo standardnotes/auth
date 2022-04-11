@@ -18,6 +18,7 @@ import { SettingServiceInterface } from '../Setting/SettingServiceInterface'
 import { OfflineSettingServiceInterface } from '../Setting/OfflineSettingServiceInterface'
 import { ContentDecoderInterface } from '@standardnotes/common'
 import { UserSubscriptionType } from '../Subscription/UserSubscriptionType'
+import { SubscriptionSettingServiceInterface } from '../Setting/SubscriptionSettingServiceInterface'
 
 describe('SubscriptionSyncRequestedEventHandler', () => {
   let userRepository: UserRepositoryInterface
@@ -31,6 +32,7 @@ describe('SubscriptionSyncRequestedEventHandler', () => {
   let event: SubscriptionSyncRequestedEvent
   let subscriptionExpiresAt: number
   let settingService: SettingServiceInterface
+  let subscriptionSettingService: SubscriptionSettingServiceInterface
   let timestamp: number
   let offlineSettingService: OfflineSettingServiceInterface
   let contentDecoder: ContentDecoderInterface
@@ -41,6 +43,7 @@ describe('SubscriptionSyncRequestedEventHandler', () => {
     offlineUserSubscriptionRepository,
     roleService,
     settingService,
+    subscriptionSettingService,
     offlineSettingService,
     contentDecoder,
     logger
@@ -102,8 +105,10 @@ describe('SubscriptionSyncRequestedEventHandler', () => {
     }
 
     settingService = {} as jest.Mocked<SettingServiceInterface>
-    settingService.applyDefaultSettingsForSubscription = jest.fn()
     settingService.createOrReplace = jest.fn()
+
+    subscriptionSettingService = {} as jest.Mocked<SubscriptionSettingServiceInterface>
+    subscriptionSettingService.applyDefaultSubscriptionSettingsForSubscription = jest.fn()
 
     logger = {} as jest.Mocked<Logger>
     logger.info = jest.fn()
@@ -120,7 +125,7 @@ describe('SubscriptionSyncRequestedEventHandler', () => {
   it('should update user default settings', async () => {
     await createHandler().handle(event)
 
-    expect(settingService.applyDefaultSettingsForSubscription).toHaveBeenCalledWith(user, SubscriptionName.ProPlan)
+    expect(subscriptionSettingService.applyDefaultSubscriptionSettingsForSubscription).toHaveBeenCalledWith(subscription, SubscriptionName.ProPlan)
 
     expect(settingService.createOrReplace).toHaveBeenCalledWith({
       props: {

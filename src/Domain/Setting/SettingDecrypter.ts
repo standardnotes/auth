@@ -5,6 +5,7 @@ import { EncryptionVersion } from '../Encryption/EncryptionVersion'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { Setting } from './Setting'
 import { SettingDecrypterInterface } from './SettingDecrypterInterface'
+import { SubscriptionSetting } from './SubscriptionSetting'
 
 @injectable()
 export class SettingDecrypter implements SettingDecrypterInterface {
@@ -14,7 +15,7 @@ export class SettingDecrypter implements SettingDecrypterInterface {
   ) {
   }
 
-  async decryptSettingValue(setting: Setting, userUuid: string): Promise<string | null> {
+  async decryptSettingValue(setting: Setting | SubscriptionSetting, userUuid: string): Promise<string | null> {
     if (setting.value !== null && setting.serverEncryptionVersion === EncryptionVersion.Default) {
       const user = await this.userRepository.findOneByUuid(userUuid)
 

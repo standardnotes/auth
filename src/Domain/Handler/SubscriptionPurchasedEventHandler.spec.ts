@@ -14,7 +14,7 @@ import { SubscriptionPurchasedEventHandler } from './SubscriptionPurchasedEventH
 import { UserSubscription } from '../Subscription/UserSubscription'
 import { OfflineUserSubscriptionRepositoryInterface } from '../Subscription/OfflineUserSubscriptionRepositoryInterface'
 import { OfflineUserSubscription } from '../Subscription/OfflineUserSubscription'
-import { SettingServiceInterface } from '../Setting/SettingServiceInterface'
+import { SubscriptionSettingServiceInterface } from '../Setting/SubscriptionSettingServiceInterface'
 import { UserSubscriptionType } from '../Subscription/UserSubscriptionType'
 
 describe('SubscriptionPurchasedEventHandler', () => {
@@ -28,7 +28,7 @@ describe('SubscriptionPurchasedEventHandler', () => {
   let subscription: UserSubscription
   let event: SubscriptionPurchasedEvent
   let subscriptionExpiresAt: number
-  let settingService: SettingServiceInterface
+  let subscriptionSettingService: SubscriptionSettingServiceInterface
   let timestamp: number
 
   const createHandler = () => new SubscriptionPurchasedEventHandler(
@@ -36,7 +36,7 @@ describe('SubscriptionPurchasedEventHandler', () => {
     userSubscriptionRepository,
     offlineUserSubscriptionRepository,
     roleService,
-    settingService,
+    subscriptionSettingService,
     logger
   )
 
@@ -82,8 +82,8 @@ describe('SubscriptionPurchasedEventHandler', () => {
       offline: false,
     }
 
-    settingService = {} as jest.Mocked<SettingServiceInterface>
-    settingService.applyDefaultSettingsForSubscription = jest.fn()
+    subscriptionSettingService = {} as jest.Mocked<SubscriptionSettingServiceInterface>
+    subscriptionSettingService.applyDefaultSubscriptionSettingsForSubscription = jest.fn()
 
     logger = {} as jest.Mocked<Logger>
     logger.info = jest.fn()
@@ -100,7 +100,7 @@ describe('SubscriptionPurchasedEventHandler', () => {
   it('should update user default settings', async () => {
     await createHandler().handle(event)
 
-    expect(settingService.applyDefaultSettingsForSubscription).toHaveBeenCalledWith(user, SubscriptionName.ProPlan)
+    expect(subscriptionSettingService.applyDefaultSubscriptionSettingsForSubscription).toHaveBeenCalledWith(subscription, SubscriptionName.ProPlan)
   })
 
   it('should update the offline user role', async () => {

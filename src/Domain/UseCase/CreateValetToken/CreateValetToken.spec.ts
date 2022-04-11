@@ -2,15 +2,17 @@ import 'reflect-metadata'
 
 import { TokenEncoderInterface, ValetTokenData } from '@standardnotes/auth'
 import { CreateValetToken } from './CreateValetToken'
-import { SettingServiceInterface } from '../../Setting/SettingServiceInterface'
 import { UserSubscriptionRepositoryInterface } from '../../Subscription/UserSubscriptionRepositoryInterface'
 import { TimerInterface } from '@standardnotes/time'
 import { UserSubscription } from '../../Subscription/UserSubscription'
 import { SettingsAssociationServiceInterface } from '../../Setting/SettingsAssociationServiceInterface'
+import { SubscriptionSettingServiceInterface } from '../../Setting/SubscriptionSettingServiceInterface'
+import { User } from '../../User/User'
+import { UserSubscriptionType } from '../../Subscription/UserSubscriptionType'
 
 describe('CreateValetToken', () => {
   let tokenEncoder: TokenEncoderInterface<ValetTokenData>
-  let settingService: SettingServiceInterface
+  let subscriptionSettingService: SubscriptionSettingServiceInterface
   let settingsAssociationService: SettingsAssociationServiceInterface
   let userSubscriptionRepository: UserSubscriptionRepositoryInterface
   let timer: TimerInterface
@@ -18,7 +20,7 @@ describe('CreateValetToken', () => {
 
   const createUseCase = () => new CreateValetToken(
     tokenEncoder,
-    settingService,
+    subscriptionSettingService,
     settingsAssociationService,
     userSubscriptionRepository,
     timer,
@@ -29,16 +31,19 @@ describe('CreateValetToken', () => {
     tokenEncoder = {} as jest.Mocked<TokenEncoderInterface<ValetTokenData>>
     tokenEncoder.encodeExpirableToken = jest.fn().mockReturnValue('foobar')
 
-    settingService = {} as jest.Mocked<SettingServiceInterface>
-    settingService.findSettingWithDecryptedValue = jest.fn().mockReturnValue({
+    subscriptionSettingService = {} as jest.Mocked<SubscriptionSettingServiceInterface>
+    subscriptionSettingService.findSubscriptionSettingWithDecryptedValue = jest.fn().mockReturnValue({
       value: '123',
     })
 
     settingsAssociationService = {} as jest.Mocked<SettingsAssociationServiceInterface>
     settingsAssociationService.getFileUploadLimit = jest.fn().mockReturnValue(5_368_709_120)
 
+    const regularSubscription = { uuid: 'regular-1-2-3', endsAt: 123, subscriptionType: UserSubscriptionType.Regular, subscriptionId: 7 } as jest.Mocked<UserSubscription>
+    regularSubscription.user = Promise.resolve({ uuid: '1-2-3' } as jest.Mocked<User>)
     userSubscriptionRepository = {} as jest.Mocked<UserSubscriptionRepositoryInterface>
-    userSubscriptionRepository.findOneByUserUuid = jest.fn().mockReturnValue({ endsAt: 123 } as jest.Mocked<UserSubscription>)
+    userSubscriptionRepository.findOneByUserUuid = jest.fn().mockReturnValue(regularSubscription)
+    userSubscriptionRepository.findBySubscriptionIdAndType = jest.fn().mockReturnValue([regularSubscription])
 
     timer = {} as jest.Mocked<TimerInterface>
     timer.getTimestampInMicroseconds = jest.fn().mockReturnValue(100)
@@ -150,8 +155,64 @@ describe('CreateValetToken', () => {
     })
   })
 
+  it('should create a write valet token for shared subscription', async () => {
+    userSubscriptionRepository.findOneByUserUuid = jest.fn().mockReturnValue({ uuid: 'shared-1-2-3', endsAt: 123, subscriptionType: UserSubscriptionType.Shared, subscriptionId: 7 } as jest.Mocked<UserSubscription>)
+
+    const response = await createUseCase().execute({
+      operation: 'write',
+      resources: [
+        {
+          remoteIdentifier: '2-3-4',
+          unencryptedFileSize: 123,
+        },
+      ],
+      userUuid: '1-2-3',
+    })
+
+    expect(tokenEncoder.encodeExpirableToken).toHaveBeenCalledWith({
+      permittedOperation: 'write',
+      permittedResources:  [
+        {
+          remoteIdentifier: '2-3-4',
+          unencryptedFileSize: 123,
+        },
+      ],
+      userUuid: '1-2-3',
+      uploadBytesUsed: 123,
+      uploadBytesLimit: 123,
+    }, 123)
+
+    expect(response).toEqual({
+      success: true,
+      valetToken: 'foobar',
+    })
+
+    expect(userSubscriptionRepository.findBySubscriptionIdAndType).toHaveBeenCalledWith(7, UserSubscriptionType.Regular)
+  })
+
+  it('should not create a write valet token for shared subscription if regular subscription could not be found', async () => {
+    userSubscriptionRepository.findOneByUserUuid = jest.fn().mockReturnValue({ uuid: 'shared-1-2-3', endsAt: 123, subscriptionType: UserSubscriptionType.Shared, subscriptionId: 7 } as jest.Mocked<UserSubscription>)
+    userSubscriptionRepository.findBySubscriptionIdAndType = jest.fn().mockReturnValue([])
+
+    const response = await createUseCase().execute({
+      operation: 'write',
+      resources: [
+        {
+          remoteIdentifier: '2-3-4',
+          unencryptedFileSize: 123,
+        },
+      ],
+      userUuid: '1-2-3',
+    })
+
+    expect(response).toEqual({
+      success: false,
+      reason: 'no-subscription',
+    })
+  })
+
   it('should create a write valet token with default subscription upload limit if upload bytes settings do not exist', async () => {
-    settingService.findSettingWithDecryptedValue = jest.fn().mockReturnValue(undefined)
+    subscriptionSettingService.findSubscriptionSettingWithDecryptedValue = jest.fn().mockReturnValue(undefined)
 
     const response = await createUseCase().execute({
       operation: 'write',
