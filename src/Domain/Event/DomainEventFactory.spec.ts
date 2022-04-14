@@ -19,6 +19,33 @@ describe('DomainEventFactory', () => {
     timer.getUTCDate = jest.fn().mockReturnValue(new Date(1))
   })
 
+  it('should create a SHARED_SUBSCRIPTION_INVITATION_CANCELED event', () => {
+    expect(createFactory().createSharedSubscriptionInvitationCanceledEvent({
+      inviterEmail: 'test@test.te',
+      inviterSubscriptionId: 1,
+      inviteeIdentifier: 'invitee@test.te',
+      inviteeIdentifierType: InviteeIdentifierType.Email,
+      sharedSubscriptionInvitationUuid: '1-2-3',
+    }))
+      .toEqual({
+        createdAt: expect.any(Date),
+        meta: {
+          correlation: {
+            userIdentifier: 'test@test.te',
+            userIdentifierType: 'email',
+          },
+        },
+        payload: {
+          inviterEmail: 'test@test.te',
+          inviterSubscriptionId: 1,
+          inviteeIdentifier: 'invitee@test.te',
+          inviteeIdentifierType: InviteeIdentifierType.Email,
+          sharedSubscriptionInvitationUuid: '1-2-3',
+        },
+        type: 'SHARED_SUBSCRIPTION_INVITATION_CANCELED',
+      })
+  })
+
   it('should create a SHARED_SUBSCRIPTION_INVITATION_CREATED event', () => {
     expect(createFactory().createSharedSubscriptionInvitationCreatedEvent({
       inviterEmail: 'test@test.te',

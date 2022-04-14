@@ -812,6 +812,14 @@
     "@standardnotes/common" "^1.18.0"
     jsonwebtoken "^8.5.1"
 
+"@standardnotes/auth@^3.18.5":
+  version "3.18.5"
+  resolved "https://registry.yarnpkg.com/@standardnotes/auth/-/auth-3.18.5.tgz#11087e0bc31c42e489a7f546d317bbbcbd48d573"
+  integrity sha512-NSeU3A9iDyZFLLfv6jOyaweykMbjUUe0XoZo6lVifQucsRW0VJ4R6m3aeXqx6/zDwmHIBqVVzrX2bqQ7r2s9SA==
+  dependencies:
+    "@standardnotes/common" "^1.19.3"
+    jsonwebtoken "^8.5.1"
+
 "@standardnotes/common@^1.11.0":
   version "1.11.0"
   resolved "https://registry.yarnpkg.com/@standardnotes/common/-/common-1.11.0.tgz#5ed4be817a1f448e6eeb700d141dbfd40193aabe"
@@ -831,6 +839,11 @@
   version "1.18.0"
   resolved "https://registry.yarnpkg.com/@standardnotes/common/-/common-1.18.0.tgz#59a92a322e0987c62bf076fabca466ef121e86d8"
   integrity sha512-xL0+uEoQYhL6ZNI+Jc63smhQdQD9TsEoN+/nqLSfYs3WOoKNV1sZ/NYrQZL9SuVbgWVT238xxQeoA9FrfTfJaA==
+
+"@standardnotes/common@^1.19.3":
+  version "1.19.3"
+  resolved "https://registry.yarnpkg.com/@standardnotes/common/-/common-1.19.3.tgz#ae2ca493492eb5e0d9663abf736a9d7a26365c52"
+  integrity sha512-nMqH+grkIgnODr5EncbG9yHqIxSBHLVTiAb+NZ2EvkhLBiuVhP2UEDNs8KcZKfgNVGGDIHQbjEXZKGog9J6gZw==
 
 "@standardnotes/config@2.0.1":
   version "2.0.1"
@@ -861,13 +874,13 @@
     "@standardnotes/auth" "^3.16.1"
     "@standardnotes/features" "^1.32.6"
 
-"@standardnotes/domain-events@^2.26.4":
-  version "2.26.4"
-  resolved "https://registry.yarnpkg.com/@standardnotes/domain-events/-/domain-events-2.26.4.tgz#ecd3b1767c3a99f5e72e93e1c073cc68e3bfa34a"
-  integrity sha512-MBtg87x0e7ehl4Qhq4Esliz3GNbCURCRWyOsxX1fUhMLwpRCFco3FOfxNkdwO5KCdVzxqEUC2L2CLqptJF/5sw==
+"@standardnotes/domain-events@^2.27.0":
+  version "2.27.0"
+  resolved "https://registry.yarnpkg.com/@standardnotes/domain-events/-/domain-events-2.27.0.tgz#18178dba96ffe9517dd8b79ab9e078cfc04aa52d"
+  integrity sha512-+3Y/0C53dj6DJWMQdYuGIihZofMhuodfOJOiQA+QOWw/ekooI7ne8hUW/nf2raXP+xUvmyj+ryBIhqi9Jg6cuw==
   dependencies:
-    "@standardnotes/auth" "^3.18.1"
-    "@standardnotes/features" "^1.36.1"
+    "@standardnotes/auth" "^3.18.5"
+    "@standardnotes/features" "^1.37.3"
 
 "@standardnotes/features@^1.32.6":
   version "1.32.6"
@@ -900,6 +913,14 @@
   dependencies:
     "@standardnotes/auth" "^3.18.1"
     "@standardnotes/common" "^1.18.0"
+
+"@standardnotes/features@^1.37.3":
+  version "1.37.3"
+  resolved "https://registry.yarnpkg.com/@standardnotes/features/-/features-1.37.3.tgz#cf953a99ea79790337c7fe690c439b76e2b5a0e9"
+  integrity sha512-5hBy3Y9EepHuX1lohH9E5+PrPZegbvUbJh/WgYQJjqNurYfSzw9NO4L6z43ZEnPZO+eRoRm4TI7sLLwg/XWdDQ==
+  dependencies:
+    "@standardnotes/auth" "^3.18.5"
+    "@standardnotes/common" "^1.19.3"
 
 "@standardnotes/payloads@^1.4.15":
   version "1.4.15"

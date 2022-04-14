@@ -1,6 +1,6 @@
 import { RoleName } from '@standardnotes/common'
 import { Uuid } from '@standardnotes/common'
-import { AccountDeletionRequestedEvent, UserEmailChangedEvent, UserRegisteredEvent, UserRolesChangedEvent, OfflineSubscriptionTokenCreatedEvent, EmailBackupRequestedEvent, CloudBackupRequestedEvent, ListedAccountRequestedEvent, UserSignedInEvent, UserDisabledSessionUserAgentLoggingEvent, SharedSubscriptionInvitationCreatedEvent } from '@standardnotes/domain-events'
+import { AccountDeletionRequestedEvent, UserEmailChangedEvent, UserRegisteredEvent, UserRolesChangedEvent, OfflineSubscriptionTokenCreatedEvent, EmailBackupRequestedEvent, CloudBackupRequestedEvent, ListedAccountRequestedEvent, UserSignedInEvent, UserDisabledSessionUserAgentLoggingEvent, SharedSubscriptionInvitationCreatedEvent, SharedSubscriptionInvitationCanceledEvent } from '@standardnotes/domain-events'
 import { TimerInterface } from '@standardnotes/time'
 import { inject, injectable } from 'inversify'
 import TYPES from '../../Bootstrap/Types'
@@ -13,6 +13,21 @@ export class DomainEventFactory implements DomainEventFactoryInterface {
     @inject(TYPES.Timer) private timer: TimerInterface,
   ) {
   }
+
+  createSharedSubscriptionInvitationCanceledEvent(dto: { inviterEmail: string; inviterSubscriptionId: number; inviteeIdentifier: string; inviteeIdentifierType: InviteeIdentifierType; sharedSubscriptionInvitationUuid: string }): SharedSubscriptionInvitationCanceledEvent {
+    return {
+      type: 'SHARED_SUBSCRIPTION_INVITATION_CANCELED',
+      createdAt: this.timer.getUTCDate(),
+      meta: {
+        correlation: {
+          userIdentifier: dto.inviterEmail,
+          userIdentifierType: 'email',
+        },
+      },
+      payload: dto,
+    }
+  }
+
   createSharedSubscriptionInvitationCreatedEvent(dto: { inviterEmail: string; inviterSubscriptionId: number; inviteeIdentifier: string; inviteeIdentifierType: InviteeIdentifierType; sharedSubscriptionInvitationUuid: string }): SharedSubscriptionInvitationCreatedEvent {
     return {
       type: 'SHARED_SUBSCRIPTION_INVITATION_CREATED',

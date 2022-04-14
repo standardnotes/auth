@@ -1,8 +1,10 @@
 import { SubscriptionName } from '@standardnotes/common'
+import { DomainEventPublisherInterface } from '@standardnotes/domain-events'
 import { TimerInterface } from '@standardnotes/time'
 import { inject, injectable } from 'inversify'
 
 import TYPES from '../../../Bootstrap/Types'
+import { DomainEventFactoryInterface } from '../../Event/DomainEventFactoryInterface'
 import { RoleServiceInterface } from '../../Role/RoleServiceInterface'
 import { InvitationStatus } from '../../SharedSubscription/InvitationStatus'
 import { SharedSubscriptionInvitationRepositoryInterface } from '../../SharedSubscription/SharedSubscriptionInvitationRepositoryInterface'
@@ -22,6 +24,8 @@ export class CancelSharedSubscriptionInvitation implements UseCaseInterface {
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
     @inject(TYPES.UserSubscriptionRepository) private userSubscriptionRepository: UserSubscriptionRepositoryInterface,
     @inject(TYPES.RoleService) private roleService: RoleServiceInterface,
+    @inject(TYPES.DomainEventPublisher) private domainEventPublisher: DomainEventPublisherInterface,
+    @inject(TYPES.DomainEventFactory) private domainEventFactory: DomainEventFactoryInterface,
     @inject(TYPES.Timer) private timer: TimerInterface,
   ) {
   }
@@ -70,6 +74,16 @@ export class CancelSharedSubscriptionInvitation implements UseCaseInterface {
     )
 
     await this.roleService.removeUserRole(invitee, inviterUserSubscription.planName as SubscriptionName)
+
+    await this.domainEventPublisher.publish(
+      this.domainEventFactory.createSharedSubscriptionInvitationCanceledEvent({
+        inviteeIdentifier: sharedSubscriptionInvitation.inviteeIdentifier,
+        inviteeIdentifierType: sharedSubscriptionInvitation.inviteeIdentifierType,
+        inviterEmail: sharedSubscriptionInvitation.inviterIdentifier,
+        inviterSubscriptionId: sharedSubscriptionInvitation.subscriptionId,
+        sharedSubscriptionInvitationUuid: sharedSubscriptionInvitation.uuid,
+      })
+    )
 
     return {
       success: true,

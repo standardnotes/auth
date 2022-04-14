@@ -12,6 +12,10 @@ import { User } from '../../User/User'
 import { UserRepositoryInterface } from '../../User/UserRepositoryInterface'
 
 import { CancelSharedSubscriptionInvitation } from './CancelSharedSubscriptionInvitation'
+import { DomainEventPublisherInterface, SharedSubscriptionInvitationCanceledEvent } from '@standardnotes/domain-events'
+import { DomainEventFactoryInterface } from '../../Event/DomainEventFactoryInterface'
+import { InviterIdentifierType } from '../../SharedSubscription/InviterIdentifierType'
+import { InviteeIdentifierType } from '../../SharedSubscription/InviteeIdentifierType'
 
 describe('CancelSharedSubscriptionInvitation', () => {
   let sharedSubscriptionInvitationRepository: SharedSubscriptionInvitationRepositoryInterface
@@ -22,12 +26,16 @@ describe('CancelSharedSubscriptionInvitation', () => {
   let invitee: User
   let inviterSubscription: UserSubscription
   let invitation: SharedSubscriptionInvitation
+  let domainEventPublisher: DomainEventPublisherInterface
+  let domainEventFactory: DomainEventFactoryInterface
 
   const createUseCase = () => new CancelSharedSubscriptionInvitation(
     sharedSubscriptionInvitationRepository,
     userRepository,
     userSubscriptionRepository,
     roleService,
+    domainEventPublisher,
+    domainEventFactory,
     timer
   )
 
@@ -41,8 +49,12 @@ describe('CancelSharedSubscriptionInvitation', () => {
     } as jest.Mocked<User>
 
     invitation = {
+      uuid: '1-2-3',
       subscriptionId: 3,
       inviterIdentifier: 'test@test.te',
+      inviterIdentifierType: InviterIdentifierType.Email,
+      inviteeIdentifier: 'invitee@test.te',
+      inviteeIdentifierType: InviteeIdentifierType.Email,
     } as jest.Mocked<SharedSubscriptionInvitation>
 
     sharedSubscriptionInvitationRepository = {} as jest.Mocked<SharedSubscriptionInvitationRepositoryInterface>
@@ -64,6 +76,12 @@ describe('CancelSharedSubscriptionInvitation', () => {
 
     timer = {} as jest.Mocked<TimerInterface>
     timer.getTimestampInMicroseconds = jest.fn().mockReturnValue(1)
+
+    domainEventPublisher = {} as jest.Mocked<DomainEventPublisherInterface>
+    domainEventPublisher.publish = jest.fn()
+
+    domainEventFactory = {} as jest.Mocked<DomainEventFactoryInterface>
+    domainEventFactory.createSharedSubscriptionInvitationCanceledEvent = jest.fn().mockReturnValue({} as jest.Mocked<SharedSubscriptionInvitationCanceledEvent>)
   })
 
   it('should cancel a shared subscription invitation', async () => {
@@ -79,12 +97,24 @@ describe('CancelSharedSubscriptionInvitation', () => {
       subscriptionId: 3,
       updatedAt: 1,
       inviterIdentifier: 'test@test.te',
+      uuid: '1-2-3',
+      inviterIdentifierType: 'email',
+      inviteeIdentifier: 'invitee@test.te',
+      inviteeIdentifierType: 'email',
     })
     expect(userSubscriptionRepository.save).toHaveBeenCalledWith({
       endsAt: 1,
       user: Promise.resolve(invitee),
     })
     expect(roleService.removeUserRole).toHaveBeenCalledWith(invitee, 'CORE_PLAN')
+    expect(domainEventPublisher.publish).toHaveBeenCalled()
+    expect(domainEventFactory.createSharedSubscriptionInvitationCanceledEvent).toHaveBeenCalledWith({
+      inviteeIdentifier: 'invitee@test.te',
+      inviteeIdentifierType: 'email',
+      inviterEmail: 'test@test.te',
+      inviterSubscriptionId: 3,
+      sharedSubscriptionInvitationUuid: '1-2-3',
+    })
   })
 
   it('should cancel a shared subscription invitation without subscription removal is subscription is not found', async () => {
@@ -102,6 +132,10 @@ describe('CancelSharedSubscriptionInvitation', () => {
       subscriptionId: 3,
       updatedAt: 1,
       inviterIdentifier: 'test@test.te',
+      uuid: '1-2-3',
+      inviterIdentifierType: 'email',
+      inviteeIdentifier: 'invitee@test.te',
+      inviteeIdentifierType: 'email',
     })
     expect(userSubscriptionRepository.save).not.toHaveBeenCalled()
     expect(roleService.removeUserRole).toHaveBeenCalledWith(invitee, 'CORE_PLAN')
