@@ -137,6 +137,8 @@ describe('CreateValetToken', () => {
     })
 
     expect(tokenEncoder.encodeExpirableToken).toHaveBeenCalledWith({
+      performerSubscriptionUuid: 'regular-1-2-3',
+      regularSubscriptionUuid: 'regular-1-2-3',
       permittedOperation: 'write',
       permittedResources:  [
         {
@@ -170,6 +172,8 @@ describe('CreateValetToken', () => {
     })
 
     expect(tokenEncoder.encodeExpirableToken).toHaveBeenCalledWith({
+      performerSubscriptionUuid: 'shared-1-2-3',
+      regularSubscriptionUuid: 'regular-1-2-3',
       permittedOperation: 'write',
       permittedResources:  [
         {
@@ -226,6 +230,8 @@ describe('CreateValetToken', () => {
     })
 
     expect(tokenEncoder.encodeExpirableToken).toHaveBeenCalledWith({
+      performerSubscriptionUuid: 'regular-1-2-3',
+      regularSubscriptionUuid: 'regular-1-2-3',
       permittedOperation: 'write',
       permittedResources:  [
         {

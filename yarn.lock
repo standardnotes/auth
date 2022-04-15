@@ -820,6 +820,14 @@
     "@standardnotes/common" "^1.19.3"
     jsonwebtoken "^8.5.1"
 
+"@standardnotes/auth@^3.18.6":
+  version "3.18.6"
+  resolved "https://registry.yarnpkg.com/@standardnotes/auth/-/auth-3.18.6.tgz#ba362a9e3da7a6217b54f4e908d7f00be63e5ab2"
+  integrity sha512-XdRkWsTp0G35TjY/X01XV/r6jKj+d2EULAQGOxVEKRxHD6DU9WCp6JV+9PboWZf/I2GIn5SxspX2fVj6JerwSw==
+  dependencies:
+    "@standardnotes/common" "^1.19.3"
+    jsonwebtoken "^8.5.1"
+
 "@standardnotes/common@^1.11.0":
   version "1.11.0"
   resolved "https://registry.yarnpkg.com/@standardnotes/common/-/common-1.11.0.tgz#5ed4be817a1f448e6eeb700d141dbfd40193aabe"

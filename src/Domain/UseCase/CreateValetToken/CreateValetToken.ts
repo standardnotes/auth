@@ -30,15 +30,15 @@ export class CreateValetToken implements UseCaseInterface {
 
   async execute(dto: CreateValetTokenDTO): Promise<CreateValetTokenResponseData> {
     const { userUuid, ...payload } = dto
-    const { userSubscription, subscriptionUserUuid } = await this.getRegularSubscriptionAndAssociatedUserUuid(userUuid)
-    if (userSubscription === undefined || subscriptionUserUuid === undefined) {
+    const { regularUserSubscription, performerUserSubscription, subscriptionUserUuid } = await this.getRegularSubscriptionAndAssociatedUserUuid(userUuid)
+    if (regularUserSubscription === undefined || performerUserSubscription === undefined || subscriptionUserUuid === undefined) {
       return {
         success: false,
         reason: 'no-subscription',
       }
     }
 
-    if (userSubscription.endsAt < this.timer.getTimestampInMicroseconds()) {
+    if (regularUserSubscription.endsAt < this.timer.getTimestampInMicroseconds()) {
       return {
         success: false,
         reason: 'expired-subscription',
@@ -55,18 +55,18 @@ export class CreateValetToken implements UseCaseInterface {
     let uploadBytesUsed = 0
     const uploadBytesUsedSetting = await this.subscriptionSettingService.findSubscriptionSettingWithDecryptedValue({
       userUuid: subscriptionUserUuid,
-      userSubscriptionUuid: userSubscription.uuid,
+      userSubscriptionUuid: regularUserSubscription.uuid,
       settingName: SettingName.FileUploadBytesUsed,
     })
     if (uploadBytesUsedSetting !== undefined) {
       uploadBytesUsed = +(uploadBytesUsedSetting.value as string)
     }
 
-    const defaultUploadBytesLimitForSubscription = await this.settingsAssociationService.getFileUploadLimit(userSubscription.planName as SubscriptionName)
+    const defaultUploadBytesLimitForSubscription = await this.settingsAssociationService.getFileUploadLimit(regularUserSubscription.planName as SubscriptionName)
     let uploadBytesLimit = defaultUploadBytesLimitForSubscription
     const overwriteWithUserUploadBytesLimitSetting = await this.subscriptionSettingService.findSubscriptionSettingWithDecryptedValue({
       userUuid: subscriptionUserUuid,
-      userSubscriptionUuid: userSubscription.uuid,
+      userSubscriptionUuid: regularUserSubscription.uuid,
       settingName: SettingName.FileUploadBytesLimit,
     })
     if (overwriteWithUserUploadBytesLimitSetting !== undefined) {
@@ -79,6 +79,8 @@ export class CreateValetToken implements UseCaseInterface {
       permittedResources: dto.resources,
       uploadBytesUsed,
       uploadBytesLimit,
+      performerSubscriptionUuid: performerUserSubscription.uuid,
+      regularSubscriptionUuid: regularUserSubscription.uuid,
     }
 
     const valetToken = this.tokenEncoder.encodeExpirableToken(tokenData, this.valetTokenTTL)
@@ -99,20 +101,23 @@ export class CreateValetToken implements UseCaseInterface {
   }
 
   private async getRegularSubscriptionAndAssociatedUserUuid(userUuid: Uuid): Promise<{
-    userSubscription: UserSubscription | undefined,
+    regularUserSubscription: UserSubscription | undefined,
+    performerUserSubscription: UserSubscription | undefined,
     subscriptionUserUuid: Uuid | undefined,
   }> {
     const userSubscription = await this.userSubscriptionRepository.findOneByUserUuid(userUuid)
     if (userSubscription === undefined) {
       return {
-        userSubscription: undefined,
+        regularUserSubscription: undefined,
+        performerUserSubscription: undefined,
         subscriptionUserUuid: userUuid,
       }
     }
 
     if (userSubscription.subscriptionType === UserSubscriptionType.Regular) {
       return {
-        userSubscription,
+        regularUserSubscription: userSubscription,
+        performerUserSubscription: userSubscription,
         subscriptionUserUuid: userUuid,
       }
     }
@@ -125,7 +130,8 @@ export class CreateValetToken implements UseCaseInterface {
     }
 
     return {
-      userSubscription: regularSubscriptions[0],
+      regularUserSubscription: regularSubscriptions[0],
+      performerUserSubscription: userSubscription,
       subscriptionUserUuid: regularSubscriptionUserUuid,
     }
   }
