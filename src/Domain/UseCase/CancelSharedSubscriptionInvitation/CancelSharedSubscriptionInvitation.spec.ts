@@ -109,8 +109,8 @@ describe('CancelSharedSubscriptionInvitation', () => {
     expect(roleService.removeUserRole).toHaveBeenCalledWith(invitee, 'CORE_PLAN')
     expect(domainEventPublisher.publish).toHaveBeenCalled()
     expect(domainEventFactory.createSharedSubscriptionInvitationCanceledEvent).toHaveBeenCalledWith({
-      inviteeIdentifier: 'invitee@test.te',
-      inviteeIdentifierType: 'email',
+      inviteeIdentifier: '123',
+      inviteeIdentifierType: 'uuid',
       inviterEmail: 'test@test.te',
       inviterSubscriptionId: 3,
       sharedSubscriptionInvitationUuid: '1-2-3',

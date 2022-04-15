@@ -7,6 +7,7 @@ import TYPES from '../../../Bootstrap/Types'
 import { DomainEventFactoryInterface } from '../../Event/DomainEventFactoryInterface'
 import { RoleServiceInterface } from '../../Role/RoleServiceInterface'
 import { InvitationStatus } from '../../SharedSubscription/InvitationStatus'
+import { InviteeIdentifierType } from '../../SharedSubscription/InviteeIdentifierType'
 import { SharedSubscriptionInvitationRepositoryInterface } from '../../SharedSubscription/SharedSubscriptionInvitationRepositoryInterface'
 import { UserSubscriptionRepositoryInterface } from '../../Subscription/UserSubscriptionRepositoryInterface'
 import { UserSubscriptionType } from '../../Subscription/UserSubscriptionType'
@@ -77,8 +78,8 @@ export class CancelSharedSubscriptionInvitation implements UseCaseInterface {
 
     await this.domainEventPublisher.publish(
       this.domainEventFactory.createSharedSubscriptionInvitationCanceledEvent({
-        inviteeIdentifier: sharedSubscriptionInvitation.inviteeIdentifier,
-        inviteeIdentifierType: sharedSubscriptionInvitation.inviteeIdentifierType,
+        inviteeIdentifier: invitee.uuid,
+        inviteeIdentifierType: InviteeIdentifierType.Uuid,
         inviterEmail: sharedSubscriptionInvitation.inviterIdentifier,
         inviterSubscriptionId: sharedSubscriptionInvitation.subscriptionId,
         sharedSubscriptionInvitationUuid: sharedSubscriptionInvitation.uuid,

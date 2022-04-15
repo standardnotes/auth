@@ -874,10 +874,10 @@
     "@standardnotes/auth" "^3.16.1"
     "@standardnotes/features" "^1.32.6"
 
-"@standardnotes/domain-events@^2.27.0":
-  version "2.27.0"
-  resolved "https://registry.yarnpkg.com/@standardnotes/domain-events/-/domain-events-2.27.0.tgz#18178dba96ffe9517dd8b79ab9e078cfc04aa52d"
-  integrity sha512-+3Y/0C53dj6DJWMQdYuGIihZofMhuodfOJOiQA+QOWw/ekooI7ne8hUW/nf2raXP+xUvmyj+ryBIhqi9Jg6cuw==
+"@standardnotes/domain-events@^2.27.3":
+  version "2.27.3"
+  resolved "https://registry.yarnpkg.com/@standardnotes/domain-events/-/domain-events-2.27.3.tgz#b45f469102fdde99ead1ac96abdf911be09201bf"
+  integrity sha512-ekw/J+W1boOHdV1EBVB2eBUaY7hdK0Ql/+k87QQqS6fapyQdiacJTe33rfHxg9I+ZG+hV1mxAXYeY56rfGeekw==
   dependencies:
     "@standardnotes/auth" "^3.18.5"
     "@standardnotes/features" "^1.37.3"
