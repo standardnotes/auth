@@ -102,6 +102,7 @@ const TYPES = {
   AcceptSharedSubscriptionInvitation: Symbol.for('AcceptSharedSubscriptionInvitation'),
   DeclineSharedSubscriptionInvitation: Symbol.for('DeclineSharedSubscriptionInvitation'),
   CancelSharedSubscriptionInvitation: Symbol.for('CancelSharedSubscriptionInvitation'),
+  ListSharedSubscriptionInvitations: Symbol.for('ListSharedSubscriptionInvitations'),
   // Handlers
   UserRegisteredEventHandler: Symbol.for('UserRegisteredEventHandler'),
   AccountDeletionRequestedEventHandler: Symbol.for('AccountDeletionRequestedEventHandler'),

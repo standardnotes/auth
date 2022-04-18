@@ -150,6 +150,7 @@ import { SubscriptionSettingService } from '../Domain/Setting/SubscriptionSettin
 import { SubscriptionSettingRepositoryInterface } from '../Domain/Setting/SubscriptionSettingRepositoryInterface'
 import { MySQLSubscriptionSettingRepository } from '../Infra/MySQL/MySQLSubscriptionSettingRepository'
 import { SettingFactoryInterface } from '../Domain/Setting/SettingFactoryInterface'
+import { ListSharedSubscriptionInvitations } from '../Domain/UseCase/ListSharedSubscriptionInvitations/ListSharedSubscriptionInvitations'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const newrelicWinstonEnricher = require('@newrelic/winston-enricher')
@@ -360,6 +361,7 @@ export class ContainerConfigLoader {
     container.bind<AcceptSharedSubscriptionInvitation>(TYPES.AcceptSharedSubscriptionInvitation).to(AcceptSharedSubscriptionInvitation)
     container.bind<DeclineSharedSubscriptionInvitation>(TYPES.DeclineSharedSubscriptionInvitation).to(DeclineSharedSubscriptionInvitation)
     container.bind<CancelSharedSubscriptionInvitation>(TYPES.CancelSharedSubscriptionInvitation).to(CancelSharedSubscriptionInvitation)
+    container.bind<ListSharedSubscriptionInvitations>(TYPES.ListSharedSubscriptionInvitations).to(ListSharedSubscriptionInvitations)
 
     // Handlers
     container.bind<UserRegisteredEventHandler>(TYPES.UserRegisteredEventHandler).to(UserRegisteredEventHandler)

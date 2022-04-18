@@ -7,6 +7,17 @@ import { SharedSubscriptionInvitationRepositoryInterface } from '../../Domain/Sh
 @injectable()
 @EntityRepository(SharedSubscriptionInvitation)
 export class MySQLSharedSubscriptionInvitationRepository extends Repository<SharedSubscriptionInvitation> implements SharedSubscriptionInvitationRepositoryInterface {
+  async findByInviterEmail(inviterEmail: string): Promise<SharedSubscriptionInvitation[]> {
+    return this.createQueryBuilder('invitation')
+      .where(
+        'invitation.inviter_identifier = :inviterEmail',
+        {
+          inviterEmail,
+        }
+      )
+      .getMany()
+  }
+
   async countByInviterEmailAndStatus(inviterEmail: string, statuses: InvitationStatus[]): Promise<number> {
     return this.createQueryBuilder('invitation')
       .where(

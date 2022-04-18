@@ -25,6 +25,17 @@ describe('MySQLSharedSubscriptionInvitationRepository', () => {
     repository.createQueryBuilder = jest.fn().mockImplementation(() => queryBuilder)
   })
 
+  it('should get invitations by inviter email', async () => {
+    queryBuilder.where = jest.fn().mockReturnThis()
+    queryBuilder.getMany = jest.fn().mockReturnValue([])
+
+    const result = await repository.findByInviterEmail('test@test.te')
+
+    expect(queryBuilder.where).toHaveBeenCalledWith('invitation.inviter_identifier = :inviterEmail', { inviterEmail: 'test@test.te' })
+
+    expect(result).toEqual([])
+  })
+
   it('should count invitations by inviter email and statuses', async () => {
     queryBuilder.where = jest.fn().mockReturnThis()
     queryBuilder.getCount = jest.fn().mockReturnValue(3)

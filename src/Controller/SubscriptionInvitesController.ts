@@ -16,6 +16,7 @@ import { AcceptSharedSubscriptionInvitation } from '../Domain/UseCase/AcceptShar
 import { CancelSharedSubscriptionInvitation } from '../Domain/UseCase/CancelSharedSubscriptionInvitation/CancelSharedSubscriptionInvitation'
 import { DeclineSharedSubscriptionInvitation } from '../Domain/UseCase/DeclineSharedSubscriptionInvitation/DeclineSharedSubscriptionInvitation'
 import { InviteToSharedSubscription } from '../Domain/UseCase/InviteToSharedSubscription/InviteToSharedSubscription'
+import { ListSharedSubscriptionInvitations } from '../Domain/UseCase/ListSharedSubscriptionInvitations/ListSharedSubscriptionInvitations'
 
 @controller('/subscription-invites')
 export class SubscriptionInvitesController extends BaseHttpController {
@@ -24,6 +25,7 @@ export class SubscriptionInvitesController extends BaseHttpController {
     @inject(TYPES.AcceptSharedSubscriptionInvitation) private acceptSharedSubscriptionInvitation: AcceptSharedSubscriptionInvitation,
     @inject(TYPES.DeclineSharedSubscriptionInvitation) private declineSharedSubscriptionInvitation: DeclineSharedSubscriptionInvitation,
     @inject(TYPES.CancelSharedSubscriptionInvitation) private cancelSharedSubscriptionInvitation: CancelSharedSubscriptionInvitation,
+    @inject(TYPES.ListSharedSubscriptionInvitations) private listSharedSubscriptionInvitations: ListSharedSubscriptionInvitations,
   ) {
     super()
   }
@@ -85,5 +87,14 @@ export class SubscriptionInvitesController extends BaseHttpController {
     }
 
     return this.json(result, 400)
+  }
+
+  @httpGet('/', TYPES.ApiGatewayAuthMiddleware)
+  async listInvites(_request: Request, response: Response): Promise<results.JsonResult> {
+    const result = await this.listSharedSubscriptionInvitations.execute({
+      inviterEmail: response.locals.user.email,
+    })
+
+    return this.json(result)
   }
 }
