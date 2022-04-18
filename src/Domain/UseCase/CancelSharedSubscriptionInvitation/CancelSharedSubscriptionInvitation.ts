@@ -82,6 +82,7 @@ export class CancelSharedSubscriptionInvitation implements UseCaseInterface {
         inviteeIdentifierType: InviteeIdentifierType.Uuid,
         inviterEmail: sharedSubscriptionInvitation.inviterIdentifier,
         inviterSubscriptionId: sharedSubscriptionInvitation.subscriptionId,
+        inviterSubscriptionUuid: inviterUserSubscription.uuid,
         sharedSubscriptionInvitationUuid: sharedSubscriptionInvitation.uuid,
       })
     )

@@ -23,6 +23,7 @@ describe('DomainEventFactory', () => {
     expect(createFactory().createSharedSubscriptionInvitationCanceledEvent({
       inviterEmail: 'test@test.te',
       inviterSubscriptionId: 1,
+      inviterSubscriptionUuid: '2-3-4',
       inviteeIdentifier: 'invitee@test.te',
       inviteeIdentifierType: InviteeIdentifierType.Email,
       sharedSubscriptionInvitationUuid: '1-2-3',
@@ -38,6 +39,7 @@ describe('DomainEventFactory', () => {
         payload: {
           inviterEmail: 'test@test.te',
           inviterSubscriptionId: 1,
+          inviterSubscriptionUuid: '2-3-4',
           inviteeIdentifier: 'invitee@test.te',
           inviteeIdentifierType: InviteeIdentifierType.Email,
           sharedSubscriptionInvitationUuid: '1-2-3',
@@ -237,7 +239,10 @@ describe('DomainEventFactory', () => {
   })
 
   it('should create a ACCOUNT_DELETION_REQUESTED event', () => {
-    expect(createFactory().createAccountDeletionRequestedEvent('1-2-3'))
+    expect(createFactory().createAccountDeletionRequestedEvent({
+      userUuid: '1-2-3',
+      regularSubscriptionUuid: '2-3-4',
+    }))
       .toEqual({
         createdAt: expect.any(Date),
         meta: {
@@ -248,6 +253,7 @@ describe('DomainEventFactory', () => {
         },
         payload: {
           userUuid: '1-2-3',
+          regularSubscriptionUuid: '2-3-4',
         },
         type: 'ACCOUNT_DELETION_REQUESTED',
       })

@@ -1,3 +1,4 @@
+import { Uuid } from '@standardnotes/common'
 import { injectable } from 'inversify'
 import { EntityRepository, Repository } from 'typeorm'
 
@@ -8,7 +9,7 @@ import { UserSubscriptionType } from '../../Domain/Subscription/UserSubscription
 @injectable()
 @EntityRepository(UserSubscription)
 export class MySQLUserSubscriptionRepository extends Repository<UserSubscription> implements UserSubscriptionRepositoryInterface {
-  async findOneByUserUuidAndSubscriptionId(userUuid: string, subscriptionId: number): Promise<UserSubscription | undefined> {
+  async findOneByUserUuidAndSubscriptionId(userUuid: Uuid, subscriptionId: number): Promise<UserSubscription | undefined> {
     return await this.createQueryBuilder()
       .where(
         'user_uuid = :userUuid AND subscription_id = :subscriptionId',
@@ -43,7 +44,18 @@ export class MySQLUserSubscriptionRepository extends Repository<UserSubscription
       .getMany()
   }
 
-  async findOneByUserUuid(userUuid: string): Promise<UserSubscription | undefined> {
+  async findOneByUuid(uuid: Uuid): Promise<UserSubscription | undefined> {
+    return await this.createQueryBuilder()
+      .where(
+        'uuid = :uuid',
+        {
+          uuid,
+        }
+      )
+      .getOne()
+  }
+
+  async findOneByUserUuid(userUuid: Uuid): Promise<UserSubscription | undefined> {
     const subscriptions = await this.createQueryBuilder()
       .where(
         'user_uuid = :user_uuid',

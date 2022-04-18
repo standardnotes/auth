@@ -14,7 +14,14 @@ export class DomainEventFactory implements DomainEventFactoryInterface {
   ) {
   }
 
-  createSharedSubscriptionInvitationCanceledEvent(dto: { inviterEmail: string; inviterSubscriptionId: number; inviteeIdentifier: string; inviteeIdentifierType: InviteeIdentifierType; sharedSubscriptionInvitationUuid: string }): SharedSubscriptionInvitationCanceledEvent {
+  createSharedSubscriptionInvitationCanceledEvent(dto: {
+    inviterEmail: string
+    inviterSubscriptionId: number
+    inviterSubscriptionUuid: Uuid
+    inviteeIdentifier: string
+    inviteeIdentifierType: InviteeIdentifierType
+    sharedSubscriptionInvitationUuid: Uuid
+  }): SharedSubscriptionInvitationCanceledEvent {
     return {
       type: 'SHARED_SUBSCRIPTION_INVITATION_CANCELED',
       createdAt: this.timer.getUTCDate(),
@@ -132,19 +139,17 @@ export class DomainEventFactory implements DomainEventFactoryInterface {
     }
   }
 
-  createAccountDeletionRequestedEvent(userUuid: string): AccountDeletionRequestedEvent {
+  createAccountDeletionRequestedEvent(dto: { userUuid: Uuid, regularSubscriptionUuid: Uuid | undefined }): AccountDeletionRequestedEvent {
     return {
       type: 'ACCOUNT_DELETION_REQUESTED',
       createdAt: this.timer.getUTCDate(),
       meta: {
         correlation: {
-          userIdentifier: userUuid,
+          userIdentifier: dto.userUuid,
           userIdentifierType: 'uuid',
         },
       },
-      payload: {
-        userUuid,
-      },
+      payload: dto,
     }
   }
 
