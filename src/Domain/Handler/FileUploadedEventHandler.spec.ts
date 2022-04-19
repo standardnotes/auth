@@ -8,22 +8,21 @@ import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { FileUploadedEventHandler } from './FileUploadedEventHandler'
 import { SubscriptionSettingServiceInterface } from '../Setting/SubscriptionSettingServiceInterface'
 import { UserSubscription } from '../Subscription/UserSubscription'
+import { UserSubscriptionServiceInterface } from '../Subscription/UserSubscriptionServiceInterface'
 import { UserSubscriptionType } from '../Subscription/UserSubscriptionType'
-import { UserSubscriptionRepositoryInterface } from '../Subscription/UserSubscriptionRepositoryInterface'
 
 describe('FileUploadedEventHandler', () => {
   let userRepository: UserRepositoryInterface
-  let userSubscriptionRepository: UserSubscriptionRepositoryInterface
+  let userSubscriptionService: UserSubscriptionServiceInterface
   let logger: Logger
   let user: User
   let event: FileUploadedEvent
   let subscriptionSettingService: SubscriptionSettingServiceInterface
   let regularSubscription: UserSubscription
-  let sharedSubscription: UserSubscription
 
   const createHandler = () => new FileUploadedEventHandler(
     userRepository,
-    userSubscriptionRepository,
+    userSubscriptionService,
     subscriptionSettingService,
     logger
   )
@@ -41,16 +40,9 @@ describe('FileUploadedEventHandler', () => {
       subscriptionType: UserSubscriptionType.Regular,
       user: Promise.resolve(user),
     } as jest.Mocked<UserSubscription>
-    sharedSubscription = {
-      uuid: '2-3-4',
-      subscriptionType: UserSubscriptionType.Shared,
-      subscriptionId: 9,
-      user: Promise.resolve(user),
-    } as jest.Mocked<UserSubscription>
 
-    userSubscriptionRepository = {} as jest.Mocked<UserSubscriptionRepositoryInterface>
-    userSubscriptionRepository.findOneByUserUuid = jest.fn().mockReturnValue(regularSubscription)
-    userSubscriptionRepository.findBySubscriptionIdAndType = jest.fn().mockReturnValue([regularSubscription])
+    userSubscriptionService = {} as jest.Mocked<UserSubscriptionServiceInterface>
+    userSubscriptionService.findRegularSubscriptionForUserUuid = jest.fn().mockReturnValue(regularSubscription)
 
     subscriptionSettingService = {} as jest.Mocked<SubscriptionSettingServiceInterface>
     subscriptionSettingService.findSubscriptionSettingWithDecryptedValue = jest.fn().mockReturnValue(undefined)
@@ -98,19 +90,7 @@ describe('FileUploadedEventHandler', () => {
     subscriptionSettingService.findSubscriptionSettingWithDecryptedValue = jest.fn().mockReturnValue({
       value: 345,
     })
-    userSubscriptionRepository.findOneByUserUuid = jest.fn().mockReturnValue(undefined)
-
-    await createHandler().handle(event)
-
-    expect(subscriptionSettingService.createOrReplace).not.toHaveBeenCalled()
-  })
-
-  it('should not do anything if a user regular subscription is not found', async () => {
-    subscriptionSettingService.findSubscriptionSettingWithDecryptedValue = jest.fn().mockReturnValue({
-      value: 345,
-    })
-    userSubscriptionRepository.findOneByUserUuid = jest.fn().mockReturnValue(sharedSubscription)
-    userSubscriptionRepository.findBySubscriptionIdAndType = jest.fn().mockReturnValue([])
+    userSubscriptionService.findRegularSubscriptionForUserUuid = jest.fn().mockReturnValue(undefined)
 
     await createHandler().handle(event)
 
@@ -118,28 +98,6 @@ describe('FileUploadedEventHandler', () => {
   })
 
   it('should update a bytes used setting if one does exist', async () => {
-    subscriptionSettingService.findSubscriptionSettingWithDecryptedValue = jest.fn().mockReturnValue({
-      value: 345,
-    })
-    await createHandler().handle(event)
-
-    expect(subscriptionSettingService.createOrReplace).toHaveBeenCalledWith({
-      props:  {
-        name: 'FILE_UPLOAD_BYTES_USED',
-        sensitive: false,
-        unencryptedValue: '468',
-      },
-      userSubscription:  {
-        uuid: '1-2-3',
-        subscriptionType: 'regular',
-        user: Promise.resolve(user),
-      },
-    })
-  })
-
-  it('should update a bytes used setting on a shared subscription if one does exist', async () => {
-    userSubscriptionRepository.findOneByUserUuid = jest.fn().mockReturnValue(sharedSubscription)
-
     subscriptionSettingService.findSubscriptionSettingWithDecryptedValue = jest.fn().mockReturnValue({
       value: 345,
     })

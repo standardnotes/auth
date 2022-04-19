@@ -15,8 +15,19 @@ export class UserSubscriptionService implements UserSubscriptionServiceInterface
   ){
   }
 
+  async findRegularSubscriptionForUserUuid(userUuid: string): Promise<UserSubscription | undefined> {
+    const userSubscription = await this.userSubscriptionRepository.findOneByUserUuid(userUuid)
+
+    return this.findRegularSubscription(userSubscription)
+  }
+
   async findRegularSubscriptionForUuid(uuid: Uuid): Promise<UserSubscription | undefined> {
     const userSubscription = await this.userSubscriptionRepository.findOneByUuid(uuid)
+
+    return this.findRegularSubscription(userSubscription)
+  }
+
+  private async findRegularSubscription(userSubscription: UserSubscription | undefined): Promise<UserSubscription | undefined> {
     if (userSubscription === undefined) {
       return undefined
     }

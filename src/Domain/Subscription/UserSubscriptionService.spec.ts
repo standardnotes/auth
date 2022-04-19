@@ -31,31 +31,60 @@ describe('UserSubscriptionService', () => {
     } as jest.Mocked<UserSubscription>
 
     userSubscriptionRepository = {} as jest.Mocked<UserSubscriptionRepositoryInterface>
+    userSubscriptionRepository.findOneByUserUuid = jest.fn().mockReturnValue(undefined)
     userSubscriptionRepository.findOneByUuid = jest.fn().mockReturnValue(undefined)
     userSubscriptionRepository.findBySubscriptionIdAndType = jest.fn().mockReturnValue([])
   })
 
-  it('should return undefined if there is no user subscription', async () => {
-    expect(await createService().findRegularSubscriptionForUuid('1-2-3')).toBeUndefined()
+  describe('by uuid', () => {
+    it('should return undefined if there is no user subscription', async () => {
+      expect(await createService().findRegularSubscriptionForUuid('1-2-3')).toBeUndefined()
+    })
+
+    it('should return a regular subscription if the uuid corresponds to a regular subscription', async () => {
+      userSubscriptionRepository.findOneByUuid = jest.fn().mockReturnValue(regularSubscription)
+
+      expect(await createService().findRegularSubscriptionForUuid('1-2-3')).toEqual(regularSubscription)
+    })
+
+    it('should return a regular subscription if the uuid corresponds to a shared subscription', async () => {
+      userSubscriptionRepository.findOneByUuid = jest.fn().mockReturnValue(sharedSubscription)
+      userSubscriptionRepository.findBySubscriptionIdAndType = jest.fn().mockReturnValue([regularSubscription])
+
+      expect(await createService().findRegularSubscriptionForUuid('1-2-3')).toEqual(regularSubscription)
+    })
+
+    it('should return undefined if a regular subscription is not found corresponding to the shared subscription', async () => {
+      userSubscriptionRepository.findOneByUuid = jest.fn().mockReturnValue(sharedSubscription)
+      userSubscriptionRepository.findBySubscriptionIdAndType = jest.fn().mockReturnValue([])
+
+      expect(await createService().findRegularSubscriptionForUuid('1-2-3')).toBeUndefined()
+    })
   })
 
-  it('should return a regular subscription if the uuid corresponds to a regular subscription', async () => {
-    userSubscriptionRepository.findOneByUuid = jest.fn().mockReturnValue(regularSubscription)
+  describe('by user uuid', () => {
+    it('should return undefined if there is no user subscription', async () => {
+      expect(await createService().findRegularSubscriptionForUserUuid('1-2-3')).toBeUndefined()
+    })
 
-    expect(await createService().findRegularSubscriptionForUuid('1-2-3')).toEqual(regularSubscription)
-  })
+    it('should return a regular subscription if the uuid corresponds to a regular subscription', async () => {
+      userSubscriptionRepository.findOneByUserUuid = jest.fn().mockReturnValue(regularSubscription)
 
-  it('should return a regular subscription if the uuid corresponds to a shared subscription', async () => {
-    userSubscriptionRepository.findOneByUuid = jest.fn().mockReturnValue(sharedSubscription)
-    userSubscriptionRepository.findBySubscriptionIdAndType = jest.fn().mockReturnValue([regularSubscription])
+      expect(await createService().findRegularSubscriptionForUserUuid('1-2-3')).toEqual(regularSubscription)
+    })
 
-    expect(await createService().findRegularSubscriptionForUuid('1-2-3')).toEqual(regularSubscription)
-  })
+    it('should return a regular subscription if the uuid corresponds to a shared subscription', async () => {
+      userSubscriptionRepository.findOneByUserUuid = jest.fn().mockReturnValue(sharedSubscription)
+      userSubscriptionRepository.findBySubscriptionIdAndType = jest.fn().mockReturnValue([regularSubscription])
 
-  it('should return undefined if a regular subscription is not found corresponding to the shared subscription', async () => {
-    userSubscriptionRepository.findOneByUuid = jest.fn().mockReturnValue(sharedSubscription)
-    userSubscriptionRepository.findBySubscriptionIdAndType = jest.fn().mockReturnValue([])
+      expect(await createService().findRegularSubscriptionForUserUuid('1-2-3')).toEqual(regularSubscription)
+    })
 
-    expect(await createService().findRegularSubscriptionForUuid('1-2-3')).toBeUndefined()
+    it('should return undefined if a regular subscription is not found corresponding to the shared subscription', async () => {
+      userSubscriptionRepository.findOneByUserUuid = jest.fn().mockReturnValue(sharedSubscription)
+      userSubscriptionRepository.findBySubscriptionIdAndType = jest.fn().mockReturnValue([])
+
+      expect(await createService().findRegularSubscriptionForUserUuid('1-2-3')).toBeUndefined()
+    })
   })
 })
