@@ -5,15 +5,15 @@ import { CreateValetToken } from './CreateValetToken'
 import { UserSubscriptionRepositoryInterface } from '../../Subscription/UserSubscriptionRepositoryInterface'
 import { TimerInterface } from '@standardnotes/time'
 import { UserSubscription } from '../../Subscription/UserSubscription'
-import { SettingsAssociationServiceInterface } from '../../Setting/SettingsAssociationServiceInterface'
 import { SubscriptionSettingServiceInterface } from '../../Setting/SubscriptionSettingServiceInterface'
 import { User } from '../../User/User'
 import { UserSubscriptionType } from '../../Subscription/UserSubscriptionType'
+import { SubscriptionSettingsAssociationServiceInterface } from '../../Setting/SubscriptionSettingsAssociationServiceInterface'
 
 describe('CreateValetToken', () => {
   let tokenEncoder: TokenEncoderInterface<ValetTokenData>
   let subscriptionSettingService: SubscriptionSettingServiceInterface
-  let settingsAssociationService: SettingsAssociationServiceInterface
+  let subscriptionSettingsAssociationService: SubscriptionSettingsAssociationServiceInterface
   let userSubscriptionRepository: UserSubscriptionRepositoryInterface
   let timer: TimerInterface
   const valetTokenTTL = 123
@@ -21,7 +21,7 @@ describe('CreateValetToken', () => {
   const createUseCase = () => new CreateValetToken(
     tokenEncoder,
     subscriptionSettingService,
-    settingsAssociationService,
+    subscriptionSettingsAssociationService,
     userSubscriptionRepository,
     timer,
     valetTokenTTL
@@ -36,8 +36,8 @@ describe('CreateValetToken', () => {
       value: '123',
     })
 
-    settingsAssociationService = {} as jest.Mocked<SettingsAssociationServiceInterface>
-    settingsAssociationService.getFileUploadLimit = jest.fn().mockReturnValue(5_368_709_120)
+    subscriptionSettingsAssociationService = {} as jest.Mocked<SubscriptionSettingsAssociationServiceInterface>
+    subscriptionSettingsAssociationService.getFileUploadLimit = jest.fn().mockReturnValue(5_368_709_120)
 
     const regularSubscription = { uuid: 'regular-1-2-3', endsAt: 123, subscriptionType: UserSubscriptionType.Regular, subscriptionId: 7 } as jest.Mocked<UserSubscription>
     regularSubscription.user = Promise.resolve({ uuid: '1-2-3' } as jest.Mocked<User>)

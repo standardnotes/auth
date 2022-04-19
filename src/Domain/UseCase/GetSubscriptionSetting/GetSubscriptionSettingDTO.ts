@@ -1,9 +1,8 @@
 import { Uuid } from '@standardnotes/common'
 import { SubscriptionSettingName } from '@standardnotes/settings'
 
-export type FindSubscriptionSettingDTO = {
+export type GetSubscriptionSettingDTO = {
   userUuid: Uuid,
-  userSubscriptionUuid: Uuid,
   subscriptionSettingName: SubscriptionSettingName,
-  settingUuid?: Uuid
+  allowSensitiveRetrieval?: boolean
 }

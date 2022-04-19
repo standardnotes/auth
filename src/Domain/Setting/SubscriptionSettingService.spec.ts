@@ -1,11 +1,10 @@
 import 'reflect-metadata'
 
-import { EmailBackupFrequency, SettingName } from '@standardnotes/settings'
+import { SubscriptionSettingName } from '@standardnotes/settings'
 import { Logger } from 'winston'
 import { EncryptionVersion } from '../Encryption/EncryptionVersion'
 
 import { SubscriptionSettingService } from './SubscriptionSettingService'
-import { SettingsAssociationServiceInterface } from './SettingsAssociationServiceInterface'
 import { SettingDecrypterInterface } from './SettingDecrypterInterface'
 import { SubscriptionSettingRepositoryInterface } from './SubscriptionSettingRepositoryInterface'
 import { SubscriptionSetting } from './SubscriptionSetting'
@@ -13,6 +12,7 @@ import { UserSubscription } from '../Subscription/UserSubscription'
 import { SubscriptionName } from '@standardnotes/common'
 import { User } from '../User/User'
 import { SettingFactoryInterface } from './SettingFactoryInterface'
+import { SubscriptionSettingsAssociationServiceInterface } from './SubscriptionSettingsAssociationServiceInterface'
 
 describe('SubscriptionSettingService', () => {
   let setting: SubscriptionSetting
@@ -20,14 +20,14 @@ describe('SubscriptionSettingService', () => {
   let userSubscription: UserSubscription
   let factory: SettingFactoryInterface
   let subscriptionSettingRepository: SubscriptionSettingRepositoryInterface
-  let settingsAssociationService: SettingsAssociationServiceInterface
+  let subscriptionSettingsAssociationService: SubscriptionSettingsAssociationServiceInterface
   let settingDecrypter: SettingDecrypterInterface
   let logger: Logger
 
   const createService = () => new SubscriptionSettingService(
     factory,
     subscriptionSettingRepository,
-    settingsAssociationService,
+    subscriptionSettingsAssociationService,
     settingDecrypter,
     logger
   )
@@ -50,11 +50,11 @@ describe('SubscriptionSettingService', () => {
     subscriptionSettingRepository.findLastByNameAndUserSubscriptionUuid = jest.fn().mockReturnValue(undefined)
     subscriptionSettingRepository.save = jest.fn().mockImplementation(setting => setting)
 
-    settingsAssociationService = {} as jest.Mocked<SettingsAssociationServiceInterface>
-    settingsAssociationService.getDefaultSettingsAndValuesForSubscriptionName = jest.fn().mockReturnValue(new Map([
-      [SettingName.EmailBackupFrequency,
+    subscriptionSettingsAssociationService = {} as jest.Mocked<SubscriptionSettingsAssociationServiceInterface>
+    subscriptionSettingsAssociationService.getDefaultSettingsAndValuesForSubscriptionName = jest.fn().mockReturnValue(new Map([
+      [SubscriptionSettingName.FileUploadBytesUsed,
         {
-          value: EmailBackupFrequency.Weekly,
+          value: '0',
           sensitive: 0,
           serverEncryptionVersion: EncryptionVersion.Unencrypted,
         }],
@@ -76,7 +76,7 @@ describe('SubscriptionSettingService', () => {
   })
 
   it ('should not create default settings for a subscription if subscription has no defaults', async () => {
-    settingsAssociationService.getDefaultSettingsAndValuesForSubscriptionName = jest.fn().mockReturnValue(undefined)
+    subscriptionSettingsAssociationService.getDefaultSettingsAndValuesForSubscriptionName = jest.fn().mockReturnValue(undefined)
 
     await createService().applyDefaultSubscriptionSettingsForSubscription(userSubscription, SubscriptionName.PlusPlan)
 
@@ -153,7 +153,7 @@ describe('SubscriptionSettingService', () => {
 
     subscriptionSettingRepository.findLastByNameAndUserSubscriptionUuid = jest.fn().mockReturnValue(setting)
 
-    expect(await createService().findSubscriptionSettingWithDecryptedValue({ userSubscriptionUuid: '2-3-4', userUuid: '1-2-3', settingName: 'test' as SettingName })).toEqual({
+    expect(await createService().findSubscriptionSettingWithDecryptedValue({ userSubscriptionUuid: '2-3-4', userUuid: '1-2-3', subscriptionSettingName: 'test' as SubscriptionSettingName })).toEqual({
       serverEncryptionVersion: 1,
       value: 'decrypted',
     })

@@ -34,6 +34,7 @@ const TYPES = {
   RoleProjector: Symbol.for('RoleProjector'),
   PermissionProjector: Symbol.for('PermissionProjector'),
   SettingProjector: Symbol.for('SettingProjector'),
+  SubscriptionSettingProjector: Symbol.for('SubscriptionSettingProjector'),
   // Factories
   SettingFactory: Symbol.for('SettingFactory'),
   // env vars
@@ -103,6 +104,7 @@ const TYPES = {
   DeclineSharedSubscriptionInvitation: Symbol.for('DeclineSharedSubscriptionInvitation'),
   CancelSharedSubscriptionInvitation: Symbol.for('CancelSharedSubscriptionInvitation'),
   ListSharedSubscriptionInvitations: Symbol.for('ListSharedSubscriptionInvitations'),
+  GetSubscriptionSetting: Symbol.for('GetSubscriptionSetting'),
   // Handlers
   UserRegisteredEventHandler: Symbol.for('UserRegisteredEventHandler'),
   AccountDeletionRequestedEventHandler: Symbol.for('AccountDeletionRequestedEventHandler'),
@@ -154,6 +156,7 @@ const TYPES = {
   RoleService: Symbol.for('RoleService'),
   RoleToSubscriptionMap: Symbol.for('RoleToSubscriptionMap'),
   SettingsAssociationService: Symbol.for('SettingsAssociationService'),
+  SubscriptionSettingsAssociationService: Symbol.for('SubscriptionSettingsAssociationService'),
   FeatureService: Symbol.for('FeatureService'),
   SettingDecrypter: Symbol.for('SettingDecrypter'),
   SettingInterpreter: Symbol.for('SettingInterpreter'),

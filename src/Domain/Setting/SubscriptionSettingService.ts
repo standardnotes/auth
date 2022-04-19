@@ -1,12 +1,11 @@
 import { SubscriptionName } from '@standardnotes/common'
-import { SettingName } from '@standardnotes/settings'
+import { SubscriptionSettingName } from '@standardnotes/settings'
 import { inject, injectable } from 'inversify'
 import { Logger } from 'winston'
 
 import TYPES from '../../Bootstrap/Types'
 import { UserSubscription } from '../Subscription/UserSubscription'
 
-import { SettingsAssociationServiceInterface } from './SettingsAssociationServiceInterface'
 import { SettingDecrypterInterface } from './SettingDecrypterInterface'
 import { SettingDescription } from './SettingDescription'
 import { SubscriptionSettingServiceInterface } from './SubscriptionSettingServiceInterface'
@@ -16,20 +15,21 @@ import { SubscriptionSetting } from './SubscriptionSetting'
 import { FindSubscriptionSettingDTO } from './FindSubscriptionSettingDTO'
 import { SubscriptionSettingRepositoryInterface } from './SubscriptionSettingRepositoryInterface'
 import { SettingFactoryInterface } from './SettingFactoryInterface'
+import { SubscriptionSettingsAssociationServiceInterface } from './SubscriptionSettingsAssociationServiceInterface'
 
 @injectable()
 export class SubscriptionSettingService implements SubscriptionSettingServiceInterface {
   constructor(
     @inject(TYPES.SettingFactory) private factory: SettingFactoryInterface,
     @inject(TYPES.SubscriptionSettingRepository) private subscriptionSettingRepository: SubscriptionSettingRepositoryInterface,
-    @inject(TYPES.SettingsAssociationService) private settingsAssociationService: SettingsAssociationServiceInterface,
+    @inject(TYPES.SubscriptionSettingsAssociationService) private subscriptionSettingAssociationService: SubscriptionSettingsAssociationServiceInterface,
     @inject(TYPES.SettingDecrypter) private settingDecrypter: SettingDecrypterInterface,
     @inject(TYPES.Logger) private logger: Logger,
   ) {
   }
 
   async applyDefaultSubscriptionSettingsForSubscription(userSubscription: UserSubscription, subscriptionName: SubscriptionName): Promise<void> {
-    const defaultSettingsWithValues = await this.settingsAssociationService.getDefaultSettingsAndValuesForSubscriptionName(subscriptionName)
+    const defaultSettingsWithValues = await this.subscriptionSettingAssociationService.getDefaultSettingsAndValuesForSubscriptionName(subscriptionName)
     if (defaultSettingsWithValues === undefined) {
       this.logger.warn(`Could not find settings for subscription: ${subscriptionName}`)
 
@@ -56,7 +56,7 @@ export class SubscriptionSettingService implements SubscriptionSettingServiceInt
     if (dto.settingUuid !== undefined) {
       setting = await this.subscriptionSettingRepository.findOneByUuid(dto.settingUuid)
     } else {
-      setting = await this.subscriptionSettingRepository.findLastByNameAndUserSubscriptionUuid(dto.settingName, dto.userSubscriptionUuid)
+      setting = await this.subscriptionSettingRepository.findLastByNameAndUserSubscriptionUuid(dto.subscriptionSettingName, dto.userSubscriptionUuid)
     }
 
     if (setting === undefined) {
@@ -74,7 +74,7 @@ export class SubscriptionSettingService implements SubscriptionSettingServiceInt
     const existing = await this.findSubscriptionSettingWithDecryptedValue({
       userUuid: (await userSubscription.user).uuid,
       userSubscriptionUuid: userSubscription.uuid,
-      settingName: props.name as SettingName,
+      subscriptionSettingName: props.name as SubscriptionSettingName,
       settingUuid: props.uuid,
     })
 

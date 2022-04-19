@@ -2,7 +2,7 @@ import {
   DomainEventHandlerInterface,
   FileRemovedEvent,
 } from '@standardnotes/domain-events'
-import { SettingName } from '@standardnotes/settings'
+import { SubscriptionSettingName } from '@standardnotes/settings'
 import { inject, injectable } from 'inversify'
 import { Logger } from 'winston'
 
@@ -31,7 +31,7 @@ export class FileRemovedEventHandler implements DomainEventHandlerInterface {
     const bytesUsedSetting = await this.subscriptionSettingService.findSubscriptionSettingWithDecryptedValue({
       userUuid: (await userSubscription.user).uuid,
       userSubscriptionUuid: userSubscription.uuid,
-      settingName: SettingName.FileUploadBytesUsed,
+      subscriptionSettingName: SubscriptionSettingName.FileUploadBytesUsed,
     })
     if (bytesUsedSetting === undefined) {
       this.logger.warn(`Could not find bytes used setting for user with uuid: ${event.payload.userUuid}`)
@@ -44,7 +44,7 @@ export class FileRemovedEventHandler implements DomainEventHandlerInterface {
     await this.subscriptionSettingService.createOrReplace({
       userSubscription,
       props: {
-        name: SettingName.FileUploadBytesUsed,
+        name: SubscriptionSettingName.FileUploadBytesUsed,
         unencryptedValue: (+(bytesUsed) - event.payload.fileByteSize).toString(),
         sensitive: false,
       },

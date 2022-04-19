@@ -2,7 +2,7 @@ import {
   DomainEventHandlerInterface,
   FileUploadedEvent,
 } from '@standardnotes/domain-events'
-import { SettingName } from '@standardnotes/settings'
+import { SubscriptionSettingName } from '@standardnotes/settings'
 import { inject, injectable } from 'inversify'
 import { Logger } from 'winston'
 
@@ -41,7 +41,7 @@ export class FileUploadedEventHandler implements DomainEventHandlerInterface {
     const bytesUsedSetting = await this.subscriptionSettingService.findSubscriptionSettingWithDecryptedValue({
       userUuid: (await userSubscription.user).uuid,
       userSubscriptionUuid: userSubscription.uuid,
-      settingName: SettingName.FileUploadBytesUsed,
+      subscriptionSettingName: SubscriptionSettingName.FileUploadBytesUsed,
     })
     if (bytesUsedSetting !== undefined) {
       bytesUsed = bytesUsedSetting.value as string
@@ -50,7 +50,7 @@ export class FileUploadedEventHandler implements DomainEventHandlerInterface {
     await this.subscriptionSettingService.createOrReplace({
       userSubscription,
       props: {
-        name: SettingName.FileUploadBytesUsed,
+        name: SubscriptionSettingName.FileUploadBytesUsed,
         unencryptedValue: (+(bytesUsed) + event.payload.fileByteSize).toString(),
         sensitive: false,
       },

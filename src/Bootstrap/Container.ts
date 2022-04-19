@@ -153,6 +153,10 @@ import { SettingFactoryInterface } from '../Domain/Setting/SettingFactoryInterfa
 import { ListSharedSubscriptionInvitations } from '../Domain/UseCase/ListSharedSubscriptionInvitations/ListSharedSubscriptionInvitations'
 import { UserSubscriptionServiceInterface } from '../Domain/Subscription/UserSubscriptionServiceInterface'
 import { UserSubscriptionService } from '../Domain/Subscription/UserSubscriptionService'
+import { SubscriptionSettingProjector } from '../Projection/SubscriptionSettingProjector'
+import { GetSubscriptionSetting } from '../Domain/UseCase/GetSubscriptionSetting/GetSubscriptionSetting'
+import { SubscriptionSettingsAssociationService } from '../Domain/Setting/SubscriptionSettingsAssociationService'
+import { SubscriptionSettingsAssociationServiceInterface } from '../Domain/Setting/SubscriptionSettingsAssociationServiceInterface'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const newrelicWinstonEnricher = require('@newrelic/winston-enricher')
@@ -293,6 +297,7 @@ export class ContainerConfigLoader {
     container.bind<RoleProjector>(TYPES.RoleProjector).to(RoleProjector)
     container.bind<PermissionProjector>(TYPES.PermissionProjector).to(PermissionProjector)
     container.bind<SettingProjector>(TYPES.SettingProjector).to(SettingProjector)
+    container.bind<SubscriptionSettingProjector>(TYPES.SubscriptionSettingProjector).to(SubscriptionSettingProjector)
 
     // Factories
     container.bind<SettingFactoryInterface>(TYPES.SettingFactory).to(SettingFactory)
@@ -364,6 +369,7 @@ export class ContainerConfigLoader {
     container.bind<DeclineSharedSubscriptionInvitation>(TYPES.DeclineSharedSubscriptionInvitation).to(DeclineSharedSubscriptionInvitation)
     container.bind<CancelSharedSubscriptionInvitation>(TYPES.CancelSharedSubscriptionInvitation).to(CancelSharedSubscriptionInvitation)
     container.bind<ListSharedSubscriptionInvitations>(TYPES.ListSharedSubscriptionInvitations).to(ListSharedSubscriptionInvitations)
+    container.bind<GetSubscriptionSetting>(TYPES.GetSubscriptionSetting).to(GetSubscriptionSetting)
 
     // Handlers
     container.bind<UserRegisteredEventHandler>(TYPES.UserRegisteredEventHandler).to(UserRegisteredEventHandler)
@@ -414,6 +420,7 @@ export class ContainerConfigLoader {
     container.bind<RoleServiceInterface>(TYPES.RoleService).to(RoleService)
     container.bind<RoleToSubscriptionMapInterface>(TYPES.RoleToSubscriptionMap).to(RoleToSubscriptionMap)
     container.bind<SettingsAssociationServiceInterface>(TYPES.SettingsAssociationService).to(SettingsAssociationService)
+    container.bind<SubscriptionSettingsAssociationServiceInterface>(TYPES.SubscriptionSettingsAssociationService).to(SubscriptionSettingsAssociationService)
     container.bind<FeatureServiceInterface>(TYPES.FeatureService).to(FeatureService)
     container.bind<SettingInterpreterInterface>(TYPES.SettingInterpreter).to(SettingInterpreter)
     container.bind<SettingDecrypterInterface>(TYPES.SettingDecrypter).to(SettingDecrypter)

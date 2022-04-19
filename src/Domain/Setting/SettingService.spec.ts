@@ -1,6 +1,6 @@
 import 'reflect-metadata'
 
-import { EmailBackupFrequency, LogSessionUserAgentOption, MuteSignInEmailsOption, SettingName } from '@standardnotes/settings'
+import { LogSessionUserAgentOption, MuteSignInEmailsOption, SettingName } from '@standardnotes/settings'
 import { Logger } from 'winston'
 import { EncryptionVersion } from '../Encryption/EncryptionVersion'
 import { User } from '../User/User'
@@ -50,14 +50,6 @@ describe('SettingService', () => {
     settingRepository.save = jest.fn().mockImplementation(setting => setting)
 
     settingsAssociationService = {} as jest.Mocked<SettingsAssociationServiceInterface>
-    settingsAssociationService.getDefaultSettingsAndValuesForSubscriptionName = jest.fn().mockReturnValue(new Map([
-      [SettingName.EmailBackupFrequency,
-        {
-          value: EmailBackupFrequency.Weekly,
-          sensitive: 0,
-          serverEncryptionVersion: EncryptionVersion.Unencrypted,
-        }],
-    ]))
     settingsAssociationService.getDefaultSettingsAndValuesForNewUser = jest.fn().mockReturnValue(new Map([
       [SettingName.MuteSignInEmails, { value: MuteSignInEmailsOption.NotMuted, sensitive: 0, serverEncryptionVersion: EncryptionVersion.Unencrypted }],
     ]))
