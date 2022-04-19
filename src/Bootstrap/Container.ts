@@ -151,6 +151,8 @@ import { SubscriptionSettingRepositoryInterface } from '../Domain/Setting/Subscr
 import { MySQLSubscriptionSettingRepository } from '../Infra/MySQL/MySQLSubscriptionSettingRepository'
 import { SettingFactoryInterface } from '../Domain/Setting/SettingFactoryInterface'
 import { ListSharedSubscriptionInvitations } from '../Domain/UseCase/ListSharedSubscriptionInvitations/ListSharedSubscriptionInvitations'
+import { UserSubscriptionServiceInterface } from '../Domain/Subscription/UserSubscriptionServiceInterface'
+import { UserSubscriptionService } from '../Domain/Subscription/UserSubscriptionService'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const newrelicWinstonEnricher = require('@newrelic/winston-enricher')
@@ -417,6 +419,7 @@ export class ContainerConfigLoader {
     container.bind<SettingDecrypterInterface>(TYPES.SettingDecrypter).to(SettingDecrypter)
     container.bind<SelectorInterface<ProtocolVersion>>(TYPES.ProtocolVersionSelector).toConstantValue(new DeterministicSelector<ProtocolVersion>())
     container.bind<SelectorInterface<boolean>>(TYPES.BooleanSelector).toConstantValue(new DeterministicSelector<boolean>())
+    container.bind<UserSubscriptionServiceInterface>(TYPES.UserSubscriptionService).to(UserSubscriptionService)
 
     if (env.get('SNS_TOPIC_ARN', true)) {
       container.bind<SNSDomainEventPublisher>(TYPES.DomainEventPublisher).toConstantValue(

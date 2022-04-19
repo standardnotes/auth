@@ -159,6 +159,7 @@ const TYPES = {
   SettingInterpreter: Symbol.for('SettingInterpreter'),
   ProtocolVersionSelector: Symbol.for('ProtocolVersionSelector'),
   BooleanSelector: Symbol.for('BooleanSelector'),
+  UserSubscriptionService: Symbol.for('UserSubscriptionService'),
 }
 
 export default TYPES
