@@ -39,7 +39,7 @@ describe('DeleteAccount', () => {
     userRepository.findOneByEmail = jest.fn().mockReturnValue(user)
 
     userSubscriptionService = {} as jest.Mocked<UserSubscriptionServiceInterface>
-    userSubscriptionService.findRegularSubscriptionForUserUuid = jest.fn().mockReturnValue(regularSubscription)
+    userSubscriptionService.findRegularSubscriptionForUserUuid = jest.fn().mockReturnValue({ regularSubscription, sharedSubscription: undefined })
 
     domainEventPublisher = {} as jest.Mocked<DomainEventPublisherInterface>
     domainEventPublisher.publish = jest.fn()
@@ -49,7 +49,7 @@ describe('DeleteAccount', () => {
   })
 
   it('should trigger account deletion - no subscription', async () => {
-    userSubscriptionService.findRegularSubscriptionForUserUuid = jest.fn().mockReturnValue(undefined)
+    userSubscriptionService.findRegularSubscriptionForUserUuid = jest.fn().mockReturnValue({ regularSubscription: undefined, sharedSubscription: undefined })
 
     expect(await createUseCase().execute({ email: 'test@test.te' })).toEqual({
       message: 'Successfully deleted user',
@@ -65,7 +65,7 @@ describe('DeleteAccount', () => {
   })
 
   it('should trigger account deletion - subscription present', async () => {
-    userSubscriptionService.findRegularSubscriptionForUserUuid = jest.fn().mockReturnValue(regularSubscription)
+    userSubscriptionService.findRegularSubscriptionForUserUuid = jest.fn().mockReturnValue({ regularSubscription, sharedSubscription: undefined })
 
     expect(await createUseCase().execute({ email: 'test@test.te' })).toEqual({
       message: 'Successfully deleted user',

@@ -30,7 +30,7 @@ export class DeleteAccount implements UseCaseInterface {
     }
 
     let regularSubscriptionUuid = undefined
-    const regularSubscription = await this.userSubscriptionService.findRegularSubscriptionForUserUuid(user.uuid)
+    const { regularSubscription } = await this.userSubscriptionService.findRegularSubscriptionForUserUuid(user.uuid)
     if (regularSubscription !== undefined) {
       regularSubscriptionUuid = regularSubscription.uuid
     }

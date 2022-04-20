@@ -19,6 +19,7 @@ describe('FileUploadedEventHandler', () => {
   let event: FileUploadedEvent
   let subscriptionSettingService: SubscriptionSettingServiceInterface
   let regularSubscription: UserSubscription
+  let sharedSubscription: UserSubscription
 
   const createHandler = () => new FileUploadedEventHandler(
     userRepository,
@@ -41,8 +42,14 @@ describe('FileUploadedEventHandler', () => {
       user: Promise.resolve(user),
     } as jest.Mocked<UserSubscription>
 
+    sharedSubscription = {
+      uuid: '2-3-4',
+      subscriptionType: UserSubscriptionType.Shared,
+      user: Promise.resolve(user),
+    } as jest.Mocked<UserSubscription>
+
     userSubscriptionService = {} as jest.Mocked<UserSubscriptionServiceInterface>
-    userSubscriptionService.findRegularSubscriptionForUserUuid = jest.fn().mockReturnValue(regularSubscription)
+    userSubscriptionService.findRegularSubscriptionForUserUuid = jest.fn().mockReturnValue({ regularSubscription, sharedSubscription: undefined })
 
     subscriptionSettingService = {} as jest.Mocked<SubscriptionSettingServiceInterface>
     subscriptionSettingService.findSubscriptionSettingWithDecryptedValue = jest.fn().mockReturnValue(undefined)
@@ -90,7 +97,7 @@ describe('FileUploadedEventHandler', () => {
     subscriptionSettingService.findSubscriptionSettingWithDecryptedValue = jest.fn().mockReturnValue({
       value: 345,
     })
-    userSubscriptionService.findRegularSubscriptionForUserUuid = jest.fn().mockReturnValue(undefined)
+    userSubscriptionService.findRegularSubscriptionForUserUuid = jest.fn().mockReturnValue({ regularSubscription: undefined, sharedSubscription: undefined })
 
     await createHandler().handle(event)
 
@@ -112,6 +119,41 @@ describe('FileUploadedEventHandler', () => {
       userSubscription:  {
         uuid: '1-2-3',
         subscriptionType: 'regular',
+        user: Promise.resolve(user),
+      },
+    })
+  })
+
+  it('should update a bytes used setting on both regular and shared subscription', async () => {
+    userSubscriptionService.findRegularSubscriptionForUserUuid = jest.fn().mockReturnValue({ regularSubscription, sharedSubscription })
+
+    subscriptionSettingService.findSubscriptionSettingWithDecryptedValue = jest.fn().mockReturnValue({
+      value: 345,
+    })
+    await createHandler().handle(event)
+
+    expect(subscriptionSettingService.createOrReplace).toHaveBeenCalledWith({
+      props:  {
+        name: 'FILE_UPLOAD_BYTES_USED',
+        sensitive: false,
+        unencryptedValue: '468',
+      },
+      userSubscription:  {
+        uuid: '1-2-3',
+        subscriptionType: 'regular',
+        user: Promise.resolve(user),
+      },
+    })
+
+    expect(subscriptionSettingService.createOrReplace).toHaveBeenCalledWith({
+      props:  {
+        name: 'FILE_UPLOAD_BYTES_USED',
+        sensitive: false,
+        unencryptedValue: '468',
+      },
+      userSubscription:  {
+        uuid: '2-3-4',
+        subscriptionType: 'shared',
         user: Promise.resolve(user),
       },
     })

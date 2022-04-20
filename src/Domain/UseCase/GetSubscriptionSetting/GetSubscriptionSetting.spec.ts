@@ -40,7 +40,7 @@ describe('GetSubscriptionSetting', () => {
     } as jest.Mocked<UserSubscription>
 
     userSubscriptionService = {} as jest.Mocked<UserSubscriptionServiceInterface>
-    userSubscriptionService.findRegularSubscriptionForUserUuid = jest.fn().mockReturnValue(regularSubscription)
+    userSubscriptionService.findRegularSubscriptionForUserUuid = jest.fn().mockReturnValue({ regularSubscription, sharedSubscription: undefined })
 
     subscriptionSettingService = {} as jest.Mocked<SubscriptionSettingServiceInterface>
     subscriptionSettingService.findSubscriptionSettingWithDecryptedValue = jest.fn().mockReturnValue(subscriptionSetting)
@@ -57,7 +57,7 @@ describe('GetSubscriptionSetting', () => {
   })
 
   it('should not get a setting for user if user has no corresponding regular subscription', async () => {
-    userSubscriptionService.findRegularSubscriptionForUserUuid = jest.fn().mockReturnValue(undefined)
+    userSubscriptionService.findRegularSubscriptionForUserUuid = jest.fn().mockReturnValue({ regularSubscription: undefined, sharedSubscription: undefined })
 
     expect(await createUseCase().execute({ userUuid: '1-2-3', subscriptionSettingName: SubscriptionSettingName.FileUploadBytesLimit })).toEqual({
       success: false,

@@ -8,6 +8,7 @@ import { Logger } from 'winston'
 
 import TYPES from '../../Bootstrap/Types'
 import { SubscriptionSettingServiceInterface } from '../Setting/SubscriptionSettingServiceInterface'
+import { UserSubscription } from '../Subscription/UserSubscription'
 import { UserSubscriptionServiceInterface } from '../Subscription/UserSubscriptionServiceInterface'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 
@@ -30,17 +31,25 @@ export class FileUploadedEventHandler implements DomainEventHandlerInterface {
       return
     }
 
-    const userSubscription = await this.userSubscriptionService.findRegularSubscriptionForUserUuid(event.payload.userUuid)
-    if (userSubscription === undefined) {
-      this.logger.warn(`Could not find user subscription for user with uuid: ${event.payload.userUuid}`)
+    const { regularSubscription, sharedSubscription } = await this.userSubscriptionService.findRegularSubscriptionForUserUuid(event.payload.userUuid)
+    if (regularSubscription === undefined) {
+      this.logger.warn(`Could not find regular user subscription for user with uuid: ${event.payload.userUuid}`)
 
       return
     }
 
+    await this.updateUploadBytesUsedSetting(regularSubscription, event.payload.fileByteSize)
+
+    if (sharedSubscription !== undefined) {
+      await this.updateUploadBytesUsedSetting(sharedSubscription, event.payload.fileByteSize)
+    }
+  }
+
+  private async updateUploadBytesUsedSetting(subscription: UserSubscription, byteSize: number): Promise<void> {
     let bytesUsed = '0'
     const bytesUsedSetting = await this.subscriptionSettingService.findSubscriptionSettingWithDecryptedValue({
-      userUuid: (await userSubscription.user).uuid,
-      userSubscriptionUuid: userSubscription.uuid,
+      userUuid: (await subscription.user).uuid,
+      userSubscriptionUuid: subscription.uuid,
       subscriptionSettingName: SubscriptionSettingName.FileUploadBytesUsed,
     })
     if (bytesUsedSetting !== undefined) {
@@ -48,10 +57,10 @@ export class FileUploadedEventHandler implements DomainEventHandlerInterface {
     }
 
     await this.subscriptionSettingService.createOrReplace({
-      userSubscription,
+      userSubscription: subscription,
       props: {
         name: SubscriptionSettingName.FileUploadBytesUsed,
-        unencryptedValue: (+(bytesUsed) + event.payload.fileByteSize).toString(),
+        unencryptedValue: (+(bytesUsed) + byteSize).toString(),
         sensitive: false,
       },
     })

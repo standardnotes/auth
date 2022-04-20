@@ -8,33 +8,42 @@ import { Logger } from 'winston'
 
 import TYPES from '../../Bootstrap/Types'
 import { SubscriptionSettingServiceInterface } from '../Setting/SubscriptionSettingServiceInterface'
-import { UserSubscriptionRepositoryInterface } from '../Subscription/UserSubscriptionRepositoryInterface'
-
+import { UserSubscription } from '../Subscription/UserSubscription'
+import { UserSubscriptionServiceInterface } from '../Subscription/UserSubscriptionServiceInterface'
 
 @injectable()
 export class FileRemovedEventHandler implements DomainEventHandlerInterface {
   constructor(
-    @inject(TYPES.UserSubscriptionRepository) private userSubscriptionRepository: UserSubscriptionRepositoryInterface,
+    @inject(TYPES.UserSubscriptionService) private userSubscriptionService: UserSubscriptionServiceInterface,
     @inject(TYPES.SubscriptionSettingService) private subscriptionSettingService: SubscriptionSettingServiceInterface,
     @inject(TYPES.Logger) private logger: Logger
   ) {
   }
 
   async handle(event: FileRemovedEvent): Promise<void> {
-    const userSubscription = await this.userSubscriptionRepository.findOneByUuid(event.payload.regularSubscriptionUuid)
-    if (userSubscription === undefined) {
-      this.logger.warn(`Could not find user subscription for with uuid: ${event.payload.regularSubscriptionUuid}`)
+    const { regularSubscription, sharedSubscription } = await this.userSubscriptionService.findRegularSubscriptionForUserUuid(event.payload.userUuid)
+    if (regularSubscription === undefined) {
+      this.logger.warn(`Could not find regular user subscription for user with uuid: ${event.payload.userUuid}`)
 
       return
     }
 
+    await this.updateUploadBytesUsedSetting(regularSubscription, event.payload.fileByteSize)
+
+    if (sharedSubscription !== undefined) {
+      await this.updateUploadBytesUsedSetting(sharedSubscription, event.payload.fileByteSize)
+    }
+  }
+
+  private async updateUploadBytesUsedSetting(subscription: UserSubscription, byteSize: number): Promise<void> {
+    const user = await subscription.user
     const bytesUsedSetting = await this.subscriptionSettingService.findSubscriptionSettingWithDecryptedValue({
-      userUuid: (await userSubscription.user).uuid,
-      userSubscriptionUuid: userSubscription.uuid,
+      userUuid: user.uuid,
+      userSubscriptionUuid: subscription.uuid,
       subscriptionSettingName: SubscriptionSettingName.FileUploadBytesUsed,
     })
     if (bytesUsedSetting === undefined) {
-      this.logger.warn(`Could not find bytes used setting for user with uuid: ${event.payload.userUuid}`)
+      this.logger.warn(`Could not find bytes used setting for user with uuid: ${user.uuid}`)
 
       return
     }
@@ -42,10 +51,10 @@ export class FileRemovedEventHandler implements DomainEventHandlerInterface {
     const bytesUsed = bytesUsedSetting.value as string
 
     await this.subscriptionSettingService.createOrReplace({
-      userSubscription,
+      userSubscription: subscription,
       props: {
         name: SubscriptionSettingName.FileUploadBytesUsed,
-        unencryptedValue: (+(bytesUsed) - event.payload.fileByteSize).toString(),
+        unencryptedValue: (+(bytesUsed) - byteSize).toString(),
         sensitive: false,
       },
     })

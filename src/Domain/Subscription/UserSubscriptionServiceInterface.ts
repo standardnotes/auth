@@ -1,7 +1,7 @@
 import { Uuid } from '@standardnotes/common'
-import { UserSubscription } from './UserSubscription'
+import { FindRegularSubscriptionResponse } from './FindRegularSubscriptionResponse'
 
 export interface UserSubscriptionServiceInterface {
-  findRegularSubscriptionForUuid(uuid: Uuid): Promise<UserSubscription | undefined>
-  findRegularSubscriptionForUserUuid(userUuid: Uuid): Promise<UserSubscription | undefined>
+  findRegularSubscriptionForUuid(uuid: Uuid): Promise<FindRegularSubscriptionResponse>
+  findRegularSubscriptionForUserUuid(userUuid: Uuid): Promise<FindRegularSubscriptionResponse>
 }

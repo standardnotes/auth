@@ -2,6 +2,7 @@ import { Uuid } from '@standardnotes/common'
 import { inject, injectable } from 'inversify'
 
 import TYPES from '../../Bootstrap/Types'
+import { FindRegularSubscriptionResponse } from './FindRegularSubscriptionResponse'
 
 import { UserSubscription } from './UserSubscription'
 import { UserSubscriptionRepositoryInterface } from './UserSubscriptionRepositoryInterface'
@@ -15,25 +16,31 @@ export class UserSubscriptionService implements UserSubscriptionServiceInterface
   ){
   }
 
-  async findRegularSubscriptionForUserUuid(userUuid: string): Promise<UserSubscription | undefined> {
+  async findRegularSubscriptionForUserUuid(userUuid: string): Promise<FindRegularSubscriptionResponse> {
     const userSubscription = await this.userSubscriptionRepository.findOneByUserUuid(userUuid)
 
     return this.findRegularSubscription(userSubscription)
   }
 
-  async findRegularSubscriptionForUuid(uuid: Uuid): Promise<UserSubscription | undefined> {
+  async findRegularSubscriptionForUuid(uuid: Uuid): Promise<FindRegularSubscriptionResponse> {
     const userSubscription = await this.userSubscriptionRepository.findOneByUuid(uuid)
 
     return this.findRegularSubscription(userSubscription)
   }
 
-  private async findRegularSubscription(userSubscription: UserSubscription | undefined): Promise<UserSubscription | undefined> {
+  private async findRegularSubscription(userSubscription: UserSubscription | undefined): Promise<FindRegularSubscriptionResponse> {
     if (userSubscription === undefined) {
-      return undefined
+      return {
+        regularSubscription: undefined,
+        sharedSubscription: undefined,
+      }
     }
 
     if (userSubscription.subscriptionType === UserSubscriptionType.Regular) {
-      return userSubscription
+      return {
+        regularSubscription: userSubscription,
+        sharedSubscription: undefined,
+      }
     }
 
     const regularSubscriptions = await this.userSubscriptionRepository.findBySubscriptionIdAndType(
@@ -41,9 +48,15 @@ export class UserSubscriptionService implements UserSubscriptionServiceInterface
       UserSubscriptionType.Regular
     )
     if (regularSubscriptions.length === 0) {
-      return undefined
+      return {
+        regularSubscription: undefined,
+        sharedSubscription: userSubscription,
+      }
     }
 
-    return regularSubscriptions[0]
+    return {
+      regularSubscription: regularSubscriptions[0],
+      sharedSubscription: userSubscription,
+    }
   }
 }
