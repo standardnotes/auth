@@ -36,33 +36,6 @@ describe('KeyParamsFactory', () => {
     })
   })
 
-  it('should create a key params structure for 001 version', () => {
-    user.version = '001'
-
-    expect(createFactory().create(user, true)).toEqual({
-      email: 'test@test.te',
-      identifier: 'test@test.te',
-      pw_alg: 'pwAlg',
-      pw_cost: 1,
-      pw_func: 'pwFunc',
-      pw_key_size: 2,
-      pw_salt: 'qwe',
-      version: '001',
-    })
-  })
-
-  it('should create a key params structure for 002 version', () => {
-    user.version = '002'
-
-    expect(createFactory().create(user, true)).toEqual({
-      email: 'test@test.te',
-      identifier: 'test@test.te',
-      pw_cost: 1,
-      pw_salt: 'qwe',
-      version: '002',
-    })
-  })
-
   it('should create a key params structure for 003 version', () => {
     user.version = '003'
 
