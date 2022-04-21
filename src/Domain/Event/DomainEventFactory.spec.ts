@@ -4,6 +4,7 @@ import { RoleName } from '@standardnotes/common'
 import { TimerInterface } from '@standardnotes/time'
 
 import { DomainEventFactory } from './DomainEventFactory'
+import { InviteeIdentifierType } from '../SharedSubscription/InviteeIdentifierType'
 
 describe('DomainEventFactory', () => {
   let timer: TimerInterface
@@ -16,6 +17,62 @@ describe('DomainEventFactory', () => {
     timer = {} as jest.Mocked<TimerInterface>
     timer.getTimestampInMicroseconds = jest.fn().mockReturnValue(1)
     timer.getUTCDate = jest.fn().mockReturnValue(new Date(1))
+  })
+
+  it('should create a SHARED_SUBSCRIPTION_INVITATION_CANCELED event', () => {
+    expect(createFactory().createSharedSubscriptionInvitationCanceledEvent({
+      inviterEmail: 'test@test.te',
+      inviterSubscriptionId: 1,
+      inviterSubscriptionUuid: '2-3-4',
+      inviteeIdentifier: 'invitee@test.te',
+      inviteeIdentifierType: InviteeIdentifierType.Email,
+      sharedSubscriptionInvitationUuid: '1-2-3',
+    }))
+      .toEqual({
+        createdAt: expect.any(Date),
+        meta: {
+          correlation: {
+            userIdentifier: 'test@test.te',
+            userIdentifierType: 'email',
+          },
+        },
+        payload: {
+          inviterEmail: 'test@test.te',
+          inviterSubscriptionId: 1,
+          inviterSubscriptionUuid: '2-3-4',
+          inviteeIdentifier: 'invitee@test.te',
+          inviteeIdentifierType: InviteeIdentifierType.Email,
+          sharedSubscriptionInvitationUuid: '1-2-3',
+        },
+        type: 'SHARED_SUBSCRIPTION_INVITATION_CANCELED',
+      })
+  })
+
+  it('should create a SHARED_SUBSCRIPTION_INVITATION_CREATED event', () => {
+    expect(createFactory().createSharedSubscriptionInvitationCreatedEvent({
+      inviterEmail: 'test@test.te',
+      inviterSubscriptionId: 1,
+      inviteeIdentifier: 'invitee@test.te',
+      inviteeIdentifierType: InviteeIdentifierType.Email,
+      sharedSubscriptionInvitationUuid: '1-2-3',
+    }))
+      .toEqual({
+        createdAt: expect.any(Date),
+        meta: {
+          correlation: {
+            userIdentifier: 'test@test.te',
+            userIdentifierType: 'email',
+          },
+        },
+        payload: {
+          inviterEmail: 'test@test.te',
+          inviterSubscriptionId: 1,
+          inviteeIdentifier: 'invitee@test.te',
+          inviteeIdentifierType: InviteeIdentifierType.Email,
+          sharedSubscriptionInvitationUuid: '1-2-3',
+        },
+        type: 'SHARED_SUBSCRIPTION_INVITATION_CREATED',
+      })
   })
 
   it('should create a USER_DISABLED_SESSION_USER_AGENT_LOGGING event', () => {
@@ -182,7 +239,10 @@ describe('DomainEventFactory', () => {
   })
 
   it('should create a ACCOUNT_DELETION_REQUESTED event', () => {
-    expect(createFactory().createAccountDeletionRequestedEvent('1-2-3'))
+    expect(createFactory().createAccountDeletionRequestedEvent({
+      userUuid: '1-2-3',
+      regularSubscriptionUuid: '2-3-4',
+    }))
       .toEqual({
         createdAt: expect.any(Date),
         meta: {
@@ -193,6 +253,7 @@ describe('DomainEventFactory', () => {
         },
         payload: {
           userUuid: '1-2-3',
+          regularSubscriptionUuid: '2-3-4',
         },
         type: 'ACCOUNT_DELETION_REQUESTED',
       })

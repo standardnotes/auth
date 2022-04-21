@@ -1,25 +1,26 @@
 import { inject, injectable } from 'inversify'
+import { SubscriptionName } from '@standardnotes/common'
+import { TimerInterface } from '@standardnotes/time'
 import { TokenEncoderInterface, ValetTokenData } from '@standardnotes/auth'
 import { CreateValetTokenPayload } from '@standardnotes/payloads'
+import { SubscriptionSettingName } from '@standardnotes/settings'
 import { CreateValetTokenResponseData } from '@standardnotes/responses'
 
-import { CreateValetTokenDTO } from './CreateValetTokenDTO'
-import { UseCaseInterface } from '../UseCaseInterface'
 import TYPES from '../../../Bootstrap/Types'
-import { SettingServiceInterface } from '../../Setting/SettingServiceInterface'
-import { SettingName } from '@standardnotes/settings'
-import { UserSubscriptionRepositoryInterface } from '../../Subscription/UserSubscriptionRepositoryInterface'
-import { TimerInterface } from '@standardnotes/time'
-import { SettingsAssociationServiceInterface } from '../../Setting/SettingsAssociationServiceInterface'
-import { SubscriptionName } from '@standardnotes/common'
+import { UseCaseInterface } from '../UseCaseInterface'
+import { SubscriptionSettingServiceInterface } from '../../Setting/SubscriptionSettingServiceInterface'
+
+import { CreateValetTokenDTO } from './CreateValetTokenDTO'
+import { SubscriptionSettingsAssociationServiceInterface } from '../../Setting/SubscriptionSettingsAssociationServiceInterface'
+import { UserSubscriptionServiceInterface } from '../../Subscription/UserSubscriptionServiceInterface'
 
 @injectable()
 export class CreateValetToken implements UseCaseInterface {
   constructor(
     @inject(TYPES.ValetTokenEncoder) private tokenEncoder: TokenEncoderInterface<ValetTokenData>,
-    @inject(TYPES.SettingService) private settingService: SettingServiceInterface,
-    @inject(TYPES.SettingsAssociationService) private settingsAssociationService: SettingsAssociationServiceInterface,
-    @inject(TYPES.UserSubscriptionRepository) private userSubscriptionRepository: UserSubscriptionRepositoryInterface,
+    @inject(TYPES.SubscriptionSettingService) private subscriptionSettingService: SubscriptionSettingServiceInterface,
+    @inject(TYPES.SubscriptionSettingsAssociationService) private subscriptionSettingsAssociationService: SubscriptionSettingsAssociationServiceInterface,
+    @inject(TYPES.UserSubscriptionService) private userSubscriptionService: UserSubscriptionServiceInterface,
     @inject(TYPES.Timer) private timer: TimerInterface,
     @inject(TYPES.VALET_TOKEN_TTL) private valetTokenTTL: number,
   ) {
@@ -27,15 +28,15 @@ export class CreateValetToken implements UseCaseInterface {
 
   async execute(dto: CreateValetTokenDTO): Promise<CreateValetTokenResponseData> {
     const { userUuid, ...payload } = dto
-    const userSubscription = await this.userSubscriptionRepository.findOneByUserUuid(userUuid)
-    if (userSubscription === undefined) {
+    const { regularSubscription, sharedSubscription } = await this.userSubscriptionService.findRegularSubscriptionForUserUuid(userUuid)
+    if (regularSubscription === undefined) {
       return {
         success: false,
         reason: 'no-subscription',
       }
     }
 
-    if (userSubscription.endsAt < this.timer.getTimestampInMicroseconds()) {
+    if (regularSubscription.endsAt < this.timer.getTimestampInMicroseconds()) {
       return {
         success: false,
         reason: 'expired-subscription',
@@ -49,23 +50,32 @@ export class CreateValetToken implements UseCaseInterface {
       }
     }
 
+    const regularSubscriptionUserUuid = (await regularSubscription.user).uuid
+
     let uploadBytesUsed = 0
-    const uploadBytesUsedSetting = await this.settingService.findSettingWithDecryptedValue({
-      userUuid: dto.userUuid,
-      settingName: SettingName.FileUploadBytesUsed,
+    const uploadBytesUsedSetting = await this.subscriptionSettingService.findSubscriptionSettingWithDecryptedValue({
+      userUuid: regularSubscriptionUserUuid,
+      userSubscriptionUuid: regularSubscription.uuid,
+      subscriptionSettingName: SubscriptionSettingName.FileUploadBytesUsed,
     })
     if (uploadBytesUsedSetting !== undefined) {
       uploadBytesUsed = +(uploadBytesUsedSetting.value as string)
     }
 
-    const defaultUploadBytesLimitForSubscription = await this.settingsAssociationService.getFileUploadLimit(userSubscription.planName as SubscriptionName)
+    const defaultUploadBytesLimitForSubscription = await this.subscriptionSettingsAssociationService.getFileUploadLimit(regularSubscription.planName as SubscriptionName)
     let uploadBytesLimit = defaultUploadBytesLimitForSubscription
-    const overwriteWithUserUploadBytesLimitSetting = await this.settingService.findSettingWithDecryptedValue({
-      userUuid: dto.userUuid,
-      settingName: SettingName.FileUploadBytesLimit,
+    const overwriteWithUserUploadBytesLimitSetting = await this.subscriptionSettingService.findSubscriptionSettingWithDecryptedValue({
+      userUuid: regularSubscriptionUserUuid,
+      userSubscriptionUuid: regularSubscription.uuid,
+      subscriptionSettingName: SubscriptionSettingName.FileUploadBytesLimit,
     })
     if (overwriteWithUserUploadBytesLimitSetting !== undefined) {
       uploadBytesLimit = +(overwriteWithUserUploadBytesLimitSetting.value as string)
+    }
+
+    let sharedSubscriptionUuid = undefined
+    if (sharedSubscription !== undefined) {
+      sharedSubscriptionUuid = sharedSubscription.uuid
     }
 
     const tokenData: ValetTokenData = {
@@ -74,6 +84,8 @@ export class CreateValetToken implements UseCaseInterface {
       permittedResources: dto.resources,
       uploadBytesUsed,
       uploadBytesLimit,
+      sharedSubscriptionUuid,
+      regularSubscriptionUuid: regularSubscription.uuid,
     }
 
     const valetToken = this.tokenEncoder.encodeExpirableToken(tokenData, this.valetTokenTTL)

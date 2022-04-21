@@ -2,6 +2,7 @@ import { DomainEventPublisherInterface } from '@standardnotes/domain-events'
 import { inject, injectable } from 'inversify'
 import TYPES from '../../../Bootstrap/Types'
 import { DomainEventFactoryInterface } from '../../Event/DomainEventFactoryInterface'
+import { UserSubscriptionServiceInterface } from '../../Subscription/UserSubscriptionServiceInterface'
 import { UserRepositoryInterface } from '../../User/UserRepositoryInterface'
 import { UseCaseInterface } from '../UseCaseInterface'
 import { DeleteAccountDTO } from './DeleteAccountDTO'
@@ -11,6 +12,7 @@ import { DeleteAccountResponse } from './DeleteAccountResponse'
 export class DeleteAccount implements UseCaseInterface {
   constructor (
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
+    @inject(TYPES.UserSubscriptionService) private userSubscriptionService: UserSubscriptionServiceInterface,
     @inject(TYPES.DomainEventPublisher) private domainEventPublisher: DomainEventPublisherInterface,
     @inject(TYPES.DomainEventFactory) private domainEventFactory: DomainEventFactoryInterface,
   ) {
@@ -27,8 +29,17 @@ export class DeleteAccount implements UseCaseInterface {
       }
     }
 
+    let regularSubscriptionUuid = undefined
+    const { regularSubscription } = await this.userSubscriptionService.findRegularSubscriptionForUserUuid(user.uuid)
+    if (regularSubscription !== undefined) {
+      regularSubscriptionUuid = regularSubscription.uuid
+    }
+
     await this.domainEventPublisher.publish(
-      this.domainEventFactory.createAccountDeletionRequestedEvent(user.uuid)
+      this.domainEventFactory.createAccountDeletionRequestedEvent({
+        userUuid: user.uuid,
+        regularSubscriptionUuid,
+      })
     )
 
     return {

@@ -12,6 +12,7 @@ import { GetUserSubscription } from '../Domain/UseCase/GetUserSubscription/GetUs
 import { ClearLoginAttempts } from '../Domain/UseCase/ClearLoginAttempts'
 import { IncreaseLoginAttempts } from '../Domain/UseCase/IncreaseLoginAttempts'
 import { ChangeCredentials } from '../Domain/UseCase/ChangeCredentials/ChangeCredentials'
+import { InviteToSharedSubscription } from '../Domain/UseCase/InviteToSharedSubscription/InviteToSharedSubscription'
 
 describe('UsersController', () => {
   let updateUser: UpdateUser
@@ -21,6 +22,7 @@ describe('UsersController', () => {
   let clearLoginAttempts: ClearLoginAttempts
   let increaseLoginAttempts: IncreaseLoginAttempts
   let changeCredentials: ChangeCredentials
+  let inviteToSharedSubscription: InviteToSharedSubscription
 
   let request: express.Request
   let response: express.Response
@@ -33,7 +35,7 @@ describe('UsersController', () => {
     getUserSubscription,
     clearLoginAttempts,
     increaseLoginAttempts,
-    changeCredentials
+    changeCredentials,
   )
 
   beforeEach(() => {
@@ -61,6 +63,9 @@ describe('UsersController', () => {
 
     increaseLoginAttempts = {} as jest.Mocked<IncreaseLoginAttempts>
     increaseLoginAttempts.execute = jest.fn()
+
+    inviteToSharedSubscription = {} as jest.Mocked<InviteToSharedSubscription>
+    inviteToSharedSubscription.execute = jest.fn()
 
     request = {
       headers: {},

@@ -13,6 +13,8 @@ import { UserSubscriptionRepositoryInterface } from '../Subscription/UserSubscri
 import { SubscriptionReassignedEventHandler } from './SubscriptionReassignedEventHandler'
 import { UserSubscription } from '../Subscription/UserSubscription'
 import { SettingServiceInterface } from '../Setting/SettingServiceInterface'
+import { UserSubscriptionType } from '../Subscription/UserSubscriptionType'
+import { SubscriptionSettingServiceInterface } from '../Setting/SubscriptionSettingServiceInterface'
 
 describe('SubscriptionReassignedEventHandler', () => {
   let userRepository: UserRepositoryInterface
@@ -25,12 +27,14 @@ describe('SubscriptionReassignedEventHandler', () => {
   let subscriptionExpiresAt: number
   let timestamp: number
   let settingService: SettingServiceInterface
+  let subscriptionSettingService: SubscriptionSettingServiceInterface
 
   const createHandler = () => new SubscriptionReassignedEventHandler(
     userRepository,
     userSubscriptionRepository,
     roleService,
     settingService,
+    subscriptionSettingService,
     logger
   )
 
@@ -42,7 +46,9 @@ describe('SubscriptionReassignedEventHandler', () => {
         name: RoleName.CoreUser,
       }]),
     } as jest.Mocked<User>
-    subscription = {} as jest.Mocked<UserSubscription>
+    subscription = {
+      subscriptionType: UserSubscriptionType.Regular,
+    } as jest.Mocked<UserSubscription>
 
     userRepository = {} as jest.Mocked<UserRepositoryInterface>
     userRepository.findOneByEmail = jest.fn().mockReturnValue(user)
@@ -70,7 +76,9 @@ describe('SubscriptionReassignedEventHandler', () => {
 
     settingService = {} as jest.Mocked<SettingServiceInterface>
     settingService.createOrReplace = jest.fn()
-    settingService.applyDefaultSettingsForSubscription = jest.fn()
+
+    subscriptionSettingService = {} as jest.Mocked<SubscriptionSettingServiceInterface>
+    subscriptionSettingService.applyDefaultSubscriptionSettingsForSubscription = jest.fn()
 
     logger = {} as jest.Mocked<Logger>
     logger.info = jest.fn()
@@ -80,7 +88,7 @@ describe('SubscriptionReassignedEventHandler', () => {
   it('should update user default settings', async () => {
     await createHandler().handle(event)
 
-    expect(settingService.applyDefaultSettingsForSubscription).toHaveBeenCalledWith(user, SubscriptionName.ProPlan)
+    expect(subscriptionSettingService.applyDefaultSubscriptionSettingsForSubscription).toHaveBeenCalledWith(subscription, SubscriptionName.ProPlan)
   })
 
   it('should update the user role', async () => {

@@ -2,8 +2,8 @@ import 'reflect-metadata'
 
 import { RoleName, SubscriptionName } from '@standardnotes/common'
 import { SubscriptionRenewedEvent } from '@standardnotes/domain-events'
-
 import * as dayjs from 'dayjs'
+import { Logger } from 'winston'
 
 import { SubscriptionRenewedEventHandler } from './SubscriptionRenewedEventHandler'
 import { UserSubscriptionRepositoryInterface } from '../Subscription/UserSubscriptionRepositoryInterface'
@@ -13,8 +13,7 @@ import { UserSubscription } from '../Subscription/UserSubscription'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { OfflineUserSubscription } from '../Subscription/OfflineUserSubscription'
 import { RoleServiceInterface } from '../Role/RoleServiceInterface'
-import { Logger } from 'winston'
-import { SettingServiceInterface } from '../Setting/SettingServiceInterface'
+
 
 describe('SubscriptionRenewedEventHandler', () => {
   let userRepository: UserRepositoryInterface
@@ -27,7 +26,6 @@ describe('SubscriptionRenewedEventHandler', () => {
   let subscription: UserSubscription
   let event: SubscriptionRenewedEvent
   let subscriptionExpiresAt: number
-  let settingService: SettingServiceInterface
   let timestamp: number
 
   const createHandler = () => new SubscriptionRenewedEventHandler(
@@ -35,7 +33,6 @@ describe('SubscriptionRenewedEventHandler', () => {
     userSubscriptionRepository,
     offlineUserSubscriptionRepository,
     roleService,
-    settingService,
     logger
   )
 
@@ -56,6 +53,7 @@ describe('SubscriptionRenewedEventHandler', () => {
     userSubscriptionRepository = {} as jest.Mocked<UserSubscriptionRepositoryInterface>
     userSubscriptionRepository.updateEndsAt = jest.fn()
     userSubscriptionRepository.save = jest.fn().mockReturnValue(subscription)
+    userSubscriptionRepository.findBySubscriptionId = jest.fn().mockReturnValue([ { user: Promise.resolve(user) } as jest.Mocked<UserSubscription>])
 
     offlineUserSubscription = {} as jest.Mocked<OfflineUserSubscription>
 
@@ -81,17 +79,8 @@ describe('SubscriptionRenewedEventHandler', () => {
       offline: false,
     }
 
-    settingService = {} as jest.Mocked<SettingServiceInterface>
-    settingService.applyDefaultSettingsForSubscription = jest.fn()
-
     logger = {} as jest.Mocked<Logger>
     logger.warn = jest.fn()
-  })
-
-  it('should update user default settings', async () => {
-    await createHandler().handle(event)
-
-    expect(settingService.applyDefaultSettingsForSubscription).toHaveBeenCalledWith(user, SubscriptionName.ProPlan)
   })
 
   it('should update subscription ends at', async () => {

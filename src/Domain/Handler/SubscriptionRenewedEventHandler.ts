@@ -7,12 +7,10 @@ import { inject, injectable } from 'inversify'
 import TYPES from '../../Bootstrap/Types'
 import { UserSubscriptionRepositoryInterface } from '../Subscription/UserSubscriptionRepositoryInterface'
 import { OfflineUserSubscriptionRepositoryInterface } from '../Subscription/OfflineUserSubscriptionRepositoryInterface'
-import { User } from '../User/User'
 import { SubscriptionName } from '@standardnotes/common'
 import { RoleServiceInterface } from '../Role/RoleServiceInterface'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { Logger } from 'winston'
-import { SettingServiceInterface } from '../Setting/SettingServiceInterface'
 import { OfflineUserSubscription } from '../Subscription/OfflineUserSubscription'
 
 @injectable()
@@ -24,7 +22,6 @@ implements DomainEventHandlerInterface
     @inject(TYPES.UserSubscriptionRepository) private userSubscriptionRepository: UserSubscriptionRepositoryInterface,
     @inject(TYPES.OfflineUserSubscriptionRepository) private offlineUserSubscriptionRepository: OfflineUserSubscriptionRepositoryInterface,
     @inject(TYPES.RoleService) private roleService: RoleServiceInterface,
-    @inject(TYPES.SettingService) private settingService: SettingServiceInterface,
     @inject(TYPES.Logger) private logger: Logger
   ) {
   }
@@ -63,16 +60,19 @@ implements DomainEventHandlerInterface
       return
     }
 
-    await this.addUserRole(user, event.payload.subscriptionName)
-
-    await this.settingService.applyDefaultSettingsForSubscription(user, event.payload.subscriptionName)
+    await this.addRoleToSubscriptionUsers(event.payload.subscriptionId, event.payload.subscriptionName)
   }
 
-  private async addUserRole(
-    user: User,
+  private async addRoleToSubscriptionUsers(
+    subscriptionId: number,
     subscriptionName: SubscriptionName
   ): Promise<void> {
-    await this.roleService.addUserRole(user, subscriptionName)
+    const userSubscriptions = await this.userSubscriptionRepository.findBySubscriptionId(subscriptionId)
+    for (const userSubscription of userSubscriptions) {
+      const user = await userSubscription.user
+
+      await this.roleService.addUserRole(user, subscriptionName)
+    }
   }
 
   private async updateSubscriptionEndsAt(

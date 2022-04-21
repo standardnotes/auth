@@ -1,4 +1,3 @@
-import { SubscriptionName } from '@standardnotes/common'
 import { SettingName } from '@standardnotes/settings'
 import { inject, injectable } from 'inversify'
 import { Logger } from 'winston'
@@ -8,46 +7,23 @@ import { CreateOrReplaceSettingDto } from './CreateOrReplaceSettingDto'
 import { CreateOrReplaceSettingResponse } from './CreateOrReplaceSettingResponse'
 import { FindSettingDTO } from './FindSettingDTO'
 import { Setting } from './Setting'
-import { SettingFactory } from './SettingFactory'
 import { SettingRepositoryInterface } from './SettingRepositoryInterface'
 import { SettingServiceInterface } from './SettingServiceInterface'
 import { SettingsAssociationServiceInterface } from './SettingsAssociationServiceInterface'
 import { SettingInterpreterInterface } from './SettingInterpreterInterface'
 import { SettingDecrypterInterface } from './SettingDecrypterInterface'
+import { SettingFactoryInterface } from './SettingFactoryInterface'
 
 @injectable()
 export class SettingService implements SettingServiceInterface {
   constructor(
-    @inject(TYPES.SettingFactory) private factory: SettingFactory,
+    @inject(TYPES.SettingFactory) private factory: SettingFactoryInterface,
     @inject(TYPES.SettingRepository) private settingRepository: SettingRepositoryInterface,
     @inject(TYPES.SettingsAssociationService) private settingsAssociationService: SettingsAssociationServiceInterface,
     @inject(TYPES.SettingInterpreter) private settingInterpreter: SettingInterpreterInterface,
     @inject(TYPES.SettingDecrypter) private settingDecrypter: SettingDecrypterInterface,
     @inject(TYPES.Logger) private logger: Logger,
   ) {
-  }
-
-  async applyDefaultSettingsForSubscription(user: User, subscriptionName: SubscriptionName): Promise<void> {
-    const defaultSettingsWithValues = await this.settingsAssociationService.getDefaultSettingsAndValuesForSubscriptionName(subscriptionName)
-    if (defaultSettingsWithValues === undefined) {
-      this.logger.warn(`Could not find settings for subscription: ${subscriptionName}`)
-
-      return
-    }
-
-    for (const settingName of defaultSettingsWithValues.keys()) {
-      const setting = defaultSettingsWithValues.get(settingName) as { value: string, sensitive: boolean, serverEncryptionVersion: number }
-
-      await this.createOrReplace({
-        user,
-        props: {
-          name: settingName,
-          unencryptedValue: setting.value,
-          serverEncryptionVersion: setting.serverEncryptionVersion,
-          sensitive: setting.sensitive,
-        },
-      })
-    }
   }
 
   async applyDefaultSettingsUponRegistration(user: User): Promise<void> {

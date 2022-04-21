@@ -1,23 +1,22 @@
 import 'reflect-metadata'
 
-import { SubscriptionName } from '@standardnotes/common'
-import { EmailBackupFrequency, LogSessionUserAgentOption, MuteSignInEmailsOption, SettingName } from '@standardnotes/settings'
+import { LogSessionUserAgentOption, MuteSignInEmailsOption, SettingName } from '@standardnotes/settings'
 import { Logger } from 'winston'
 import { EncryptionVersion } from '../Encryption/EncryptionVersion'
 import { User } from '../User/User'
 import { Setting } from './Setting'
-import { SettingFactory } from './SettingFactory'
 import { SettingRepositoryInterface } from './SettingRepositoryInterface'
 
 import { SettingService } from './SettingService'
 import { SettingsAssociationServiceInterface } from './SettingsAssociationServiceInterface'
 import { SettingInterpreterInterface } from './SettingInterpreterInterface'
 import { SettingDecrypterInterface } from './SettingDecrypterInterface'
+import { SettingFactoryInterface } from './SettingFactoryInterface'
 
 describe('SettingService', () => {
   let setting: Setting
   let user: User
-  let factory: SettingFactory
+  let factory: SettingFactoryInterface
   let settingRepository: SettingRepositoryInterface
   let settingsAssociationService: SettingsAssociationServiceInterface
   let settingInterpreter: SettingInterpreterInterface
@@ -41,7 +40,7 @@ describe('SettingService', () => {
 
     setting = {} as jest.Mocked<Setting>
 
-    factory = {} as jest.Mocked<SettingFactory>
+    factory = {} as jest.Mocked<SettingFactoryInterface>
     factory.create = jest.fn().mockReturnValue(setting)
     factory.createReplacement = jest.fn().mockReturnValue(setting)
 
@@ -51,14 +50,6 @@ describe('SettingService', () => {
     settingRepository.save = jest.fn().mockImplementation(setting => setting)
 
     settingsAssociationService = {} as jest.Mocked<SettingsAssociationServiceInterface>
-    settingsAssociationService.getDefaultSettingsAndValuesForSubscriptionName = jest.fn().mockReturnValue(new Map([
-      [SettingName.EmailBackupFrequency,
-        {
-          value: EmailBackupFrequency.Weekly,
-          sensitive: 0,
-          serverEncryptionVersion: EncryptionVersion.Unencrypted,
-        }],
-    ]))
     settingsAssociationService.getDefaultSettingsAndValuesForNewUser = jest.fn().mockReturnValue(new Map([
       [SettingName.MuteSignInEmails, { value: MuteSignInEmailsOption.NotMuted, sensitive: 0, serverEncryptionVersion: EncryptionVersion.Unencrypted }],
     ]))
@@ -91,20 +82,6 @@ describe('SettingService', () => {
     await createService().applyDefaultSettingsUponRegistration(user)
 
     expect(settingRepository.save).toHaveBeenCalledWith(setting)
-  })
-
-  it ('should create default settings for a subscription', async () => {
-    await createService().applyDefaultSettingsForSubscription(user, SubscriptionName.PlusPlan)
-
-    expect(settingRepository.save).toHaveBeenCalledWith(setting)
-  })
-
-  it ('should not create default settings for a subscription if subscription has no defaults', async () => {
-    settingsAssociationService.getDefaultSettingsAndValuesForSubscriptionName = jest.fn().mockReturnValue(undefined)
-
-    await createService().applyDefaultSettingsForSubscription(user, SubscriptionName.PlusPlan)
-
-    expect(settingRepository.save).not.toHaveBeenCalled()
   })
 
   it ('should create setting if it doesn\'t exist', async () => {

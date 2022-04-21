@@ -1,5 +1,7 @@
-import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
+import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
+import { SubscriptionSetting } from '../Setting/SubscriptionSetting'
 import { User } from '../User/User'
+import { UserSubscriptionType } from './UserSubscriptionType'
 
 @Entity({ name: 'user_subscriptions' })
 export class UserSubscription {
@@ -48,6 +50,13 @@ export class UserSubscription {
   })
   subscriptionId: number | null
 
+  @Column({
+    name: 'subscription_type',
+    length: 24,
+    type: 'varchar',
+  })
+  subscriptionType: UserSubscriptionType
+
   @ManyToOne(
     /* istanbul ignore next */
     () => User,
@@ -58,4 +67,12 @@ export class UserSubscription {
   )
   @JoinColumn({ name: 'user_uuid', referencedColumnName: 'uuid' })
   user: Promise<User>
+
+  @OneToMany(
+    /* istanbul ignore next */
+    () => SubscriptionSetting,
+    /* istanbul ignore next */
+    subscriptionSetting => subscriptionSetting.userSubscription
+  )
+  subscriptionSettings: Promise<SubscriptionSetting[]>
 }

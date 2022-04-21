@@ -136,6 +136,27 @@ import { SettingInterpreterInterface } from '../Domain/Setting/SettingInterprete
 import { SettingInterpreter } from '../Domain/Setting/SettingInterpreter'
 import { SettingDecrypterInterface } from '../Domain/Setting/SettingDecrypterInterface'
 import { SettingDecrypter } from '../Domain/Setting/SettingDecrypter'
+import { SharedSubscriptionInvitationRepositoryInterface } from '../Domain/SharedSubscription/SharedSubscriptionInvitationRepositoryInterface'
+import { MySQLSharedSubscriptionInvitationRepository } from '../Infra/MySQL/MySQLSharedSubscriptionInvitationRepository'
+import { InviteToSharedSubscription } from '../Domain/UseCase/InviteToSharedSubscription/InviteToSharedSubscription'
+import { SharedSubscriptionInvitation } from '../Domain/SharedSubscription/SharedSubscriptionInvitation'
+import { AcceptSharedSubscriptionInvitation } from '../Domain/UseCase/AcceptSharedSubscriptionInvitation/AcceptSharedSubscriptionInvitation'
+import { DeclineSharedSubscriptionInvitation } from '../Domain/UseCase/DeclineSharedSubscriptionInvitation/DeclineSharedSubscriptionInvitation'
+import { CancelSharedSubscriptionInvitation } from '../Domain/UseCase/CancelSharedSubscriptionInvitation/CancelSharedSubscriptionInvitation'
+import { SharedSubscriptionInvitationCreatedEventHandler } from '../Domain/Handler/SharedSubscriptionInvitationCreatedEventHandler'
+import { SubscriptionSetting } from '../Domain/Setting/SubscriptionSetting'
+import { SubscriptionSettingServiceInterface } from '../Domain/Setting/SubscriptionSettingServiceInterface'
+import { SubscriptionSettingService } from '../Domain/Setting/SubscriptionSettingService'
+import { SubscriptionSettingRepositoryInterface } from '../Domain/Setting/SubscriptionSettingRepositoryInterface'
+import { MySQLSubscriptionSettingRepository } from '../Infra/MySQL/MySQLSubscriptionSettingRepository'
+import { SettingFactoryInterface } from '../Domain/Setting/SettingFactoryInterface'
+import { ListSharedSubscriptionInvitations } from '../Domain/UseCase/ListSharedSubscriptionInvitations/ListSharedSubscriptionInvitations'
+import { UserSubscriptionServiceInterface } from '../Domain/Subscription/UserSubscriptionServiceInterface'
+import { UserSubscriptionService } from '../Domain/Subscription/UserSubscriptionService'
+import { SubscriptionSettingProjector } from '../Projection/SubscriptionSettingProjector'
+import { GetSubscriptionSetting } from '../Domain/UseCase/GetSubscriptionSetting/GetSubscriptionSetting'
+import { SubscriptionSettingsAssociationService } from '../Domain/Setting/SubscriptionSettingsAssociationService'
+import { SubscriptionSettingsAssociationServiceInterface } from '../Domain/Setting/SubscriptionSettingsAssociationServiceInterface'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const newrelicWinstonEnricher = require('@newrelic/winston-enricher')
@@ -184,6 +205,8 @@ export class ContainerConfigLoader {
         Permission,
         Setting,
         OfflineSetting,
+        SharedSubscriptionInvitation,
+        SubscriptionSetting,
       ],
       migrations: [
         env.get('DB_MIGRATIONS_PATH'),
@@ -247,6 +270,7 @@ export class ContainerConfigLoader {
     container.bind<MySQLRevokedSessionRepository>(TYPES.RevokedSessionRepository).toConstantValue(connection.getCustomRepository(MySQLRevokedSessionRepository))
     container.bind<MySQLUserRepository>(TYPES.UserRepository).toConstantValue(connection.getCustomRepository(MySQLUserRepository))
     container.bind<SettingRepositoryInterface>(TYPES.SettingRepository).toConstantValue(connection.getCustomRepository(MySQLSettingRepository))
+    container.bind<SubscriptionSettingRepositoryInterface>(TYPES.SubscriptionSettingRepository).toConstantValue(connection.getCustomRepository(MySQLSubscriptionSettingRepository))
     container.bind<OfflineSettingRepositoryInterface>(TYPES.OfflineSettingRepository).toConstantValue(connection.getCustomRepository(MySQLOfflineSettingRepository))
     container.bind<MySQLRoleRepository>(TYPES.RoleRepository).toConstantValue(connection.getCustomRepository(MySQLRoleRepository))
     container.bind<UserSubscriptionRepositoryInterface>(TYPES.UserSubscriptionRepository).toConstantValue(connection.getCustomRepository(MySQLUserSubscriptionRepository))
@@ -256,6 +280,7 @@ export class ContainerConfigLoader {
     container.bind<WebSocketsConnectionRepositoryInterface>(TYPES.WebSocketsConnectionRepository).to(RedisWebSocketsConnectionRepository)
     container.bind<SubscriptionTokenRepositoryInterface>(TYPES.SubscriptionTokenRepository).to(RedisSubscriptionTokenRepository)
     container.bind<OfflineSubscriptionTokenRepositoryInterface>(TYPES.OfflineSubscriptionTokenRepository).to(RedisOfflineSubscriptionTokenRepository)
+    container.bind<SharedSubscriptionInvitationRepositoryInterface>(TYPES.SharedSubscriptionInvitationRepository).toConstantValue(connection.getCustomRepository(MySQLSharedSubscriptionInvitationRepository))
 
     // Middleware
     container.bind<AuthMiddleware>(TYPES.AuthMiddleware).to(AuthMiddleware)
@@ -272,9 +297,10 @@ export class ContainerConfigLoader {
     container.bind<RoleProjector>(TYPES.RoleProjector).to(RoleProjector)
     container.bind<PermissionProjector>(TYPES.PermissionProjector).to(PermissionProjector)
     container.bind<SettingProjector>(TYPES.SettingProjector).to(SettingProjector)
+    container.bind<SubscriptionSettingProjector>(TYPES.SubscriptionSettingProjector).to(SubscriptionSettingProjector)
 
     // Factories
-    container.bind<SettingFactory>(TYPES.SettingFactory).to(SettingFactory)
+    container.bind<SettingFactoryInterface>(TYPES.SettingFactory).to(SettingFactory)
 
     // env vars
     container.bind(TYPES.JWT_SECRET).toConstantValue(env.get('JWT_SECRET'))
@@ -338,6 +364,12 @@ export class ContainerConfigLoader {
     container.bind<MuteSignInEmails>(TYPES.MuteSignInEmails).to(MuteSignInEmails)
     container.bind<CreateValetToken>(TYPES.CreateValetToken).to(CreateValetToken)
     container.bind<CreateListedAccount>(TYPES.CreateListedAccount).to(CreateListedAccount)
+    container.bind<InviteToSharedSubscription>(TYPES.InviteToSharedSubscription).to(InviteToSharedSubscription)
+    container.bind<AcceptSharedSubscriptionInvitation>(TYPES.AcceptSharedSubscriptionInvitation).to(AcceptSharedSubscriptionInvitation)
+    container.bind<DeclineSharedSubscriptionInvitation>(TYPES.DeclineSharedSubscriptionInvitation).to(DeclineSharedSubscriptionInvitation)
+    container.bind<CancelSharedSubscriptionInvitation>(TYPES.CancelSharedSubscriptionInvitation).to(CancelSharedSubscriptionInvitation)
+    container.bind<ListSharedSubscriptionInvitations>(TYPES.ListSharedSubscriptionInvitations).to(ListSharedSubscriptionInvitations)
+    container.bind<GetSubscriptionSetting>(TYPES.GetSubscriptionSetting).to(GetSubscriptionSetting)
 
     // Handlers
     container.bind<UserRegisteredEventHandler>(TYPES.UserRegisteredEventHandler).to(UserRegisteredEventHandler)
@@ -356,6 +388,7 @@ export class ContainerConfigLoader {
     container.bind<ListedAccountCreatedEventHandler>(TYPES.ListedAccountCreatedEventHandler).to(ListedAccountCreatedEventHandler)
     container.bind<ListedAccountDeletedEventHandler>(TYPES.ListedAccountDeletedEventHandler).to(ListedAccountDeletedEventHandler)
     container.bind<UserDisabledSessionUserAgentLoggingEventHandler>(TYPES.UserDisabledSessionUserAgentLoggingEventHandler).to(UserDisabledSessionUserAgentLoggingEventHandler)
+    container.bind<SharedSubscriptionInvitationCreatedEventHandler>(TYPES.SharedSubscriptionInvitationCreatedEventHandler).to(SharedSubscriptionInvitationCreatedEventHandler)
 
     // Services
     container.bind<UAParser>(TYPES.DeviceDetector).toConstantValue(new UAParser())
@@ -378,6 +411,7 @@ export class ContainerConfigLoader {
     container.bind<AxiosInstance>(TYPES.HTTPClient).toConstantValue(axios.create())
     container.bind<CrypterInterface>(TYPES.Crypter).to(CrypterNode)
     container.bind<SettingServiceInterface>(TYPES.SettingService).to(SettingService)
+    container.bind<SubscriptionSettingServiceInterface>(TYPES.SubscriptionSettingService).to(SubscriptionSettingService)
     container.bind<OfflineSettingServiceInterface>(TYPES.OfflineSettingService).to(OfflineSettingService)
     container.bind<SnCryptoNode>(TYPES.SnCryptoNode).toConstantValue(new SnCryptoNode())
     container.bind<TimerInterface>(TYPES.Timer).toConstantValue(new Timer())
@@ -386,11 +420,13 @@ export class ContainerConfigLoader {
     container.bind<RoleServiceInterface>(TYPES.RoleService).to(RoleService)
     container.bind<RoleToSubscriptionMapInterface>(TYPES.RoleToSubscriptionMap).to(RoleToSubscriptionMap)
     container.bind<SettingsAssociationServiceInterface>(TYPES.SettingsAssociationService).to(SettingsAssociationService)
+    container.bind<SubscriptionSettingsAssociationServiceInterface>(TYPES.SubscriptionSettingsAssociationService).to(SubscriptionSettingsAssociationService)
     container.bind<FeatureServiceInterface>(TYPES.FeatureService).to(FeatureService)
     container.bind<SettingInterpreterInterface>(TYPES.SettingInterpreter).to(SettingInterpreter)
     container.bind<SettingDecrypterInterface>(TYPES.SettingDecrypter).to(SettingDecrypter)
     container.bind<SelectorInterface<ProtocolVersion>>(TYPES.ProtocolVersionSelector).toConstantValue(new DeterministicSelector<ProtocolVersion>())
     container.bind<SelectorInterface<boolean>>(TYPES.BooleanSelector).toConstantValue(new DeterministicSelector<boolean>())
+    container.bind<UserSubscriptionServiceInterface>(TYPES.UserSubscriptionService).to(UserSubscriptionService)
 
     if (env.get('SNS_TOPIC_ARN', true)) {
       container.bind<SNSDomainEventPublisher>(TYPES.DomainEventPublisher).toConstantValue(
@@ -425,6 +461,7 @@ export class ContainerConfigLoader {
       ['LISTED_ACCOUNT_CREATED', container.get(TYPES.ListedAccountCreatedEventHandler)],
       ['LISTED_ACCOUNT_DELETED', container.get(TYPES.ListedAccountDeletedEventHandler)],
       ['USER_DISABLED_SESSION_USER_AGENT_LOGGING', container.get(TYPES.UserDisabledSessionUserAgentLoggingEventHandler)],
+      ['SHARED_SUBSCRIPTION_INVITATION_CREATED', container.get(TYPES.SharedSubscriptionInvitationCreatedEventHandler)],
     ])
 
     if (env.get('SQS_QUEUE_URL', true)) {

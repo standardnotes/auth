@@ -12,6 +12,7 @@ import { SubscriptionRefundedEventHandler } from './SubscriptionRefundedEventHan
 import { UserSubscriptionRepositoryInterface } from '../Subscription/UserSubscriptionRepositoryInterface'
 import { RoleServiceInterface } from '../Role/RoleServiceInterface'
 import { OfflineUserSubscriptionRepositoryInterface } from '../Subscription/OfflineUserSubscriptionRepositoryInterface'
+import { UserSubscription } from '../Subscription/UserSubscription'
 
 describe('SubscriptionRefundedEventHandler', () => {
   let userRepository: UserRepositoryInterface
@@ -46,6 +47,7 @@ describe('SubscriptionRefundedEventHandler', () => {
 
     userSubscriptionRepository = {} as jest.Mocked<UserSubscriptionRepositoryInterface>
     userSubscriptionRepository.updateEndsAt = jest.fn()
+    userSubscriptionRepository.findBySubscriptionId = jest.fn().mockReturnValue([ { user: Promise.resolve(user) } as jest.Mocked<UserSubscription>])
 
     offlineUserSubscriptionRepository = {} as jest.Mocked<OfflineUserSubscriptionRepositoryInterface>
     offlineUserSubscriptionRepository.updateEndsAt = jest.fn()

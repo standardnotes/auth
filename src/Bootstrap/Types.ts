@@ -10,6 +10,7 @@ const TYPES = {
   EphemeralSessionRepository: Symbol.for('EphemeralSessionRepository'),
   RevokedSessionRepository: Symbol.for('RevokedSessionRepository'),
   SettingRepository: Symbol.for('SettingRepository'),
+  SubscriptionSettingRepository: Symbol.for('SubscriptionSettingRepository'),
   OfflineSettingRepository: Symbol.for('OfflineSettingRepository'),
   LockRepository: Symbol.for('LockRepository'),
   RoleRepository: Symbol.for('RoleRepository'),
@@ -18,6 +19,7 @@ const TYPES = {
   OfflineUserSubscriptionRepository: Symbol.for('OfflineUserSubscriptionRepository'),
   SubscriptionTokenRepository: Symbol.for('SubscriptionTokenRepository'),
   OfflineSubscriptionTokenRepository: Symbol.for('OfflineSubscriptionTokenRepository'),
+  SharedSubscriptionInvitationRepository: Symbol.for('SharedSubscriptionInvitationRepository'),
   // Middleware
   AuthMiddleware: Symbol.for('AuthMiddleware'),
   ApiGatewayAuthMiddleware: Symbol.for('ApiGatewayAuthMiddleware'),
@@ -32,6 +34,7 @@ const TYPES = {
   RoleProjector: Symbol.for('RoleProjector'),
   PermissionProjector: Symbol.for('PermissionProjector'),
   SettingProjector: Symbol.for('SettingProjector'),
+  SubscriptionSettingProjector: Symbol.for('SubscriptionSettingProjector'),
   // Factories
   SettingFactory: Symbol.for('SettingFactory'),
   // env vars
@@ -96,6 +99,12 @@ const TYPES = {
   MuteSignInEmails: Symbol.for('MuteSignInEmails'),
   CreateValetToken: Symbol.for('CreateValetToken'),
   CreateListedAccount: Symbol.for('CreateListedAccount'),
+  InviteToSharedSubscription: Symbol.for('InviteToSharedSubscription'),
+  AcceptSharedSubscriptionInvitation: Symbol.for('AcceptSharedSubscriptionInvitation'),
+  DeclineSharedSubscriptionInvitation: Symbol.for('DeclineSharedSubscriptionInvitation'),
+  CancelSharedSubscriptionInvitation: Symbol.for('CancelSharedSubscriptionInvitation'),
+  ListSharedSubscriptionInvitations: Symbol.for('ListSharedSubscriptionInvitations'),
+  GetSubscriptionSetting: Symbol.for('GetSubscriptionSetting'),
   // Handlers
   UserRegisteredEventHandler: Symbol.for('UserRegisteredEventHandler'),
   AccountDeletionRequestedEventHandler: Symbol.for('AccountDeletionRequestedEventHandler'),
@@ -113,10 +122,12 @@ const TYPES = {
   ListedAccountCreatedEventHandler: Symbol.for('ListedAccountCreatedEventHandler'),
   ListedAccountDeletedEventHandler: Symbol.for('ListedAccountDeletedEventHandler'),
   UserDisabledSessionUserAgentLoggingEventHandler: Symbol.for('UserDisabledSessionUserAgentLoggingEventHandler'),
+  SharedSubscriptionInvitationCreatedEventHandler: Symbol.for('SharedSubscriptionInvitationCreatedEventHandler'),
   // Services
   DeviceDetector: Symbol.for('DeviceDetector'),
   SessionService: Symbol.for('SessionService'),
   SettingService: Symbol.for('SettingService'),
+  SubscriptionSettingService: Symbol.for('SubscriptionSettingService'),
   OfflineSettingService: Symbol.for('OfflineSettingService'),
   AuthResponseFactory20161215: Symbol.for('AuthResponseFactory20161215'),
   AuthResponseFactory20190520: Symbol.for('AuthResponseFactory20190520'),
@@ -145,11 +156,13 @@ const TYPES = {
   RoleService: Symbol.for('RoleService'),
   RoleToSubscriptionMap: Symbol.for('RoleToSubscriptionMap'),
   SettingsAssociationService: Symbol.for('SettingsAssociationService'),
+  SubscriptionSettingsAssociationService: Symbol.for('SubscriptionSettingsAssociationService'),
   FeatureService: Symbol.for('FeatureService'),
   SettingDecrypter: Symbol.for('SettingDecrypter'),
   SettingInterpreter: Symbol.for('SettingInterpreter'),
   ProtocolVersionSelector: Symbol.for('ProtocolVersionSelector'),
   BooleanSelector: Symbol.for('BooleanSelector'),
+  UserSubscriptionService: Symbol.for('UserSubscriptionService'),
 }
 
 export default TYPES
