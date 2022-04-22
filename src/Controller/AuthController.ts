@@ -135,7 +135,7 @@ export class AuthController extends BaseHttpController {
     return this.json(signInResult.authResponse)
   }
 
-  @httpPost('/sign_out', TYPES.AuthMiddleware)
+  @httpPost('/sign_out', TYPES.AuthMiddlewareWithoutResponse)
   async signOut(request: Request, response: Response): Promise<results.JsonResult | results.StatusCodeResult> {
     if (response.locals.readOnlyAccess) {
       return this.json({

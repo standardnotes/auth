@@ -22,6 +22,7 @@ export class AuthMiddlewareWithoutResponse extends BaseMiddleware {
 
       response.locals.user = authenticateRequestResponse.user
       response.locals.session = authenticateRequestResponse.session
+      response.locals.readOnlyAccess = authenticateRequestResponse.session?.readonlyAccess ?? false
 
       return next()
     } catch (error) {
