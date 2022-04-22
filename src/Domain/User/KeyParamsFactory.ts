@@ -18,7 +18,11 @@ export class KeyParamsFactory implements KeyParamsFactoryInterface {
 
   createPseudoParams(email: string): KeyParamsData {
     const versionSelectorHash = crypto.createHash('sha256').update(`version-selector-${email}${this.pseudoKeyParamsKey}`).digest('hex')
-    const version = this.protocolVersionSelector.select(versionSelectorHash, Object.values(ProtocolVersion))
+    const versionsThatAreCompliantWithPseudoParams = [
+      ProtocolVersion.V003,
+      ProtocolVersion.V004,
+    ]
+    const version = this.protocolVersionSelector.select(versionSelectorHash, versionsThatAreCompliantWithPseudoParams)
 
     return this.sortKeys({
       identifier: email,
