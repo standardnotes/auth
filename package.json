@@ -33,7 +33,7 @@
     "@standardnotes/common": "^1.18.0",
     "@standardnotes/domain-events": "^2.27.6",
     "@standardnotes/domain-events-infra": "1.4.45",
-    "@standardnotes/features": "^1.36.1",
+    "@standardnotes/features": "^1.38.0",
     "@standardnotes/payloads": "^1.4.8",
     "@standardnotes/responses": "^1.3.16",
     "@standardnotes/settings": "^1.14.0",
