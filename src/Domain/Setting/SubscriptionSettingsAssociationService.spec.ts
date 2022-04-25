@@ -30,10 +30,7 @@ describe('SubscriptionSettingsAssociationService', () => {
   })
 
   it('should return the default set of setting values for a core subscription', async () => {
-    const permission = {
-      name: PermissionName.Files5GB,
-    } as jest.Mocked<Permission>
-    role.permissions = Promise.resolve([ permission ])
+    role.permissions = Promise.resolve([])
     roleRepository.findOneByName = jest.fn().mockReturnValue(role)
 
     const settings = await createService().getDefaultSettingsAndValuesForSubscriptionName(SubscriptionName.CorePlan)
@@ -45,12 +42,31 @@ describe('SubscriptionSettingsAssociationService', () => {
       'FILE_UPLOAD_BYTES_USED',
       'FILE_UPLOAD_BYTES_LIMIT',
     ])
-    expect(settings?.get(SubscriptionSettingName.FileUploadBytesLimit)).toEqual({ sensitive: false, serverEncryptionVersion: 0, value: '5368709120' })
+    expect(settings?.get(SubscriptionSettingName.FileUploadBytesLimit)).toEqual({ sensitive: false, serverEncryptionVersion: 0, value: '0' })
+  })
+
+  it('should return the default set of setting values for a pro subscription', async () => {
+    const permission = {
+      name: PermissionName.FilesMaximumStorageTier,
+    } as jest.Mocked<Permission>
+    role.permissions = Promise.resolve([ permission ])
+    roleRepository.findOneByName = jest.fn().mockReturnValue(role)
+
+    const settings = await createService().getDefaultSettingsAndValuesForSubscriptionName(SubscriptionName.ProPlan)
+
+    expect(settings).not.toBeUndefined()
+
+    const flatSettings = [...(settings as Map<SubscriptionSettingName, { value: string, sensitive: boolean, serverEncryptionVersion: EncryptionVersion }>).keys()]
+    expect(flatSettings).toEqual([
+      'FILE_UPLOAD_BYTES_USED',
+      'FILE_UPLOAD_BYTES_LIMIT',
+    ])
+    expect(settings?.get(SubscriptionSettingName.FileUploadBytesLimit)).toEqual({ sensitive: false, serverEncryptionVersion: 0, value: '107374182400' })
   })
 
   it('should return the default set of setting values for a plus subscription', async () => {
     const permission = {
-      name: PermissionName.Files25GB,
+      name: PermissionName.FilesLowStorageTier,
     } as jest.Mocked<Permission>
     role.permissions = Promise.resolve([ permission ])
     roleRepository.findOneByName = jest.fn().mockReturnValue(role)
@@ -64,23 +80,7 @@ describe('SubscriptionSettingsAssociationService', () => {
       'FILE_UPLOAD_BYTES_USED',
       'FILE_UPLOAD_BYTES_LIMIT',
     ])
-    expect(settings?.get(SubscriptionSettingName.FileUploadBytesLimit)).toEqual({ sensitive: false, serverEncryptionVersion: 0, value: '26843545600' })
-  })
-
-  it('should return the default set of setting values for a pro subscription', async () => {
-    role.permissions = Promise.resolve([])
-    roleRepository.findOneByName = jest.fn().mockReturnValue(role)
-
-    const settings = await createService().getDefaultSettingsAndValuesForSubscriptionName(SubscriptionName.ProPlan)
-
-    expect(settings).not.toBeUndefined()
-
-    const flatSettings = [...(settings as Map<SubscriptionSettingName, { value: string, sensitive: boolean, serverEncryptionVersion: EncryptionVersion }>).keys()]
-    expect(flatSettings).toEqual([
-      'FILE_UPLOAD_BYTES_USED',
-      'FILE_UPLOAD_BYTES_LIMIT',
-    ])
-    expect(settings?.get(SubscriptionSettingName.FileUploadBytesLimit)).toEqual({ sensitive: false, serverEncryptionVersion: 0, value: '0' })
+    expect(settings?.get(SubscriptionSettingName.FileUploadBytesLimit)).toEqual({ sensitive: false, serverEncryptionVersion: 0, value: '104857600' })
   })
 
   it('should throw error if a role is not found when getting default setting values for a subscription', async () => {

@@ -58,14 +58,14 @@ export class SubscriptionSettingsAssociationService implements SubscriptionSetti
 
     const permissions = await role.permissions
 
-    const uploadLimit5GB = permissions.find((permission: Permission) => permission.name === PermissionName.Files5GB)
-    if (uploadLimit5GB !== undefined) {
-      return 5_368_709_120
+    const uploadLimit100GB = permissions.find((permission: Permission) => permission.name === PermissionName.FilesMaximumStorageTier)
+    if (uploadLimit100GB !== undefined) {
+      return 107_374_182_400
     }
 
-    const uploadLimit25GB = permissions.find((permission: Permission) => permission.name === PermissionName.Files25GB)
-    if (uploadLimit25GB !== undefined) {
-      return 26_843_545_600
+    const uploadLimit100MB = permissions.find((permission: Permission) => permission.name === PermissionName.FilesLowStorageTier)
+    if (uploadLimit100MB !== undefined) {
+      return 104_857_600
     }
 
     return 0
