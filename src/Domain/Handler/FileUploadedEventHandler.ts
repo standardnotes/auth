@@ -7,6 +7,7 @@ import { inject, injectable } from 'inversify'
 import { Logger } from 'winston'
 
 import TYPES from '../../Bootstrap/Types'
+import { EncryptionVersion } from '../Encryption/EncryptionVersion'
 import { SubscriptionSettingServiceInterface } from '../Setting/SubscriptionSettingServiceInterface'
 import { UserSubscription } from '../Subscription/UserSubscription'
 import { UserSubscriptionServiceInterface } from '../Subscription/UserSubscriptionServiceInterface'
@@ -62,6 +63,7 @@ export class FileUploadedEventHandler implements DomainEventHandlerInterface {
         name: SubscriptionSettingName.FileUploadBytesUsed,
         unencryptedValue: (+(bytesUsed) + byteSize).toString(),
         sensitive: false,
+        serverEncryptionVersion: EncryptionVersion.Unencrypted,
       },
     })
   }
