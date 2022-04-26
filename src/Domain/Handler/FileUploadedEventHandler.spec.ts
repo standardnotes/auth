@@ -76,6 +76,7 @@ describe('FileUploadedEventHandler', () => {
         name: 'FILE_UPLOAD_BYTES_USED',
         sensitive: false,
         unencryptedValue: '123',
+        serverEncryptionVersion: 0,
       },
       userSubscription:  {
         uuid: '1-2-3',
@@ -115,6 +116,7 @@ describe('FileUploadedEventHandler', () => {
         name: 'FILE_UPLOAD_BYTES_USED',
         sensitive: false,
         unencryptedValue: '468',
+        serverEncryptionVersion: 0,
       },
       userSubscription:  {
         uuid: '1-2-3',
@@ -137,6 +139,7 @@ describe('FileUploadedEventHandler', () => {
         name: 'FILE_UPLOAD_BYTES_USED',
         sensitive: false,
         unencryptedValue: '468',
+        serverEncryptionVersion: 0,
       },
       userSubscription:  {
         uuid: '1-2-3',
@@ -150,6 +153,7 @@ describe('FileUploadedEventHandler', () => {
         name: 'FILE_UPLOAD_BYTES_USED',
         sensitive: false,
         unencryptedValue: '468',
+        serverEncryptionVersion: 0,
       },
       userSubscription:  {
         uuid: '2-3-4',

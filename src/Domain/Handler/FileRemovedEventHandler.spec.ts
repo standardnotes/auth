@@ -91,6 +91,7 @@ describe('FileRemovedEventHandler', () => {
         name: 'FILE_UPLOAD_BYTES_USED',
         sensitive: false,
         unencryptedValue: '222',
+        serverEncryptionVersion: 0,
       },
       userSubscription:  {
         uuid: '1-2-3',
@@ -113,6 +114,7 @@ describe('FileRemovedEventHandler', () => {
         name: 'FILE_UPLOAD_BYTES_USED',
         sensitive: false,
         unencryptedValue: '222',
+        serverEncryptionVersion: 0,
       },
       userSubscription:  {
         uuid: '1-2-3',
@@ -126,6 +128,7 @@ describe('FileRemovedEventHandler', () => {
         name: 'FILE_UPLOAD_BYTES_USED',
         sensitive: false,
         unencryptedValue: '222',
+        serverEncryptionVersion: 0,
       },
       userSubscription:  {
         uuid: '2-3-4',
