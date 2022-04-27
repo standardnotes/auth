@@ -13,6 +13,7 @@ export class RoleToSubscriptionMap implements RoleToSubscriptionMapInterface {
   ])
 
   private readonly nonSubscriptionRoles = [
+    RoleName.BasicUser,
     RoleName.FilesBetaUser,
   ]
 
