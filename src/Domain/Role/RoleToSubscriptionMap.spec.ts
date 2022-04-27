@@ -23,9 +23,6 @@ describe('RoleToSubscriptionMap', () => {
   it('should filter our non subscription roles from an array of roles', () => {
     const roles = [
       {
-        name: RoleName.BasicUser,
-      } as jest.Mocked<Role>,
-      {
         name: RoleName.CoreUser,
       } as jest.Mocked<Role>,
       {
@@ -37,10 +34,10 @@ describe('RoleToSubscriptionMap', () => {
     ]
     expect(createMap().filterNonSubscriptionRoles(roles)).toEqual([
       {
-        name: RoleName.BasicUser,
+        name: RoleName.FilesBetaUser,
       },
       {
-        name: RoleName.FilesBetaUser,
+        name: RoleName.BasicUser,
       },
     ])
   })
