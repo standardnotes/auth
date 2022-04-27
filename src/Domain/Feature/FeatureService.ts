@@ -111,6 +111,7 @@ export class FeatureService implements FeatureServiceInterface {
         userFeatures.set(rolePermission.name, {
           ...featureForPermission,
           expires_at: longestLastingSubscription ? longestLastingSubscription.endsAt : undefined,
+          no_expire: longestLastingSubscription ? false : true,
           role_name: role.name as RoleName,
         })
 

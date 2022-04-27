@@ -330,6 +330,7 @@ describe('FeatureService', () => {
           expect.objectContaining({
             identifier: 'org.standardnotes.files-beta',
             expires_at: undefined,
+            no_expire: true,
           }),
         ])
       )
