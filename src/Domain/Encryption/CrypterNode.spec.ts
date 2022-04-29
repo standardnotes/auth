@@ -42,6 +42,8 @@ describe('CrypterNode', () => {
     crypto.aes256GcmEncrypt = jest.fn().mockReturnValue(encrypted)
     crypto.aes256GcmDecrypt = jest.fn().mockReturnValue(decrypted)
     crypto.generateRandomKey = jest.fn().mockReturnValue(iv)
+    crypto.sha256 = jest.fn().mockReturnValue('sha256-encrypted')
+    crypto.base64URLEncode = jest.fn().mockReturnValue('base64-url-encoded')
 
     user = {} as jest.Mocked<User>
     user.encryptedServerKey = version(encryptedUserKey)
@@ -143,5 +145,13 @@ describe('CrypterNode', () => {
     }
 
     expect(error).not.toBeNull()
+  })
+
+  it('should encrypt a string with sha256', () => {
+    expect(createCrypter().sha256Encrypt('test')).toEqual('sha256-encrypted')
+  })
+
+  it('should encode a string with base64 url-safe', () => {
+    expect(createCrypter().base64URLEncode('test')).toEqual('base64-url-encoded')
   })
 })

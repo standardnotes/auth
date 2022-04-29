@@ -62,7 +62,7 @@ export class AuthController extends BaseHttpController {
     const verifyMFAResponse = await this.verifyMFA.execute({
       email: <string> request.query.email,
       requestParams: request.query,
-      source: 'auth-params',
+      preventOTPFromFurtherUsage: false,
     })
 
     if (!verifyMFAResponse.success) {
@@ -99,7 +99,7 @@ export class AuthController extends BaseHttpController {
     const verifyMFAResponse = await this.verifyMFA.execute({
       email: request.body.email,
       requestParams: request.body,
-      source: 'sign-in',
+      preventOTPFromFurtherUsage: true,
     })
 
     if (!verifyMFAResponse.success) {
@@ -118,6 +118,95 @@ export class AuthController extends BaseHttpController {
       email: request.body.email,
       password: request.body.password,
       ephemeralSession: request.body.ephemeral ?? false,
+    })
+
+    if (!signInResult.success) {
+      await this.increaseLoginAttempts.execute({ email: request.body.email })
+
+      return this.json({
+        error: {
+          message: signInResult.errorMessage,
+        },
+      }, 401)
+    }
+
+    await this.clearLoginAttempts.execute({ email: request.body.email })
+
+    return this.json(signInResult.authResponse)
+  }
+
+  @httpGet('/pkce_params', TYPES.AuthMiddlewareWithoutResponse)
+  async pkceParams(request: Request, response: Response): Promise<results.JsonResult> {
+    if (response.locals.session) {
+      const result = await this.getUserKeyParams.execute({
+        email: response.locals.user.email,
+        authenticated: true,
+        authenticatedUser: response.locals.user,
+      })
+
+      return this.json(result.keyParams)
+    }
+
+    if (!request.query.code_challenge) {
+      return this.json({
+        error: {
+          message: 'Please provide the code challenge parameter.',
+        },
+      }, 400)
+    }
+
+    if (!request.query.email) {
+      return this.json({
+        error: {
+          message: 'Please provide an email address.',
+        },
+      }, 400)
+    }
+
+    const verifyMFAResponse = await this.verifyMFA.execute({
+      email: <string> request.query.email,
+      requestParams: request.query,
+      preventOTPFromFurtherUsage: true,
+    })
+
+    if (!verifyMFAResponse.success) {
+      return this.json({
+        error: {
+          tag: verifyMFAResponse.errorTag,
+          message: verifyMFAResponse.errorMessage,
+          payload: verifyMFAResponse.errorPayload,
+        },
+      }, 401)
+    }
+
+    const result = await this.getUserKeyParams.execute({
+      email: <string> request.query.email,
+      authenticated: false,
+    })
+
+    return this.json(result.keyParams)
+  }
+
+  @httpPost('/pkce_sign_in', TYPES.LockMiddleware)
+  async pkceSignIn(request: Request): Promise<results.JsonResult> {
+    if (!request.body.email || !request.body.password || !request.body.code_verifier) {
+      this.logger.debug('/auth/sign_in request missing credentials: %O', request.body)
+
+      return this.json({
+        error: {
+          tag: 'invalid-auth',
+          message: 'Invalid login credentials.',
+        },
+      }, 401)
+    }
+
+    const signInResult = await this.signInUseCase.execute({
+      apiVersion: request.body.api,
+      userAgent: <string> request.headers['user-agent'],
+      email: request.body.email,
+      password: request.body.password,
+      ephemeralSession: request.body.ephemeral ?? false,
+      codeVerifier: request.body.code_verifier,
     })
 
     if (!signInResult.success) {

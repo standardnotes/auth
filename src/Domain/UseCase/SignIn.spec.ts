@@ -14,6 +14,8 @@ import { RoleServiceInterface } from '../Role/RoleServiceInterface'
 import { SettingServiceInterface } from '../Setting/SettingServiceInterface'
 import { Setting } from '../Setting/Setting'
 import { MuteSignInEmailsOption } from '@standardnotes/settings'
+import { PKCERepositoryInterface } from '../User/PKCERepositoryInterface'
+import { CrypterInterface } from '../Encryption/CrypterInterface'
 
 describe('SignIn', () => {
   let user: User
@@ -27,6 +29,8 @@ describe('SignIn', () => {
   let logger: Logger
   let settingService: SettingServiceInterface
   let setting: Setting
+  let pkceRepository: PKCERepositoryInterface
+  let crypter: CrypterInterface
 
   const createUseCase = () => new SignIn(
     userRepository,
@@ -36,6 +40,8 @@ describe('SignIn', () => {
     sessionService,
     roleService,
     settingService,
+    pkceRepository,
+    crypter,
     logger
   )
 
@@ -80,6 +86,13 @@ describe('SignIn', () => {
       setting,
     })
 
+    pkceRepository = {} as jest.Mocked<PKCERepositoryInterface>
+    pkceRepository.removeCodeChallenge = jest.fn().mockReturnValue(true)
+
+    crypter = {} as jest.Mocked<CrypterInterface>
+    crypter.base64URLEncode = jest.fn().mockReturnValue('base64-url-encoded')
+    crypter.sha256Encrypt = jest.fn().mockReturnValue('sha256-encrypted')
+
     logger = {} as jest.Mocked<Logger>
     logger.debug = jest.fn()
     logger.error = jest.fn()
@@ -92,6 +105,30 @@ describe('SignIn', () => {
       userAgent: 'Google Chrome',
       apiVersion: '20190520',
       ephemeralSession: false,
+    })).toEqual({
+      success: true,
+      authResponse: { foo: 'bar' },
+    })
+
+    expect(domainEventFactory.createUserSignedInEvent).toHaveBeenCalledWith({
+      browser: 'Firefox 1',
+      device: 'iOS 1',
+      userEmail: 'test@test.com',
+      userUuid: '1-2-3',
+      signInAlertEnabled: true,
+      muteSignInEmailsSettingUuid: '3-4-5',
+    })
+    expect(domainEventPublisher.publish).toHaveBeenCalled()
+  })
+
+  it('should sign in a user with valid code verifier', async () => {
+    expect(await createUseCase().execute({
+      email: 'test@test.te',
+      password: 'qweqwe123123',
+      userAgent: 'Google Chrome',
+      apiVersion: '20190520',
+      ephemeralSession: false,
+      codeVerifier: 'test',
     })).toEqual({
       success: true,
       authResponse: { foo: 'bar' },
@@ -200,6 +237,22 @@ describe('SignIn', () => {
       userAgent: 'Google Chrome',
       apiVersion: '20190520',
       ephemeralSession: false,
+    })).toEqual({
+      success: false,
+      errorMessage: 'Invalid email or password',
+    })
+  })
+
+  it('should not sign in a user with invalid code verifier', async () => {
+    pkceRepository.removeCodeChallenge = jest.fn().mockReturnValue(false)
+
+    expect(await createUseCase().execute({
+      email: 'test@test.te',
+      password: 'qweqwe123123',
+      userAgent: 'Google Chrome',
+      apiVersion: '20190520',
+      ephemeralSession: false,
+      codeVerifier: 'test',
     })).toEqual({
       success: false,
       errorMessage: 'Invalid email or password',
