@@ -58,7 +58,7 @@ export class VerifyMFA implements UseCaseInterface {
         dto.email,
         mfaSecret.value,
         dto.requestParams,
-        dto.source === 'sign-in',
+        dto.preventOTPFromFurtherUsage,
       )
 
       return verificationResult
@@ -103,7 +103,7 @@ export class VerifyMFA implements UseCaseInterface {
     email: string,
     secret: string,
     requestParams: Record<string, unknown>,
-    isSignInVerification: boolean
+    preventOTPFromFurtherUsage: boolean
   ): Promise<VerifyMFAResponse> {
     const tokenAndParamKey = this.getMFATokenAndParamKeyFromRequestParams(requestParams)
 
@@ -124,7 +124,7 @@ export class VerifyMFA implements UseCaseInterface {
       )
     }
 
-    if (isSignInVerification) {
+    if (preventOTPFromFurtherUsage) {
       await this.lockRepository.lockSuccessfullOTP(email, tokenAndParamKey.token)
     }
 

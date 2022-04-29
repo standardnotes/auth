@@ -4,4 +4,5 @@ export type SignInDTO = {
   email: string
   password: string
   ephemeralSession: boolean
+  codeVerifier?: string
 }

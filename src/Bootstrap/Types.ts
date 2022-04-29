@@ -20,6 +20,7 @@ const TYPES = {
   SubscriptionTokenRepository: Symbol.for('SubscriptionTokenRepository'),
   OfflineSubscriptionTokenRepository: Symbol.for('OfflineSubscriptionTokenRepository'),
   SharedSubscriptionInvitationRepository: Symbol.for('SharedSubscriptionInvitationRepository'),
+  PKCERepository: Symbol.for('PKCERepository'),
   // Middleware
   AuthMiddleware: Symbol.for('AuthMiddleware'),
   ApiGatewayAuthMiddleware: Symbol.for('ApiGatewayAuthMiddleware'),

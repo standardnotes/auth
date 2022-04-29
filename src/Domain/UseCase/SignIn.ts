@@ -18,6 +18,8 @@ import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { SignInDTO } from './SignInDTO'
 import { SignInResponse } from './SignInResponse'
 import { UseCaseInterface } from './UseCaseInterface'
+import { PKCERepositoryInterface } from '../User/PKCERepositoryInterface'
+import { CrypterInterface } from '../Encryption/CrypterInterface'
 
 @injectable()
 export class SignIn implements UseCaseInterface {
@@ -29,6 +31,8 @@ export class SignIn implements UseCaseInterface {
     @inject(TYPES.SessionService) private sessionService: SessionServiceInterface,
     @inject(TYPES.RoleService) private roleService: RoleServiceInterface,
     @inject(TYPES.SettingService) private settingService: SettingServiceInterface,
+    @inject(TYPES.PKCERepository) private pkceRepository: PKCERepositoryInterface,
+    @inject(TYPES.Crypter) private crypter: CrypterInterface,
     @inject(TYPES.Logger) private logger: Logger
   ){
   }
@@ -55,24 +59,21 @@ export class SignIn implements UseCaseInterface {
       }
     }
 
+    if (dto.codeVerifier !== undefined) {
+      const validCodeVerifier = await this.validateCodeVerifier(dto.codeVerifier)
+      if (!validCodeVerifier) {
+        this.logger.debug('Code verifier does not match')
+
+        return {
+          success: false,
+          errorMessage: 'Invalid email or password',
+        }
+      }
+    }
+
     const authResponseFactory = this.authResponseFactoryResolver.resolveAuthResponseFactoryVersion(dto.apiVersion)
 
-    try {
-      const muteSignInEmailsSetting = await this.findOrCreateMuteSignInEmailsSetting(user)
-
-      await this.domainEventPublisher.publish(
-        this.domainEventFactory.createUserSignedInEvent({
-          userUuid: user.uuid,
-          userEmail: user.email,
-          device: this.sessionService.getOperatingSystemInfoFromUserAgent(dto.userAgent),
-          browser: this.sessionService.getBrowserInfoFromUserAgent(dto.userAgent),
-          signInAlertEnabled: await this.roleService.userHasPermission(user.uuid, PermissionName.SignInAlerts) && muteSignInEmailsSetting.value === MuteSignInEmailsOption.NotMuted,
-          muteSignInEmailsSettingUuid: muteSignInEmailsSetting.uuid,
-        })
-      )
-    } catch (error) {
-      this.logger.error(`Could not publish sign in event: ${error.message}`)
-    }
+    await this.sendSignInEmailNotification(user, dto.userAgent)
 
     return {
       success: true,
@@ -83,6 +84,35 @@ export class SignIn implements UseCaseInterface {
         ephemeralSession: dto.ephemeralSession,
         readonlyAccess: false,
       }),
+    }
+  }
+
+  private async validateCodeVerifier(codeVerifier: string): Promise<boolean> {
+    const codeChallenge = this.crypter.base64URLEncode(
+      this.crypter.sha256Encrypt(codeVerifier)
+    )
+
+    const matchingCodeChallengeWasPresentAndRemoved = await this.pkceRepository.removeCodeChallenge(codeChallenge)
+
+    return matchingCodeChallengeWasPresentAndRemoved
+  }
+
+  private async sendSignInEmailNotification(user: User, userAgent: string): Promise<void> {
+    try {
+      const muteSignInEmailsSetting = await this.findOrCreateMuteSignInEmailsSetting(user)
+
+      await this.domainEventPublisher.publish(
+        this.domainEventFactory.createUserSignedInEvent({
+          userUuid: user.uuid,
+          userEmail: user.email,
+          device: this.sessionService.getOperatingSystemInfoFromUserAgent(userAgent),
+          browser: this.sessionService.getBrowserInfoFromUserAgent(userAgent),
+          signInAlertEnabled: await this.roleService.userHasPermission(user.uuid, PermissionName.SignInAlerts) && muteSignInEmailsSetting.value === MuteSignInEmailsOption.NotMuted,
+          muteSignInEmailsSettingUuid: muteSignInEmailsSetting.uuid,
+        })
+      )
+    } catch (error) {
+      this.logger.error(`Could not publish sign in event: ${error.message}`)
     }
   }
 

@@ -2,6 +2,7 @@ import 'reflect-metadata'
 import { Logger } from 'winston'
 
 import { KeyParamsFactoryInterface } from '../../User/KeyParamsFactoryInterface'
+import { PKCERepositoryInterface } from '../../User/PKCERepositoryInterface'
 import { User } from '../../User/User'
 import { UserRepositoryInterface } from '../../User/UserRepositoryInterface'
 import { GetUserKeyParams } from './GetUserKeyParams'
@@ -11,8 +12,9 @@ describe('GetUserKeyParams', () => {
   let userRepository: UserRepositoryInterface
   let logger: Logger
   let user: User
+  let pkceRepository: PKCERepositoryInterface
 
-  const createUseCase = () => new GetUserKeyParams(keyParamsFactory, userRepository, logger)
+  const createUseCase = () => new GetUserKeyParams(keyParamsFactory, userRepository, pkceRepository, logger)
 
   beforeEach(() => {
     keyParamsFactory = {} as jest.Mocked<KeyParamsFactoryInterface>
@@ -27,6 +29,9 @@ describe('GetUserKeyParams', () => {
 
     logger = {} as jest.Mocked<Logger>
     logger.debug = jest.fn()
+
+    pkceRepository = {} as jest.Mocked<PKCERepositoryInterface>
+    pkceRepository.storeCodeChallenge = jest.fn()
   })
 
   it('should get key params for an authenticated user - searching by email', async () => {
@@ -67,6 +72,16 @@ describe('GetUserKeyParams', () => {
     })
 
     expect(keyParamsFactory.create).toHaveBeenCalledWith(user, false)
+  })
+
+  it('should get key params for an unauthenticated user and store it\'s code challenge', async () => {
+    expect(await createUseCase().execute({ userUuid: '1-2-3', authenticated: false, codeChallenge: 'test' })).toEqual({
+      keyParams: {
+        foo: 'bar',
+      },
+    })
+
+    expect(pkceRepository.storeCodeChallenge).toHaveBeenCalledWith('test')
   })
 
   it('should get pseudo key params for a non existing user - when searching by email', async () => {

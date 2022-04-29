@@ -1,4 +1,4 @@
-import { Aes256GcmEncrypted } from '@standardnotes/sncrypto-common'
+import { Aes256GcmEncrypted, Base64String, HexString, Utf8String } from '@standardnotes/sncrypto-common'
 import { SnCryptoNode } from '@standardnotes/sncrypto-node'
 import { inject, injectable } from 'inversify'
 import { Logger } from 'winston'
@@ -19,6 +19,14 @@ export class CrypterNode implements CrypterInterface {
     if (byteLength !== 32) {
       throw Error('ENCRYPTION_SERVER_KEY must be a hex string exactly 32 bytes long!')
     }
+  }
+
+  sha256Encrypt(text: Utf8String): HexString {
+    return this.cryptoNode.sha256(text)
+  }
+
+  base64URLEncode(text: Utf8String): Base64String {
+    return this.cryptoNode.base64URLEncode(text)
   }
 
   async encryptForUser(unencrypted: string, user: User): Promise<string> {

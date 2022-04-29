@@ -157,6 +157,8 @@ import { SubscriptionSettingProjector } from '../Projection/SubscriptionSettingP
 import { GetSubscriptionSetting } from '../Domain/UseCase/GetSubscriptionSetting/GetSubscriptionSetting'
 import { SubscriptionSettingsAssociationService } from '../Domain/Setting/SubscriptionSettingsAssociationService'
 import { SubscriptionSettingsAssociationServiceInterface } from '../Domain/Setting/SubscriptionSettingsAssociationServiceInterface'
+import { PKCERepositoryInterface } from '../Domain/User/PKCERepositoryInterface'
+import { RedisPKCERepository } from '../Infra/Redis/RedisPKCERepository'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const newrelicWinstonEnricher = require('@newrelic/winston-enricher')
@@ -281,6 +283,7 @@ export class ContainerConfigLoader {
     container.bind<SubscriptionTokenRepositoryInterface>(TYPES.SubscriptionTokenRepository).to(RedisSubscriptionTokenRepository)
     container.bind<OfflineSubscriptionTokenRepositoryInterface>(TYPES.OfflineSubscriptionTokenRepository).to(RedisOfflineSubscriptionTokenRepository)
     container.bind<SharedSubscriptionInvitationRepositoryInterface>(TYPES.SharedSubscriptionInvitationRepository).toConstantValue(connection.getCustomRepository(MySQLSharedSubscriptionInvitationRepository))
+    container.bind<PKCERepositoryInterface>(TYPES.PKCERepository).to(RedisPKCERepository)
 
     // Middleware
     container.bind<AuthMiddleware>(TYPES.AuthMiddleware).to(AuthMiddleware)

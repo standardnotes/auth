@@ -7,12 +7,14 @@ import { GetUserKeyParamsResponse } from './GetUserKeyParamsResponse'
 import { UseCaseInterface } from '../UseCaseInterface'
 import { Logger } from 'winston'
 import { User } from '../../User/User'
+import { PKCERepositoryInterface } from '../../User/PKCERepositoryInterface'
 
 @injectable()
 export class GetUserKeyParams implements UseCaseInterface {
   constructor (
     @inject(TYPES.KeyParamsFactory) private keyParamsFactory: KeyParamsFactoryInterface,
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
+    @inject(TYPES.PKCERepository) private pkceRepository: PKCERepositoryInterface,
     @inject(TYPES.Logger) private logger: Logger
   ) {
   }
@@ -48,8 +50,14 @@ export class GetUserKeyParams implements UseCaseInterface {
 
     this.logger.debug(`Creating key params for user ${user.email}. Authentication: ${dto.authenticated}`)
 
+    const keyParams = this.keyParamsFactory.create(user, dto.authenticated)
+
+    if (dto.codeChallenge !== undefined) {
+      await this.pkceRepository.storeCodeChallenge(dto.codeChallenge)
+    }
+
     return {
-      keyParams: this.keyParamsFactory.create(user, dto.authenticated),
+      keyParams,
     }
   }
 }
