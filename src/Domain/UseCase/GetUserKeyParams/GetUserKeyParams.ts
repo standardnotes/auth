@@ -8,6 +8,7 @@ import { UseCaseInterface } from '../UseCaseInterface'
 import { Logger } from 'winston'
 import { User } from '../../User/User'
 import { PKCERepositoryInterface } from '../../User/PKCERepositoryInterface'
+import { GetUserKeyParamsDTOV2Challenged } from './GetUserKeyParamsDTOV2Challenged'
 
 @injectable()
 export class GetUserKeyParams implements UseCaseInterface {
@@ -52,12 +53,16 @@ export class GetUserKeyParams implements UseCaseInterface {
 
     const keyParams = this.keyParamsFactory.create(user, dto.authenticated)
 
-    if (dto.codeChallenge !== undefined) {
+    if (this.isCodeChallengedVersion(dto)) {
       await this.pkceRepository.storeCodeChallenge(dto.codeChallenge)
     }
 
     return {
       keyParams,
     }
+  }
+
+  private isCodeChallengedVersion(dto: unknown): dto is GetUserKeyParamsDTOV2Challenged {
+    return typeof dto === 'object' && dto !== null && 'codeChallenge' in dto
   }
 }

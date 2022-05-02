@@ -20,6 +20,7 @@ import { SignInResponse } from './SignInResponse'
 import { UseCaseInterface } from './UseCaseInterface'
 import { PKCERepositoryInterface } from '../User/PKCERepositoryInterface'
 import { CrypterInterface } from '../Encryption/CrypterInterface'
+import { SignInDTOV2Challenged } from './SignInDTOV2Challenged'
 
 @injectable()
 export class SignIn implements UseCaseInterface {
@@ -38,7 +39,7 @@ export class SignIn implements UseCaseInterface {
   }
 
   async execute(dto: SignInDTO): Promise<SignInResponse> {
-    if (dto.codeVerifier !== undefined) {
+    if (this.isCodeChallengedVersion(dto)) {
       const validCodeVerifier = await this.validateCodeVerifier(dto.codeVerifier)
       if (!validCodeVerifier) {
         this.logger.debug('Code verifier does not match')
@@ -137,5 +138,9 @@ export class SignIn implements UseCaseInterface {
     })
 
     return createSettingResult.setting
+  }
+
+  private isCodeChallengedVersion(dto: unknown): dto is SignInDTOV2Challenged {
+    return typeof dto === 'object' && dto !== null && 'codeVerifier' in dto
   }
 }

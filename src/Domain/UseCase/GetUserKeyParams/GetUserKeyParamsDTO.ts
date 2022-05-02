@@ -1,9 +1,4 @@
-import { User } from '../../User/User'
+import { GetUserKeyParamsDTOV1Unchallenged } from './GetUserKeyParamsDTOV1Unchallenged'
+import { GetUserKeyParamsDTOV2Challenged } from './GetUserKeyParamsDTOV2Challenged'
 
-export type GetUserKeyParamsDTO = {
-  authenticated: boolean
-  email?: string
-  userUuid?: string
-  authenticatedUser?: User
-  codeChallenge?: string
-}
+export type GetUserKeyParamsDTO = GetUserKeyParamsDTOV1Unchallenged | GetUserKeyParamsDTOV2Challenged
