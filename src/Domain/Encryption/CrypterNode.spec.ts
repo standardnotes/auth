@@ -148,7 +148,7 @@ describe('CrypterNode', () => {
   })
 
   it('should encrypt a string with sha256', () => {
-    expect(createCrypter().sha256Encrypt('test')).toEqual('sha256-encrypted')
+    expect(createCrypter().sha256Hash('test')).toEqual('sha256-encrypted')
   })
 
   it('should encode a string with base64 url-safe', () => {

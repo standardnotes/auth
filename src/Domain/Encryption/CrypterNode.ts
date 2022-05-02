@@ -21,7 +21,7 @@ export class CrypterNode implements CrypterInterface {
     }
   }
 
-  sha256Encrypt(text: Utf8String): HexString {
+  sha256Hash(text: Utf8String): HexString {
     return this.cryptoNode.sha256(text)
   }
 

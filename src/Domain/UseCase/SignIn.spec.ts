@@ -91,7 +91,7 @@ describe('SignIn', () => {
 
     crypter = {} as jest.Mocked<CrypterInterface>
     crypter.base64URLEncode = jest.fn().mockReturnValue('base64-url-encoded')
-    crypter.sha256Encrypt = jest.fn().mockReturnValue('sha256-encrypted')
+    crypter.sha256Hash = jest.fn().mockReturnValue('sha256-encrypted')
 
     logger = {} as jest.Mocked<Logger>
     logger.debug = jest.fn()

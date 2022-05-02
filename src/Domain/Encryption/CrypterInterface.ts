@@ -6,6 +6,6 @@ export interface CrypterInterface {
   decryptForUser(value: string, user: User): Promise<string>
   generateEncryptedUserServerKey(): Promise<string>
   decryptUserServerKey(user: User): Promise<string>
-  sha256Encrypt(text: Utf8String): HexString
+  sha256Hash(text: Utf8String): HexString
   base64URLEncode(text: Utf8String): Base64String
 }

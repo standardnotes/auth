@@ -89,7 +89,7 @@ export class SignIn implements UseCaseInterface {
 
   private async validateCodeVerifier(codeVerifier: string): Promise<boolean> {
     const codeChallenge = this.crypter.base64URLEncode(
-      this.crypter.sha256Encrypt(codeVerifier)
+      this.crypter.sha256Hash(codeVerifier)
     )
 
     const matchingCodeChallengeWasPresentAndRemoved = await this.pkceRepository.removeCodeChallenge(codeChallenge)
