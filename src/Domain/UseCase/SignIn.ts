@@ -38,6 +38,18 @@ export class SignIn implements UseCaseInterface {
   }
 
   async execute(dto: SignInDTO): Promise<SignInResponse> {
+    if (dto.codeVerifier !== undefined) {
+      const validCodeVerifier = await this.validateCodeVerifier(dto.codeVerifier)
+      if (!validCodeVerifier) {
+        this.logger.debug('Code verifier does not match')
+
+        return {
+          success: false,
+          errorMessage: 'Invalid email or password',
+        }
+      }
+    }
+
     const user = await this.userRepository.findOneByEmail(dto.email)
 
     if (!user) {
@@ -56,18 +68,6 @@ export class SignIn implements UseCaseInterface {
       return {
         success: false,
         errorMessage: 'Invalid email or password',
-      }
-    }
-
-    if (dto.codeVerifier !== undefined) {
-      const validCodeVerifier = await this.validateCodeVerifier(dto.codeVerifier)
-      if (!validCodeVerifier) {
-        this.logger.debug('Code verifier does not match')
-
-        return {
-          success: false,
-          errorMessage: 'Invalid email or password',
-        }
       }
     }
 
