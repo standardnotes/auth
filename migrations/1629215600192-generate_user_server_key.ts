@@ -1,9 +1,9 @@
 import { MigrationInterface, QueryRunner } from 'typeorm'
-import { SnCryptoNode } from '@standardnotes/sncrypto-node'
+import { CryptoNode } from '@standardnotes/sncrypto-node'
 
 export class generateUserServerKey1629215600192 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
-    const crypto = new SnCryptoNode()
+    const crypto = new CryptoNode()
 
     const users = await queryRunner.manager.query('SELECT * FROM users where encrypted_server_key IS NULL ORDER BY created_at')
     for (const user of users) {

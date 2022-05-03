@@ -944,10 +944,10 @@
   resolved "https://registry.yarnpkg.com/@standardnotes/sncrypto-common/-/sncrypto-common-1.8.0.tgz#7904e5c9eb907e2db3fa3c1a0c364607b3057243"
   integrity sha512-+of+U+mTCV0LJVsCIzALLx2TvgGkqriT2NTcHjnIawbz7eoUZGXqWw/mSshhboDLtINje9Wz8qqRyYPmacu9VA==
 
-"@standardnotes/sncrypto-node@1.7.0":
-  version "1.7.0"
-  resolved "https://registry.yarnpkg.com/@standardnotes/sncrypto-node/-/sncrypto-node-1.7.0.tgz#78903640545146fbdf4b2fbf4ca4a5b016d10cb9"
-  integrity sha512-R9Eu4ozU2krBKNLeHNUdE1aLTgYdxE2tcfghhZWhf2I4E2lzuD7HQJrBy1JCBC0H9yCg4kQi65tNk0z/7/J3gQ==
+"@standardnotes/sncrypto-node@1.8.0":
+  version "1.8.0"
+  resolved "https://registry.yarnpkg.com/@standardnotes/sncrypto-node/-/sncrypto-node-1.8.0.tgz#aeeaddd3159a314657a31968815134cddfdec209"
+  integrity sha512-vlx9S+MPeHWCJPMDOtZ6oAjc89JDSfGwyAPW1HlYdFpTrczxAlUnqthGCeLh2xvo6vrNEwYwalAW609nf5gS4Q==
   dependencies:
     "@standardnotes/sncrypto-common" "^1.8.0"
 

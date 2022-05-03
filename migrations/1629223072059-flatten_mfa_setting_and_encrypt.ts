@@ -1,5 +1,5 @@
 import { MigrationInterface, QueryRunner } from 'typeorm'
-import { SnCryptoNode } from '@standardnotes/sncrypto-node'
+import { CryptoNode } from '@standardnotes/sncrypto-node'
 
 export class flattenMfaSettingAndEncrypt1629223072059 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
@@ -28,7 +28,7 @@ export class flattenMfaSettingAndEncrypt1629223072059 implements MigrationInterf
   }
 
   private async decryptMFASetting(encryptedMFASetting: string, userEncryptedServerKey: string) {
-    const crypto = new SnCryptoNode()
+    const crypto = new CryptoNode()
 
     const userServerKey = JSON.parse(userEncryptedServerKey)
 
@@ -40,7 +40,7 @@ export class flattenMfaSettingAndEncrypt1629223072059 implements MigrationInterf
   }
 
   private async encryptMFASecret(secret: string, userEncryptedServerKey: string): Promise<string> {
-    const crypto = new SnCryptoNode()
+    const crypto = new CryptoNode()
 
     const userServerKey = JSON.parse(userEncryptedServerKey)
 

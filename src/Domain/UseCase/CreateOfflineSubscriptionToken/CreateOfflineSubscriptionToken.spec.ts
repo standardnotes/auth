@@ -1,6 +1,6 @@
 import 'reflect-metadata'
 
-import { SnCryptoNode } from '@standardnotes/sncrypto-node'
+import { CryptoNode } from '@standardnotes/sncrypto-node'
 import { TimerInterface } from '@standardnotes/time'
 import { OfflineSubscriptionTokenRepositoryInterface } from '../../Auth/OfflineSubscriptionTokenRepositoryInterface'
 
@@ -14,7 +14,7 @@ import { Logger } from 'winston'
 describe('CreateOfflineSubscriptionToken', () => {
   let offlineSubscriptionTokenRepository: OfflineSubscriptionTokenRepositoryInterface
   let offlineUserSubscriptionRepository: OfflineUserSubscriptionRepositoryInterface
-  let cryptoNode: SnCryptoNode
+  let cryptoNode: CryptoNode
   let domainEventPublisher: DomainEventPublisherInterface
   let domainEventFactory: DomainEventFactoryInterface
   let timer: TimerInterface
@@ -37,7 +37,7 @@ describe('CreateOfflineSubscriptionToken', () => {
     offlineUserSubscriptionRepository = {} as jest.Mocked<OfflineUserSubscriptionRepositoryInterface>
     offlineUserSubscriptionRepository.findOneByEmail = jest.fn().mockReturnValue({ cancelled: false, endsAt: 100 } as jest.Mocked<OfflineUserSubscription>)
 
-    cryptoNode = {} as jest.Mocked<SnCryptoNode>
+    cryptoNode = {} as jest.Mocked<CryptoNode>
     cryptoNode.generateRandomKey = jest.fn().mockReturnValueOnce('random-string')
 
     domainEventPublisher = {} as jest.Mocked<DomainEventPublisherInterface>

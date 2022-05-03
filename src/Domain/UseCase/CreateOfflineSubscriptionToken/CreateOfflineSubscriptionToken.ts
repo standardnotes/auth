@@ -1,5 +1,5 @@
 import { DomainEventPublisherInterface } from '@standardnotes/domain-events'
-import { SnCryptoNode } from '@standardnotes/sncrypto-node'
+import { CryptoNode } from '@standardnotes/sncrypto-node'
 import { TimerInterface } from '@standardnotes/time'
 import { inject, injectable } from 'inversify'
 import { Logger } from 'winston'
@@ -17,7 +17,7 @@ export class CreateOfflineSubscriptionToken implements UseCaseInterface {
   constructor(
     @inject(TYPES.OfflineSubscriptionTokenRepository) private offlineSubscriptionTokenRepository: OfflineSubscriptionTokenRepositoryInterface,
     @inject(TYPES.OfflineUserSubscriptionRepository) private offlineUserSubscriptionRepository: OfflineUserSubscriptionRepositoryInterface,
-    @inject(TYPES.SnCryptoNode) private cryptoNode: SnCryptoNode,
+    @inject(TYPES.CryptoNode) private cryptoNode: CryptoNode,
     @inject(TYPES.DomainEventPublisher) private domainEventPublisher: DomainEventPublisherInterface,
     @inject(TYPES.DomainEventFactory) private domainEventFactory: DomainEventFactoryInterface,
     @inject(TYPES.Timer) private timer: TimerInterface,

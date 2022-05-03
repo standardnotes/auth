@@ -1,4 +1,4 @@
-import { SnCryptoNode } from '@standardnotes/sncrypto-node'
+import { CryptoNode } from '@standardnotes/sncrypto-node'
 import { TimerInterface } from '@standardnotes/time'
 import { inject, injectable } from 'inversify'
 
@@ -12,7 +12,7 @@ import { CreateSubscriptionTokenResponse } from './CreateSubscriptionTokenRespon
 export class CreateSubscriptionToken implements UseCaseInterface {
   constructor(
     @inject(TYPES.SubscriptionTokenRepository) private subscriptionTokenRepository: SubscriptionTokenRepositoryInterface,
-    @inject(TYPES.SnCryptoNode) private cryptoNode: SnCryptoNode,
+    @inject(TYPES.CryptoNode) private cryptoNode: CryptoNode,
     @inject(TYPES.Timer) private timer: TimerInterface,
   ) {
   }

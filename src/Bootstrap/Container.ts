@@ -58,7 +58,7 @@ import { Setting } from '../Domain/Setting/Setting'
 import { MySQLSettingRepository } from '../Infra/MySQL/MySQLSettingRepository'
 import { CrypterInterface } from '../Domain/Encryption/CrypterInterface'
 import { CrypterNode } from '../Domain/Encryption/CrypterNode'
-import { SnCryptoNode } from '@standardnotes/sncrypto-node'
+import { CryptoNode } from '@standardnotes/sncrypto-node'
 import { GetSettings } from '../Domain/UseCase/GetSettings/GetSettings'
 import { SettingProjector } from '../Projection/SettingProjector'
 import { GetSetting } from '../Domain/UseCase/GetSetting/GetSetting'
@@ -416,7 +416,7 @@ export class ContainerConfigLoader {
     container.bind<SettingServiceInterface>(TYPES.SettingService).to(SettingService)
     container.bind<SubscriptionSettingServiceInterface>(TYPES.SubscriptionSettingService).to(SubscriptionSettingService)
     container.bind<OfflineSettingServiceInterface>(TYPES.OfflineSettingService).to(OfflineSettingService)
-    container.bind<SnCryptoNode>(TYPES.SnCryptoNode).toConstantValue(new SnCryptoNode())
+    container.bind<CryptoNode>(TYPES.CryptoNode).toConstantValue(new CryptoNode())
     container.bind<TimerInterface>(TYPES.Timer).toConstantValue(new Timer())
     container.bind<ContentDecoderInterface>(TYPES.ContenDecoder).toConstantValue(new ContentDecoder())
     container.bind<ClientServiceInterface>(TYPES.WebSocketsClientService).to(WebSocketsClientService)

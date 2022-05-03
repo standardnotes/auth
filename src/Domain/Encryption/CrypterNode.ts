@@ -1,5 +1,5 @@
 import { Aes256GcmEncrypted, Base64String, HexString, Utf8String } from '@standardnotes/sncrypto-common'
-import { SnCryptoNode } from '@standardnotes/sncrypto-node'
+import { CryptoNode } from '@standardnotes/sncrypto-node'
 import { inject, injectable } from 'inversify'
 import { Logger } from 'winston'
 import TYPES from '../../Bootstrap/Types'
@@ -10,7 +10,7 @@ import { CrypterInterface } from './CrypterInterface'
 export class CrypterNode implements CrypterInterface {
   constructor (
     @inject(TYPES.ENCRYPTION_SERVER_KEY) private encryptionServerKey: string,
-    @inject(TYPES.SnCryptoNode) private cryptoNode: SnCryptoNode,
+    @inject(TYPES.CryptoNode) private cryptoNode: CryptoNode,
     @inject(TYPES.Logger) private logger: Logger,
   ) {
     const keyBuffer = Buffer.from(encryptionServerKey, 'hex')

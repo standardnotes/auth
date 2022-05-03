@@ -150,7 +150,7 @@ const TYPES = {
   DomainEventMessageHandler: Symbol.for('DomainEventMessageHandler'),
   HTTPClient: Symbol.for('HTTPClient'),
   Crypter: Symbol.for('Crypter'),
-  SnCryptoNode: Symbol.for('SnCryptoNode'),
+  CryptoNode: Symbol.for('CryptoNode'),
   Timer: Symbol.for('Timer'),
   ContenDecoder: Symbol.for('ContenDecoder'),
   WebSocketsClientService: Symbol.for('WebSocketClientService'),

@@ -1,5 +1,5 @@
 import { MigrationInterface, QueryRunner } from 'typeorm'
-import { SnCryptoNode } from '@standardnotes/sncrypto-node'
+import { CryptoNode } from '@standardnotes/sncrypto-node'
 
 export class encryptEncodedMfaSettings1629217630132 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
@@ -27,7 +27,7 @@ export class encryptEncodedMfaSettings1629217630132 implements MigrationInterfac
   }
 
   private async encryptMFASecret(secret: string, userEncryptedServerKey: string): Promise<string> {
-    const crypto = new SnCryptoNode()
+    const crypto = new CryptoNode()
 
     const userServerKey = JSON.parse(userEncryptedServerKey)
 

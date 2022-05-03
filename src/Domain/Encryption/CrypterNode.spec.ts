@@ -1,11 +1,11 @@
 import { Aes256GcmEncrypted } from '@standardnotes/sncrypto-common'
-import { SnCryptoNode } from '@standardnotes/sncrypto-node'
+import { CryptoNode } from '@standardnotes/sncrypto-node'
 import { Logger } from 'winston'
 import { User } from '../User/User'
 import { CrypterNode } from './CrypterNode'
 
 describe('CrypterNode', () => {
-  let crypto: SnCryptoNode
+  let crypto: CryptoNode
   let user: User
   let logger: Logger
 
@@ -38,7 +38,7 @@ describe('CrypterNode', () => {
   const encrypted = makeEncrypted('encrypted')
 
   beforeEach(() => {
-    crypto = {} as jest.Mocked<SnCryptoNode>
+    crypto = {} as jest.Mocked<CryptoNode>
     crypto.aes256GcmEncrypt = jest.fn().mockReturnValue(encrypted)
     crypto.aes256GcmDecrypt = jest.fn().mockReturnValue(decrypted)
     crypto.generateRandomKey = jest.fn().mockReturnValue(iv)
