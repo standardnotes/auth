@@ -182,6 +182,7 @@ export class AuthController extends BaseHttpController {
     const result = await this.getUserKeyParams.execute({
       email: <string> request.query.email,
       authenticated: false,
+      codeChallenge: request.query.code_challenge as string,
     })
 
     return this.json(result.keyParams)
