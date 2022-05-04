@@ -62,7 +62,7 @@ export class GetUserKeyParams implements UseCaseInterface {
     }
   }
 
-  private isCodeChallengedVersion(dto: unknown): dto is GetUserKeyParamsDTOV2Challenged {
-    return typeof dto === 'object' && dto !== null && 'codeChallenge' in dto
+  private isCodeChallengedVersion(dto: GetUserKeyParamsDTO): dto is GetUserKeyParamsDTOV2Challenged {
+    return (dto as GetUserKeyParamsDTOV2Challenged).codeChallenge !== undefined
   }
 }

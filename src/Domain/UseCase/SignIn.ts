@@ -140,7 +140,7 @@ export class SignIn implements UseCaseInterface {
     return createSettingResult.setting
   }
 
-  private isCodeChallengedVersion(dto: unknown): dto is SignInDTOV2Challenged {
-    return typeof dto === 'object' && dto !== null && 'codeVerifier' in dto
+  private isCodeChallengedVersion(dto: SignInDTO): dto is SignInDTOV2Challenged {
+    return (dto as SignInDTOV2Challenged).codeVerifier !== undefined
   }
 }
