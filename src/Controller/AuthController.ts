@@ -135,7 +135,7 @@ export class AuthController extends BaseHttpController {
     return this.json(signInResult.authResponse)
   }
 
-  @httpGet('/pkce_params', TYPES.AuthMiddlewareWithoutResponse)
+  @httpPost('/pkce_params', TYPES.AuthMiddlewareWithoutResponse)
   async pkceParams(request: Request, response: Response): Promise<results.JsonResult> {
     if (response.locals.session) {
       const result = await this.getUserKeyParams.execute({
@@ -147,7 +147,7 @@ export class AuthController extends BaseHttpController {
       return this.json(result.keyParams)
     }
 
-    if (!request.query.code_challenge) {
+    if (!request.body.code_challenge) {
       return this.json({
         error: {
           message: 'Please provide the code challenge parameter.',
@@ -155,7 +155,7 @@ export class AuthController extends BaseHttpController {
       }, 400)
     }
 
-    if (!request.query.email) {
+    if (!request.body.email) {
       return this.json({
         error: {
           message: 'Please provide an email address.',
@@ -164,8 +164,8 @@ export class AuthController extends BaseHttpController {
     }
 
     const verifyMFAResponse = await this.verifyMFA.execute({
-      email: <string> request.query.email,
-      requestParams: request.query,
+      email: <string> request.body.email,
+      requestParams: request.body,
       preventOTPFromFurtherUsage: true,
     })
 
@@ -180,9 +180,9 @@ export class AuthController extends BaseHttpController {
     }
 
     const result = await this.getUserKeyParams.execute({
-      email: <string> request.query.email,
+      email: <string> request.body.email,
       authenticated: false,
-      codeChallenge: request.query.code_challenge as string,
+      codeChallenge: request.body.code_challenge as string,
     })
 
     return this.json(result.keyParams)

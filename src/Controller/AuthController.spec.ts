@@ -451,8 +451,8 @@ describe('AuthController', () => {
 
       verifyMFA.execute = jest.fn().mockReturnValue({ success: true })
 
-      request.query.code_challenge = 'test'
-      request.query.email = 'test2@test.te'
+      request.body.code_challenge = 'test'
+      request.body.email = 'test2@test.te'
 
       const httpResponse = <results.JsonResult> await createController().pkceParams(request, response)
       const result = await httpResponse.executeAsync()
@@ -474,8 +474,8 @@ describe('AuthController', () => {
         },
       })
 
-      request.query.code_challenge = 'test'
-      request.query.email = 'test2@test.te'
+      request.body.code_challenge = 'test'
+      request.body.email = 'test2@test.te'
 
       verifyMFA.execute = jest.fn().mockReturnValue({ success: false })
 
@@ -492,7 +492,7 @@ describe('AuthController', () => {
         },
       })
 
-      request.query.code_challenge = 'test'
+      request.body.code_challenge = 'test'
 
       verifyMFA.execute = jest.fn().mockReturnValue({ success: true })
 
@@ -509,7 +509,7 @@ describe('AuthController', () => {
         },
       })
 
-      request.query.email = 'test2@test.te'
+      request.body.email = 'test2@test.te'
 
       verifyMFA.execute = jest.fn().mockReturnValue({ success: true })
 
