@@ -427,6 +427,8 @@ describe('AuthController', () => {
         },
       })
 
+      request.body.code_challenge = 'test'
+
       const httpResponse = <results.JsonResult> await createController().pkceParams(request, response)
       const result = await httpResponse.executeAsync()
 
@@ -436,6 +438,7 @@ describe('AuthController', () => {
         },
         authenticated: true,
         email: 'test@test.te',
+        codeChallenge: 'test',
       })
 
       expect(result.statusCode).toEqual(200)

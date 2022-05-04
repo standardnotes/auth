@@ -137,22 +137,23 @@ export class AuthController extends BaseHttpController {
 
   @httpPost('/pkce_params', TYPES.AuthMiddlewareWithoutResponse)
   async pkceParams(request: Request, response: Response): Promise<results.JsonResult> {
-    if (response.locals.session) {
-      const result = await this.getUserKeyParams.execute({
-        email: response.locals.user.email,
-        authenticated: true,
-        authenticatedUser: response.locals.user,
-      })
-
-      return this.json(result.keyParams)
-    }
-
     if (!request.body.code_challenge) {
       return this.json({
         error: {
           message: 'Please provide the code challenge parameter.',
         },
       }, 400)
+    }
+
+    if (response.locals.session) {
+      const result = await this.getUserKeyParams.execute({
+        email: response.locals.user.email,
+        authenticated: true,
+        authenticatedUser: response.locals.user,
+        codeChallenge: request.body.code_challenge as string,
+      })
+
+      return this.json(result.keyParams)
     }
 
     if (!request.body.email) {

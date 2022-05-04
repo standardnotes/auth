@@ -9,6 +9,7 @@ import { Logger } from 'winston'
 import { User } from '../../User/User'
 import { PKCERepositoryInterface } from '../../User/PKCERepositoryInterface'
 import { GetUserKeyParamsDTOV2Challenged } from './GetUserKeyParamsDTOV2Challenged'
+import { KeyParamsData } from '@standardnotes/responses'
 
 @injectable()
 export class GetUserKeyParams implements UseCaseInterface {
@@ -24,8 +25,10 @@ export class GetUserKeyParams implements UseCaseInterface {
     if (dto.authenticatedUser) {
       this.logger.debug(`Creating key params for authenticated user ${dto.authenticatedUser.email}`)
 
+      const keyParams = await this.createKeyParams(dto, dto.authenticatedUser, true)
+
       return {
-        keyParams: this.keyParamsFactory.create(dto.authenticatedUser, true),
+        keyParams,
       }
     }
 
@@ -51,15 +54,19 @@ export class GetUserKeyParams implements UseCaseInterface {
 
     this.logger.debug(`Creating key params for user ${user.email}. Authentication: ${dto.authenticated}`)
 
-    const keyParams = this.keyParamsFactory.create(user, dto.authenticated)
-
-    if (this.isCodeChallengedVersion(dto)) {
-      await this.pkceRepository.storeCodeChallenge(dto.codeChallenge)
-    }
+    const keyParams = await this.createKeyParams(dto, user, dto.authenticated)
 
     return {
       keyParams,
     }
+  }
+
+  private async createKeyParams(dto: GetUserKeyParamsDTO, user: User, authenticated: boolean): Promise<KeyParamsData> {
+    if (this.isCodeChallengedVersion(dto)) {
+      await this.pkceRepository.storeCodeChallenge(dto.codeChallenge)
+    }
+
+    return this.keyParamsFactory.create(user, authenticated)
   }
 
   private isCodeChallengedVersion(dto: GetUserKeyParamsDTO): dto is GetUserKeyParamsDTOV2Challenged {
