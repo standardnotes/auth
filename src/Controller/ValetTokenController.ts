@@ -7,7 +7,7 @@ import {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   results,
 } from 'inversify-express-utils'
-import { CreateValetTokenPayload } from '@standardnotes/payloads'
+import { CreateValetTokenPayload } from '@standardnotes/responses'
 
 import TYPES from '../Bootstrap/Types'
 import { CreateValetToken } from '../Domain/UseCase/CreateValetToken/CreateValetToken'

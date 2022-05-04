@@ -1,4 +1,4 @@
-import { CreateValetTokenPayload } from '@standardnotes/payloads'
+import { CreateValetTokenPayload } from '@standardnotes/responses'
 
 export type CreateValetTokenDTO = CreateValetTokenPayload & {
   userUuid: string,
