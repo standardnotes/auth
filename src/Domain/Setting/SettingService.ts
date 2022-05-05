@@ -32,6 +32,8 @@ export class SettingService implements SettingServiceInterface {
     }
 
     for (const settingName of defaultSettingsWithValues.keys()) {
+      this.logger.debug(`Creating setting ${settingName} for user ${user.uuid}`)
+
       const setting = defaultSettingsWithValues.get(settingName) as {
         value: string
         sensitive: boolean
