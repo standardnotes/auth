@@ -45,7 +45,7 @@ export class SettingFactory implements SettingFactoryInterface {
       sensitive,
     }
 
-    return Object.assign(new SubscriptionSetting(), subscriptionSetting)
+    return subscriptionSetting
   }
 
   async createSubscriptionSettingReplacement(
@@ -54,9 +54,10 @@ export class SettingFactory implements SettingFactoryInterface {
   ): Promise<SubscriptionSetting> {
     const { uuid, userSubscription } = original
 
-    return Object.assign(await this.createSubscriptionSetting(props, await userSubscription), {
-      uuid,
-    })
+    const subscriptionSetting = await this.createSubscriptionSetting(props, await userSubscription)
+    subscriptionSetting.uuid = uuid
+
+    return subscriptionSetting
   }
 
   async create(props: SettingProps, user: User): Promise<Setting> {
@@ -82,15 +83,16 @@ export class SettingFactory implements SettingFactoryInterface {
       sensitive,
     }
 
-    return Object.assign(new Setting(), setting)
+    return setting
   }
 
   async createReplacement(original: Setting, props: SettingProps): Promise<Setting> {
     const { uuid, user } = original
 
-    return Object.assign(await this.create(props, await user), {
-      uuid,
-    })
+    const setting = await this.create(props, await user)
+    setting.uuid = uuid
+
+    return setting
   }
 
   async createValue({
