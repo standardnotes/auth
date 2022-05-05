@@ -32,7 +32,7 @@ export class SettingFactory implements SettingFactoryInterface {
 
     const subscriptionSetting: SubscriptionSetting = {
       uuid,
-      userSubscription: (async () => userSubscription)(),
+      userSubscription: Promise.resolve(userSubscription),
       name,
       value: await this.createValue({
         unencryptedValue,
@@ -69,7 +69,7 @@ export class SettingFactory implements SettingFactoryInterface {
 
     const setting: Setting = {
       uuid,
-      user: (async () => user)(),
+      user: Promise.resolve(user),
       name,
       value: await this.createValue({
         unencryptedValue,
