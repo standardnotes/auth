@@ -6,50 +6,44 @@ import { SharedSubscriptionInvitationRepositoryInterface } from '../../Domain/Sh
 
 @injectable()
 @EntityRepository(SharedSubscriptionInvitation)
-export class MySQLSharedSubscriptionInvitationRepository extends Repository<SharedSubscriptionInvitation> implements SharedSubscriptionInvitationRepositoryInterface {
+export class MySQLSharedSubscriptionInvitationRepository
+  extends Repository<SharedSubscriptionInvitation>
+  implements SharedSubscriptionInvitationRepositoryInterface
+{
   async findByInviterEmail(inviterEmail: string): Promise<SharedSubscriptionInvitation[]> {
     return this.createQueryBuilder('invitation')
-      .where(
-        'invitation.inviter_identifier = :inviterEmail',
-        {
-          inviterEmail,
-        }
-      )
+      .where('invitation.inviter_identifier = :inviterEmail', {
+        inviterEmail,
+      })
       .getMany()
   }
 
   async countByInviterEmailAndStatus(inviterEmail: string, statuses: InvitationStatus[]): Promise<number> {
     return this.createQueryBuilder('invitation')
-      .where(
-        'invitation.inviter_identifier = :inviterEmail AND invitation.status IN (:...statuses)',
-        {
-          inviterEmail,
-          statuses,
-        }
-      )
+      .where('invitation.inviter_identifier = :inviterEmail AND invitation.status IN (:...statuses)', {
+        inviterEmail,
+        statuses,
+      })
       .getCount()
   }
 
   async findOneByUuid(uuid: string): Promise<SharedSubscriptionInvitation | undefined> {
     return this.createQueryBuilder('invitation')
-      .where(
-        'invitation.uuid = :uuid',
-        {
-          uuid,
-        }
-      )
+      .where('invitation.uuid = :uuid', {
+        uuid,
+      })
       .getOne()
   }
 
-  async findOneByUuidAndStatus(uuid: string, status: InvitationStatus): Promise<SharedSubscriptionInvitation | undefined> {
+  async findOneByUuidAndStatus(
+    uuid: string,
+    status: InvitationStatus,
+  ): Promise<SharedSubscriptionInvitation | undefined> {
     return this.createQueryBuilder('invitation')
-      .where(
-        'invitation.uuid = :uuid AND invitation.status = :status',
-        {
-          uuid,
-          status,
-        }
-      )
+      .where('invitation.uuid = :uuid AND invitation.status = :status', {
+        uuid,
+        status,
+      })
       .getOne()
   }
 }

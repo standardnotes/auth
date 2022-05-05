@@ -9,10 +9,10 @@ import { RemoveWebSocketsConnectionResponse } from './RemoveWebSocketsConnection
 @injectable()
 export class RemoveWebSocketsConnection implements UseCaseInterface {
   constructor(
-    @inject(TYPES.WebSocketsConnectionRepository) private webSocketsConnectionRepository: WebSocketsConnectionRepositoryInterface,
-    @inject(TYPES.Logger) private logger: Logger
-  ) {
-  }
+    @inject(TYPES.WebSocketsConnectionRepository)
+    private webSocketsConnectionRepository: WebSocketsConnectionRepositoryInterface,
+    @inject(TYPES.Logger) private logger: Logger,
+  ) {}
 
   async execute(dto: RemoveWebSocketsConnectionDTO): Promise<RemoveWebSocketsConnectionResponse> {
     this.logger.debug(`Removing connection ${dto.connectionId}`)

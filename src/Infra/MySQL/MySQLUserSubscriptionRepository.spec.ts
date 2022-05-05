@@ -41,15 +41,10 @@ describe('MySQLUserSubscriptionRepository', () => {
 
     const result = await repository.findOneByUserUuid('123')
 
-    expect(selectQueryBuilder.where).toHaveBeenCalledWith(
-      'user_uuid = :user_uuid',
-      {
-        user_uuid: '123',
-      },
-    )
-    expect(selectQueryBuilder.orderBy).toHaveBeenCalledWith(
-      'ends_at', 'DESC'
-    )
+    expect(selectQueryBuilder.where).toHaveBeenCalledWith('user_uuid = :user_uuid', {
+      user_uuid: '123',
+    })
+    expect(selectQueryBuilder.orderBy).toHaveBeenCalledWith('ends_at', 'DESC')
     expect(selectQueryBuilder.getMany).toHaveBeenCalled()
     expect(result).toEqual(subscription)
   })
@@ -63,15 +58,10 @@ describe('MySQLUserSubscriptionRepository', () => {
 
     const result = await repository.findOneByUserUuid('123')
 
-    expect(selectQueryBuilder.where).toHaveBeenCalledWith(
-      'user_uuid = :user_uuid',
-      {
-        user_uuid: '123',
-      },
-    )
-    expect(selectQueryBuilder.orderBy).toHaveBeenCalledWith(
-      'ends_at', 'DESC'
-    )
+    expect(selectQueryBuilder.where).toHaveBeenCalledWith('user_uuid = :user_uuid', {
+      user_uuid: '123',
+    })
+    expect(selectQueryBuilder.orderBy).toHaveBeenCalledWith('ends_at', 'DESC')
     expect(selectQueryBuilder.getMany).toHaveBeenCalled()
     expect(result).toEqual(subscription)
   })
@@ -85,15 +75,10 @@ describe('MySQLUserSubscriptionRepository', () => {
 
     const result = await repository.findOneByUserUuid('123')
 
-    expect(selectQueryBuilder.where).toHaveBeenCalledWith(
-      'user_uuid = :user_uuid',
-      {
-        user_uuid: '123',
-      },
-    )
-    expect(selectQueryBuilder.orderBy).toHaveBeenCalledWith(
-      'ends_at', 'DESC'
-    )
+    expect(selectQueryBuilder.where).toHaveBeenCalledWith('user_uuid = :user_uuid', {
+      user_uuid: '123',
+    })
+    expect(selectQueryBuilder.orderBy).toHaveBeenCalledWith('ends_at', 'DESC')
     expect(selectQueryBuilder.getMany).toHaveBeenCalled()
     expect(result).toBeUndefined()
   })
@@ -109,18 +94,13 @@ describe('MySQLUserSubscriptionRepository', () => {
     await repository.updateEndsAt(1, 1000, 1000)
 
     expect(updateQueryBuilder.update).toHaveBeenCalled()
-    expect(updateQueryBuilder.set).toHaveBeenCalledWith(
-      {
-        updatedAt: expect.any(Number),
-        endsAt: 1000,
-      }
-    )
-    expect(updateQueryBuilder.where).toHaveBeenCalledWith(
-      'subscription_id = :subscriptionId',
-      {
-        subscriptionId: 1,
-      }
-    )
+    expect(updateQueryBuilder.set).toHaveBeenCalledWith({
+      updatedAt: expect.any(Number),
+      endsAt: 1000,
+    })
+    expect(updateQueryBuilder.where).toHaveBeenCalledWith('subscription_id = :subscriptionId', {
+      subscriptionId: 1,
+    })
     expect(updateQueryBuilder.execute).toHaveBeenCalled()
   })
 
@@ -135,18 +115,13 @@ describe('MySQLUserSubscriptionRepository', () => {
     await repository.updateCancelled(1, true, 1000)
 
     expect(updateQueryBuilder.update).toHaveBeenCalled()
-    expect(updateQueryBuilder.set).toHaveBeenCalledWith(
-      {
-        updatedAt: expect.any(Number),
-        cancelled: true,
-      }
-    )
-    expect(updateQueryBuilder.where).toHaveBeenCalledWith(
-      'subscription_id = :subscriptionId',
-      {
-        subscriptionId: 1,
-      }
-    )
+    expect(updateQueryBuilder.set).toHaveBeenCalledWith({
+      updatedAt: expect.any(Number),
+      cancelled: true,
+    })
+    expect(updateQueryBuilder.where).toHaveBeenCalledWith('subscription_id = :subscriptionId', {
+      subscriptionId: 1,
+    })
     expect(updateQueryBuilder.execute).toHaveBeenCalled()
   })
 
@@ -158,12 +133,9 @@ describe('MySQLUserSubscriptionRepository', () => {
 
     const result = await repository.findBySubscriptionId(123)
 
-    expect(selectQueryBuilder.where).toHaveBeenCalledWith(
-      'subscription_id = :subscriptionId',
-      {
-        subscriptionId: 123,
-      },
-    )
+    expect(selectQueryBuilder.where).toHaveBeenCalledWith('subscription_id = :subscriptionId', {
+      subscriptionId: 123,
+    })
     expect(selectQueryBuilder.getMany).toHaveBeenCalled()
     expect(result).toEqual([subscription])
   })
@@ -214,12 +186,9 @@ describe('MySQLUserSubscriptionRepository', () => {
 
     const result = await repository.findOneByUuid('1-2-3')
 
-    expect(selectQueryBuilder.where).toHaveBeenCalledWith(
-      'uuid = :uuid',
-      {
-        uuid: '1-2-3',
-      },
-    )
+    expect(selectQueryBuilder.where).toHaveBeenCalledWith('uuid = :uuid', {
+      uuid: '1-2-3',
+    })
     expect(selectQueryBuilder.getOne).toHaveBeenCalled()
     expect(result).toEqual(subscription)
   })

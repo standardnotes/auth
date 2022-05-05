@@ -14,7 +14,6 @@ import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { OfflineUserSubscription } from '../Subscription/OfflineUserSubscription'
 import { RoleServiceInterface } from '../Role/RoleServiceInterface'
 
-
 describe('SubscriptionRenewedEventHandler', () => {
   let userRepository: UserRepositoryInterface
   let userSubscriptionRepository: UserSubscriptionRepositoryInterface
@@ -28,21 +27,24 @@ describe('SubscriptionRenewedEventHandler', () => {
   let subscriptionExpiresAt: number
   let timestamp: number
 
-  const createHandler = () => new SubscriptionRenewedEventHandler(
-    userRepository,
-    userSubscriptionRepository,
-    offlineUserSubscriptionRepository,
-    roleService,
-    logger
-  )
+  const createHandler = () =>
+    new SubscriptionRenewedEventHandler(
+      userRepository,
+      userSubscriptionRepository,
+      offlineUserSubscriptionRepository,
+      roleService,
+      logger,
+    )
 
   beforeEach(() => {
     user = {
       uuid: '123',
       email: 'test@test.com',
-      roles: Promise.resolve([{
-        name: RoleName.CoreUser,
-      }]),
+      roles: Promise.resolve([
+        {
+          name: RoleName.CoreUser,
+        },
+      ]),
     } as jest.Mocked<User>
     subscription = {} as jest.Mocked<UserSubscription>
 
@@ -53,7 +55,9 @@ describe('SubscriptionRenewedEventHandler', () => {
     userSubscriptionRepository = {} as jest.Mocked<UserSubscriptionRepositoryInterface>
     userSubscriptionRepository.updateEndsAt = jest.fn()
     userSubscriptionRepository.save = jest.fn().mockReturnValue(subscription)
-    userSubscriptionRepository.findBySubscriptionId = jest.fn().mockReturnValue([ { user: Promise.resolve(user) } as jest.Mocked<UserSubscription>])
+    userSubscriptionRepository.findBySubscriptionId = jest
+      .fn()
+      .mockReturnValue([{ user: Promise.resolve(user) } as jest.Mocked<UserSubscription>])
 
     offlineUserSubscription = {} as jest.Mocked<OfflineUserSubscription>
 
@@ -66,7 +70,7 @@ describe('SubscriptionRenewedEventHandler', () => {
     roleService.setOfflineUserRole = jest.fn()
 
     timestamp = dayjs.utc().valueOf()
-    subscriptionExpiresAt = dayjs.utc().valueOf() + 365*1000
+    subscriptionExpiresAt = dayjs.utc().valueOf() + 365 * 1000
 
     event = {} as jest.Mocked<SubscriptionRenewedEvent>
     event.createdAt = new Date(1)
@@ -86,13 +90,7 @@ describe('SubscriptionRenewedEventHandler', () => {
   it('should update subscription ends at', async () => {
     await createHandler().handle(event)
 
-    expect(
-      userSubscriptionRepository.updateEndsAt
-    ).toHaveBeenCalledWith(
-      1,
-      subscriptionExpiresAt,
-      timestamp,
-    )
+    expect(userSubscriptionRepository.updateEndsAt).toHaveBeenCalledWith(1, subscriptionExpiresAt, timestamp)
   })
 
   it('should update offline subscription ends at', async () => {
@@ -100,9 +98,7 @@ describe('SubscriptionRenewedEventHandler', () => {
 
     await createHandler().handle(event)
 
-    expect(
-      offlineUserSubscriptionRepository.save
-    ).toHaveBeenCalledWith(offlineUserSubscription)
+    expect(offlineUserSubscriptionRepository.save).toHaveBeenCalledWith(offlineUserSubscription)
   })
 
   it('should update the user role', async () => {

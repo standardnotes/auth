@@ -8,61 +8,52 @@ import { UserSubscriptionType } from '../../Domain/Subscription/UserSubscription
 
 @injectable()
 @EntityRepository(UserSubscription)
-export class MySQLUserSubscriptionRepository extends Repository<UserSubscription> implements UserSubscriptionRepositoryInterface {
-  async findOneByUserUuidAndSubscriptionId(userUuid: Uuid, subscriptionId: number): Promise<UserSubscription | undefined> {
+export class MySQLUserSubscriptionRepository
+  extends Repository<UserSubscription>
+  implements UserSubscriptionRepositoryInterface
+{
+  async findOneByUserUuidAndSubscriptionId(
+    userUuid: Uuid,
+    subscriptionId: number,
+  ): Promise<UserSubscription | undefined> {
     return await this.createQueryBuilder()
-      .where(
-        'user_uuid = :userUuid AND subscription_id = :subscriptionId',
-        {
-          userUuid,
-          subscriptionId,
-        }
-      )
+      .where('user_uuid = :userUuid AND subscription_id = :subscriptionId', {
+        userUuid,
+        subscriptionId,
+      })
       .getOne()
   }
 
   async findBySubscriptionIdAndType(subscriptionId: number, type: UserSubscriptionType): Promise<UserSubscription[]> {
     return await this.createQueryBuilder()
-      .where(
-        'subscription_id = :subscriptionId AND subscription_type = :type',
-        {
-          subscriptionId,
-          type,
-        }
-      )
+      .where('subscription_id = :subscriptionId AND subscription_type = :type', {
+        subscriptionId,
+        type,
+      })
       .getMany()
   }
 
   async findBySubscriptionId(subscriptionId: number): Promise<UserSubscription[]> {
     return await this.createQueryBuilder()
-      .where(
-        'subscription_id = :subscriptionId',
-        {
-          subscriptionId,
-        }
-      )
+      .where('subscription_id = :subscriptionId', {
+        subscriptionId,
+      })
       .getMany()
   }
 
   async findOneByUuid(uuid: Uuid): Promise<UserSubscription | undefined> {
     return await this.createQueryBuilder()
-      .where(
-        'uuid = :uuid',
-        {
-          uuid,
-        }
-      )
+      .where('uuid = :uuid', {
+        uuid,
+      })
       .getOne()
   }
 
   async findOneByUserUuid(userUuid: Uuid): Promise<UserSubscription | undefined> {
     const subscriptions = await this.createQueryBuilder()
-      .where(
-        'user_uuid = :user_uuid',
-        {
-          user_uuid: userUuid,
-        }
-      )
+      .where('user_uuid = :user_uuid', {
+        user_uuid: userUuid,
+      })
       .orderBy('ends_at', 'DESC')
       .getMany()
 
@@ -78,12 +69,9 @@ export class MySQLUserSubscriptionRepository extends Repository<UserSubscription
         endsAt,
         updatedAt,
       })
-      .where(
-        'subscription_id = :subscriptionId',
-        {
-          subscriptionId,
-        }
-      )
+      .where('subscription_id = :subscriptionId', {
+        subscriptionId,
+      })
       .execute()
   }
 
@@ -94,12 +82,9 @@ export class MySQLUserSubscriptionRepository extends Repository<UserSubscription
         cancelled,
         updatedAt,
       })
-      .where(
-        'subscription_id = :subscriptionId',
-        {
-          subscriptionId,
-        }
-      )
+      .where('subscription_id = :subscriptionId', {
+        subscriptionId,
+      })
       .execute()
   }
 }

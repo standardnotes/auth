@@ -22,11 +22,11 @@ export class InviteToSharedSubscription implements UseCaseInterface {
   constructor(
     @inject(TYPES.UserSubscriptionRepository) private userSubscriptionRepository: UserSubscriptionRepositoryInterface,
     @inject(TYPES.Timer) private timer: TimerInterface,
-    @inject(TYPES.SharedSubscriptionInvitationRepository) private sharedSubscriptionInvitationRepository: SharedSubscriptionInvitationRepositoryInterface,
+    @inject(TYPES.SharedSubscriptionInvitationRepository)
+    private sharedSubscriptionInvitationRepository: SharedSubscriptionInvitationRepositoryInterface,
     @inject(TYPES.DomainEventPublisher) private domainEventPublisher: DomainEventPublisherInterface,
     @inject(TYPES.DomainEventFactory) private domainEventFactory: DomainEventFactoryInterface,
-  ) {
-  }
+  ) {}
 
   async execute(dto: InviteToSharedSubscriptionDTO): Promise<InviteToSharedSubscriptionResult> {
     if (!dto.inviterRoles.includes(RoleName.ProUser)) {
@@ -35,8 +35,10 @@ export class InviteToSharedSubscription implements UseCaseInterface {
       }
     }
 
-    const numberOfUsedInvites = await this.sharedSubscriptionInvitationRepository
-      .countByInviterEmailAndStatus(dto.inviterEmail, [InvitationStatus.Sent, InvitationStatus.Accepted])
+    const numberOfUsedInvites = await this.sharedSubscriptionInvitationRepository.countByInviterEmailAndStatus(
+      dto.inviterEmail,
+      [InvitationStatus.Sent, InvitationStatus.Accepted],
+    )
     if (numberOfUsedInvites >= this.MAX_NUMBER_OF_INVITES) {
       return {
         success: false,
@@ -54,9 +56,11 @@ export class InviteToSharedSubscription implements UseCaseInterface {
     sharedSubscriptionInvition.inviterIdentifier = dto.inviterEmail
     sharedSubscriptionInvition.inviterIdentifierType = InviterIdentifierType.Email
     sharedSubscriptionInvition.inviteeIdentifier = dto.inviteeIdentifier
-    sharedSubscriptionInvition.inviteeIdentifierType =
-      this.isInviteeIdentifierPotentiallyAVaultAccount(dto.inviteeIdentifier) ?
-        InviteeIdentifierType.Hash : InviteeIdentifierType.Email
+    sharedSubscriptionInvition.inviteeIdentifierType = this.isInviteeIdentifierPotentiallyAVaultAccount(
+      dto.inviteeIdentifier,
+    )
+      ? InviteeIdentifierType.Hash
+      : InviteeIdentifierType.Email
     sharedSubscriptionInvition.status = InvitationStatus.Sent
     sharedSubscriptionInvition.subscriptionId = inviterUserSubscription.subscriptionId as number
     sharedSubscriptionInvition.createdAt = this.timer.getTimestampInMicroseconds()
@@ -71,7 +75,7 @@ export class InviteToSharedSubscription implements UseCaseInterface {
         inviteeIdentifier: dto.inviteeIdentifier,
         inviteeIdentifierType: savedInvitation.inviteeIdentifierType,
         sharedSubscriptionInvitationUuid: savedInvitation.uuid,
-      })
+      }),
     )
 
     return {

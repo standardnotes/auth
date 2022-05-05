@@ -23,25 +23,29 @@ export class VerifyMFA implements UseCaseInterface {
     @inject(TYPES.BooleanSelector) private booleanSelector: SelectorInterface<boolean>,
     @inject(TYPES.LockRepository) private lockRepository: LockRepositoryInterface,
     @inject(TYPES.PSEUDO_KEY_PARAMS_KEY) private pseudoKeyParamsKey: string,
-  ) {
-  }
+  ) {}
 
   async execute(dto: VerifyMFADTO): Promise<VerifyMFAResponse> {
     try {
       const user = await this.userRepository.findOneByEmail(dto.email)
       if (user == undefined) {
-        const mfaSelectorHash = crypto.createHash('sha256').update(`mfa-selector-${dto.email}${this.pseudoKeyParamsKey}`).digest('hex')
+        const mfaSelectorHash = crypto
+          .createHash('sha256')
+          .update(`mfa-selector-${dto.email}${this.pseudoKeyParamsKey}`)
+          .digest('hex')
 
         const isPseudoMFARequired = this.booleanSelector.select(mfaSelectorHash, [true, false])
 
-        return isPseudoMFARequired ? {
-          success: false,
-          errorTag: ErrorTag.MfaRequired,
-          errorMessage: 'Please enter your two-factor authentication code.',
-          errorPayload: { mfa_key: `mfa_${uuidv4()}` },
-        } : {
-          success: true,
-        }
+        return isPseudoMFARequired
+          ? {
+              success: false,
+              errorTag: ErrorTag.MfaRequired,
+              errorMessage: 'Please enter your two-factor authentication code.',
+              errorPayload: { mfa_key: `mfa_${uuidv4()}` },
+            }
+          : {
+              success: true,
+            }
       }
 
       const mfaSecret = await this.settingService.findSettingWithDecryptedValue({
@@ -76,7 +80,10 @@ export class VerifyMFA implements UseCaseInterface {
     }
   }
 
-  private getMFATokenAndParamKeyFromRequestParams(requestParams: Record<string, unknown>): { key: string, token: string } {
+  private getMFATokenAndParamKeyFromRequestParams(requestParams: Record<string, unknown>): {
+    key: string
+    token: string
+  } {
     let mfaParamKey = null
     for (const key of Object.keys(requestParams)) {
       if (key.startsWith('mfa_')) {
@@ -86,11 +93,9 @@ export class VerifyMFA implements UseCaseInterface {
     }
 
     if (mfaParamKey === null) {
-      throw new MFAValidationError(
-        'Please enter your two-factor authentication code.',
-        ErrorTag.MfaRequired,
-        { mfa_key: `mfa_${uuidv4()}` }
-      )
+      throw new MFAValidationError('Please enter your two-factor authentication code.', ErrorTag.MfaRequired, {
+        mfa_key: `mfa_${uuidv4()}`,
+      })
     }
 
     return {
@@ -103,7 +108,7 @@ export class VerifyMFA implements UseCaseInterface {
     email: string,
     secret: string,
     requestParams: Record<string, unknown>,
-    preventOTPFromFurtherUsage: boolean
+    preventOTPFromFurtherUsage: boolean,
   ): Promise<VerifyMFAResponse> {
     const tokenAndParamKey = this.getMFATokenAndParamKeyFromRequestParams(requestParams)
 
@@ -112,7 +117,7 @@ export class VerifyMFA implements UseCaseInterface {
       throw new MFAValidationError(
         'The two-factor authentication code you entered has been already utilized. Please try again in a while.',
         ErrorTag.MfaInvalid,
-        { mfa_key: tokenAndParamKey.key }
+        { mfa_key: tokenAndParamKey.key },
       )
     }
 
@@ -120,7 +125,7 @@ export class VerifyMFA implements UseCaseInterface {
       throw new MFAValidationError(
         'The two-factor authentication code you entered is incorrect. Please try again.',
         ErrorTag.MfaInvalid,
-        { mfa_key: tokenAndParamKey.key }
+        { mfa_key: tokenAndParamKey.key },
       )
     }
 

@@ -5,39 +5,33 @@ import { OfflineUserSubscriptionRepositoryInterface } from '../../Domain/Subscri
 
 @injectable()
 @EntityRepository(OfflineUserSubscription)
-export class MySQLOfflineUserSubscriptionRepository extends Repository<OfflineUserSubscription> implements OfflineUserSubscriptionRepositoryInterface {
+export class MySQLOfflineUserSubscriptionRepository
+  extends Repository<OfflineUserSubscription>
+  implements OfflineUserSubscriptionRepositoryInterface
+{
   async findOneBySubscriptionId(subscriptionId: number): Promise<OfflineUserSubscription | undefined> {
     return await this.createQueryBuilder()
-      .where(
-        'subscription_id = :subscriptionId',
-        {
-          subscriptionId,
-        }
-      )
+      .where('subscription_id = :subscriptionId', {
+        subscriptionId,
+      })
       .getOne()
   }
 
   async findByEmail(email: string, activeAfter: number): Promise<OfflineUserSubscription[]> {
     return await this.createQueryBuilder()
-      .where(
-        'email = :email AND ends_at > :endsAt',
-        {
-          email,
-          endsAt: activeAfter,
-        }
-      )
+      .where('email = :email AND ends_at > :endsAt', {
+        email,
+        endsAt: activeAfter,
+      })
       .orderBy('ends_at', 'DESC')
       .getMany()
   }
 
   async findOneByEmail(email: string): Promise<OfflineUserSubscription | undefined> {
     const subscriptions = await this.createQueryBuilder()
-      .where(
-        'email = :email',
-        {
-          email,
-        }
-      )
+      .where('email = :email', {
+        email,
+      })
       .orderBy('ends_at', 'DESC')
       .getMany()
 
@@ -53,12 +47,9 @@ export class MySQLOfflineUserSubscriptionRepository extends Repository<OfflineUs
         cancelled,
         updatedAt,
       })
-      .where(
-        'subscription_id = :subscriptionId',
-        {
-          subscriptionId,
-        }
-      )
+      .where('subscription_id = :subscriptionId', {
+        subscriptionId,
+      })
       .execute()
   }
 
@@ -69,12 +60,9 @@ export class MySQLOfflineUserSubscriptionRepository extends Repository<OfflineUs
         endsAt,
         updatedAt,
       })
-      .where(
-        'subscription_id = :subscriptionId',
-        {
-          subscriptionId,
-        }
-      )
+      .where('subscription_id = :subscriptionId', {
+        subscriptionId,
+      })
       .execute()
   }
 }

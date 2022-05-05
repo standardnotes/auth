@@ -9,12 +9,11 @@ import { UseCaseInterface } from './UseCaseInterface'
 
 @injectable()
 export class ClearLoginAttempts implements UseCaseInterface {
-  constructor (
+  constructor(
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
     @inject(TYPES.LockRepository) private lockRepository: LockRepositoryInterface,
-    @inject(TYPES.Logger) private logger: Logger
-  ) {
-  }
+    @inject(TYPES.Logger) private logger: Logger,
+  ) {}
 
   async execute(dto: ClearLoginAttemptsDTO): Promise<ClearLoginAttemptsResponse> {
     await this.lockRepository.resetLockCounter(dto.email)

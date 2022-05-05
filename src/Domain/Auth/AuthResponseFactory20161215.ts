@@ -16,16 +16,15 @@ export class AuthResponseFactory20161215 implements AuthResponseFactoryInterface
   constructor(
     @inject(TYPES.UserProjector) protected userProjector: ProjectorInterface<User>,
     @inject(TYPES.SessionTokenEncoder) protected tokenEncoder: TokenEncoderInterface<SessionTokenData>,
-    @inject(TYPES.Logger) protected logger: Logger
-  ) {
-  }
+    @inject(TYPES.Logger) protected logger: Logger,
+  ) {}
 
   async createResponse(dto: {
-    user: User,
-    apiVersion: string,
-    userAgent: string,
-    ephemeralSession: boolean,
-    readonlyAccess: boolean,
+    user: User
+    apiVersion: string
+    userAgent: string
+    ephemeralSession: boolean
+    readonlyAccess: boolean
   }): Promise<AuthResponse20161215 | AuthResponse20200115> {
     this.logger.debug(`Creating JWT auth response for user ${dto.user.uuid}`)
 

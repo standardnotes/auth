@@ -1,7 +1,4 @@
-import {
-  DomainEventHandlerInterface,
-  FileRemovedEvent,
-} from '@standardnotes/domain-events'
+import { DomainEventHandlerInterface, FileRemovedEvent } from '@standardnotes/domain-events'
 import { SubscriptionSettingName } from '@standardnotes/settings'
 import { inject, injectable } from 'inversify'
 import { Logger } from 'winston'
@@ -17,12 +14,12 @@ export class FileRemovedEventHandler implements DomainEventHandlerInterface {
   constructor(
     @inject(TYPES.UserSubscriptionService) private userSubscriptionService: UserSubscriptionServiceInterface,
     @inject(TYPES.SubscriptionSettingService) private subscriptionSettingService: SubscriptionSettingServiceInterface,
-    @inject(TYPES.Logger) private logger: Logger
-  ) {
-  }
+    @inject(TYPES.Logger) private logger: Logger,
+  ) {}
 
   async handle(event: FileRemovedEvent): Promise<void> {
-    const { regularSubscription, sharedSubscription } = await this.userSubscriptionService.findRegularSubscriptionForUserUuid(event.payload.userUuid)
+    const { regularSubscription, sharedSubscription } =
+      await this.userSubscriptionService.findRegularSubscriptionForUserUuid(event.payload.userUuid)
     if (regularSubscription === undefined) {
       this.logger.warn(`Could not find regular user subscription for user with uuid: ${event.payload.userUuid}`)
 
@@ -55,7 +52,7 @@ export class FileRemovedEventHandler implements DomainEventHandlerInterface {
       userSubscription: subscription,
       props: {
         name: SubscriptionSettingName.FileUploadBytesUsed,
-        unencryptedValue: (+(bytesUsed) - byteSize).toString(),
+        unencryptedValue: (+bytesUsed - byteSize).toString(),
         sensitive: false,
         serverEncryptionVersion: EncryptionVersion.Unencrypted,
       },

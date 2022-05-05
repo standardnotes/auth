@@ -8,21 +8,22 @@ import { ErrorTag } from '@standardnotes/common'
 
 @controller('/listed')
 export class ListedController extends BaseHttpController {
-  constructor(
-    @inject(TYPES.CreateListedAccount) private doCreateListedAccount: CreateListedAccount,
-  ) {
+  constructor(@inject(TYPES.CreateListedAccount) private doCreateListedAccount: CreateListedAccount) {
     super()
   }
 
   @httpPost('/', TYPES.ApiGatewayAuthMiddleware)
   async createListedAccount(_request: Request, response: Response): Promise<results.JsonResult> {
     if (response.locals.readOnlyAccess) {
-      return this.json({
-        error: {
-          tag: ErrorTag.ReadOnlyAccess,
-          message: 'Session has read-only access.',
+      return this.json(
+        {
+          error: {
+            tag: ErrorTag.ReadOnlyAccess,
+            message: 'Session has read-only access.',
+          },
         },
-      }, 401)
+        401,
+      )
     }
 
     await this.doCreateListedAccount.execute({

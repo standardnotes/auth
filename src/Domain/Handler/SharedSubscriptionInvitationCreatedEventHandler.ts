@@ -8,9 +8,9 @@ import { AcceptSharedSubscriptionInvitation } from '../UseCase/AcceptSharedSubsc
 @injectable()
 export class SharedSubscriptionInvitationCreatedEventHandler implements DomainEventHandlerInterface {
   constructor(
-    @inject(TYPES.AcceptSharedSubscriptionInvitation) private acceptSharedSubscriptionInvitation: AcceptSharedSubscriptionInvitation,
-  ) {
-  }
+    @inject(TYPES.AcceptSharedSubscriptionInvitation)
+    private acceptSharedSubscriptionInvitation: AcceptSharedSubscriptionInvitation,
+  ) {}
 
   async handle(event: SharedSubscriptionInvitationCreatedEvent): Promise<void> {
     if (event.payload.inviteeIdentifierType != InviteeIdentifierType.Hash) {

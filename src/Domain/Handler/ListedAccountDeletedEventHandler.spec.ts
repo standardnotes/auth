@@ -15,11 +15,7 @@ describe('ListedAccountDeletedEventHandler', () => {
   let user: User
   let logger: Logger
 
-  const createHandler = () => new ListedAccountDeletedEventHandler(
-    userRepository,
-    settingService,
-    logger
-  )
+  const createHandler = () => new ListedAccountDeletedEventHandler(userRepository, settingService, logger)
 
   beforeEach(() => {
     user = {} as jest.Mocked<User>
@@ -77,7 +73,8 @@ describe('ListedAccountDeletedEventHandler', () => {
 
   it('should remove the listed secret from an existing list of secrets', async () => {
     settingService.findSettingWithDecryptedValue = jest.fn().mockReturnValue({
-      value: '[{"authorId":2,"secret":"old-secret","hostUrl":"https://dev.listed.to"},{"authorId":1,"secret":"my-secret","hostUrl":"https://dev.listed.to"},{"authorId":1,"secret":"my-secret","hostUrl":"https://local.listed.to"}]',
+      value:
+        '[{"authorId":2,"secret":"old-secret","hostUrl":"https://dev.listed.to"},{"authorId":1,"secret":"my-secret","hostUrl":"https://dev.listed.to"},{"authorId":1,"secret":"my-secret","hostUrl":"https://local.listed.to"}]',
     } as jest.Mocked<Setting>)
 
     await createHandler().handle(event)
@@ -87,7 +84,8 @@ describe('ListedAccountDeletedEventHandler', () => {
       props: {
         name: 'LISTED_AUTHOR_SECRETS',
         sensitive: false,
-        unencryptedValue: '[{"authorId":2,"secret":"old-secret","hostUrl":"https://dev.listed.to"},{"authorId":1,"secret":"my-secret","hostUrl":"https://local.listed.to"}]',
+        unencryptedValue:
+          '[{"authorId":2,"secret":"old-secret","hostUrl":"https://dev.listed.to"},{"authorId":1,"secret":"my-secret","hostUrl":"https://local.listed.to"}]',
       },
     })
   })

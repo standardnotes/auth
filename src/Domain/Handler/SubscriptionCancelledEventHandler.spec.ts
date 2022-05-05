@@ -15,10 +15,8 @@ describe('SubscriptionCancelledEventHandler', () => {
   let event: SubscriptionCancelledEvent
   let timestamp: number
 
-  const createHandler = () => new SubscriptionCancelledEventHandler(
-    userSubscriptionRepository,
-    offlineUserSubscriptionRepository,
-  )
+  const createHandler = () =>
+    new SubscriptionCancelledEventHandler(userSubscriptionRepository, offlineUserSubscriptionRepository)
 
   beforeEach(() => {
     userSubscriptionRepository = {} as jest.Mocked<UserSubscriptionRepositoryInterface>
@@ -43,13 +41,7 @@ describe('SubscriptionCancelledEventHandler', () => {
   it('should update subscription cancelled', async () => {
     await createHandler().handle(event)
 
-    expect(
-      userSubscriptionRepository.updateCancelled
-    ).toHaveBeenCalledWith(
-      1,
-      true,
-      timestamp,
-    )
+    expect(userSubscriptionRepository.updateCancelled).toHaveBeenCalledWith(1, true, timestamp)
   })
 
   it('should update offline subscription cancelled', async () => {
@@ -57,12 +49,6 @@ describe('SubscriptionCancelledEventHandler', () => {
 
     await createHandler().handle(event)
 
-    expect(
-      offlineUserSubscriptionRepository.updateCancelled
-    ).toHaveBeenCalledWith(
-      1,
-      true,
-      timestamp,
-    )
+    expect(offlineUserSubscriptionRepository.updateCancelled).toHaveBeenCalledWith(1, true, timestamp)
   })
 })

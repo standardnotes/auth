@@ -20,13 +20,13 @@ export class Register implements UseCaseInterface {
   constructor(
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
     @inject(TYPES.RoleRepository) private roleRepository: RoleRepositoryInterface,
-    @inject(TYPES.AuthResponseFactoryResolver) private authResponseFactoryResolver: AuthResponseFactoryResolverInterface,
+    @inject(TYPES.AuthResponseFactoryResolver)
+    private authResponseFactoryResolver: AuthResponseFactoryResolverInterface,
     @inject(TYPES.Crypter) private crypter: CrypterInterface,
     @inject(TYPES.DISABLE_USER_REGISTRATION) private disableUserRegistration: boolean,
     @inject(TYPES.SettingService) private settingService: SettingServiceInterface,
     @inject(TYPES.Timer) private timer: TimerInterface,
-  ) {
-  }
+  ) {}
 
   async execute(dto: RegisterDTO): Promise<RegisterResponse> {
     if (this.disableUserRegistration) {
@@ -57,7 +57,7 @@ export class Register implements UseCaseInterface {
 
     const defaultRole = await this.roleRepository.findOneByName(RoleName.BasicUser)
     if (defaultRole) {
-      user.roles = Promise.resolve([ defaultRole ])
+      user.roles = Promise.resolve([defaultRole])
     }
 
     Object.assign(user, registrationFields)

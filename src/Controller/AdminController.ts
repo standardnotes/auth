@@ -27,24 +27,30 @@ export class AdminController extends BaseHttpController {
 
   @httpGet('/user/:email')
   async getUser(request: Request): Promise<results.JsonResult> {
-    const email = 'email' in request.params ? <string> request.params.email : undefined
+    const email = 'email' in request.params ? <string>request.params.email : undefined
 
-    if(!email) {
-      return this.json({
-        error: {
-          message: 'Missing email parameter.',
+    if (!email) {
+      return this.json(
+        {
+          error: {
+            message: 'Missing email parameter.',
+          },
         },
-      }, 400)
+        400,
+      )
     }
 
     const user = await this.userRepository.findOneByEmail(email)
 
     if (!user) {
-      return this.json({
-        error: {
-          message: `No user with email '${email}'.`,
+      return this.json(
+        {
+          error: {
+            message: `No user with email '${email}'.`,
+          },
         },
-      }, 400)
+        400,
+      )
     }
 
     return this.json({
@@ -52,7 +58,7 @@ export class AdminController extends BaseHttpController {
     })
   }
 
-  @httpDelete('/users/:userUuid/mfa',)
+  @httpDelete('/users/:userUuid/mfa')
   async deleteMFASetting(request: Request): Promise<results.JsonResult> {
     const { userUuid } = request.params
     const { uuid, updatedAt } = request.body

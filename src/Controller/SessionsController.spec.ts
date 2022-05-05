@@ -26,21 +26,22 @@ describe('SessionsController', () => {
   let user: User
   let role: Role
 
-  const createController = () => new SessionsController(
-    getActiveSessionsForUser,
-    authenticateRequest,
-    userProjector,
-    sessionProjector,
-    roleProjector,
-    tokenEncoder,
-    jwtTTL
-  )
+  const createController = () =>
+    new SessionsController(
+      getActiveSessionsForUser,
+      authenticateRequest,
+      userProjector,
+      sessionProjector,
+      roleProjector,
+      tokenEncoder,
+      jwtTTL,
+    )
 
   beforeEach(() => {
     session = {} as jest.Mocked<Session>
 
     user = {} as jest.Mocked<User>
-    user.roles = Promise.resolve([ role ])
+    user.roles = Promise.resolve([role])
 
     getActiveSessionsForUser = {} as jest.Mocked<GetActiveSessionsForUser>
     getActiveSessionsForUser.execute = jest.fn().mockReturnValue({ sessions: [session] })
@@ -144,6 +145,8 @@ describe('SessionsController', () => {
     expect(httpResponse.statusCode).toEqual(401)
 
     const result = await httpResponse.executeAsync()
-    expect(await result.content.readAsStringAsync()).toEqual('{"error":{"tag":"invalid-auth","message":"Invalid login credentials."}}')
+    expect(await result.content.readAsStringAsync()).toEqual(
+      '{"error":{"tag":"invalid-auth","message":"Invalid login credentials."}}',
+    )
   })
 })

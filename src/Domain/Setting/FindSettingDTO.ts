@@ -3,6 +3,6 @@ import { SettingName } from '@standardnotes/settings'
 
 export type FindSettingDTO = {
   userUuid: string
-  settingName: SettingName,
+  settingName: SettingName
   settingUuid?: Uuid
 }

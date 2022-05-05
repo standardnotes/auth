@@ -8,15 +8,10 @@ import { MuteSignInEmailsResponse } from './MuteSignInEmailsResponse'
 
 @injectable()
 export class MuteSignInEmails implements UseCaseInterface {
-  constructor (
-    @inject(TYPES.SettingRepository) private settingRepository: SettingRepositoryInterface,
-  ) {
-  }
+  constructor(@inject(TYPES.SettingRepository) private settingRepository: SettingRepositoryInterface) {}
 
   async execute(dto: MuteSignInEmailsDTO): Promise<MuteSignInEmailsResponse> {
-    const setting = await this.settingRepository.findOneByUuidAndNames(dto.settingUuid, [
-      SettingName.MuteSignInEmails,
-    ])
+    const setting = await this.settingRepository.findOneByUuidAndNames(dto.settingUuid, [SettingName.MuteSignInEmails])
 
     if (setting === undefined) {
       return {

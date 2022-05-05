@@ -11,11 +11,7 @@ describe('CreateSubscriptionToken', () => {
   let cryptoNode: CryptoNode
   let timer: TimerInterface
 
-  const createUseCase = () => new CreateSubscriptionToken(
-    subscriptionTokenRepository,
-    cryptoNode,
-    timer,
-  )
+  const createUseCase = () => new CreateSubscriptionToken(subscriptionTokenRepository, cryptoNode, timer)
 
   beforeEach(() => {
     subscriptionTokenRepository = {} as jest.Mocked<SubscriptionTokenRepositoryInterface>

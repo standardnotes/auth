@@ -15,9 +15,7 @@ import { ErrorTag } from '@standardnotes/common'
 
 @controller('/valet-tokens', TYPES.ApiGatewayAuthMiddleware)
 export class ValetTokenController extends BaseHttpController {
-  constructor(
-    @inject(TYPES.CreateValetToken) private createValetKey: CreateValetToken,
-  ) {
+  constructor(@inject(TYPES.CreateValetToken) private createValetKey: CreateValetToken) {
     super()
   }
 
@@ -26,12 +24,15 @@ export class ValetTokenController extends BaseHttpController {
     const payload: CreateValetTokenPayload = request.body
 
     if (response.locals.readOnlyAccess && payload.operation !== 'read') {
-      return this.json({
-        error: {
-          tag: ErrorTag.ReadOnlyAccess,
-          message: 'Session has read-only access.',
+      return this.json(
+        {
+          error: {
+            tag: ErrorTag.ReadOnlyAccess,
+            message: 'Session has read-only access.',
+          },
         },
-      }, 401)
+        401,
+      )
     }
 
     const createValetKeyResponse = await this.createValetKey.execute({

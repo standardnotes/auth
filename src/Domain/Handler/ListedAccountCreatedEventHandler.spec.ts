@@ -15,11 +15,7 @@ describe('ListedAccountCreatedEventHandler', () => {
   let user: User
   let logger: Logger
 
-  const createHandler = () => new ListedAccountCreatedEventHandler(
-    userRepository,
-    settingService,
-    logger
-  )
+  const createHandler = () => new ListedAccountCreatedEventHandler(userRepository, settingService, logger)
 
   beforeEach(() => {
     user = {} as jest.Mocked<User>
@@ -77,7 +73,8 @@ describe('ListedAccountCreatedEventHandler', () => {
       props: {
         name: 'LISTED_AUTHOR_SECRETS',
         sensitive: false,
-        unencryptedValue: '[{"authorId":2,"secret":"old-secret","hostUrl":"https://dev.listed.to"},{"authorId":1,"secret":"new-secret","hostUrl":"https://dev.listed.to"}]',
+        unencryptedValue:
+          '[{"authorId":2,"secret":"old-secret","hostUrl":"https://dev.listed.to"},{"authorId":1,"secret":"new-secret","hostUrl":"https://dev.listed.to"}]',
       },
     })
   })

@@ -21,14 +21,15 @@ describe('CreateValetToken', () => {
   let sharedSubscription: UserSubscription
   let user: User
 
-  const createUseCase = () => new CreateValetToken(
-    tokenEncoder,
-    subscriptionSettingService,
-    subscriptionSettingsAssociationService,
-    userSubscriptionService,
-    timer,
-    valetTokenTTL
-  )
+  const createUseCase = () =>
+    new CreateValetToken(
+      tokenEncoder,
+      subscriptionSettingService,
+      subscriptionSettingsAssociationService,
+      userSubscriptionService,
+      timer,
+      valetTokenTTL,
+    )
 
   beforeEach(() => {
     tokenEncoder = {} as jest.Mocked<TokenEncoderInterface<ValetTokenData>>
@@ -59,7 +60,9 @@ describe('CreateValetToken', () => {
     } as jest.Mocked<UserSubscription>
 
     userSubscriptionService = {} as jest.Mocked<UserSubscriptionServiceInterface>
-    userSubscriptionService.findRegularSubscriptionForUserUuid = jest.fn().mockReturnValue({ regularSubscription, sharedSubscription: undefined })
+    userSubscriptionService.findRegularSubscriptionForUserUuid = jest
+      .fn()
+      .mockReturnValue({ regularSubscription, sharedSubscription: undefined })
 
     timer = {} as jest.Mocked<TimerInterface>
     timer.getTimestampInMicroseconds = jest.fn().mockReturnValue(100)
@@ -84,7 +87,9 @@ describe('CreateValetToken', () => {
   })
 
   it('should not create a valet token if a user has no subscription', async () => {
-    userSubscriptionService.findRegularSubscriptionForUserUuid = jest.fn().mockReturnValue({ regularSubscription: undefined, sharedSubscription: undefined })
+    userSubscriptionService.findRegularSubscriptionForUserUuid = jest
+      .fn()
+      .mockReturnValue({ regularSubscription: undefined, sharedSubscription: undefined })
 
     const response = await createUseCase().execute({
       operation: 'read',
@@ -105,7 +110,9 @@ describe('CreateValetToken', () => {
 
   it('should not create a valet token if a user has an expired subscription', async () => {
     regularSubscription.endsAt = 1
-    userSubscriptionService.findRegularSubscriptionForUserUuid = jest.fn().mockReturnValue({ regularSubscription, sharedSubscription: undefined })
+    userSubscriptionService.findRegularSubscriptionForUserUuid = jest
+      .fn()
+      .mockReturnValue({ regularSubscription, sharedSubscription: undefined })
 
     timer.getTimestampInMicroseconds = jest.fn().mockReturnValue(150)
 
@@ -155,20 +162,23 @@ describe('CreateValetToken', () => {
       userUuid: '1-2-3',
     })
 
-    expect(tokenEncoder.encodeExpirableToken).toHaveBeenCalledWith({
-      sharedSubscriptionUuid: undefined,
-      regularSubscriptionUuid: '1-2-3',
-      permittedOperation: 'write',
-      permittedResources:  [
-        {
-          remoteIdentifier: '2-3-4',
-          unencryptedFileSize: 123,
-        },
-      ],
-      userUuid: '1-2-3',
-      uploadBytesUsed: 123,
-      uploadBytesLimit: 123,
-    }, 123)
+    expect(tokenEncoder.encodeExpirableToken).toHaveBeenCalledWith(
+      {
+        sharedSubscriptionUuid: undefined,
+        regularSubscriptionUuid: '1-2-3',
+        permittedOperation: 'write',
+        permittedResources: [
+          {
+            remoteIdentifier: '2-3-4',
+            unencryptedFileSize: 123,
+          },
+        ],
+        userUuid: '1-2-3',
+        uploadBytesUsed: 123,
+        uploadBytesLimit: 123,
+      },
+      123,
+    )
 
     expect(response).toEqual({
       success: true,
@@ -177,7 +187,9 @@ describe('CreateValetToken', () => {
   })
 
   it('should create a write valet token for shared subscription', async () => {
-    userSubscriptionService.findRegularSubscriptionForUserUuid = jest.fn().mockReturnValue({ regularSubscription, sharedSubscription })
+    userSubscriptionService.findRegularSubscriptionForUserUuid = jest
+      .fn()
+      .mockReturnValue({ regularSubscription, sharedSubscription })
 
     const response = await createUseCase().execute({
       operation: 'write',
@@ -190,20 +202,23 @@ describe('CreateValetToken', () => {
       userUuid: '1-2-3',
     })
 
-    expect(tokenEncoder.encodeExpirableToken).toHaveBeenCalledWith({
-      sharedSubscriptionUuid: '2-3-4',
-      regularSubscriptionUuid: '1-2-3',
-      permittedOperation: 'write',
-      permittedResources:  [
-        {
-          remoteIdentifier: '2-3-4',
-          unencryptedFileSize: 123,
-        },
-      ],
-      userUuid: '1-2-3',
-      uploadBytesUsed: 123,
-      uploadBytesLimit: 123,
-    }, 123)
+    expect(tokenEncoder.encodeExpirableToken).toHaveBeenCalledWith(
+      {
+        sharedSubscriptionUuid: '2-3-4',
+        regularSubscriptionUuid: '1-2-3',
+        permittedOperation: 'write',
+        permittedResources: [
+          {
+            remoteIdentifier: '2-3-4',
+            unencryptedFileSize: 123,
+          },
+        ],
+        userUuid: '1-2-3',
+        uploadBytesUsed: 123,
+        uploadBytesLimit: 123,
+      },
+      123,
+    )
 
     expect(response).toEqual({
       success: true,
@@ -212,7 +227,9 @@ describe('CreateValetToken', () => {
   })
 
   it('should not create a write valet token for shared subscription if regular subscription could not be found', async () => {
-    userSubscriptionService.findRegularSubscriptionForUserUuid = jest.fn().mockReturnValue({ regularSubscription: undefined, sharedSubscription })
+    userSubscriptionService.findRegularSubscriptionForUserUuid = jest
+      .fn()
+      .mockReturnValue({ regularSubscription: undefined, sharedSubscription })
 
     const response = await createUseCase().execute({
       operation: 'write',
@@ -245,20 +262,23 @@ describe('CreateValetToken', () => {
       ],
     })
 
-    expect(tokenEncoder.encodeExpirableToken).toHaveBeenCalledWith({
-      sharedSubscriptionUuid: undefined,
-      regularSubscriptionUuid: '1-2-3',
-      permittedOperation: 'write',
-      permittedResources:  [
-        {
-          remoteIdentifier: '2-3-4',
-          unencryptedFileSize: 123,
-        },
-      ],
-      userUuid: '1-2-3',
-      uploadBytesUsed: 0,
-      uploadBytesLimit: 5368709120,
-    }, 123)
+    expect(tokenEncoder.encodeExpirableToken).toHaveBeenCalledWith(
+      {
+        sharedSubscriptionUuid: undefined,
+        regularSubscriptionUuid: '1-2-3',
+        permittedOperation: 'write',
+        permittedResources: [
+          {
+            remoteIdentifier: '2-3-4',
+            unencryptedFileSize: 123,
+          },
+        ],
+        userUuid: '1-2-3',
+        uploadBytesUsed: 0,
+        uploadBytesLimit: 5368709120,
+      },
+      123,
+    )
 
     expect(response).toEqual({
       success: true,

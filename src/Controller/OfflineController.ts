@@ -21,7 +21,8 @@ export class OfflineController extends BaseHttpController {
   constructor(
     @inject(TYPES.GetUserFeatures) private doGetUserFeatures: GetUserFeatures,
     @inject(TYPES.GetUserOfflineSubscription) private getUserOfflineSubscription: GetUserOfflineSubscription,
-    @inject(TYPES.CreateOfflineSubscriptionToken) private createOfflineSubscriptionToken: CreateOfflineSubscriptionToken,
+    @inject(TYPES.CreateOfflineSubscriptionToken)
+    private createOfflineSubscriptionToken: CreateOfflineSubscriptionToken,
     @inject(TYPES.AuthenticateOfflineSubscriptionToken) private authenticateToken: AuthenticateOfflineSubscriptionToken,
     @inject(TYPES.OfflineUserTokenEncoder) private tokenEncoder: TokenEncoderInterface<OfflineUserTokenData>,
     @inject(TYPES.AUTH_JWT_TTL) private jwtTTL: number,
@@ -47,12 +48,15 @@ export class OfflineController extends BaseHttpController {
   @httpPost('/subscription-tokens')
   async createToken(request: Request): Promise<results.JsonResult> {
     if (!request.body.email) {
-      return this.json({
-        error: {
-          tag: 'invalid-request',
-          message: 'Invalid request parameters.',
+      return this.json(
+        {
+          error: {
+            tag: 'invalid-request',
+            message: 'Invalid request parameters.',
+          },
         },
-      }, 400)
+        400,
+      )
     }
 
     const response = await this.createOfflineSubscriptionToken.execute({
@@ -71,12 +75,15 @@ export class OfflineController extends BaseHttpController {
     if (!request.body.email) {
       this.logger.debug('[Offline Subscription Token Validation] Missing email')
 
-      return this.json({
-        error: {
-          tag: 'invalid-request',
-          message: 'Invalid request parameters.',
+      return this.json(
+        {
+          error: {
+            tag: 'invalid-request',
+            message: 'Invalid request parameters.',
+          },
         },
-      }, 400)
+        400,
+      )
     }
 
     const authenticateTokenResponse = await this.authenticateToken.execute({
@@ -87,12 +94,15 @@ export class OfflineController extends BaseHttpController {
     if (!authenticateTokenResponse.success) {
       this.logger.debug('[Offline Subscription Token Validation] invalid token')
 
-      return this.json({
-        error: {
-          tag: 'invalid-auth',
-          message: 'Invalid login credentials.',
+      return this.json(
+        {
+          error: {
+            tag: 'invalid-auth',
+            message: 'Invalid login credentials.',
+          },
         },
-      }, 401)
+        401,
+      )
     }
 
     const offlineAuthTokenData: OfflineUserTokenData = {
@@ -102,7 +112,9 @@ export class OfflineController extends BaseHttpController {
 
     const authToken = this.tokenEncoder.encodeExpirableToken(offlineAuthTokenData, this.jwtTTL)
 
-    this.logger.debug(`[Offline Subscription Token Validation] authenticated token for user ${authenticateTokenResponse.email}`)
+    this.logger.debug(
+      `[Offline Subscription Token Validation] authenticated token for user ${authenticateTokenResponse.email}`,
+    )
 
     return this.json({ authToken })
   }

@@ -8,7 +8,7 @@ import { CrypterInterface } from './CrypterInterface'
 
 @injectable()
 export class CrypterNode implements CrypterInterface {
-  constructor (
+  constructor(
     @inject(TYPES.ENCRYPTION_SERVER_KEY) private encryptionServerKey: string,
     @inject(TYPES.CryptoNode) private cryptoNode: CryptoNode,
     @inject(TYPES.Logger) private logger: Logger,
@@ -75,19 +75,14 @@ export class CrypterNode implements CrypterInterface {
     return this.cryptoNode.aes256GcmDecrypt(encrypted, this.encryptionServerKey)
   }
 
-  private stringifyVersionedEncrypted(
-    version: number,
-    encrypted: Aes256GcmEncrypted<BufferEncoding>,
-  ): string {
+  private stringifyVersionedEncrypted(version: number, encrypted: Aes256GcmEncrypted<BufferEncoding>): string {
     return JSON.stringify({ version, encrypted })
   }
 
-  private parseVersionedEncrypted(
-    versionedEncryptedString: string,
-  ): Aes256GcmEncrypted<BufferEncoding> {
+  private parseVersionedEncrypted(versionedEncryptedString: string): Aes256GcmEncrypted<BufferEncoding> {
     const { version, encrypted } = JSON.parse(versionedEncryptedString)
     if (+version !== User.DEFAULT_ENCRYPTION_VERSION) {
-      throw Error (`Not supported encryption version: ${version}`)
+      throw Error(`Not supported encryption version: ${version}`)
     }
 
     return encrypted

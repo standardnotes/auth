@@ -83,8 +83,7 @@ describe('SettingFactory', () => {
       sensitive: false,
     }
 
-    const actual = await createFactory()
-      .createSubscriptionSetting(props, userSubscription)
+    const actual = await createFactory().createSubscriptionSetting(props, userSubscription)
 
     expect(actual).toEqual({
       createdAt: 1,
@@ -158,8 +157,7 @@ describe('SettingFactory', () => {
       sensitive: false,
     }
 
-    const actual = await createFactory()
-      .create(props, user)
+    const actual = await createFactory().create(props, user)
 
     expect(actual).toEqual({
       createdAt: 1,
@@ -182,7 +180,6 @@ describe('SettingFactory', () => {
       sensitive: false,
     }
 
-    await expect(async () => await createFactory()
-      .create(props, user)).rejects.toThrow()
+    await expect(async () => await createFactory().create(props, user)).rejects.toThrow()
   })
 })

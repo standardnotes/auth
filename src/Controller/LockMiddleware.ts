@@ -8,14 +8,14 @@ import { UserRepositoryInterface } from '../Domain/User/UserRepositoryInterface'
 
 @injectable()
 export class LockMiddleware extends BaseMiddleware {
-  constructor (
-      @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
-      @inject(TYPES.LockRepository) private lockRepository: LockRepositoryInterface
+  constructor(
+    @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
+    @inject(TYPES.LockRepository) private lockRepository: LockRepositoryInterface,
   ) {
     super()
   }
 
-  async handler (request: Request, response: Response, next: NextFunction): Promise<void> {
+  async handler(request: Request, response: Response, next: NextFunction): Promise<void> {
     try {
       let identifier = request.body.email
 

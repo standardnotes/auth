@@ -38,11 +38,14 @@ describe('MySQLSubscriptionSettingRepository', () => {
     queryBuilder.where = jest.fn().mockReturnThis()
     queryBuilder.orderBy = jest.fn().mockReturnThis()
     queryBuilder.limit = jest.fn().mockReturnThis()
-    queryBuilder.getMany = jest.fn().mockReturnValue([ setting ])
+    queryBuilder.getMany = jest.fn().mockReturnValue([setting])
 
     const result = await repository.findLastByNameAndUserSubscriptionUuid('test', '1-2-3')
 
-    expect(queryBuilder.where).toHaveBeenCalledWith('setting.name = :name AND setting.user_subscription_uuid = :userSubscriptionUuid', { name: 'test', userSubscriptionUuid: '1-2-3' })
+    expect(queryBuilder.where).toHaveBeenCalledWith(
+      'setting.name = :name AND setting.user_subscription_uuid = :userSubscriptionUuid',
+      { name: 'test', userSubscriptionUuid: '1-2-3' },
+    )
     expect(queryBuilder.orderBy).toHaveBeenCalledWith('updated_at', 'DESC')
     expect(queryBuilder.limit).toHaveBeenCalledWith(1)
     expect(result).toEqual(setting)

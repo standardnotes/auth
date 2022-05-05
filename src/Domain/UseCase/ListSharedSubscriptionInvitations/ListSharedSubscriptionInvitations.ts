@@ -9,9 +9,9 @@ import { ListSharedSubscriptionInvitationsResponse } from './ListSharedSubscript
 @injectable()
 export class ListSharedSubscriptionInvitations implements UseCaseInterface {
   constructor(
-    @inject(TYPES.SharedSubscriptionInvitationRepository) private sharedSubscriptionInvitationRepository: SharedSubscriptionInvitationRepositoryInterface,
-  ) {
-  }
+    @inject(TYPES.SharedSubscriptionInvitationRepository)
+    private sharedSubscriptionInvitationRepository: SharedSubscriptionInvitationRepositoryInterface,
+  ) {}
 
   async execute(dto: ListSharedSubscriptionInvitationsDTO): Promise<ListSharedSubscriptionInvitationsResponse> {
     const invitations = await this.sharedSubscriptionInvitationRepository.findByInviterEmail(dto.inviterEmail)

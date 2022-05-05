@@ -16,15 +16,15 @@ import { TimerInterface } from '@standardnotes/time'
 export class ChangeCredentials implements UseCaseInterface {
   constructor(
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
-    @inject(TYPES.AuthResponseFactoryResolver) private authResponseFactoryResolver: AuthResponseFactoryResolverInterface,
+    @inject(TYPES.AuthResponseFactoryResolver)
+    private authResponseFactoryResolver: AuthResponseFactoryResolverInterface,
     @inject(TYPES.DomainEventPublisher) private domainEventPublisher: DomainEventPublisherInterface,
     @inject(TYPES.DomainEventFactory) private domainEventFactory: DomainEventFactoryInterface,
     @inject(TYPES.Timer) private timer: TimerInterface,
-  ) {
-  }
+  ) {}
 
   async execute(dto: ChangeCredentialsDTO): Promise<ChangeCredentialsResponse> {
-    if (!await bcrypt.compare(dto.currentPassword, dto.user.encryptedPassword)) {
+    if (!(await bcrypt.compare(dto.currentPassword, dto.user.encryptedPassword))) {
       return {
         success: false,
         errorMessage: 'The current password you entered is incorrect. Please try again.',
@@ -43,7 +43,11 @@ export class ChangeCredentials implements UseCaseInterface {
         }
       }
 
-      userEmailChangedEvent = this.domainEventFactory.createUserEmailChangedEvent(dto.user.uuid, dto.user.email, dto.newEmail)
+      userEmailChangedEvent = this.domainEventFactory.createUserEmailChangedEvent(
+        dto.user.uuid,
+        dto.user.email,
+        dto.newEmail,
+      )
 
       dto.user.email = dto.newEmail
     }

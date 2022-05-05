@@ -64,7 +64,9 @@ describe('GetSetting', () => {
 
     settingService.findSettingWithDecryptedValue = jest.fn().mockReturnValue(setting)
 
-    expect(await createUseCase().execute({ userUuid: '1-2-3', settingName: 'MFA_SECRET', allowSensitiveRetrieval: true })).toEqual({
+    expect(
+      await createUseCase().execute({ userUuid: '1-2-3', settingName: 'MFA_SECRET', allowSensitiveRetrieval: true }),
+    ).toEqual({
       success: true,
       userUuid: '1-2-3',
       setting: { foo: 'bar' },

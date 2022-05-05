@@ -21,15 +21,8 @@ describe('Register', () => {
   let crypter: CrypterInterface
   let timer: TimerInterface
 
-  const createUseCase = () => new Register(
-    userRepository,
-    roleRepository,
-    authResponseFactoryResolver,
-    crypter,
-    false,
-    settingService,
-    timer
-  )
+  const createUseCase = () =>
+    new Register(userRepository, roleRepository, authResponseFactoryResolver, crypter, false, settingService, timer)
 
   beforeEach(() => {
     userRepository = {} as jest.Mocked<UserRepositoryInterface>
@@ -58,17 +51,19 @@ describe('Register', () => {
   })
 
   it('should register a new user', async () => {
-    expect(await createUseCase().execute({
-      email: 'test@test.te',
-      password: 'asdzxc',
-      updatedWithUserAgent: 'Mozilla',
-      apiVersion: '20190520',
-      ephemeralSession: false,
-      version: '004',
-      pwCost: 11,
-      pwSalt: 'qweqwe',
-      pwNonce: undefined,
-    })).toEqual({ success: true, authResponse: { foo: 'bar' } })
+    expect(
+      await createUseCase().execute({
+        email: 'test@test.te',
+        password: 'asdzxc',
+        updatedWithUserAgent: 'Mozilla',
+        apiVersion: '20190520',
+        ephemeralSession: false,
+        version: '004',
+        pwCost: 11,
+        pwSalt: 'qweqwe',
+        pwNonce: undefined,
+      }),
+    ).toEqual({ success: true, authResponse: { foo: 'bar' } })
 
     expect(userRepository.save).toHaveBeenCalledWith({
       email: 'test@test.te',
@@ -94,17 +89,19 @@ describe('Register', () => {
     role.name = 'role1'
     roleRepository.findOneByName = jest.fn().mockReturnValue(role)
 
-    expect(await createUseCase().execute({
-      email: 'test@test.te',
-      password: 'asdzxc',
-      updatedWithUserAgent: 'Mozilla',
-      apiVersion: '20190520',
-      ephemeralSession: false,
-      version: '004',
-      pwCost: 11,
-      pwSalt: 'qweqwe',
-      pwNonce: undefined,
-    })).toEqual({ success: true, authResponse: { foo: 'bar' } })
+    expect(
+      await createUseCase().execute({
+        email: 'test@test.te',
+        password: 'asdzxc',
+        updatedWithUserAgent: 'Mozilla',
+        apiVersion: '20190520',
+        ephemeralSession: false,
+        version: '004',
+        pwCost: 11,
+        pwSalt: 'qweqwe',
+        pwNonce: undefined,
+      }),
+    ).toEqual({ success: true, authResponse: { foo: 'bar' } })
 
     expect(userRepository.save).toHaveBeenCalledWith({
       email: 'test@test.te',
@@ -120,24 +117,26 @@ describe('Register', () => {
       createdAt: new Date(1),
       updatedAt: new Date(1),
       SESSIONS_PROTOCOL_VERSION: 4,
-      roles: Promise.resolve([ role ]),
+      roles: Promise.resolve([role]),
     })
   })
 
   it('should fail to register if a user already exists', async () => {
     userRepository.findOneByEmail = jest.fn().mockReturnValue(user)
 
-    expect(await createUseCase().execute({
-      email: 'test@test.te',
-      password: 'asdzxc',
-      updatedWithUserAgent: 'Mozilla',
-      apiVersion: '20190520',
-      ephemeralSession: false,
-      version: '004',
-      pwCost: 11,
-      pwSalt: 'qweqwe',
-      pwNonce: undefined,
-    })).toEqual({
+    expect(
+      await createUseCase().execute({
+        email: 'test@test.te',
+        password: 'asdzxc',
+        updatedWithUserAgent: 'Mozilla',
+        apiVersion: '20190520',
+        ephemeralSession: false,
+        version: '004',
+        pwCost: 11,
+        pwSalt: 'qweqwe',
+        pwNonce: undefined,
+      }),
+    ).toEqual({
       success: false,
       errorMessage: 'This email is already registered.',
     })
@@ -148,17 +147,27 @@ describe('Register', () => {
   it('should fail to register if a registration is disabled', async () => {
     userRepository.findOneByEmail = jest.fn().mockReturnValue(user)
 
-    expect(await new Register(userRepository, roleRepository, authResponseFactoryResolver, crypter, true, settingService, timer).execute({
-      email: 'test@test.te',
-      password: 'asdzxc',
-      updatedWithUserAgent: 'Mozilla',
-      apiVersion: '20190520',
-      version: '004',
-      ephemeralSession: false,
-      pwCost: 11,
-      pwSalt: 'qweqwe',
-      pwNonce: undefined,
-    })).toEqual({
+    expect(
+      await new Register(
+        userRepository,
+        roleRepository,
+        authResponseFactoryResolver,
+        crypter,
+        true,
+        settingService,
+        timer,
+      ).execute({
+        email: 'test@test.te',
+        password: 'asdzxc',
+        updatedWithUserAgent: 'Mozilla',
+        apiVersion: '20190520',
+        version: '004',
+        ephemeralSession: false,
+        pwCost: 11,
+        pwSalt: 'qweqwe',
+        pwNonce: undefined,
+      }),
+    ).toEqual({
       success: false,
       errorMessage: 'User registration is currently not allowed.',
     })

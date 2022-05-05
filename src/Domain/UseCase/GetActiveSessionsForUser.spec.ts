@@ -34,14 +34,16 @@ describe('GetActiveSessionsForUser', () => {
     ephemeralSession2.refreshExpiration = new Date(4)
 
     sessionRepository = {} as jest.Mocked<SessionRepositoryInterface>
-    sessionRepository.findAllByRefreshExpirationAndUserUuid = jest.fn().mockReturnValue([ session1, session2 ])
+    sessionRepository.findAllByRefreshExpirationAndUserUuid = jest.fn().mockReturnValue([session1, session2])
 
     ephemeralSessionRepository = {} as jest.Mocked<EphemeralSessionRepositoryInterface>
-    ephemeralSessionRepository.findAllByUserUuid = jest.fn().mockReturnValue([ ephemeralSession1, ephemeralSession2 ])
+    ephemeralSessionRepository.findAllByUserUuid = jest.fn().mockReturnValue([ephemeralSession1, ephemeralSession2])
   })
 
   it('should get all active sessions for a user', async () => {
-    expect(await createUseCase().execute({ userUuid: '1-2-3' })).toEqual({ sessions: [ ephemeralSession2, ephemeralSession1, session2, session1 ] })
+    expect(await createUseCase().execute({ userUuid: '1-2-3' })).toEqual({
+      sessions: [ephemeralSession2, ephemeralSession1, session2, session1],
+    })
 
     expect(sessionRepository.findAllByRefreshExpirationAndUserUuid).toHaveBeenCalledWith('1-2-3')
   })
@@ -55,9 +57,11 @@ describe('GetActiveSessionsForUser', () => {
     ephemeralSession4.uuid = '4-5-6'
     ephemeralSession4.refreshExpiration = '1970-01-01T00:00:00.004Z'
 
-    ephemeralSessionRepository.findAllByUserUuid = jest.fn().mockReturnValue([ ephemeralSession3, ephemeralSession4 ])
+    ephemeralSessionRepository.findAllByUserUuid = jest.fn().mockReturnValue([ephemeralSession3, ephemeralSession4])
 
-    expect(await createUseCase().execute({ userUuid: '1-2-3' })).toEqual({ sessions: [ ephemeralSession4, ephemeralSession3, session2, session1 ] })
+    expect(await createUseCase().execute({ userUuid: '1-2-3' })).toEqual({
+      sessions: [ephemeralSession4, ephemeralSession3, session2, session1],
+    })
 
     expect(sessionRepository.findAllByRefreshExpirationAndUserUuid).toHaveBeenCalledWith('1-2-3')
   })

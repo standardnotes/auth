@@ -11,61 +11,46 @@ import { DeleteSettingDto } from '../../Domain/UseCase/DeleteSetting/DeleteSetti
 export class MySQLSettingRepository extends Repository<Setting> implements SettingRepositoryInterface {
   async findOneByUuidAndNames(uuid: string, names: SettingName[]): Promise<Setting | undefined> {
     return this.createQueryBuilder('setting')
-      .where(
-        'setting.uuid = :uuid AND setting.name IN (:...names)',
-        {
-          names,
-          uuid,
-        }
-      )
+      .where('setting.uuid = :uuid AND setting.name IN (:...names)', {
+        names,
+        uuid,
+      })
       .getOne()
   }
 
   async streamAllByNameAndValue(name: SettingName, value: string): Promise<ReadStream> {
     return this.createQueryBuilder('setting')
-      .where(
-        'setting.name = :name AND setting.value = :value',
-        {
-          name,
-          value,
-        }
-      )
+      .where('setting.name = :name AND setting.value = :value', {
+        name,
+        value,
+      })
       .orderBy('updated_at', 'ASC')
       .stream()
   }
 
   async findOneByUuid(uuid: string): Promise<Setting | undefined> {
     return this.createQueryBuilder('setting')
-      .where(
-        'setting.uuid = :uuid',
-        {
-          uuid,
-        }
-      )
+      .where('setting.uuid = :uuid', {
+        uuid,
+      })
       .getOne()
   }
 
   async findOneByNameAndUserUuid(name: string, userUuid: string): Promise<Setting | undefined> {
     return this.createQueryBuilder('setting')
-      .where(
-        'setting.name = :name AND setting.user_uuid = :user_uuid',
-        {
-          name,
-          user_uuid: userUuid,
-        }
-      )
+      .where('setting.name = :name AND setting.user_uuid = :user_uuid', {
+        name,
+        user_uuid: userUuid,
+      })
       .getOne()
   }
 
   async findLastByNameAndUserUuid(name: string, userUuid: string): Promise<Setting | undefined> {
     const settings = await this.createQueryBuilder('setting')
-      .where(
-        'setting.name = :name AND setting.user_uuid = :user_uuid',
-        {
-          name,
-          user_uuid: userUuid,
-        }
-      )
+      .where('setting.name = :name AND setting.user_uuid = :user_uuid', {
+        name,
+        user_uuid: userUuid,
+      })
       .orderBy('updated_at', 'DESC')
       .limit(1)
       .getMany()
@@ -75,28 +60,19 @@ export class MySQLSettingRepository extends Repository<Setting> implements Setti
 
   async findAllByUserUuid(userUuid: string): Promise<Setting[]> {
     return this.createQueryBuilder('setting')
-      .where(
-        'setting.user_uuid = :user_uuid',
-        {
-          user_uuid: userUuid,
-        }
-      )
+      .where('setting.user_uuid = :user_uuid', {
+        user_uuid: userUuid,
+      })
       .getMany()
   }
 
-  async deleteByUserUuid({
-    settingName,
-    userUuid,
-  }: DeleteSettingDto): Promise<void> {
+  async deleteByUserUuid({ settingName, userUuid }: DeleteSettingDto): Promise<void> {
     await this.createQueryBuilder('setting')
       .delete()
-      .where(
-        'name = :name AND user_uuid = :user_uuid',
-        {
-          user_uuid: userUuid,
-          name: settingName,
-        }
-      )
+      .where('name = :name AND user_uuid = :user_uuid', {
+        user_uuid: userUuid,
+        name: settingName,
+      })
       .execute()
   }
 }

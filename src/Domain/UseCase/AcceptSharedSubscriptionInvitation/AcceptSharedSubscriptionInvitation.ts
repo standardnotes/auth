@@ -20,18 +20,20 @@ import { AcceptSharedSubscriptionInvitationResponse } from './AcceptSharedSubscr
 @injectable()
 export class AcceptSharedSubscriptionInvitation implements UseCaseInterface {
   constructor(
-    @inject(TYPES.SharedSubscriptionInvitationRepository) private sharedSubscriptionInvitationRepository: SharedSubscriptionInvitationRepositoryInterface,
+    @inject(TYPES.SharedSubscriptionInvitationRepository)
+    private sharedSubscriptionInvitationRepository: SharedSubscriptionInvitationRepositoryInterface,
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
     @inject(TYPES.UserSubscriptionRepository) private userSubscriptionRepository: UserSubscriptionRepositoryInterface,
     @inject(TYPES.RoleService) private roleService: RoleServiceInterface,
     @inject(TYPES.SubscriptionSettingService) private subscriptionSettingService: SubscriptionSettingServiceInterface,
     @inject(TYPES.Timer) private timer: TimerInterface,
-  ) {
-  }
+  ) {}
 
   async execute(dto: AcceptSharedSubscriptionInvitationDTO): Promise<AcceptSharedSubscriptionInvitationResponse> {
-    const sharedSubscriptionInvitation = await this.sharedSubscriptionInvitationRepository
-      .findOneByUuidAndStatus(dto.sharedSubscriptionInvitationUuid, InvitationStatus.Sent)
+    const sharedSubscriptionInvitation = await this.sharedSubscriptionInvitationRepository.findOneByUuidAndStatus(
+      dto.sharedSubscriptionInvitationUuid,
+      InvitationStatus.Sent,
+    )
     if (sharedSubscriptionInvitation === undefined) {
       return {
         success: false,
@@ -72,7 +74,7 @@ export class AcceptSharedSubscriptionInvitation implements UseCaseInterface {
 
     await this.subscriptionSettingService.applyDefaultSubscriptionSettingsForSubscription(
       inviteeSubscription,
-      inviteeSubscription.planName as SubscriptionName
+      inviteeSubscription.planName as SubscriptionName,
     )
 
     return {
@@ -80,10 +82,7 @@ export class AcceptSharedSubscriptionInvitation implements UseCaseInterface {
     }
   }
 
-  private async addUserRole(
-    user: User,
-    subscriptionName: SubscriptionName
-  ): Promise<void> {
+  private async addUserRole(user: User, subscriptionName: SubscriptionName): Promise<void> {
     await this.roleService.addUserRole(user, subscriptionName)
   }
 

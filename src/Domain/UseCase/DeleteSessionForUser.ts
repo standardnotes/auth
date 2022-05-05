@@ -14,9 +14,8 @@ export class DeleteSessionForUser implements UseCaseInterface {
   constructor(
     @inject(TYPES.SessionRepository) private sessionRepository: SessionRepositoryInterface,
     @inject(TYPES.EphemeralSessionRepository) private ephemeralSessionRepository: EphemeralSessionRepositoryInterface,
-    @inject(TYPES.SessionService) private sessionService: SessionServiceInterface
-  ) {
-  }
+    @inject(TYPES.SessionService) private sessionService: SessionServiceInterface,
+  ) {}
 
   async execute(dto: DeleteSessionForUserDTO): Promise<DeleteSessionForUserResponse> {
     let session: Session | EphemeralSession | undefined

@@ -42,15 +42,10 @@ describe('MySQLOfflineUserSubscriptionRepository', () => {
 
     const result = await repository.findOneByEmail('test@test.com')
 
-    expect(selectQueryBuilder.where).toHaveBeenCalledWith(
-      'email = :email',
-      {
-        email: 'test@test.com',
-      },
-    )
-    expect(selectQueryBuilder.orderBy).toHaveBeenCalledWith(
-      'ends_at', 'DESC'
-    )
+    expect(selectQueryBuilder.where).toHaveBeenCalledWith('email = :email', {
+      email: 'test@test.com',
+    })
+    expect(selectQueryBuilder.orderBy).toHaveBeenCalledWith('ends_at', 'DESC')
     expect(selectQueryBuilder.getMany).toHaveBeenCalled()
     expect(result).toEqual(offlineSubscription)
   })
@@ -64,15 +59,10 @@ describe('MySQLOfflineUserSubscriptionRepository', () => {
 
     const result = await repository.findOneByEmail('test@test.com')
 
-    expect(selectQueryBuilder.where).toHaveBeenCalledWith(
-      'email = :email',
-      {
-        email: 'test@test.com',
-      },
-    )
-    expect(selectQueryBuilder.orderBy).toHaveBeenCalledWith(
-      'ends_at', 'DESC'
-    )
+    expect(selectQueryBuilder.where).toHaveBeenCalledWith('email = :email', {
+      email: 'test@test.com',
+    })
+    expect(selectQueryBuilder.orderBy).toHaveBeenCalledWith('ends_at', 'DESC')
     expect(selectQueryBuilder.getMany).toHaveBeenCalled()
     expect(result).toEqual(offlineSubscription)
   })
@@ -86,15 +76,10 @@ describe('MySQLOfflineUserSubscriptionRepository', () => {
 
     const result = await repository.findOneByEmail('test@test.com')
 
-    expect(selectQueryBuilder.where).toHaveBeenCalledWith(
-      'email = :email',
-      {
-        email: 'test@test.com',
-      },
-    )
-    expect(selectQueryBuilder.orderBy).toHaveBeenCalledWith(
-      'ends_at', 'DESC'
-    )
+    expect(selectQueryBuilder.where).toHaveBeenCalledWith('email = :email', {
+      email: 'test@test.com',
+    })
+    expect(selectQueryBuilder.orderBy).toHaveBeenCalledWith('ends_at', 'DESC')
     expect(selectQueryBuilder.getMany).toHaveBeenCalled()
     expect(result).toBeUndefined()
   })
@@ -108,16 +93,11 @@ describe('MySQLOfflineUserSubscriptionRepository', () => {
 
     const result = await repository.findByEmail('test@test.com', 123)
 
-    expect(selectQueryBuilder.where).toHaveBeenCalledWith(
-      'email = :email AND ends_at > :endsAt',
-      {
-        email: 'test@test.com',
-        endsAt: 123,
-      },
-    )
-    expect(selectQueryBuilder.orderBy).toHaveBeenCalledWith(
-      'ends_at', 'DESC'
-    )
+    expect(selectQueryBuilder.where).toHaveBeenCalledWith('email = :email AND ends_at > :endsAt', {
+      email: 'test@test.com',
+      endsAt: 123,
+    })
+    expect(selectQueryBuilder.orderBy).toHaveBeenCalledWith('ends_at', 'DESC')
     expect(selectQueryBuilder.getMany).toHaveBeenCalled()
     expect(result).toEqual([offlineSubscription])
   })
@@ -133,18 +113,13 @@ describe('MySQLOfflineUserSubscriptionRepository', () => {
     await repository.updateCancelled(1, true, 1000)
 
     expect(updateQueryBuilder.update).toHaveBeenCalled()
-    expect(updateQueryBuilder.set).toHaveBeenCalledWith(
-      {
-        updatedAt: expect.any(Number),
-        cancelled: true,
-      }
-    )
-    expect(updateQueryBuilder.where).toHaveBeenCalledWith(
-      'subscription_id = :subscriptionId',
-      {
-        subscriptionId: 1,
-      }
-    )
+    expect(updateQueryBuilder.set).toHaveBeenCalledWith({
+      updatedAt: expect.any(Number),
+      cancelled: true,
+    })
+    expect(updateQueryBuilder.where).toHaveBeenCalledWith('subscription_id = :subscriptionId', {
+      subscriptionId: 1,
+    })
     expect(updateQueryBuilder.execute).toHaveBeenCalled()
   })
 
@@ -159,18 +134,13 @@ describe('MySQLOfflineUserSubscriptionRepository', () => {
     await repository.updateEndsAt(1, 1000, 1000)
 
     expect(updateQueryBuilder.update).toHaveBeenCalled()
-    expect(updateQueryBuilder.set).toHaveBeenCalledWith(
-      {
-        updatedAt: expect.any(Number),
-        endsAt: 1000,
-      }
-    )
-    expect(updateQueryBuilder.where).toHaveBeenCalledWith(
-      'subscription_id = :subscriptionId',
-      {
-        subscriptionId: 1,
-      }
-    )
+    expect(updateQueryBuilder.set).toHaveBeenCalledWith({
+      updatedAt: expect.any(Number),
+      endsAt: 1000,
+    })
+    expect(updateQueryBuilder.where).toHaveBeenCalledWith('subscription_id = :subscriptionId', {
+      subscriptionId: 1,
+    })
     expect(updateQueryBuilder.execute).toHaveBeenCalled()
   })
 
@@ -182,12 +152,9 @@ describe('MySQLOfflineUserSubscriptionRepository', () => {
 
     const result = await repository.findOneBySubscriptionId(123)
 
-    expect(selectQueryBuilder.where).toHaveBeenCalledWith(
-      'subscription_id = :subscriptionId',
-      {
-        subscriptionId: 123,
-      },
-    )
+    expect(selectQueryBuilder.where).toHaveBeenCalledWith('subscription_id = :subscriptionId', {
+      subscriptionId: 123,
+    })
     expect(selectQueryBuilder.getOne).toHaveBeenCalled()
     expect(result).toEqual(offlineSubscription)
   })

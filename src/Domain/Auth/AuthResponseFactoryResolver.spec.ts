@@ -12,12 +12,13 @@ describe('AuthResponseFactoryResolver', () => {
   let authResponseFactory20200115: AuthResponseFactory20200115
   let logger: Logger
 
-  const createResolver = () => new AuthResponseFactoryResolver(
-    authResponseFactory20161215,
-    authResponseFactory20190520,
-    authResponseFactory20200115,
-    logger
-  )
+  const createResolver = () =>
+    new AuthResponseFactoryResolver(
+      authResponseFactory20161215,
+      authResponseFactory20190520,
+      authResponseFactory20200115,
+      logger,
+    )
 
   beforeEach(() => {
     logger = {} as jest.Mocked<Logger>

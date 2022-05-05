@@ -23,14 +23,15 @@ describe('SettingService', () => {
   let settingDecrypter: SettingDecrypterInterface
   let logger: Logger
 
-  const createService = () => new SettingService(
-    factory,
-    settingRepository,
-    settingsAssociationService,
-    settingInterpreter,
-    settingDecrypter,
-    logger
-  )
+  const createService = () =>
+    new SettingService(
+      factory,
+      settingRepository,
+      settingsAssociationService,
+      settingInterpreter,
+      settingDecrypter,
+      logger,
+    )
 
   beforeEach(() => {
     user = {
@@ -47,16 +48,34 @@ describe('SettingService', () => {
     settingRepository = {} as jest.Mocked<SettingRepositoryInterface>
     settingRepository.findLastByNameAndUserUuid = jest.fn().mockReturnValue(undefined)
     settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue(undefined)
-    settingRepository.save = jest.fn().mockImplementation(setting => setting)
+    settingRepository.save = jest.fn().mockImplementation((setting) => setting)
 
     settingsAssociationService = {} as jest.Mocked<SettingsAssociationServiceInterface>
-    settingsAssociationService.getDefaultSettingsAndValuesForNewUser = jest.fn().mockReturnValue(new Map([
-      [SettingName.MuteSignInEmails, { value: MuteSignInEmailsOption.NotMuted, sensitive: 0, serverEncryptionVersion: EncryptionVersion.Unencrypted }],
-    ]))
+    settingsAssociationService.getDefaultSettingsAndValuesForNewUser = jest.fn().mockReturnValue(
+      new Map([
+        [
+          SettingName.MuteSignInEmails,
+          {
+            value: MuteSignInEmailsOption.NotMuted,
+            sensitive: 0,
+            serverEncryptionVersion: EncryptionVersion.Unencrypted,
+          },
+        ],
+      ]),
+    )
 
-    settingsAssociationService.getDefaultSettingsAndValuesForNewVaultAccount = jest.fn().mockReturnValue(new Map([
-      [SettingName.LogSessionUserAgent, { sensitive: false, serverEncryptionVersion: EncryptionVersion.Unencrypted, value: LogSessionUserAgentOption.Disabled }],
-    ]))
+    settingsAssociationService.getDefaultSettingsAndValuesForNewVaultAccount = jest.fn().mockReturnValue(
+      new Map([
+        [
+          SettingName.LogSessionUserAgent,
+          {
+            sensitive: false,
+            serverEncryptionVersion: EncryptionVersion.Unencrypted,
+            value: LogSessionUserAgentOption.Disabled,
+          },
+        ],
+      ]),
+    )
 
     settingInterpreter = {} as jest.Mocked<SettingInterpreterInterface>
     settingInterpreter.interpretSettingUpdated = jest.fn()
@@ -70,13 +89,13 @@ describe('SettingService', () => {
     logger.error = jest.fn()
   })
 
-  it ('should create default settings for a newly registered user', async () => {
+  it('should create default settings for a newly registered user', async () => {
     await createService().applyDefaultSettingsUponRegistration(user)
 
     expect(settingRepository.save).toHaveBeenCalledWith(setting)
   })
 
-  it ('should create default settings for a newly registered vault account', async () => {
+  it('should create default settings for a newly registered vault account', async () => {
     user.isPotentiallyAVaultAccount = jest.fn().mockReturnValue(true)
 
     await createService().applyDefaultSettingsUponRegistration(user)
@@ -84,7 +103,7 @@ describe('SettingService', () => {
     expect(settingRepository.save).toHaveBeenCalledWith(setting)
   })
 
-  it ('should create setting if it doesn\'t exist', async () => {
+  it("should create setting if it doesn't exist", async () => {
     const result = await createService().createOrReplace({
       user,
       props: {
@@ -98,7 +117,7 @@ describe('SettingService', () => {
     expect(result.status).toEqual('created')
   })
 
-  it ('should create setting with a given uuid if it does not exist', async () => {
+  it('should create setting with a given uuid if it does not exist', async () => {
     settingRepository.findOneByUuid = jest.fn().mockReturnValue(undefined)
 
     const result = await createService().createOrReplace({
@@ -115,7 +134,7 @@ describe('SettingService', () => {
     expect(result.status).toEqual('created')
   })
 
-  it ('should replace setting if it does exist', async () => {
+  it('should replace setting if it does exist', async () => {
     settingRepository.findLastByNameAndUserUuid = jest.fn().mockReturnValue(setting)
 
     const result = await createService().createOrReplace({
@@ -130,7 +149,7 @@ describe('SettingService', () => {
     expect(result.status).toEqual('replaced')
   })
 
-  it ('should replace setting with a given uuid if it does exist', async () => {
+  it('should replace setting with a given uuid if it does exist', async () => {
     settingRepository.findOneByUuid = jest.fn().mockReturnValue(setting)
 
     const result = await createService().createOrReplace({
@@ -154,7 +173,9 @@ describe('SettingService', () => {
 
     settingRepository.findLastByNameAndUserUuid = jest.fn().mockReturnValue(setting)
 
-    expect(await createService().findSettingWithDecryptedValue({ userUuid: '1-2-3', settingName: 'test' as SettingName })).toEqual({
+    expect(
+      await createService().findSettingWithDecryptedValue({ userUuid: '1-2-3', settingName: 'test' as SettingName }),
+    ).toEqual({
       serverEncryptionVersion: 1,
       value: 'decrypted',
     })

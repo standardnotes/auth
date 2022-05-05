@@ -9,12 +9,11 @@ import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 
 @injectable()
 export class ListedAccountCreatedEventHandler implements DomainEventHandlerInterface {
-  constructor (
+  constructor(
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
     @inject(TYPES.SettingService) private settingService: SettingServiceInterface,
-    @inject(TYPES.Logger) private logger: Logger
-  ) {
-  }
+    @inject(TYPES.Logger) private logger: Logger,
+  ) {}
 
   async handle(event: ListedAccountCreatedEvent): Promise<void> {
     const user = await this.userRepository.findOneByEmail(event.payload.userEmail)
@@ -26,7 +25,7 @@ export class ListedAccountCreatedEventHandler implements DomainEventHandlerInter
 
     const newSecret = { authorId: event.payload.userId, secret: event.payload.secret, hostUrl: event.payload.hostUrl }
 
-    let authSecrets: ListedAuthorSecretsData = [ newSecret ]
+    let authSecrets: ListedAuthorSecretsData = [newSecret]
 
     const listedAuthorSecretsSetting = await this.settingService.findSettingWithDecryptedValue({
       settingName: SettingName.ListedAuthorSecrets,

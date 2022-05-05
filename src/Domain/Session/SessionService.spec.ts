@@ -26,17 +26,18 @@ describe('SessionService', () => {
   let timer: TimerInterface
   let logger: winston.Logger
 
-  const createService = () => new SessionService(
-    sessionRepository,
-    ephemeralSessionRepository,
-    revokedSessionRepository,
-    deviceDetector,
-    timer,
-    logger,
-    123,
-    234,
-    settingService
-  )
+  const createService = () =>
+    new SessionService(
+      sessionRepository,
+      ephemeralSessionRepository,
+      revokedSessionRepository,
+      deviceDetector,
+      timer,
+      logger,
+      123,
+      234,
+      settingService,
+    )
 
   beforeEach(() => {
     session = {} as jest.Mocked<Session>

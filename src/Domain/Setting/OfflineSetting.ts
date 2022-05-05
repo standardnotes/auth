@@ -5,40 +5,40 @@ import { EncryptionVersion } from '../Encryption/EncryptionVersion'
 @Index('index_offline_settings_on_name_and_email', ['name', 'email'])
 export class OfflineSetting {
   @PrimaryGeneratedColumn('uuid')
-  uuid: string
+  uuid!: string
 
   @Column({
     length: 255,
   })
-  email: string
+  email!: string
 
   @Column({
     length: 255,
   })
-  name: string
+  name!: string
 
   @Column({
     type: 'text',
     nullable: true,
   })
-  value: string | null
+  value!: string | null
 
   @Column({
     name: 'server_encryption_version',
     type: 'tinyint',
     default: EncryptionVersion.Unencrypted,
   })
-  serverEncryptionVersion: number
+  serverEncryptionVersion!: number
 
   @Column({
     name: 'created_at',
     type: 'bigint',
   })
-  createdAt: number
+  createdAt!: number
 
   @Column({
     name: 'updated_at',
     type: 'bigint',
   })
-  updatedAt: number
+  updatedAt!: number
 }

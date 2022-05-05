@@ -9,18 +9,15 @@ import { AddWebSocketsConnectionResponse } from './AddWebSocketsConnectionRespon
 @injectable()
 export class AddWebSocketsConnection implements UseCaseInterface {
   constructor(
-    @inject(TYPES.WebSocketsConnectionRepository) private webSocketsConnectionRepository: WebSocketsConnectionRepositoryInterface,
-    @inject(TYPES.Logger) private logger: Logger
-  ) {
-  }
+    @inject(TYPES.WebSocketsConnectionRepository)
+    private webSocketsConnectionRepository: WebSocketsConnectionRepositoryInterface,
+    @inject(TYPES.Logger) private logger: Logger,
+  ) {}
 
   async execute(dto: AddWebSocketsConnectionDTO): Promise<AddWebSocketsConnectionResponse> {
     this.logger.debug(`Persisting connection ${dto.connectionId} for user ${dto.userUuid}`)
 
-    await this.webSocketsConnectionRepository.saveConnection(
-      dto.userUuid,
-      dto.connectionId
-    )
+    await this.webSocketsConnectionRepository.saveConnection(dto.userUuid, dto.connectionId)
 
     return {
       success: true,

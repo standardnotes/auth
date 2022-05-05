@@ -31,7 +31,9 @@ describe('MySQLSharedSubscriptionInvitationRepository', () => {
 
     const result = await repository.findByInviterEmail('test@test.te')
 
-    expect(queryBuilder.where).toHaveBeenCalledWith('invitation.inviter_identifier = :inviterEmail', { inviterEmail: 'test@test.te' })
+    expect(queryBuilder.where).toHaveBeenCalledWith('invitation.inviter_identifier = :inviterEmail', {
+      inviterEmail: 'test@test.te',
+    })
 
     expect(result).toEqual([])
   })
@@ -42,7 +44,10 @@ describe('MySQLSharedSubscriptionInvitationRepository', () => {
 
     const result = await repository.countByInviterEmailAndStatus('test@test.te', [InvitationStatus.Sent])
 
-    expect(queryBuilder.where).toHaveBeenCalledWith('invitation.inviter_identifier = :inviterEmail AND invitation.status IN (:...statuses)', { inviterEmail: 'test@test.te', statuses: ['sent'] })
+    expect(queryBuilder.where).toHaveBeenCalledWith(
+      'invitation.inviter_identifier = :inviterEmail AND invitation.status IN (:...statuses)',
+      { inviterEmail: 'test@test.te', statuses: ['sent'] },
+    )
 
     expect(result).toEqual(3)
   })
@@ -53,7 +58,10 @@ describe('MySQLSharedSubscriptionInvitationRepository', () => {
 
     const result = await repository.findOneByUuidAndStatus('1-2-3', InvitationStatus.Sent)
 
-    expect(queryBuilder.where).toHaveBeenCalledWith('invitation.uuid = :uuid AND invitation.status = :status', { uuid: '1-2-3', status: 'sent' })
+    expect(queryBuilder.where).toHaveBeenCalledWith('invitation.uuid = :uuid AND invitation.status = :status', {
+      uuid: '1-2-3',
+      status: 'sent',
+    })
 
     expect(result).toEqual(invitation)
   })

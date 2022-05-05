@@ -27,8 +27,7 @@ describe('WebSocketsController', () => {
       body: {
         userUuid: '1-2-3',
       },
-      params: {
-      },
+      params: {},
       headers: {},
     } as jest.Mocked<express.Request>
     request.params.connectionId = '2-3-4'
@@ -45,7 +44,7 @@ describe('WebSocketsController', () => {
     const httpResponse = await createController().storeWebSocketsConnection(request, response)
 
     expect(httpResponse).toBeInstanceOf(results.JsonResult)
-    expect((<results.JsonResult> httpResponse).statusCode).toEqual(200)
+    expect((<results.JsonResult>httpResponse).statusCode).toEqual(200)
 
     expect(addWebSocketsConnection.execute).toHaveBeenCalledWith({
       userUuid: '1-2-3',
@@ -57,7 +56,7 @@ describe('WebSocketsController', () => {
     const httpResponse = await createController().deleteWebSocketsConnection(request)
 
     expect(httpResponse).toBeInstanceOf(results.JsonResult)
-    expect((<results.JsonResult> httpResponse).statusCode).toEqual(200)
+    expect((<results.JsonResult>httpResponse).statusCode).toEqual(200)
 
     expect(removeWebSocketsConnection.execute).toHaveBeenCalledWith({
       connectionId: '2-3-4',

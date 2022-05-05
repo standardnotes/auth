@@ -12,12 +12,8 @@ describe('UserRegisteredEventHandler', () => {
   let event: UserRegisteredEvent
   let logger: Logger
 
-  const createHandler = () => new UserRegisteredEventHandler(
-    httpClient,
-    userServerRegistrationUrl,
-    userServerAuthKey,
-    logger
-  )
+  const createHandler = () =>
+    new UserRegisteredEventHandler(httpClient, userServerRegistrationUrl, userServerAuthKey, logger)
 
   beforeEach(() => {
     httpClient = {} as jest.Mocked<AxiosInstance>
@@ -41,7 +37,7 @@ describe('UserRegisteredEventHandler', () => {
       method: 'POST',
       url: 'https://user-server/registration',
       headers: {
-        'Accept': 'application/json',
+        Accept: 'application/json',
         'Content-Type': 'application/json',
       },
       data: {
@@ -56,12 +52,7 @@ describe('UserRegisteredEventHandler', () => {
   })
 
   it('should not send a request to the user management server about a registration if url is not defined', async () => {
-    const handler = new UserRegisteredEventHandler(
-      httpClient,
-      '',
-      userServerAuthKey,
-      logger
-    )
+    const handler = new UserRegisteredEventHandler(httpClient, '', userServerAuthKey, logger)
     await handler.handle(event)
 
     expect(httpClient.request).not.toHaveBeenCalled()

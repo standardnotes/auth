@@ -9,11 +9,10 @@ import { UseCaseInterface } from './UseCaseInterface'
 
 @injectable()
 export class AuthenticateRequest implements UseCaseInterface {
-  constructor (
+  constructor(
     @inject(TYPES.AuthenticateUser) private authenticateUser: AuthenticateUser,
     @inject(TYPES.Logger) private logger: Logger,
-  ) {
-  }
+  ) {}
 
   async execute(dto: AuthenticateRequestDTO): Promise<AuthenticateRequestResponse> {
     if (!dto.authorizationHeader) {
@@ -27,7 +26,9 @@ export class AuthenticateRequest implements UseCaseInterface {
 
     let authenticateResponse: AuthenticateUserResponse
     try {
-      authenticateResponse = await this.authenticateUser.execute({ token: dto.authorizationHeader.replace('Bearer ', '') })
+      authenticateResponse = await this.authenticateUser.execute({
+        token: dto.authorizationHeader.replace('Bearer ', ''),
+      })
     } catch (error) {
       this.logger.error('Error occurred during authentication of a user %o', error)
 
@@ -41,27 +42,27 @@ export class AuthenticateRequest implements UseCaseInterface {
 
     if (!authenticateResponse.success) {
       switch (authenticateResponse.failureType) {
-      case 'EXPIRED_TOKEN':
-        return {
-          success: false,
-          responseCode: 498,
-          errorTag: 'expired-access-token',
-          errorMessage: 'The provided access token has expired.',
-        }
-      case 'INVALID_AUTH':
-        return {
-          success: false,
-          responseCode: 401,
-          errorTag: 'invalid-auth',
-          errorMessage: 'Invalid login credentials.',
-        }
-      case 'REVOKED_SESSION':
-        return {
-          success: false,
-          responseCode: 401,
-          errorTag: 'revoked-session',
-          errorMessage: 'Your session has been revoked.',
-        }
+        case 'EXPIRED_TOKEN':
+          return {
+            success: false,
+            responseCode: 498,
+            errorTag: 'expired-access-token',
+            errorMessage: 'The provided access token has expired.',
+          }
+        case 'INVALID_AUTH':
+          return {
+            success: false,
+            responseCode: 401,
+            errorTag: 'invalid-auth',
+            errorMessage: 'Invalid login credentials.',
+          }
+        case 'REVOKED_SESSION':
+          return {
+            success: false,
+            responseCode: 401,
+            errorTag: 'revoked-session',
+            errorMessage: 'Your session has been revoked.',
+          }
       }
     }
 

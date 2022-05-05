@@ -1,4 +1,4 @@
 export type RefreshSessionTokenDTO = {
-  accessToken: string,
+  accessToken: string
   refreshToken: string
 }

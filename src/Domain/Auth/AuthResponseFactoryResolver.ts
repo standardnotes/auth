@@ -14,20 +14,19 @@ export class AuthResponseFactoryResolver implements AuthResponseFactoryResolverI
     @inject(TYPES.AuthResponseFactory20161215) private authResponseFactory20161215: AuthResponseFactory20161215,
     @inject(TYPES.AuthResponseFactory20190520) private authResponseFactory20190520: AuthResponseFactory20190520,
     @inject(TYPES.AuthResponseFactory20200115) private authResponseFactory20200115: AuthResponseFactory20200115,
-    @inject(TYPES.Logger) private logger: Logger
-  ) {
-  }
+    @inject(TYPES.Logger) private logger: Logger,
+  ) {}
 
   resolveAuthResponseFactoryVersion(apiVersion: string): AuthResponseFactoryInterface {
     this.logger.debug(`Resolving auth response factory for api version: ${apiVersion}`)
 
-    switch(apiVersion) {
-    case ApiVersion.v20190520:
-      return this.authResponseFactory20190520
-    case ApiVersion.v20200115:
-      return this.authResponseFactory20200115
-    default:
-      return this.authResponseFactory20161215
+    switch (apiVersion) {
+      case ApiVersion.v20190520:
+        return this.authResponseFactory20190520
+      case ApiVersion.v20200115:
+        return this.authResponseFactory20200115
+      default:
+        return this.authResponseFactory20161215
     }
   }
 }

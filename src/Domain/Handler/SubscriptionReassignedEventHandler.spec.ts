@@ -29,22 +29,25 @@ describe('SubscriptionReassignedEventHandler', () => {
   let settingService: SettingServiceInterface
   let subscriptionSettingService: SubscriptionSettingServiceInterface
 
-  const createHandler = () => new SubscriptionReassignedEventHandler(
-    userRepository,
-    userSubscriptionRepository,
-    roleService,
-    settingService,
-    subscriptionSettingService,
-    logger
-  )
+  const createHandler = () =>
+    new SubscriptionReassignedEventHandler(
+      userRepository,
+      userSubscriptionRepository,
+      roleService,
+      settingService,
+      subscriptionSettingService,
+      logger,
+    )
 
   beforeEach(() => {
     user = {
       uuid: '123',
       email: 'test@test.com',
-      roles: Promise.resolve([{
-        name: RoleName.CoreUser,
-      }]),
+      roles: Promise.resolve([
+        {
+          name: RoleName.CoreUser,
+        },
+      ]),
     } as jest.Mocked<User>
     subscription = {
       subscriptionType: UserSubscriptionType.Regular,
@@ -60,7 +63,7 @@ describe('SubscriptionReassignedEventHandler', () => {
     roleService = {} as jest.Mocked<RoleServiceInterface>
     roleService.addUserRole = jest.fn()
 
-    subscriptionExpiresAt = timestamp + 365*1000
+    subscriptionExpiresAt = timestamp + 365 * 1000
 
     event = {} as jest.Mocked<SubscriptionReassignedEvent>
     event.createdAt = new Date(1)
@@ -88,7 +91,10 @@ describe('SubscriptionReassignedEventHandler', () => {
   it('should update user default settings', async () => {
     await createHandler().handle(event)
 
-    expect(subscriptionSettingService.applyDefaultSubscriptionSettingsForSubscription).toHaveBeenCalledWith(subscription, SubscriptionName.ProPlan)
+    expect(subscriptionSettingService.applyDefaultSubscriptionSettingsForSubscription).toHaveBeenCalledWith(
+      subscription,
+      SubscriptionName.ProPlan,
+    )
   })
 
   it('should update the user role', async () => {
@@ -107,9 +113,7 @@ describe('SubscriptionReassignedEventHandler', () => {
     subscription.user = Promise.resolve(user)
 
     expect(userRepository.findOneByEmail).toHaveBeenCalledWith('test@test.com')
-    expect(
-      userSubscriptionRepository.save
-    ).toHaveBeenCalledWith({
+    expect(userSubscriptionRepository.save).toHaveBeenCalledWith({
       ...subscription,
       createdAt: expect.any(Number),
       updatedAt: expect.any(Number),
@@ -130,9 +134,11 @@ describe('SubscriptionReassignedEventHandler', () => {
       user: {
         uuid: '123',
         email: 'test@test.com',
-        roles: Promise.resolve([{
-          name: RoleName.CoreUser,
-        }]),
+        roles: Promise.resolve([
+          {
+            name: RoleName.CoreUser,
+          },
+        ]),
       },
     })
   })

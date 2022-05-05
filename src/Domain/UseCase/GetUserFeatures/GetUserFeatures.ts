@@ -11,8 +11,7 @@ export class GetUserFeatures implements UseCaseInterface {
   constructor(
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
     @inject(TYPES.FeatureService) private featureService: FeatureServiceInterface,
-  ) {
-  }
+  ) {}
 
   async execute(dto: GetUserFeaturesDto): Promise<GetUserFeaturesResponse> {
     if (dto.offline) {

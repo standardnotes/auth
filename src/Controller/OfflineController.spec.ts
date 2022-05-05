@@ -28,15 +28,16 @@ describe('OfflineController', () => {
   let response: express.Response
   let user: User
 
-  const createController = () => new OfflineController(
-    getUserFeatures,
-    getUserOfflineSubscription,
-    createOfflineSubscriptionToken,
-    authenticateToken,
-    tokenEncoder,
-    jwtTTL,
-    logger
-  )
+  const createController = () =>
+    new OfflineController(
+      getUserFeatures,
+      getUserOfflineSubscription,
+      createOfflineSubscriptionToken,
+      authenticateToken,
+      tokenEncoder,
+      jwtTTL,
+      logger,
+    )
 
   beforeEach(() => {
     user = {} as jest.Mocked<User>
@@ -65,7 +66,7 @@ describe('OfflineController', () => {
     authenticateToken.execute = jest.fn().mockReturnValue({
       success: true,
       email: 'test@test.com',
-      subscriptions: [ {} as jest.Mocked<OfflineUserSubscription> ],
+      subscriptions: [{} as jest.Mocked<OfflineUserSubscription>],
     })
 
     logger = {} as jest.Mocked<Logger>
@@ -90,7 +91,7 @@ describe('OfflineController', () => {
 
     getUserFeatures.execute = jest.fn().mockReturnValue({ success: true })
 
-    const httpResponse = <results.JsonResult> await createController().getOfflineFeatures(request, response)
+    const httpResponse = <results.JsonResult>await createController().getOfflineFeatures(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(getUserFeatures.execute).toHaveBeenCalledWith({
@@ -104,7 +105,7 @@ describe('OfflineController', () => {
   it('should get offline user subscription', async () => {
     response.locals.userEmail = 'test@test.com'
 
-    const httpResponse = <results.JsonResult> await createController().getSubscription(request, response)
+    const httpResponse = <results.JsonResult>await createController().getSubscription(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(getUserOfflineSubscription.execute).toHaveBeenCalledWith({
@@ -119,7 +120,7 @@ describe('OfflineController', () => {
 
     getUserOfflineSubscription.execute = jest.fn().mockReturnValue({ success: false })
 
-    const httpResponse = <results.JsonResult> await createController().getSubscription(request, response)
+    const httpResponse = <results.JsonResult>await createController().getSubscription(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(getUserOfflineSubscription.execute).toHaveBeenCalledWith({
@@ -134,7 +135,7 @@ describe('OfflineController', () => {
 
     getUserFeatures.execute = jest.fn().mockReturnValue({ success: false })
 
-    const httpResponse = <results.JsonResult> await createController().getOfflineFeatures(request, response)
+    const httpResponse = <results.JsonResult>await createController().getOfflineFeatures(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(getUserFeatures.execute).toHaveBeenCalledWith({
@@ -148,7 +149,7 @@ describe('OfflineController', () => {
   it('should create a offline subscription token for authenticated user', async () => {
     request.body.email = 'test@test.com'
 
-    const httpResponse = <results.JsonResult> await createController().createToken(request)
+    const httpResponse = <results.JsonResult>await createController().createToken(request)
     const result = await httpResponse.executeAsync()
 
     expect(createOfflineSubscriptionToken.execute).toHaveBeenCalledWith({
@@ -159,7 +160,7 @@ describe('OfflineController', () => {
   })
 
   it('should not create a offline subscription token for missing email in request', async () => {
-    const httpResponse = <results.JsonResult> await createController().createToken(request)
+    const httpResponse = <results.JsonResult>await createController().createToken(request)
     const result = await httpResponse.executeAsync()
 
     expect(createOfflineSubscriptionToken.execute).not.toHaveBeenCalled()
@@ -175,7 +176,7 @@ describe('OfflineController', () => {
       error: 'no-subscription',
     })
 
-    const httpResponse = <results.JsonResult> await createController().createToken(request)
+    const httpResponse = <results.JsonResult>await createController().createToken(request)
     const result = await httpResponse.executeAsync()
 
     expect(createOfflineSubscriptionToken.execute).toHaveBeenCalledWith({
@@ -190,7 +191,7 @@ describe('OfflineController', () => {
     request.params.token = 'test'
     request.body.email = 'test@test.com'
 
-    const httpResponse = <results.JsonResult> await createController().validate(request)
+    const httpResponse = <results.JsonResult>await createController().validate(request)
     const result = await httpResponse.executeAsync()
 
     expect(authenticateToken.execute).toHaveBeenCalledWith({
@@ -209,7 +210,7 @@ describe('OfflineController', () => {
       success: false,
     })
 
-    const httpResponse = <results.JsonResult> await createController().validate(request)
+    const httpResponse = <results.JsonResult>await createController().validate(request)
     const result = await httpResponse.executeAsync()
 
     expect(authenticateToken.execute).toHaveBeenCalledWith({
@@ -223,7 +224,7 @@ describe('OfflineController', () => {
   it('should not validate a offline subscription token for user if email is missing', async () => {
     request.params.token = 'test'
 
-    const httpResponse = <results.JsonResult> await createController().validate(request)
+    const httpResponse = <results.JsonResult>await createController().validate(request)
     const result = await httpResponse.executeAsync()
 
     expect(authenticateToken.execute).not.toHaveBeenCalled()

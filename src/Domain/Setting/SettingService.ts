@@ -23,8 +23,7 @@ export class SettingService implements SettingServiceInterface {
     @inject(TYPES.SettingInterpreter) private settingInterpreter: SettingInterpreterInterface,
     @inject(TYPES.SettingDecrypter) private settingDecrypter: SettingDecrypterInterface,
     @inject(TYPES.Logger) private logger: Logger,
-  ) {
-  }
+  ) {}
 
   async applyDefaultSettingsUponRegistration(user: User): Promise<void> {
     let defaultSettingsWithValues = this.settingsAssociationService.getDefaultSettingsAndValuesForNewUser()
@@ -33,7 +32,11 @@ export class SettingService implements SettingServiceInterface {
     }
 
     for (const settingName of defaultSettingsWithValues.keys()) {
-      const setting = defaultSettingsWithValues.get(settingName) as { value: string, sensitive: boolean, serverEncryptionVersion: number }
+      const setting = defaultSettingsWithValues.get(settingName) as {
+        value: string
+        sensitive: boolean
+        serverEncryptionVersion: number
+      }
 
       await this.createOrReplace({
         user,

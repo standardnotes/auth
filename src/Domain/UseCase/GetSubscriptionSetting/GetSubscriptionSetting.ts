@@ -10,12 +10,11 @@ import { SubscriptionSettingProjector } from '../../../Projection/SubscriptionSe
 
 @injectable()
 export class GetSubscriptionSetting implements UseCaseInterface {
-  constructor (
+  constructor(
     @inject(TYPES.UserSubscriptionService) private userSubscriptionService: UserSubscriptionServiceInterface,
     @inject(TYPES.SubscriptionSettingService) private subscriptionSettingService: SubscriptionSettingServiceInterface,
     @inject(TYPES.SubscriptionSettingProjector) private subscriptionSettingProjector: SubscriptionSettingProjector,
-  ) {
-  }
+  ) {}
 
   async execute(dto: GetSubscriptionSettingDTO): Promise<GetSubscriptionSettingResponse> {
     const { regularSubscription } = await this.userSubscriptionService.findRegularSubscriptionForUserUuid(dto.userUuid)

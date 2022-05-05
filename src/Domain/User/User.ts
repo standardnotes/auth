@@ -11,27 +11,27 @@ export class User {
   static readonly DEFAULT_ENCRYPTION_VERSION = 1
 
   @PrimaryGeneratedColumn('uuid')
-  uuid: string
+  uuid!: string
 
   @Column({
     length: 255,
     nullable: true,
   })
-  version: string
+  version!: string
 
   @Column({
     length: 255,
     nullable: true,
   })
   @Index('index_users_on_email')
-  email: string
+  email!: string
 
   @Column({
     name: 'pw_nonce',
     length: 255,
     nullable: true,
   })
-  pwNonce: string
+  pwNonce!: string
 
   @Column({
     name: 'encrypted_server_key',
@@ -39,28 +39,28 @@ export class User {
     type: 'varchar',
     nullable: true,
   })
-  encryptedServerKey: string | null
+  encryptedServerKey!: string | null
 
   @Column({
     name: 'server_encryption_version',
     type: 'tinyint',
     default: 0,
   })
-  serverEncryptionVersion: number
+  serverEncryptionVersion!: number
 
   @Column({
     name: 'kp_created',
     length: 255,
     nullable: true,
   })
-  kpCreated: string
+  kpCreated!: string
 
   @Column({
     name: 'kp_origination',
     length: 255,
     nullable: true,
   })
-  kpOrigination: string
+  kpOrigination!: string
 
   @Column({
     name: 'pw_cost',
@@ -68,7 +68,7 @@ export class User {
     type: 'int',
     nullable: true,
   })
-  pwCost: number
+  pwCost!: number
 
   @Column({
     name: 'pw_key_size',
@@ -76,53 +76,53 @@ export class User {
     type: 'int',
     nullable: true,
   })
-  pwKeySize: number
+  pwKeySize!: number
 
   @Column({
     name: 'pw_salt',
     length: 255,
     nullable: true,
   })
-  pwSalt: string
+  pwSalt!: string
 
   @Column({
     name: 'pw_alg',
     length: 255,
     nullable: true,
   })
-  pwAlg: string
+  pwAlg!: string
 
   @Column({
     name: 'pw_func',
     length: 255,
     nullable: true,
   })
-  pwFunc: string
+  pwFunc!: string
 
   @Column({
     name: 'encrypted_password',
     length: 255,
   })
-  encryptedPassword: string
+  encryptedPassword!: string
 
   @Column({
     name: 'created_at',
     type: 'datetime',
   })
-  createdAt: Date
+  createdAt!: Date
 
   @Column({
     name: 'updated_at',
     type: 'datetime',
   })
-  updatedAt: Date
+  updatedAt!: Date
 
   @Column({
     name: 'locked_until',
     type: 'datetime',
     nullable: true,
   })
-  lockedUntil: Date | null
+  lockedUntil!: Date | null
 
   @Column({
     name: 'num_failed_attempts',
@@ -130,27 +130,27 @@ export class User {
     width: 11,
     nullable: true,
   })
-  numberOfFailedAttempts: number | null
+  numberOfFailedAttempts!: number | null
 
   @OneToMany(
     /* istanbul ignore next */
     () => RevokedSession,
     /* istanbul ignore next */
-    revokedSession => revokedSession.user
+    (revokedSession) => revokedSession.user,
   )
-  revokedSessions: Promise<RevokedSession[]>
+  revokedSessions!: Promise<RevokedSession[]>
 
   @OneToMany(
     /* istanbul ignore next */
     () => Setting,
     /* istanbul ignore next */
-    setting => setting.user
+    (setting) => setting.user,
   )
-  settings: Promise<Setting[]>
+  settings!: Promise<Setting[]>
 
   @ManyToMany(
     /* istanbul ignore next */
-    () => Role
+    () => Role,
   )
   @JoinTable({
     name: 'user_roles',
@@ -163,15 +163,15 @@ export class User {
       referencedColumnName: 'uuid',
     },
   })
-  roles: Promise<Array<Role>>
+  roles!: Promise<Array<Role>>
 
   @OneToMany(
     /* istanbul ignore next */
     () => UserSubscription,
     /* istanbul ignore next */
-    subscription => subscription.user
+    (subscription) => subscription.user,
   )
-  subscriptions: Promise<UserSubscription[]>
+  subscriptions!: Promise<UserSubscription[]>
 
   supportsSessions(): boolean {
     return parseInt(this.version) >= this.SESSIONS_PROTOCOL_VERSION

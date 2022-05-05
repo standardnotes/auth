@@ -37,7 +37,7 @@ describe('GetSettings', () => {
     } as jest.Mocked<Setting>
 
     settingRepository = {} as jest.Mocked<SettingRepositoryInterface>
-    settingRepository.findAllByUserUuid = jest.fn().mockReturnValue([ setting, mfaSetting ])
+    settingRepository.findAllByUserUuid = jest.fn().mockReturnValue([setting, mfaSetting])
 
     settingProjector = {} as jest.Mocked<SettingProjector>
     settingProjector.projectManySimple = jest.fn().mockReturnValue([{ foo: 'bar' }])
@@ -69,7 +69,7 @@ describe('GetSettings', () => {
       settings: [{ foo: 'bar' }],
     })
 
-    expect(settingProjector.projectManySimple).toHaveBeenCalledWith([ setting ])
+    expect(settingProjector.projectManySimple).toHaveBeenCalledWith([setting])
   })
 
   it('should return all setting with decrypted values', async () => {
@@ -79,7 +79,7 @@ describe('GetSettings', () => {
       value: 'encrypted',
       serverEncryptionVersion: EncryptionVersion.Default,
     } as jest.Mocked<Setting>
-    settingRepository.findAllByUserUuid = jest.fn().mockReturnValue([ setting ])
+    settingRepository.findAllByUserUuid = jest.fn().mockReturnValue([setting])
 
     expect(await createUseCase().execute({ userUuid: '1-2-3' })).toEqual({
       success: true,
@@ -87,32 +87,38 @@ describe('GetSettings', () => {
       settings: [{ foo: 'bar' }],
     })
 
-    expect(settingProjector.projectManySimple).toHaveBeenCalledWith([{
-      name: 'test',
-      updatedAt: 345,
-      value: 'decrypted',
-      serverEncryptionVersion: 1,
-    }])
+    expect(settingProjector.projectManySimple).toHaveBeenCalledWith([
+      {
+        name: 'test',
+        updatedAt: 345,
+        value: 'decrypted',
+        serverEncryptionVersion: 1,
+      },
+    ])
   })
 
   it('should return all user settings of certain name', async () => {
-    expect(await createUseCase().execute({ userUuid: '1-2-3', settingName: 'test', allowSensitiveRetrieval: true })).toEqual({
+    expect(
+      await createUseCase().execute({ userUuid: '1-2-3', settingName: 'test', allowSensitiveRetrieval: true }),
+    ).toEqual({
       success: true,
       userUuid: '1-2-3',
       settings: [{ foo: 'bar' }],
     })
 
-    expect(settingProjector.projectManySimple).toHaveBeenCalledWith([ setting ])
+    expect(settingProjector.projectManySimple).toHaveBeenCalledWith([setting])
   })
 
   it('should return all user settings updated after', async () => {
-    expect(await createUseCase().execute({ userUuid: '1-2-3', allowSensitiveRetrieval: true, updatedAfter: 123 })).toEqual({
+    expect(
+      await createUseCase().execute({ userUuid: '1-2-3', allowSensitiveRetrieval: true, updatedAfter: 123 }),
+    ).toEqual({
       success: true,
       userUuid: '1-2-3',
       settings: [{ foo: 'bar' }],
     })
 
-    expect(settingProjector.projectManySimple).toHaveBeenCalledWith([ setting ])
+    expect(settingProjector.projectManySimple).toHaveBeenCalledWith([setting])
   })
 
   it('should return all sensitive user settings if explicit', async () => {
@@ -122,6 +128,6 @@ describe('GetSettings', () => {
       settings: [{ foo: 'bar' }],
     })
 
-    expect(settingProjector.projectManySimple).toHaveBeenCalledWith([ setting, mfaSetting ])
+    expect(settingProjector.projectManySimple).toHaveBeenCalledWith([setting, mfaSetting])
   })
 })

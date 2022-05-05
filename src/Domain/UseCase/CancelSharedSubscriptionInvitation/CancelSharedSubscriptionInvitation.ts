@@ -21,19 +21,20 @@ import { CancelSharedSubscriptionInvitationResponse } from './CancelSharedSubscr
 @injectable()
 export class CancelSharedSubscriptionInvitation implements UseCaseInterface {
   constructor(
-    @inject(TYPES.SharedSubscriptionInvitationRepository) private sharedSubscriptionInvitationRepository: SharedSubscriptionInvitationRepositoryInterface,
+    @inject(TYPES.SharedSubscriptionInvitationRepository)
+    private sharedSubscriptionInvitationRepository: SharedSubscriptionInvitationRepositoryInterface,
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
     @inject(TYPES.UserSubscriptionRepository) private userSubscriptionRepository: UserSubscriptionRepositoryInterface,
     @inject(TYPES.RoleService) private roleService: RoleServiceInterface,
     @inject(TYPES.DomainEventPublisher) private domainEventPublisher: DomainEventPublisherInterface,
     @inject(TYPES.DomainEventFactory) private domainEventFactory: DomainEventFactoryInterface,
     @inject(TYPES.Timer) private timer: TimerInterface,
-  ) {
-  }
+  ) {}
 
   async execute(dto: CancelSharedSubscriptionInvitationDTO): Promise<CancelSharedSubscriptionInvitationResponse> {
-    const sharedSubscriptionInvitation = await this.sharedSubscriptionInvitationRepository
-      .findOneByUuid(dto.sharedSubscriptionInvitationUuid)
+    const sharedSubscriptionInvitation = await this.sharedSubscriptionInvitationRepository.findOneByUuid(
+      dto.sharedSubscriptionInvitationUuid,
+    )
     if (sharedSubscriptionInvitation === undefined) {
       return {
         success: false,
@@ -69,10 +70,7 @@ export class CancelSharedSubscriptionInvitation implements UseCaseInterface {
 
     await this.sharedSubscriptionInvitationRepository.save(sharedSubscriptionInvitation)
 
-    await this.removeSharedSubscription(
-      sharedSubscriptionInvitation.subscriptionId,
-      invitee,
-    )
+    await this.removeSharedSubscription(sharedSubscriptionInvitation.subscriptionId, invitee)
 
     await this.roleService.removeUserRole(invitee, inviterUserSubscription.planName as SubscriptionName)
 
@@ -84,7 +82,7 @@ export class CancelSharedSubscriptionInvitation implements UseCaseInterface {
         inviterSubscriptionId: sharedSubscriptionInvitation.subscriptionId,
         inviterSubscriptionUuid: inviterUserSubscription.uuid,
         sharedSubscriptionInvitationUuid: sharedSubscriptionInvitation.uuid,
-      })
+      }),
     )
 
     return {
@@ -92,11 +90,11 @@ export class CancelSharedSubscriptionInvitation implements UseCaseInterface {
     }
   }
 
-  private async removeSharedSubscription(
-    subscriptionId: number,
-    user: User,
-  ): Promise<void> {
-    const subscription = await this.userSubscriptionRepository.findOneByUserUuidAndSubscriptionId(user.uuid, subscriptionId)
+  private async removeSharedSubscription(subscriptionId: number, user: User): Promise<void> {
+    const subscription = await this.userSubscriptionRepository.findOneByUserUuidAndSubscriptionId(
+      user.uuid,
+      subscriptionId,
+    )
 
     if (subscription === undefined) {
       return

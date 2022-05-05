@@ -7,11 +7,11 @@ import { SubscriptionSettingProps } from './SubscriptionSettingProps'
 
 export interface SettingFactoryInterface {
   create(props: SettingProps, user: User): Promise<Setting>
-  createSubscriptionSetting(props: SubscriptionSettingProps, userSubscription: UserSubscription): Promise<SubscriptionSetting>
-  createReplacement(
-    original: Setting,
-    props: SettingProps,
-  ): Promise<Setting>
+  createSubscriptionSetting(
+    props: SubscriptionSettingProps,
+    userSubscription: UserSubscription,
+  ): Promise<SubscriptionSetting>
+  createReplacement(original: Setting, props: SettingProps): Promise<Setting>
   createSubscriptionSettingReplacement(
     original: SubscriptionSetting,
     props: SubscriptionSettingProps,

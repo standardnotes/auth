@@ -26,14 +26,8 @@ describe('UpdateSetting', () => {
   let roleService: RoleServiceInterface
   let logger: Logger
 
-  const createUseCase = () => new UpdateSetting(
-    settingService,
-    settingProjector,
-    settingsAssociationService,
-    userRepository,
-    roleService,
-    logger
-  )
+  const createUseCase = () =>
+    new UpdateSetting(settingService, settingProjector, settingsAssociationService, userRepository, roleService, logger)
 
   beforeEach(() => {
     setting = {} as jest.Mocked<Setting>
@@ -135,7 +129,9 @@ describe('UpdateSetting', () => {
   })
 
   it('should not create a setting if user is not permitted to', async () => {
-    settingsAssociationService.getPermissionAssociatedWithSetting = jest.fn().mockReturnValue(PermissionName.DailyEmailBackup)
+    settingsAssociationService.getPermissionAssociatedWithSetting = jest
+      .fn()
+      .mockReturnValue(PermissionName.DailyEmailBackup)
 
     roleService.userHasPermission = jest.fn().mockReturnValue(false)
 

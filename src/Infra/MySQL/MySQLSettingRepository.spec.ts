@@ -32,7 +32,10 @@ describe('MySQLSettingRepository', () => {
     queryBuilder.orderBy = jest.fn().mockReturnThis()
     queryBuilder.stream = jest.fn().mockReturnValue(stream)
 
-    const result = await repository.streamAllByNameAndValue(SettingName.EmailBackupFrequency, EmailBackupFrequency.Daily)
+    const result = await repository.streamAllByNameAndValue(
+      SettingName.EmailBackupFrequency,
+      EmailBackupFrequency.Daily,
+    )
 
     expect(result).toEqual(stream)
   })
@@ -53,7 +56,10 @@ describe('MySQLSettingRepository', () => {
 
     const result = await repository.findOneByNameAndUserUuid('test', '1-2-3')
 
-    expect(queryBuilder.where).toHaveBeenCalledWith('setting.name = :name AND setting.user_uuid = :user_uuid', { name: 'test', user_uuid: '1-2-3' })
+    expect(queryBuilder.where).toHaveBeenCalledWith('setting.name = :name AND setting.user_uuid = :user_uuid', {
+      name: 'test',
+      user_uuid: '1-2-3',
+    })
     expect(result).toEqual(setting)
   })
 
@@ -63,7 +69,10 @@ describe('MySQLSettingRepository', () => {
 
     const result = await repository.findOneByUuidAndNames('1-2-3', ['test' as SettingName])
 
-    expect(queryBuilder.where).toHaveBeenCalledWith('setting.uuid = :uuid AND setting.name IN (:...names)', { names: ['test'], uuid: '1-2-3' })
+    expect(queryBuilder.where).toHaveBeenCalledWith('setting.uuid = :uuid AND setting.name IN (:...names)', {
+      names: ['test'],
+      uuid: '1-2-3',
+    })
     expect(result).toEqual(setting)
   })
 
@@ -71,11 +80,14 @@ describe('MySQLSettingRepository', () => {
     queryBuilder.where = jest.fn().mockReturnThis()
     queryBuilder.orderBy = jest.fn().mockReturnThis()
     queryBuilder.limit = jest.fn().mockReturnThis()
-    queryBuilder.getMany = jest.fn().mockReturnValue([ setting ])
+    queryBuilder.getMany = jest.fn().mockReturnValue([setting])
 
     const result = await repository.findLastByNameAndUserUuid('test', '1-2-3')
 
-    expect(queryBuilder.where).toHaveBeenCalledWith('setting.name = :name AND setting.user_uuid = :user_uuid', { name: 'test', user_uuid: '1-2-3' })
+    expect(queryBuilder.where).toHaveBeenCalledWith('setting.name = :name AND setting.user_uuid = :user_uuid', {
+      name: 'test',
+      user_uuid: '1-2-3',
+    })
     expect(queryBuilder.orderBy).toHaveBeenCalledWith('updated_at', 'DESC')
     expect(queryBuilder.limit).toHaveBeenCalledWith(1)
     expect(result).toEqual(setting)

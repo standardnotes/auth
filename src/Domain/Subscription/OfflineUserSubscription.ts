@@ -4,38 +4,38 @@ import { Role } from '../Role/Role'
 @Entity({ name: 'offline_user_subscriptions' })
 export class OfflineUserSubscription {
   @PrimaryGeneratedColumn('uuid')
-  uuid: string
+  uuid!: string
 
   @Column({
     length: 255,
   })
   @Index('email')
-  email: string
+  email!: string
 
   @Column({
     name: 'plan_name',
     length: 255,
     nullable: false,
   })
-  planName: string
+  planName!: string
 
   @Column({
     name: 'ends_at',
     type: 'bigint',
   })
-  endsAt: number
+  endsAt!: number
 
   @Column({
     name: 'created_at',
     type: 'bigint',
   })
-  createdAt: number
+  createdAt!: number
 
   @Column({
     name: 'updated_at',
     type: 'bigint',
   })
-  updatedAt: number
+  updatedAt!: number
 
   @Column({
     type: 'tinyint',
@@ -43,7 +43,7 @@ export class OfflineUserSubscription {
     nullable: false,
     default: 0,
   })
-  cancelled: boolean
+  cancelled!: boolean
 
   @Column({
     name: 'subscription_id',
@@ -51,11 +51,11 @@ export class OfflineUserSubscription {
     width: 11,
     nullable: true,
   })
-  subscriptionId: number | null
+  subscriptionId!: number | null
 
   @ManyToMany(
     /* istanbul ignore next */
-    () => Role
+    () => Role,
   )
   @JoinTable({
     name: 'offline_user_roles',
@@ -68,5 +68,5 @@ export class OfflineUserSubscription {
       referencedColumnName: 'uuid',
     },
   })
-  roles: Promise<Array<Role>>
+  roles!: Promise<Array<Role>>
 }

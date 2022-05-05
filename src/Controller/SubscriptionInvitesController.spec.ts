@@ -23,13 +23,14 @@ describe('SubscriptionInvitesController', () => {
   let response: express.Response
   let user: User
 
-  const createController = () => new SubscriptionInvitesController(
-    inviteToSharedSubscription,
-    acceptSharedSubscriptionInvitation,
-    declineSharedSubscriptionInvitation,
-    cancelSharedSubscriptionInvitation,
-    listSharedSubscriptionInvitations,
-  )
+  const createController = () =>
+    new SubscriptionInvitesController(
+      inviteToSharedSubscription,
+      acceptSharedSubscriptionInvitation,
+      declineSharedSubscriptionInvitation,
+      cancelSharedSubscriptionInvitation,
+      listSharedSubscriptionInvitations,
+    )
 
   beforeEach(() => {
     user = {} as jest.Mocked<User>
@@ -76,7 +77,7 @@ describe('SubscriptionInvitesController', () => {
       invitations: [],
     })
 
-    const httpResponse = <results.JsonResult> await createController().listInvites(request, response)
+    const httpResponse = <results.JsonResult>await createController().listInvites(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(listSharedSubscriptionInvitations.execute).toHaveBeenCalledWith({
@@ -93,7 +94,7 @@ describe('SubscriptionInvitesController', () => {
       success: true,
     })
 
-    const httpResponse = <results.JsonResult> await createController().cancelSubscriptionSharing(request, response)
+    const httpResponse = <results.JsonResult>await createController().cancelSubscriptionSharing(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(cancelSharedSubscriptionInvitation.execute).toHaveBeenCalledWith({
@@ -111,7 +112,7 @@ describe('SubscriptionInvitesController', () => {
       success: false,
     })
 
-    const httpResponse = <results.JsonResult> await createController().cancelSubscriptionSharing(request, response)
+    const httpResponse = <results.JsonResult>await createController().cancelSubscriptionSharing(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(result.statusCode).toEqual(400)
@@ -124,7 +125,7 @@ describe('SubscriptionInvitesController', () => {
       success: true,
     })
 
-    const httpResponse = <results.JsonResult> await createController().declineInvite(request)
+    const httpResponse = <results.JsonResult>await createController().declineInvite(request)
     const result = await httpResponse.executeAsync()
 
     expect(declineSharedSubscriptionInvitation.execute).toHaveBeenCalledWith({
@@ -141,7 +142,7 @@ describe('SubscriptionInvitesController', () => {
       success: false,
     })
 
-    const httpResponse = <results.JsonResult> await createController().declineInvite(request)
+    const httpResponse = <results.JsonResult>await createController().declineInvite(request)
     const result = await httpResponse.executeAsync()
 
     expect(declineSharedSubscriptionInvitation.execute).toHaveBeenCalledWith({
@@ -158,7 +159,7 @@ describe('SubscriptionInvitesController', () => {
       success: true,
     })
 
-    const httpResponse = <results.JsonResult> await createController().acceptInvite(request)
+    const httpResponse = <results.JsonResult>await createController().acceptInvite(request)
     const result = await httpResponse.executeAsync()
 
     expect(acceptSharedSubscriptionInvitation.execute).toHaveBeenCalledWith({
@@ -175,7 +176,7 @@ describe('SubscriptionInvitesController', () => {
       success: false,
     })
 
-    const httpResponse = <results.JsonResult> await createController().acceptInvite(request)
+    const httpResponse = <results.JsonResult>await createController().acceptInvite(request)
     const result = await httpResponse.executeAsync()
 
     expect(acceptSharedSubscriptionInvitation.execute).toHaveBeenCalledWith({
@@ -196,7 +197,7 @@ describe('SubscriptionInvitesController', () => {
       success: true,
     })
 
-    const httpResponse = <results.JsonResult> await createController().inviteToSubscriptionSharing(request, response)
+    const httpResponse = <results.JsonResult>await createController().inviteToSubscriptionSharing(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(inviteToSharedSubscription.execute).toHaveBeenCalledWith({
@@ -215,7 +216,7 @@ describe('SubscriptionInvitesController', () => {
       email: 'test@test.te',
     }
 
-    const httpResponse = <results.JsonResult> await createController().inviteToSubscriptionSharing(request, response)
+    const httpResponse = <results.JsonResult>await createController().inviteToSubscriptionSharing(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(inviteToSharedSubscription.execute).not.toHaveBeenCalled()
@@ -234,7 +235,7 @@ describe('SubscriptionInvitesController', () => {
       success: false,
     })
 
-    const httpResponse = <results.JsonResult> await createController().inviteToSubscriptionSharing(request, response)
+    const httpResponse = <results.JsonResult>await createController().inviteToSubscriptionSharing(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(result.statusCode).toEqual(400)

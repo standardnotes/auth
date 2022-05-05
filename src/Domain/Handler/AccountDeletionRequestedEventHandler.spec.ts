@@ -24,13 +24,14 @@ describe('AccountDeletionRequestedEventHandler', () => {
   let user: User
   let event: AccountDeletionRequestedEvent
 
-  const createHandler = () => new AccountDeletionRequestedEventHandler(
-    userRepository,
-    sessionRepository,
-    ephemeralSessionRepository,
-    revokedSessionRepository,
-    logger
-  )
+  const createHandler = () =>
+    new AccountDeletionRequestedEventHandler(
+      userRepository,
+      sessionRepository,
+      ephemeralSessionRepository,
+      revokedSessionRepository,
+      logger,
+    )
 
   beforeEach(() => {
     user = {} as jest.Mocked<User>
@@ -44,7 +45,7 @@ describe('AccountDeletionRequestedEventHandler', () => {
     } as jest.Mocked<Session>
 
     sessionRepository = {} as jest.Mocked<SessionRepositoryInterface>
-    sessionRepository.findAllByUserUuid = jest.fn().mockReturnValue([ session ])
+    sessionRepository.findAllByUserUuid = jest.fn().mockReturnValue([session])
     sessionRepository.remove = jest.fn()
 
     ephemeralSession = {
@@ -53,7 +54,7 @@ describe('AccountDeletionRequestedEventHandler', () => {
     } as jest.Mocked<EphemeralSession>
 
     ephemeralSessionRepository = {} as jest.Mocked<EphemeralSessionRepositoryInterface>
-    ephemeralSessionRepository.findAllByUserUuid = jest.fn().mockReturnValue([ ephemeralSession ])
+    ephemeralSessionRepository.findAllByUserUuid = jest.fn().mockReturnValue([ephemeralSession])
     ephemeralSessionRepository.deleteOne = jest.fn()
 
     revokedSession = {
@@ -61,7 +62,7 @@ describe('AccountDeletionRequestedEventHandler', () => {
     } as jest.Mocked<RevokedSession>
 
     revokedSessionRepository = {} as jest.Mocked<RevokedSessionRepositoryInterface>
-    revokedSessionRepository.findAllByUserUuid = jest.fn().mockReturnValue([ revokedSession ])
+    revokedSessionRepository.findAllByUserUuid = jest.fn().mockReturnValue([revokedSession])
     revokedSessionRepository.remove = jest.fn()
 
     event = {} as jest.Mocked<AccountDeletionRequestedEvent>

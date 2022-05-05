@@ -24,7 +24,7 @@ import { SessionBody } from '@standardnotes/responses'
 export class SessionService implements SessionServiceInterface {
   static readonly SESSION_TOKEN_VERSION = 1
 
-  constructor (
+  constructor(
     @inject(TYPES.SessionRepository) private sessionRepository: SessionRepositoryInterface,
     @inject(TYPES.EphemeralSessionRepository) private ephemeralSessionRepository: EphemeralSessionRepositoryInterface,
     @inject(TYPES.RevokedSessionRepository) private revokedSessionRepository: RevokedSessionRepositoryInterface,
@@ -34,14 +34,13 @@ export class SessionService implements SessionServiceInterface {
     @inject(TYPES.ACCESS_TOKEN_AGE) private accessTokenAge: number,
     @inject(TYPES.REFRESH_TOKEN_AGE) private refreshTokenAge: number,
     @inject(TYPES.SettingService) private settingService: SettingServiceInterface,
-  ) {
-  }
+  ) {}
 
   async createNewSessionForUser(dto: {
-    user: User,
-    apiVersion: string,
-    userAgent: string,
-    readonlyAccess: boolean,
+    user: User
+    apiVersion: string
+    userAgent: string
+    readonlyAccess: boolean
   }): Promise<SessionBody> {
     const session = await this.createSession({
       ephemeral: false,
@@ -56,10 +55,10 @@ export class SessionService implements SessionServiceInterface {
   }
 
   async createNewEphemeralSessionForUser(dto: {
-    user: User,
-    apiVersion: string,
-    userAgent: string,
-    readonlyAccess: boolean,
+    user: User
+    apiVersion: string
+    userAgent: string
+    readonlyAccess: boolean
   }): Promise<SessionBody> {
     const ephemeralSession = await this.createSession({
       ephemeral: true,
@@ -78,14 +77,18 @@ export class SessionService implements SessionServiceInterface {
 
     await this.sessionRepository.updateHashedTokens(session.uuid, session.hashedAccessToken, session.hashedRefreshToken)
 
-    await this.sessionRepository.updatedTokenExpirationDates(session.uuid, session.accessExpiration, session.refreshExpiration)
+    await this.sessionRepository.updatedTokenExpirationDates(
+      session.uuid,
+      session.accessExpiration,
+      session.refreshExpiration,
+    )
 
     await this.ephemeralSessionRepository.updateTokensAndExpirationDates(
       session.uuid,
       session.hashedAccessToken,
       session.hashedRefreshToken,
       session.accessExpiration,
-      session.refreshExpiration
+      session.refreshExpiration,
     )
 
     return sessionPayload
@@ -114,8 +117,7 @@ export class SessionService implements SessionServiceInterface {
       }
 
       return osInfo
-    }
-    catch (error) {
+    } catch (error) {
       this.logger.warn(`Could not parse operating system info. User agent: ${userAgent}: ${error.message}`)
 
       return 'Unknown OS'
@@ -128,14 +130,15 @@ export class SessionService implements SessionServiceInterface {
 
       let clientInfo = `${userAgentParsed.browser.name ?? ''} ${userAgentParsed.browser.version ?? ''}`.trim()
 
-      const desktopAppMatches = [...userAgentParsed.ua.matchAll(/(.*)StandardNotes\/((0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*))/g)]
+      const desktopAppMatches = [
+        ...userAgentParsed.ua.matchAll(/(.*)StandardNotes\/((0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*))/g),
+      ]
       if (desktopAppMatches[0] && desktopAppMatches[0][2]) {
         clientInfo = `Standard Notes Desktop ${desktopAppMatches[0][2]}`
       }
 
       return clientInfo
-    }
-    catch (error) {
+    } catch (error) {
       this.logger.warn(`Could not parse browser info. User agent: ${userAgent}: ${error.message}`)
 
       return 'Unknown Client'
@@ -179,7 +182,7 @@ export class SessionService implements SessionServiceInterface {
     }
 
     const hashedAccessToken = crypto.createHash('sha256').update(accessToken).digest('hex')
-    if(crypto.timingSafeEqual(Buffer.from(session.hashedAccessToken), Buffer.from(hashedAccessToken))) {
+    if (crypto.timingSafeEqual(Buffer.from(session.hashedAccessToken), Buffer.from(hashedAccessToken))) {
       return session
     }
 
@@ -221,11 +224,11 @@ export class SessionService implements SessionServiceInterface {
   }
 
   private async createSession(dto: {
-    user: User,
-    apiVersion: string,
-    userAgent: string,
-    ephemeral: boolean,
-    readonlyAccess: boolean,
+    user: User
+    apiVersion: string
+    userAgent: string
+    ephemeral: boolean
+    readonlyAccess: boolean
   }): Promise<Session> {
     let session = new Session()
     if (dto.ephemeral) {

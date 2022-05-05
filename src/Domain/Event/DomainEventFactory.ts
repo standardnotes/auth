@@ -1,6 +1,18 @@
-import { RoleName } from '@standardnotes/common'
-import { Uuid } from '@standardnotes/common'
-import { AccountDeletionRequestedEvent, UserEmailChangedEvent, UserRegisteredEvent, UserRolesChangedEvent, OfflineSubscriptionTokenCreatedEvent, EmailBackupRequestedEvent, CloudBackupRequestedEvent, ListedAccountRequestedEvent, UserSignedInEvent, UserDisabledSessionUserAgentLoggingEvent, SharedSubscriptionInvitationCreatedEvent, SharedSubscriptionInvitationCanceledEvent } from '@standardnotes/domain-events'
+import { RoleName, Uuid } from '@standardnotes/common'
+import {
+  AccountDeletionRequestedEvent,
+  UserEmailChangedEvent,
+  UserRegisteredEvent,
+  UserRolesChangedEvent,
+  OfflineSubscriptionTokenCreatedEvent,
+  EmailBackupRequestedEvent,
+  CloudBackupRequestedEvent,
+  ListedAccountRequestedEvent,
+  UserSignedInEvent,
+  UserDisabledSessionUserAgentLoggingEvent,
+  SharedSubscriptionInvitationCreatedEvent,
+  SharedSubscriptionInvitationCanceledEvent,
+} from '@standardnotes/domain-events'
 import { TimerInterface } from '@standardnotes/time'
 import { inject, injectable } from 'inversify'
 import TYPES from '../../Bootstrap/Types'
@@ -9,10 +21,7 @@ import { DomainEventFactoryInterface } from './DomainEventFactoryInterface'
 
 @injectable()
 export class DomainEventFactory implements DomainEventFactoryInterface {
-  constructor (
-    @inject(TYPES.Timer) private timer: TimerInterface,
-  ) {
-  }
+  constructor(@inject(TYPES.Timer) private timer: TimerInterface) {}
 
   createSharedSubscriptionInvitationCanceledEvent(dto: {
     inviterEmail: string
@@ -35,7 +44,13 @@ export class DomainEventFactory implements DomainEventFactoryInterface {
     }
   }
 
-  createSharedSubscriptionInvitationCreatedEvent(dto: { inviterEmail: string; inviterSubscriptionId: number; inviteeIdentifier: string; inviteeIdentifierType: InviteeIdentifierType; sharedSubscriptionInvitationUuid: string }): SharedSubscriptionInvitationCreatedEvent {
+  createSharedSubscriptionInvitationCreatedEvent(dto: {
+    inviterEmail: string
+    inviterSubscriptionId: number
+    inviteeIdentifier: string
+    inviteeIdentifierType: InviteeIdentifierType
+    sharedSubscriptionInvitationUuid: string
+  }): SharedSubscriptionInvitationCreatedEvent {
     return {
       type: 'SHARED_SUBSCRIPTION_INVITATION_CREATED',
       createdAt: this.timer.getUTCDate(),
@@ -49,7 +64,10 @@ export class DomainEventFactory implements DomainEventFactoryInterface {
     }
   }
 
-  createUserDisabledSessionUserAgentLoggingEvent(dto: { userUuid: string; email: string }): UserDisabledSessionUserAgentLoggingEvent {
+  createUserDisabledSessionUserAgentLoggingEvent(dto: {
+    userUuid: string
+    email: string
+  }): UserDisabledSessionUserAgentLoggingEvent {
     return {
       type: 'USER_DISABLED_SESSION_USER_AGENT_LOGGING',
       createdAt: this.timer.getUTCDate(),
@@ -64,12 +82,12 @@ export class DomainEventFactory implements DomainEventFactoryInterface {
   }
 
   createUserSignedInEvent(dto: {
-    userUuid: string,
-    userEmail: string,
-    device: string,
-    browser: string,
-    signInAlertEnabled: boolean,
-    muteSignInEmailsSettingUuid: Uuid,
+    userUuid: string
+    userEmail: string
+    device: string
+    browser: string
+    signInAlertEnabled: boolean
+    muteSignInEmailsSettingUuid: Uuid
   }): UserSignedInEvent {
     return {
       type: 'USER_SIGNED_IN',
@@ -101,7 +119,13 @@ export class DomainEventFactory implements DomainEventFactoryInterface {
     }
   }
 
-  createCloudBackupRequestedEvent(cloudProvider: 'DROPBOX' | 'ONE_DRIVE' | 'GOOGLE_DRIVE', cloudProviderToken: string, userUuid: string, muteEmailsSettingUuid: string, userHasEmailsMuted: boolean): CloudBackupRequestedEvent {
+  createCloudBackupRequestedEvent(
+    cloudProvider: 'DROPBOX' | 'ONE_DRIVE' | 'GOOGLE_DRIVE',
+    cloudProviderToken: string,
+    userUuid: string,
+    muteEmailsSettingUuid: string,
+    userHasEmailsMuted: boolean,
+  ): CloudBackupRequestedEvent {
     return {
       type: 'CLOUD_BACKUP_REQUESTED',
       createdAt: this.timer.getUTCDate(),
@@ -121,7 +145,11 @@ export class DomainEventFactory implements DomainEventFactoryInterface {
     }
   }
 
-  createEmailBackupRequestedEvent(userUuid: string, muteEmailsSettingUuid: string, userHasEmailsMuted: boolean): EmailBackupRequestedEvent {
+  createEmailBackupRequestedEvent(
+    userUuid: string,
+    muteEmailsSettingUuid: string,
+    userHasEmailsMuted: boolean,
+  ): EmailBackupRequestedEvent {
     return {
       type: 'EMAIL_BACKUP_REQUESTED',
       createdAt: this.timer.getUTCDate(),
@@ -139,7 +167,10 @@ export class DomainEventFactory implements DomainEventFactoryInterface {
     }
   }
 
-  createAccountDeletionRequestedEvent(dto: { userUuid: Uuid, regularSubscriptionUuid: Uuid | undefined }): AccountDeletionRequestedEvent {
+  createAccountDeletionRequestedEvent(dto: {
+    userUuid: Uuid
+    regularSubscriptionUuid: Uuid | undefined
+  }): AccountDeletionRequestedEvent {
     return {
       type: 'ACCOUNT_DELETION_REQUESTED',
       createdAt: this.timer.getUTCDate(),

@@ -10,13 +10,12 @@ import { DeleteAccountResponse } from './DeleteAccountResponse'
 
 @injectable()
 export class DeleteAccount implements UseCaseInterface {
-  constructor (
+  constructor(
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
     @inject(TYPES.UserSubscriptionService) private userSubscriptionService: UserSubscriptionServiceInterface,
     @inject(TYPES.DomainEventPublisher) private domainEventPublisher: DomainEventPublisherInterface,
     @inject(TYPES.DomainEventFactory) private domainEventFactory: DomainEventFactoryInterface,
-  ) {
-  }
+  ) {}
 
   async execute(dto: DeleteAccountDTO): Promise<DeleteAccountResponse> {
     const user = await this.userRepository.findOneByEmail(dto.email)
@@ -39,7 +38,7 @@ export class DeleteAccount implements UseCaseInterface {
       this.domainEventFactory.createAccountDeletionRequestedEvent({
         userUuid: user.uuid,
         regularSubscriptionUuid,
-      })
+      }),
     )
 
     return {

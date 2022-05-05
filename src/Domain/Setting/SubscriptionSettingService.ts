@@ -21,15 +21,20 @@ import { SubscriptionSettingsAssociationServiceInterface } from './SubscriptionS
 export class SubscriptionSettingService implements SubscriptionSettingServiceInterface {
   constructor(
     @inject(TYPES.SettingFactory) private factory: SettingFactoryInterface,
-    @inject(TYPES.SubscriptionSettingRepository) private subscriptionSettingRepository: SubscriptionSettingRepositoryInterface,
-    @inject(TYPES.SubscriptionSettingsAssociationService) private subscriptionSettingAssociationService: SubscriptionSettingsAssociationServiceInterface,
+    @inject(TYPES.SubscriptionSettingRepository)
+    private subscriptionSettingRepository: SubscriptionSettingRepositoryInterface,
+    @inject(TYPES.SubscriptionSettingsAssociationService)
+    private subscriptionSettingAssociationService: SubscriptionSettingsAssociationServiceInterface,
     @inject(TYPES.SettingDecrypter) private settingDecrypter: SettingDecrypterInterface,
     @inject(TYPES.Logger) private logger: Logger,
-  ) {
-  }
+  ) {}
 
-  async applyDefaultSubscriptionSettingsForSubscription(userSubscription: UserSubscription, subscriptionName: SubscriptionName): Promise<void> {
-    const defaultSettingsWithValues = await this.subscriptionSettingAssociationService.getDefaultSettingsAndValuesForSubscriptionName(subscriptionName)
+  async applyDefaultSubscriptionSettingsForSubscription(
+    userSubscription: UserSubscription,
+    subscriptionName: SubscriptionName,
+  ): Promise<void> {
+    const defaultSettingsWithValues =
+      await this.subscriptionSettingAssociationService.getDefaultSettingsAndValuesForSubscriptionName(subscriptionName)
     if (defaultSettingsWithValues === undefined) {
       this.logger.warn(`Could not find settings for subscription: ${subscriptionName}`)
 
@@ -51,12 +56,17 @@ export class SubscriptionSettingService implements SubscriptionSettingServiceInt
     }
   }
 
-  async findSubscriptionSettingWithDecryptedValue(dto: FindSubscriptionSettingDTO): Promise<SubscriptionSetting | undefined> {
+  async findSubscriptionSettingWithDecryptedValue(
+    dto: FindSubscriptionSettingDTO,
+  ): Promise<SubscriptionSetting | undefined> {
     let setting: SubscriptionSetting | undefined
     if (dto.settingUuid !== undefined) {
       setting = await this.subscriptionSettingRepository.findOneByUuid(dto.settingUuid)
     } else {
-      setting = await this.subscriptionSettingRepository.findLastByNameAndUserSubscriptionUuid(dto.subscriptionSettingName, dto.userSubscriptionUuid)
+      setting = await this.subscriptionSettingRepository.findLastByNameAndUserSubscriptionUuid(
+        dto.subscriptionSettingName,
+        dto.userSubscriptionUuid,
+      )
     }
 
     if (setting === undefined) {
@@ -68,7 +78,9 @@ export class SubscriptionSettingService implements SubscriptionSettingServiceInt
     return setting
   }
 
-  async createOrReplace(dto: CreateOrReplaceSubscriptionSettingDTO): Promise<CreateOrReplaceSubscriptionSettingResponse> {
+  async createOrReplace(
+    dto: CreateOrReplaceSubscriptionSettingDTO,
+  ): Promise<CreateOrReplaceSubscriptionSettingResponse> {
     const { userSubscription, props } = dto
 
     const existing = await this.findSubscriptionSettingWithDecryptedValue({
@@ -79,7 +91,9 @@ export class SubscriptionSettingService implements SubscriptionSettingServiceInt
     })
 
     if (existing === undefined) {
-      const subscriptionSetting = await this.subscriptionSettingRepository.save(await this.factory.createSubscriptionSetting(props, userSubscription))
+      const subscriptionSetting = await this.subscriptionSettingRepository.save(
+        await this.factory.createSubscriptionSetting(props, userSubscription),
+      )
 
       this.logger.debug('Created subscription setting %s: %O', props.name, subscriptionSetting)
 
@@ -89,7 +103,9 @@ export class SubscriptionSettingService implements SubscriptionSettingServiceInt
       }
     }
 
-    const subscriptionSetting = await this.subscriptionSettingRepository.save(await this.factory.createSubscriptionSettingReplacement(existing, props))
+    const subscriptionSetting = await this.subscriptionSettingRepository.save(
+      await this.factory.createSubscriptionSettingReplacement(existing, props),
+    )
 
     this.logger.debug('Replaced existing subscription setting %s with: %O', props.name, subscriptionSetting)
 

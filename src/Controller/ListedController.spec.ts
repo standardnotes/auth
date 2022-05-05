@@ -40,7 +40,7 @@ describe('ListedController', () => {
       email: 'test@test.com',
     }
 
-    const httpResponse = <results.JsonResult> await createController().createListedAccount(request, response)
+    const httpResponse = <results.JsonResult>await createController().createListedAccount(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(createListedAccount.execute).toHaveBeenCalledWith({
@@ -58,7 +58,7 @@ describe('ListedController', () => {
       email: 'test@test.com',
     }
 
-    const httpResponse = <results.JsonResult> await createController().createListedAccount(request, response)
+    const httpResponse = <results.JsonResult>await createController().createListedAccount(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(createListedAccount.execute).not.toHaveBeenCalled()

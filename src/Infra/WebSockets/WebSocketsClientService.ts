@@ -9,33 +9,29 @@ import { User } from '../../Domain/User/User'
 import { WebSocketsConnectionRepositoryInterface } from '../../Domain/WebSockets/WebSocketsConnectionRepositoryInterface'
 import { ClientServiceInterface } from '../../Domain/Client/ClientServiceInterface'
 
-
 @injectable()
 export class WebSocketsClientService implements ClientServiceInterface {
   constructor(
-    @inject(TYPES.WebSocketsConnectionRepository) private webSocketsConnectionRepository: WebSocketsConnectionRepositoryInterface,
+    @inject(TYPES.WebSocketsConnectionRepository)
+    private webSocketsConnectionRepository: WebSocketsConnectionRepositoryInterface,
     @inject(TYPES.DomainEventFactory) private domainEventFactory: DomainEventFactoryInterface,
     @inject(TYPES.HTTPClient) private httpClient: AxiosInstance,
     @inject(TYPES.WEBSOCKETS_API_URL) private webSocketsApiUrl: string,
-    @inject(TYPES.Logger) private logger: Logger
-  ) {
-  }
+    @inject(TYPES.Logger) private logger: Logger,
+  ) {}
 
-  async sendUserRolesChangedEvent(
-    user: User,
-  ): Promise<void> {
+  async sendUserRolesChangedEvent(user: User): Promise<void> {
     if (!this.webSocketsApiUrl) {
       this.logger.debug('Web Sockets API url not defined. Skipped sending user role changed event.')
 
       return
     }
 
-    const userConnections =
-      await this.webSocketsConnectionRepository.findAllByUserUuid(user.uuid)
+    const userConnections = await this.webSocketsConnectionRepository.findAllByUserUuid(user.uuid)
     const event = this.domainEventFactory.createUserRolesChangedEvent(
       user.uuid,
       user.email,
-      (await user.roles).map(role => role.name) as RoleName[],
+      (await user.roles).map((role) => role.name) as RoleName[],
     )
 
     for (const connectionUuid of userConnections) {

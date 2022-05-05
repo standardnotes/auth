@@ -21,13 +21,8 @@ describe('ChangeCredentials', () => {
   let timer: TimerInterface
   let user: User
 
-  const createUseCase = () => new ChangeCredentials(
-    userRepository,
-    authResponseFactoryResolver,
-    domainEventPublisher,
-    domainEventFactory,
-    timer
-  )
+  const createUseCase = () =>
+    new ChangeCredentials(userRepository, authResponseFactoryResolver, domainEventPublisher, domainEventFactory, timer)
 
   beforeEach(() => {
     userRepository = {} as jest.Mocked<UserRepositoryInterface>
@@ -55,16 +50,18 @@ describe('ChangeCredentials', () => {
   })
 
   it('should change password', async () => {
-    expect(await createUseCase().execute({
-      user,
-      apiVersion: '20190520',
-      currentPassword: 'qweqwe123123',
-      newPassword: 'test234',
-      pwNonce: 'asdzxc',
-      updatedWithUserAgent: 'Google Chrome',
-      kpCreated: '123',
-      kpOrigination: 'password-change',
-    })).toEqual({
+    expect(
+      await createUseCase().execute({
+        user,
+        apiVersion: '20190520',
+        currentPassword: 'qweqwe123123',
+        newPassword: 'test234',
+        pwNonce: 'asdzxc',
+        updatedWithUserAgent: 'Google Chrome',
+        kpCreated: '123',
+        kpOrigination: 'password-change',
+      }),
+    ).toEqual({
       success: true,
       authResponse: {
         foo: 'bar',
@@ -87,17 +84,19 @@ describe('ChangeCredentials', () => {
   it('should change email', async () => {
     userRepository.findOneByEmail = jest.fn().mockReturnValue(undefined)
 
-    expect(await createUseCase().execute({
-      user,
-      apiVersion: '20190520',
-      currentPassword: 'qweqwe123123',
-      newPassword: 'test234',
-      newEmail: 'new@test.te',
-      pwNonce: 'asdzxc',
-      updatedWithUserAgent: 'Google Chrome',
-      kpCreated: '123',
-      kpOrigination: 'password-change',
-    })).toEqual({
+    expect(
+      await createUseCase().execute({
+        user,
+        apiVersion: '20190520',
+        currentPassword: 'qweqwe123123',
+        newPassword: 'test234',
+        newEmail: 'new@test.te',
+        pwNonce: 'asdzxc',
+        updatedWithUserAgent: 'Google Chrome',
+        kpCreated: '123',
+        kpOrigination: 'password-change',
+      }),
+    ).toEqual({
       success: true,
       authResponse: {
         foo: 'bar',
@@ -120,17 +119,19 @@ describe('ChangeCredentials', () => {
   it('should not change email if already taken', async () => {
     userRepository.findOneByEmail = jest.fn().mockReturnValue({} as jest.Mocked<User>)
 
-    expect(await createUseCase().execute({
-      user,
-      apiVersion: '20190520',
-      currentPassword: 'qweqwe123123',
-      newPassword: 'test234',
-      newEmail: 'new@test.te',
-      pwNonce: 'asdzxc',
-      updatedWithUserAgent: 'Google Chrome',
-      kpCreated: '123',
-      kpOrigination: 'password-change',
-    })).toEqual({
+    expect(
+      await createUseCase().execute({
+        user,
+        apiVersion: '20190520',
+        currentPassword: 'qweqwe123123',
+        newPassword: 'test234',
+        newEmail: 'new@test.te',
+        pwNonce: 'asdzxc',
+        updatedWithUserAgent: 'Google Chrome',
+        kpCreated: '123',
+        kpOrigination: 'password-change',
+      }),
+    ).toEqual({
       success: false,
       errorMessage: 'The email you entered is already taken. Please try again.',
     })
@@ -141,14 +142,16 @@ describe('ChangeCredentials', () => {
   })
 
   it('should not change password if current password is incorrect', async () => {
-    expect(await createUseCase().execute({
-      user,
-      apiVersion: '20190520',
-      currentPassword: 'test123',
-      newPassword: 'test234',
-      pwNonce: 'asdzxc',
-      updatedWithUserAgent: 'Google Chrome',
-    })).toEqual({
+    expect(
+      await createUseCase().execute({
+        user,
+        apiVersion: '20190520',
+        currentPassword: 'test123',
+        newPassword: 'test234',
+        pwNonce: 'asdzxc',
+        updatedWithUserAgent: 'Google Chrome',
+      }),
+    ).toEqual({
       success: false,
       errorMessage: 'The current password you entered is incorrect. Please try again.',
     })
@@ -157,15 +160,17 @@ describe('ChangeCredentials', () => {
   })
 
   it('should update protocol version while changing password', async () => {
-    expect(await createUseCase().execute({
-      user,
-      apiVersion: '20190520',
-      currentPassword: 'qweqwe123123',
-      newPassword: 'test234',
-      pwNonce: 'asdzxc',
-      updatedWithUserAgent: 'Google Chrome',
-      protocolVersion: '004',
-    })).toEqual({
+    expect(
+      await createUseCase().execute({
+        user,
+        apiVersion: '20190520',
+        currentPassword: 'qweqwe123123',
+        newPassword: 'test234',
+        pwNonce: 'asdzxc',
+        updatedWithUserAgent: 'Google Chrome',
+        protocolVersion: '004',
+      }),
+    ).toEqual({
       success: true,
       authResponse: {
         foo: 'bar',

@@ -90,7 +90,15 @@ import { FeatureServiceInterface } from '../Domain/Feature/FeatureServiceInterfa
 import { FeatureService } from '../Domain/Feature/FeatureService'
 import { SettingServiceInterface } from '../Domain/Setting/SettingServiceInterface'
 import { ExtensionKeyGrantedEventHandler } from '../Domain/Handler/ExtensionKeyGrantedEventHandler'
-import { RedisDomainEventPublisher, RedisDomainEventSubscriberFactory, RedisEventMessageHandler, SNSDomainEventPublisher, SQSDomainEventSubscriberFactory, SQSEventMessageHandler, SQSNewRelicEventMessageHandler } from '@standardnotes/domain-events-infra'
+import {
+  RedisDomainEventPublisher,
+  RedisDomainEventSubscriberFactory,
+  RedisEventMessageHandler,
+  SNSDomainEventPublisher,
+  SQSDomainEventSubscriberFactory,
+  SQSEventMessageHandler,
+  SQSNewRelicEventMessageHandler,
+} from '@standardnotes/domain-events-infra'
 import { GetUserSubscription } from '../Domain/UseCase/GetUserSubscription/GetUserSubscription'
 import { ChangeCredentials } from '../Domain/UseCase/ChangeCredentials/ChangeCredentials'
 import { SubscriptionReassignedEventHandler } from '../Domain/Handler/SubscriptionReassignedEventHandler'
@@ -123,7 +131,18 @@ import { SettingsAssociationServiceInterface } from '../Domain/Setting/SettingsA
 import { SettingsAssociationService } from '../Domain/Setting/SettingsAssociationService'
 import { MuteFailedBackupsEmails } from '../Domain/UseCase/MuteFailedBackupsEmails/MuteFailedBackupsEmails'
 import { SubscriptionSyncRequestedEventHandler } from '../Domain/Handler/SubscriptionSyncRequestedEventHandler'
-import { CrossServiceTokenData, DeterministicSelector, OfflineUserTokenData, SelectorInterface, SessionTokenData, TokenDecoder, TokenDecoderInterface, TokenEncoder, TokenEncoderInterface, ValetTokenData } from '@standardnotes/auth'
+import {
+  CrossServiceTokenData,
+  DeterministicSelector,
+  OfflineUserTokenData,
+  SelectorInterface,
+  SessionTokenData,
+  TokenDecoder,
+  TokenDecoderInterface,
+  TokenEncoder,
+  TokenEncoderInterface,
+  ValetTokenData,
+} from '@standardnotes/auth'
 import { FileUploadedEventHandler } from '../Domain/Handler/FileUploadedEventHandler'
 import { CreateValetToken } from '../Domain/UseCase/CreateValetToken/CreateValetToken'
 import { CreateListedAccount } from '../Domain/UseCase/CreateListedAccount/CreateListedAccount'
@@ -170,8 +189,9 @@ export class ContainerConfigLoader {
 
     const container = new Container()
 
-    const maxQueryExecutionTime = env.get('DB_MAX_QUERY_EXECUTION_TIME', true) ?
-      +env.get('DB_MAX_QUERY_EXECUTION_TIME', true) : 45_000
+    const maxQueryExecutionTime = env.get('DB_MAX_QUERY_EXECUTION_TIME', true)
+      ? +env.get('DB_MAX_QUERY_EXECUTION_TIME', true)
+      : 45_000
 
     const connection: Connection = await createConnection({
       type: 'mysql',
@@ -210,11 +230,9 @@ export class ContainerConfigLoader {
         SharedSubscriptionInvitation,
         SubscriptionSetting,
       ],
-      migrations: [
-        env.get('DB_MIGRATIONS_PATH'),
-      ],
+      migrations: [env.get('DB_MIGRATIONS_PATH')],
       migrationsRun: true,
-      logging: <LoggerOptions> env.get('DB_DEBUG_LEVEL'),
+      logging: <LoggerOptions>env.get('DB_DEBUG_LEVEL'),
     })
     container.bind<Connection>(TYPES.DBConnection).toConstantValue(connection)
 
@@ -229,10 +247,7 @@ export class ContainerConfigLoader {
 
     container.bind(TYPES.Redis).toConstantValue(redis)
 
-    const winstonFormatters = [
-      winston.format.splat(),
-      winston.format.json(),
-    ]
+    const winstonFormatters = [winston.format.splat(), winston.format.json()]
     if (env.get('NEW_RELIC_ENABLED', true) === 'true') {
       winstonFormatters.push(newrelicWinstonEnricher())
     }
@@ -240,17 +255,17 @@ export class ContainerConfigLoader {
     const logger = winston.createLogger({
       level: env.get('LOG_LEVEL') || 'info',
       format: winston.format.combine(...winstonFormatters),
-      transports: [
-        new winston.transports.Console({ level: env.get('LOG_LEVEL') || 'info' }),
-      ],
+      transports: [new winston.transports.Console({ level: env.get('LOG_LEVEL') || 'info' })],
     })
     container.bind<winston.Logger>(TYPES.Logger).toConstantValue(logger)
 
     if (env.get('SNS_AWS_REGION', true)) {
-      container.bind<AWS.SNS>(TYPES.SNS).toConstantValue(new AWS.SNS({
-        apiVersion: 'latest',
-        region: env.get('SNS_AWS_REGION', true),
-      }))
+      container.bind<AWS.SNS>(TYPES.SNS).toConstantValue(
+        new AWS.SNS({
+          apiVersion: 'latest',
+          region: env.get('SNS_AWS_REGION', true),
+        }),
+      )
     }
 
     if (env.get('SQS_QUEUE_URL', true)) {
@@ -268,21 +283,49 @@ export class ContainerConfigLoader {
     }
 
     // Repositories
-    container.bind<MySQLSessionRepository>(TYPES.SessionRepository).toConstantValue(connection.getCustomRepository(MySQLSessionRepository))
-    container.bind<MySQLRevokedSessionRepository>(TYPES.RevokedSessionRepository).toConstantValue(connection.getCustomRepository(MySQLRevokedSessionRepository))
-    container.bind<MySQLUserRepository>(TYPES.UserRepository).toConstantValue(connection.getCustomRepository(MySQLUserRepository))
-    container.bind<SettingRepositoryInterface>(TYPES.SettingRepository).toConstantValue(connection.getCustomRepository(MySQLSettingRepository))
-    container.bind<SubscriptionSettingRepositoryInterface>(TYPES.SubscriptionSettingRepository).toConstantValue(connection.getCustomRepository(MySQLSubscriptionSettingRepository))
-    container.bind<OfflineSettingRepositoryInterface>(TYPES.OfflineSettingRepository).toConstantValue(connection.getCustomRepository(MySQLOfflineSettingRepository))
-    container.bind<MySQLRoleRepository>(TYPES.RoleRepository).toConstantValue(connection.getCustomRepository(MySQLRoleRepository))
-    container.bind<UserSubscriptionRepositoryInterface>(TYPES.UserSubscriptionRepository).toConstantValue(connection.getCustomRepository(MySQLUserSubscriptionRepository))
-    container.bind<OfflineUserSubscriptionRepositoryInterface>(TYPES.OfflineUserSubscriptionRepository).toConstantValue(connection.getCustomRepository(MySQLOfflineUserSubscriptionRepository))
-    container.bind<RedisEphemeralSessionRepository>(TYPES.EphemeralSessionRepository).to(RedisEphemeralSessionRepository)
+    container
+      .bind<MySQLSessionRepository>(TYPES.SessionRepository)
+      .toConstantValue(connection.getCustomRepository(MySQLSessionRepository))
+    container
+      .bind<MySQLRevokedSessionRepository>(TYPES.RevokedSessionRepository)
+      .toConstantValue(connection.getCustomRepository(MySQLRevokedSessionRepository))
+    container
+      .bind<MySQLUserRepository>(TYPES.UserRepository)
+      .toConstantValue(connection.getCustomRepository(MySQLUserRepository))
+    container
+      .bind<SettingRepositoryInterface>(TYPES.SettingRepository)
+      .toConstantValue(connection.getCustomRepository(MySQLSettingRepository))
+    container
+      .bind<SubscriptionSettingRepositoryInterface>(TYPES.SubscriptionSettingRepository)
+      .toConstantValue(connection.getCustomRepository(MySQLSubscriptionSettingRepository))
+    container
+      .bind<OfflineSettingRepositoryInterface>(TYPES.OfflineSettingRepository)
+      .toConstantValue(connection.getCustomRepository(MySQLOfflineSettingRepository))
+    container
+      .bind<MySQLRoleRepository>(TYPES.RoleRepository)
+      .toConstantValue(connection.getCustomRepository(MySQLRoleRepository))
+    container
+      .bind<UserSubscriptionRepositoryInterface>(TYPES.UserSubscriptionRepository)
+      .toConstantValue(connection.getCustomRepository(MySQLUserSubscriptionRepository))
+    container
+      .bind<OfflineUserSubscriptionRepositoryInterface>(TYPES.OfflineUserSubscriptionRepository)
+      .toConstantValue(connection.getCustomRepository(MySQLOfflineUserSubscriptionRepository))
+    container
+      .bind<RedisEphemeralSessionRepository>(TYPES.EphemeralSessionRepository)
+      .to(RedisEphemeralSessionRepository)
     container.bind<LockRepository>(TYPES.LockRepository).to(LockRepository)
-    container.bind<WebSocketsConnectionRepositoryInterface>(TYPES.WebSocketsConnectionRepository).to(RedisWebSocketsConnectionRepository)
-    container.bind<SubscriptionTokenRepositoryInterface>(TYPES.SubscriptionTokenRepository).to(RedisSubscriptionTokenRepository)
-    container.bind<OfflineSubscriptionTokenRepositoryInterface>(TYPES.OfflineSubscriptionTokenRepository).to(RedisOfflineSubscriptionTokenRepository)
-    container.bind<SharedSubscriptionInvitationRepositoryInterface>(TYPES.SharedSubscriptionInvitationRepository).toConstantValue(connection.getCustomRepository(MySQLSharedSubscriptionInvitationRepository))
+    container
+      .bind<WebSocketsConnectionRepositoryInterface>(TYPES.WebSocketsConnectionRepository)
+      .to(RedisWebSocketsConnectionRepository)
+    container
+      .bind<SubscriptionTokenRepositoryInterface>(TYPES.SubscriptionTokenRepository)
+      .to(RedisSubscriptionTokenRepository)
+    container
+      .bind<OfflineSubscriptionTokenRepositoryInterface>(TYPES.OfflineSubscriptionTokenRepository)
+      .to(RedisOfflineSubscriptionTokenRepository)
+    container
+      .bind<SharedSubscriptionInvitationRepositoryInterface>(TYPES.SharedSubscriptionInvitationRepository)
+      .toConstantValue(connection.getCustomRepository(MySQLSharedSubscriptionInvitationRepository))
     container.bind<PKCERepositoryInterface>(TYPES.PKCERepository).to(RedisPKCERepository)
 
     // Middleware
@@ -291,7 +334,9 @@ export class ContainerConfigLoader {
     container.bind<LockMiddleware>(TYPES.LockMiddleware).to(LockMiddleware)
     container.bind<AuthMiddlewareWithoutResponse>(TYPES.AuthMiddlewareWithoutResponse).to(AuthMiddlewareWithoutResponse)
     container.bind<ApiGatewayAuthMiddleware>(TYPES.ApiGatewayAuthMiddleware).to(ApiGatewayAuthMiddleware)
-    container.bind<ApiGatewayOfflineAuthMiddleware>(TYPES.ApiGatewayOfflineAuthMiddleware).to(ApiGatewayOfflineAuthMiddleware)
+    container
+      .bind<ApiGatewayOfflineAuthMiddleware>(TYPES.ApiGatewayOfflineAuthMiddleware)
+      .to(ApiGatewayOfflineAuthMiddleware)
     container.bind<OfflineUserAuthMiddleware>(TYPES.OfflineUserAuthMiddleware).to(OfflineUserAuthMiddleware)
 
     // Projectors
@@ -361,37 +406,75 @@ export class ContainerConfigLoader {
     container.bind<GetUserOfflineSubscription>(TYPES.GetUserOfflineSubscription).to(GetUserOfflineSubscription)
     container.bind<CreateSubscriptionToken>(TYPES.CreateSubscriptionToken).to(CreateSubscriptionToken)
     container.bind<AuthenticateSubscriptionToken>(TYPES.AuthenticateSubscriptionToken).to(AuthenticateSubscriptionToken)
-    container.bind<AuthenticateOfflineSubscriptionToken>(TYPES.AuthenticateOfflineSubscriptionToken).to(AuthenticateOfflineSubscriptionToken)
-    container.bind<CreateOfflineSubscriptionToken>(TYPES.CreateOfflineSubscriptionToken).to(CreateOfflineSubscriptionToken)
+    container
+      .bind<AuthenticateOfflineSubscriptionToken>(TYPES.AuthenticateOfflineSubscriptionToken)
+      .to(AuthenticateOfflineSubscriptionToken)
+    container
+      .bind<CreateOfflineSubscriptionToken>(TYPES.CreateOfflineSubscriptionToken)
+      .to(CreateOfflineSubscriptionToken)
     container.bind<MuteFailedBackupsEmails>(TYPES.MuteFailedBackupsEmails).to(MuteFailedBackupsEmails)
     container.bind<MuteSignInEmails>(TYPES.MuteSignInEmails).to(MuteSignInEmails)
     container.bind<CreateValetToken>(TYPES.CreateValetToken).to(CreateValetToken)
     container.bind<CreateListedAccount>(TYPES.CreateListedAccount).to(CreateListedAccount)
     container.bind<InviteToSharedSubscription>(TYPES.InviteToSharedSubscription).to(InviteToSharedSubscription)
-    container.bind<AcceptSharedSubscriptionInvitation>(TYPES.AcceptSharedSubscriptionInvitation).to(AcceptSharedSubscriptionInvitation)
-    container.bind<DeclineSharedSubscriptionInvitation>(TYPES.DeclineSharedSubscriptionInvitation).to(DeclineSharedSubscriptionInvitation)
-    container.bind<CancelSharedSubscriptionInvitation>(TYPES.CancelSharedSubscriptionInvitation).to(CancelSharedSubscriptionInvitation)
-    container.bind<ListSharedSubscriptionInvitations>(TYPES.ListSharedSubscriptionInvitations).to(ListSharedSubscriptionInvitations)
+    container
+      .bind<AcceptSharedSubscriptionInvitation>(TYPES.AcceptSharedSubscriptionInvitation)
+      .to(AcceptSharedSubscriptionInvitation)
+    container
+      .bind<DeclineSharedSubscriptionInvitation>(TYPES.DeclineSharedSubscriptionInvitation)
+      .to(DeclineSharedSubscriptionInvitation)
+    container
+      .bind<CancelSharedSubscriptionInvitation>(TYPES.CancelSharedSubscriptionInvitation)
+      .to(CancelSharedSubscriptionInvitation)
+    container
+      .bind<ListSharedSubscriptionInvitations>(TYPES.ListSharedSubscriptionInvitations)
+      .to(ListSharedSubscriptionInvitations)
     container.bind<GetSubscriptionSetting>(TYPES.GetSubscriptionSetting).to(GetSubscriptionSetting)
 
     // Handlers
     container.bind<UserRegisteredEventHandler>(TYPES.UserRegisteredEventHandler).to(UserRegisteredEventHandler)
-    container.bind<AccountDeletionRequestedEventHandler>(TYPES.AccountDeletionRequestedEventHandler).to(AccountDeletionRequestedEventHandler)
-    container.bind<SubscriptionPurchasedEventHandler>(TYPES.SubscriptionPurchasedEventHandler).to(SubscriptionPurchasedEventHandler)
-    container.bind<SubscriptionCancelledEventHandler>(TYPES.SubscriptionCancelledEventHandler).to(SubscriptionCancelledEventHandler)
-    container.bind<SubscriptionRenewedEventHandler>(TYPES.SubscriptionRenewedEventHandler).to(SubscriptionRenewedEventHandler)
-    container.bind<SubscriptionRefundedEventHandler>(TYPES.SubscriptionRefundedEventHandler).to(SubscriptionRefundedEventHandler)
-    container.bind<SubscriptionExpiredEventHandler>(TYPES.SubscriptionExpiredEventHandler).to(SubscriptionExpiredEventHandler)
-    container.bind<SubscriptionSyncRequestedEventHandler>(TYPES.SubscriptionSyncRequestedEventHandler).to(SubscriptionSyncRequestedEventHandler)
-    container.bind<ExtensionKeyGrantedEventHandler>(TYPES.ExtensionKeyGrantedEventHandler).to(ExtensionKeyGrantedEventHandler)
-    container.bind<SubscriptionReassignedEventHandler>(TYPES.SubscriptionReassignedEventHandler).to(SubscriptionReassignedEventHandler)
+    container
+      .bind<AccountDeletionRequestedEventHandler>(TYPES.AccountDeletionRequestedEventHandler)
+      .to(AccountDeletionRequestedEventHandler)
+    container
+      .bind<SubscriptionPurchasedEventHandler>(TYPES.SubscriptionPurchasedEventHandler)
+      .to(SubscriptionPurchasedEventHandler)
+    container
+      .bind<SubscriptionCancelledEventHandler>(TYPES.SubscriptionCancelledEventHandler)
+      .to(SubscriptionCancelledEventHandler)
+    container
+      .bind<SubscriptionRenewedEventHandler>(TYPES.SubscriptionRenewedEventHandler)
+      .to(SubscriptionRenewedEventHandler)
+    container
+      .bind<SubscriptionRefundedEventHandler>(TYPES.SubscriptionRefundedEventHandler)
+      .to(SubscriptionRefundedEventHandler)
+    container
+      .bind<SubscriptionExpiredEventHandler>(TYPES.SubscriptionExpiredEventHandler)
+      .to(SubscriptionExpiredEventHandler)
+    container
+      .bind<SubscriptionSyncRequestedEventHandler>(TYPES.SubscriptionSyncRequestedEventHandler)
+      .to(SubscriptionSyncRequestedEventHandler)
+    container
+      .bind<ExtensionKeyGrantedEventHandler>(TYPES.ExtensionKeyGrantedEventHandler)
+      .to(ExtensionKeyGrantedEventHandler)
+    container
+      .bind<SubscriptionReassignedEventHandler>(TYPES.SubscriptionReassignedEventHandler)
+      .to(SubscriptionReassignedEventHandler)
     container.bind<UserEmailChangedEventHandler>(TYPES.UserEmailChangedEventHandler).to(UserEmailChangedEventHandler)
     container.bind<FileUploadedEventHandler>(TYPES.FileUploadedEventHandler).to(FileUploadedEventHandler)
     container.bind<FileRemovedEventHandler>(TYPES.FileRemovedEventHandler).to(FileRemovedEventHandler)
-    container.bind<ListedAccountCreatedEventHandler>(TYPES.ListedAccountCreatedEventHandler).to(ListedAccountCreatedEventHandler)
-    container.bind<ListedAccountDeletedEventHandler>(TYPES.ListedAccountDeletedEventHandler).to(ListedAccountDeletedEventHandler)
-    container.bind<UserDisabledSessionUserAgentLoggingEventHandler>(TYPES.UserDisabledSessionUserAgentLoggingEventHandler).to(UserDisabledSessionUserAgentLoggingEventHandler)
-    container.bind<SharedSubscriptionInvitationCreatedEventHandler>(TYPES.SharedSubscriptionInvitationCreatedEventHandler).to(SharedSubscriptionInvitationCreatedEventHandler)
+    container
+      .bind<ListedAccountCreatedEventHandler>(TYPES.ListedAccountCreatedEventHandler)
+      .to(ListedAccountCreatedEventHandler)
+    container
+      .bind<ListedAccountDeletedEventHandler>(TYPES.ListedAccountDeletedEventHandler)
+      .to(ListedAccountDeletedEventHandler)
+    container
+      .bind<UserDisabledSessionUserAgentLoggingEventHandler>(TYPES.UserDisabledSessionUserAgentLoggingEventHandler)
+      .to(UserDisabledSessionUserAgentLoggingEventHandler)
+    container
+      .bind<SharedSubscriptionInvitationCreatedEventHandler>(TYPES.SharedSubscriptionInvitationCreatedEventHandler)
+      .to(SharedSubscriptionInvitationCreatedEventHandler)
 
     // Services
     container.bind<UAParser>(TYPES.DeviceDetector).toConstantValue(new UAParser())
@@ -401,14 +484,30 @@ export class ContainerConfigLoader {
     container.bind<AuthResponseFactory20200115>(TYPES.AuthResponseFactory20200115).to(AuthResponseFactory20200115)
     container.bind<AuthResponseFactoryResolver>(TYPES.AuthResponseFactoryResolver).to(AuthResponseFactoryResolver)
     container.bind<KeyParamsFactory>(TYPES.KeyParamsFactory).to(KeyParamsFactory)
-    container.bind<TokenDecoderInterface<SessionTokenData>>(TYPES.SessionTokenDecoder).toConstantValue(new TokenDecoder<SessionTokenData>(container.get(TYPES.JWT_SECRET)))
-    container.bind<TokenDecoderInterface<SessionTokenData>>(TYPES.FallbackSessionTokenDecoder).toConstantValue(new TokenDecoder<SessionTokenData>(container.get(TYPES.LEGACY_JWT_SECRET)))
-    container.bind<TokenDecoderInterface<CrossServiceTokenData>>(TYPES.CrossServiceTokenDecoder).toConstantValue(new TokenDecoder<CrossServiceTokenData>(container.get(TYPES.AUTH_JWT_SECRET)))
-    container.bind<TokenDecoderInterface<OfflineUserTokenData>>(TYPES.OfflineUserTokenDecoder).toConstantValue(new TokenDecoder<OfflineUserTokenData>(container.get(TYPES.AUTH_JWT_SECRET)))
-    container.bind<TokenEncoderInterface<OfflineUserTokenData>>(TYPES.OfflineUserTokenEncoder).toConstantValue(new TokenEncoder<OfflineUserTokenData>(container.get(TYPES.AUTH_JWT_SECRET)))
-    container.bind<TokenEncoderInterface<SessionTokenData>>(TYPES.SessionTokenEncoder).toConstantValue(new TokenEncoder<SessionTokenData>(container.get(TYPES.JWT_SECRET)))
-    container.bind<TokenEncoderInterface<CrossServiceTokenData>>(TYPES.CrossServiceTokenEncoder).toConstantValue(new TokenEncoder<CrossServiceTokenData>(container.get(TYPES.AUTH_JWT_SECRET)))
-    container.bind<TokenEncoderInterface<ValetTokenData>>(TYPES.ValetTokenEncoder).toConstantValue(new TokenEncoder<ValetTokenData>(container.get(TYPES.VALET_TOKEN_SECRET)))
+    container
+      .bind<TokenDecoderInterface<SessionTokenData>>(TYPES.SessionTokenDecoder)
+      .toConstantValue(new TokenDecoder<SessionTokenData>(container.get(TYPES.JWT_SECRET)))
+    container
+      .bind<TokenDecoderInterface<SessionTokenData>>(TYPES.FallbackSessionTokenDecoder)
+      .toConstantValue(new TokenDecoder<SessionTokenData>(container.get(TYPES.LEGACY_JWT_SECRET)))
+    container
+      .bind<TokenDecoderInterface<CrossServiceTokenData>>(TYPES.CrossServiceTokenDecoder)
+      .toConstantValue(new TokenDecoder<CrossServiceTokenData>(container.get(TYPES.AUTH_JWT_SECRET)))
+    container
+      .bind<TokenDecoderInterface<OfflineUserTokenData>>(TYPES.OfflineUserTokenDecoder)
+      .toConstantValue(new TokenDecoder<OfflineUserTokenData>(container.get(TYPES.AUTH_JWT_SECRET)))
+    container
+      .bind<TokenEncoderInterface<OfflineUserTokenData>>(TYPES.OfflineUserTokenEncoder)
+      .toConstantValue(new TokenEncoder<OfflineUserTokenData>(container.get(TYPES.AUTH_JWT_SECRET)))
+    container
+      .bind<TokenEncoderInterface<SessionTokenData>>(TYPES.SessionTokenEncoder)
+      .toConstantValue(new TokenEncoder<SessionTokenData>(container.get(TYPES.JWT_SECRET)))
+    container
+      .bind<TokenEncoderInterface<CrossServiceTokenData>>(TYPES.CrossServiceTokenEncoder)
+      .toConstantValue(new TokenEncoder<CrossServiceTokenData>(container.get(TYPES.AUTH_JWT_SECRET)))
+    container
+      .bind<TokenEncoderInterface<ValetTokenData>>(TYPES.ValetTokenEncoder)
+      .toConstantValue(new TokenEncoder<ValetTokenData>(container.get(TYPES.VALET_TOKEN_SECRET)))
     container.bind<AuthenticationMethodResolver>(TYPES.AuthenticationMethodResolver).to(AuthenticationMethodResolver)
     container.bind<DomainEventFactory>(TYPES.DomainEventFactory).to(DomainEventFactory)
     container.bind<AxiosInstance>(TYPES.HTTPClient).toConstantValue(axios.create())
@@ -423,28 +522,30 @@ export class ContainerConfigLoader {
     container.bind<RoleServiceInterface>(TYPES.RoleService).to(RoleService)
     container.bind<RoleToSubscriptionMapInterface>(TYPES.RoleToSubscriptionMap).to(RoleToSubscriptionMap)
     container.bind<SettingsAssociationServiceInterface>(TYPES.SettingsAssociationService).to(SettingsAssociationService)
-    container.bind<SubscriptionSettingsAssociationServiceInterface>(TYPES.SubscriptionSettingsAssociationService).to(SubscriptionSettingsAssociationService)
+    container
+      .bind<SubscriptionSettingsAssociationServiceInterface>(TYPES.SubscriptionSettingsAssociationService)
+      .to(SubscriptionSettingsAssociationService)
     container.bind<FeatureServiceInterface>(TYPES.FeatureService).to(FeatureService)
     container.bind<SettingInterpreterInterface>(TYPES.SettingInterpreter).to(SettingInterpreter)
     container.bind<SettingDecrypterInterface>(TYPES.SettingDecrypter).to(SettingDecrypter)
-    container.bind<SelectorInterface<ProtocolVersion>>(TYPES.ProtocolVersionSelector).toConstantValue(new DeterministicSelector<ProtocolVersion>())
-    container.bind<SelectorInterface<boolean>>(TYPES.BooleanSelector).toConstantValue(new DeterministicSelector<boolean>())
+    container
+      .bind<SelectorInterface<ProtocolVersion>>(TYPES.ProtocolVersionSelector)
+      .toConstantValue(new DeterministicSelector<ProtocolVersion>())
+    container
+      .bind<SelectorInterface<boolean>>(TYPES.BooleanSelector)
+      .toConstantValue(new DeterministicSelector<boolean>())
     container.bind<UserSubscriptionServiceInterface>(TYPES.UserSubscriptionService).to(UserSubscriptionService)
 
     if (env.get('SNS_TOPIC_ARN', true)) {
-      container.bind<SNSDomainEventPublisher>(TYPES.DomainEventPublisher).toConstantValue(
-        new SNSDomainEventPublisher(
-          container.get(TYPES.SNS),
-          container.get(TYPES.SNS_TOPIC_ARN)
-        )
-      )
+      container
+        .bind<SNSDomainEventPublisher>(TYPES.DomainEventPublisher)
+        .toConstantValue(new SNSDomainEventPublisher(container.get(TYPES.SNS), container.get(TYPES.SNS_TOPIC_ARN)))
     } else {
-      container.bind<RedisDomainEventPublisher>(TYPES.DomainEventPublisher).toConstantValue(
-        new RedisDomainEventPublisher(
-          container.get(TYPES.Redis),
-          container.get(TYPES.REDIS_EVENTS_CHANNEL)
+      container
+        .bind<RedisDomainEventPublisher>(TYPES.DomainEventPublisher)
+        .toConstantValue(
+          new RedisDomainEventPublisher(container.get(TYPES.Redis), container.get(TYPES.REDIS_EVENTS_CHANNEL)),
         )
-      )
     }
 
     const eventHandlers: Map<string, DomainEventHandlerInterface> = new Map([
@@ -463,34 +564,43 @@ export class ContainerConfigLoader {
       ['FILE_REMOVED', container.get(TYPES.FileRemovedEventHandler)],
       ['LISTED_ACCOUNT_CREATED', container.get(TYPES.ListedAccountCreatedEventHandler)],
       ['LISTED_ACCOUNT_DELETED', container.get(TYPES.ListedAccountDeletedEventHandler)],
-      ['USER_DISABLED_SESSION_USER_AGENT_LOGGING', container.get(TYPES.UserDisabledSessionUserAgentLoggingEventHandler)],
+      [
+        'USER_DISABLED_SESSION_USER_AGENT_LOGGING',
+        container.get(TYPES.UserDisabledSessionUserAgentLoggingEventHandler),
+      ],
       ['SHARED_SUBSCRIPTION_INVITATION_CREATED', container.get(TYPES.SharedSubscriptionInvitationCreatedEventHandler)],
     ])
 
     if (env.get('SQS_QUEUE_URL', true)) {
-      container.bind<DomainEventMessageHandlerInterface>(TYPES.DomainEventMessageHandler).toConstantValue(
-        env.get('NEW_RELIC_ENABLED', true) === 'true' ?
-          new SQSNewRelicEventMessageHandler(eventHandlers, container.get(TYPES.Logger)) :
-          new SQSEventMessageHandler(eventHandlers, container.get(TYPES.Logger))
-      )
-      container.bind<DomainEventSubscriberFactoryInterface>(TYPES.DomainEventSubscriberFactory).toConstantValue(
-        new SQSDomainEventSubscriberFactory(
-          container.get(TYPES.SQS),
-          container.get(TYPES.SQS_QUEUE_URL),
-          container.get(TYPES.DomainEventMessageHandler)
+      container
+        .bind<DomainEventMessageHandlerInterface>(TYPES.DomainEventMessageHandler)
+        .toConstantValue(
+          env.get('NEW_RELIC_ENABLED', true) === 'true'
+            ? new SQSNewRelicEventMessageHandler(eventHandlers, container.get(TYPES.Logger))
+            : new SQSEventMessageHandler(eventHandlers, container.get(TYPES.Logger)),
         )
-      )
+      container
+        .bind<DomainEventSubscriberFactoryInterface>(TYPES.DomainEventSubscriberFactory)
+        .toConstantValue(
+          new SQSDomainEventSubscriberFactory(
+            container.get(TYPES.SQS),
+            container.get(TYPES.SQS_QUEUE_URL),
+            container.get(TYPES.DomainEventMessageHandler),
+          ),
+        )
     } else {
-      container.bind<DomainEventMessageHandlerInterface>(TYPES.DomainEventMessageHandler).toConstantValue(
-        new RedisEventMessageHandler(eventHandlers, container.get(TYPES.Logger))
-      )
-      container.bind<DomainEventSubscriberFactoryInterface>(TYPES.DomainEventSubscriberFactory).toConstantValue(
-        new RedisDomainEventSubscriberFactory(
-          container.get(TYPES.Redis),
-          container.get(TYPES.DomainEventMessageHandler),
-          container.get(TYPES.REDIS_EVENTS_CHANNEL)
+      container
+        .bind<DomainEventMessageHandlerInterface>(TYPES.DomainEventMessageHandler)
+        .toConstantValue(new RedisEventMessageHandler(eventHandlers, container.get(TYPES.Logger)))
+      container
+        .bind<DomainEventSubscriberFactoryInterface>(TYPES.DomainEventSubscriberFactory)
+        .toConstantValue(
+          new RedisDomainEventSubscriberFactory(
+            container.get(TYPES.Redis),
+            container.get(TYPES.DomainEventMessageHandler),
+            container.get(TYPES.REDIS_EVENTS_CHANNEL),
+          ),
         )
-      )
     }
 
     return container

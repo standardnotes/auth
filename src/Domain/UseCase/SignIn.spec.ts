@@ -32,18 +32,19 @@ describe('SignIn', () => {
   let pkceRepository: PKCERepositoryInterface
   let crypter: CrypterInterface
 
-  const createUseCase = () => new SignIn(
-    userRepository,
-    authResponseFactoryResolver,
-    domainEventPublisher,
-    domainEventFactory,
-    sessionService,
-    roleService,
-    settingService,
-    pkceRepository,
-    crypter,
-    logger
-  )
+  const createUseCase = () =>
+    new SignIn(
+      userRepository,
+      authResponseFactoryResolver,
+      domainEventPublisher,
+      domainEventFactory,
+      sessionService,
+      roleService,
+      settingService,
+      pkceRepository,
+      crypter,
+      logger,
+    )
 
   beforeEach(() => {
     user = {
@@ -99,13 +100,15 @@ describe('SignIn', () => {
   })
 
   it('should sign in a user', async () => {
-    expect(await createUseCase().execute({
-      email: 'test@test.te',
-      password: 'qweqwe123123',
-      userAgent: 'Google Chrome',
-      apiVersion: '20190520',
-      ephemeralSession: false,
-    })).toEqual({
+    expect(
+      await createUseCase().execute({
+        email: 'test@test.te',
+        password: 'qweqwe123123',
+        userAgent: 'Google Chrome',
+        apiVersion: '20190520',
+        ephemeralSession: false,
+      }),
+    ).toEqual({
       success: true,
       authResponse: { foo: 'bar' },
     })
@@ -122,14 +125,16 @@ describe('SignIn', () => {
   })
 
   it('should sign in a user with valid code verifier', async () => {
-    expect(await createUseCase().execute({
-      email: 'test@test.te',
-      password: 'qweqwe123123',
-      userAgent: 'Google Chrome',
-      apiVersion: '20190520',
-      ephemeralSession: false,
-      codeVerifier: 'test',
-    })).toEqual({
+    expect(
+      await createUseCase().execute({
+        email: 'test@test.te',
+        password: 'qweqwe123123',
+        userAgent: 'Google Chrome',
+        apiVersion: '20190520',
+        ephemeralSession: false,
+        codeVerifier: 'test',
+      }),
+    ).toEqual({
       success: true,
       authResponse: { foo: 'bar' },
     })
@@ -153,13 +158,15 @@ describe('SignIn', () => {
 
     settingService.findSettingWithDecryptedValue = jest.fn().mockReturnValue(setting)
 
-    expect(await createUseCase().execute({
-      email: 'test@test.te',
-      password: 'qweqwe123123',
-      userAgent: 'Google Chrome',
-      apiVersion: '20190520',
-      ephemeralSession: false,
-    })).toEqual({
+    expect(
+      await createUseCase().execute({
+        email: 'test@test.te',
+        password: 'qweqwe123123',
+        userAgent: 'Google Chrome',
+        apiVersion: '20190520',
+        ephemeralSession: false,
+      }),
+    ).toEqual({
       success: true,
       authResponse: { foo: 'bar' },
     })
@@ -178,13 +185,15 @@ describe('SignIn', () => {
   it('should sign in a user and create mute sign in email setting if it does not exist', async () => {
     settingService.findSettingWithDecryptedValue = jest.fn().mockReturnValue(undefined)
 
-    expect(await createUseCase().execute({
-      email: 'test@test.te',
-      password: 'qweqwe123123',
-      userAgent: 'Google Chrome',
-      apiVersion: '20190520',
-      ephemeralSession: false,
-    })).toEqual({
+    expect(
+      await createUseCase().execute({
+        email: 'test@test.te',
+        password: 'qweqwe123123',
+        userAgent: 'Google Chrome',
+        apiVersion: '20190520',
+        ephemeralSession: false,
+      }),
+    ).toEqual({
       success: true,
       authResponse: { foo: 'bar' },
     })
@@ -218,26 +227,30 @@ describe('SignIn', () => {
       throw new Error('Oops')
     })
 
-    expect(await createUseCase().execute({
-      email: 'test@test.te',
-      password: 'qweqwe123123',
-      userAgent: 'Google Chrome',
-      apiVersion: '20190520',
-      ephemeralSession: false,
-    })).toEqual({
+    expect(
+      await createUseCase().execute({
+        email: 'test@test.te',
+        password: 'qweqwe123123',
+        userAgent: 'Google Chrome',
+        apiVersion: '20190520',
+        ephemeralSession: false,
+      }),
+    ).toEqual({
       success: true,
       authResponse: { foo: 'bar' },
     })
   })
 
   it('should not sign in a user with wrong credentials', async () => {
-    expect(await createUseCase().execute({
-      email: 'test@test.te',
-      password: 'asdasd123123',
-      userAgent: 'Google Chrome',
-      apiVersion: '20190520',
-      ephemeralSession: false,
-    })).toEqual({
+    expect(
+      await createUseCase().execute({
+        email: 'test@test.te',
+        password: 'asdasd123123',
+        userAgent: 'Google Chrome',
+        apiVersion: '20190520',
+        ephemeralSession: false,
+      }),
+    ).toEqual({
       success: false,
       errorMessage: 'Invalid email or password',
     })
@@ -246,14 +259,16 @@ describe('SignIn', () => {
   it('should not sign in a user with invalid code verifier', async () => {
     pkceRepository.removeCodeChallenge = jest.fn().mockReturnValue(false)
 
-    expect(await createUseCase().execute({
-      email: 'test@test.te',
-      password: 'qweqwe123123',
-      userAgent: 'Google Chrome',
-      apiVersion: '20190520',
-      ephemeralSession: false,
-      codeVerifier: 'test',
-    })).toEqual({
+    expect(
+      await createUseCase().execute({
+        email: 'test@test.te',
+        password: 'qweqwe123123',
+        userAgent: 'Google Chrome',
+        apiVersion: '20190520',
+        ephemeralSession: false,
+        codeVerifier: 'test',
+      }),
+    ).toEqual({
       success: false,
       errorMessage: 'Invalid email or password',
     })
@@ -262,13 +277,15 @@ describe('SignIn', () => {
   it('should not sign in a user that does not exist', async () => {
     userRepository.findOneByEmail = jest.fn().mockReturnValue(undefined)
 
-    expect(await createUseCase().execute({
-      email: 'test@test.te',
-      password: 'asdasd123123',
-      userAgent: 'Google Chrome',
-      apiVersion: '20190520',
-      ephemeralSession: false,
-    })).toEqual({
+    expect(
+      await createUseCase().execute({
+        email: 'test@test.te',
+        password: 'asdasd123123',
+        userAgent: 'Google Chrome',
+        apiVersion: '20190520',
+        ephemeralSession: false,
+      }),
+    ).toEqual({
       success: false,
       errorMessage: 'Invalid email or password',
     })

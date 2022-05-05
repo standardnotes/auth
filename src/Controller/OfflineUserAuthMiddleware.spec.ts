@@ -17,10 +17,7 @@ describe('OfflineUserAuthMiddleware', () => {
     debug: jest.fn(),
   } as unknown as jest.Mocked<Logger>
 
-  const createMiddleware = () => new OfflineUserAuthMiddleware(
-    offlineSettingRepository,
-    logger,
-  )
+  const createMiddleware = () => new OfflineUserAuthMiddleware(offlineSettingRepository, logger)
 
   beforeEach(() => {
     offlineSetting = {

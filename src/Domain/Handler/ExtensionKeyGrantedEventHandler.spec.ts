@@ -10,8 +10,7 @@ import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { ExtensionKeyGrantedEventHandler } from './ExtensionKeyGrantedEventHandler'
 import { SettingServiceInterface } from '../Setting/SettingServiceInterface'
 import { OfflineSettingServiceInterface } from '../Setting/OfflineSettingServiceInterface'
-import { SubscriptionName } from '@standardnotes/common'
-import { ContentDecoderInterface } from '@standardnotes/common'
+import { ContentDecoderInterface, SubscriptionName } from '@standardnotes/common'
 
 describe('ExtensionKeyGrantedEventHandler', () => {
   let userRepository: UserRepositoryInterface
@@ -23,13 +22,8 @@ describe('ExtensionKeyGrantedEventHandler', () => {
   let contentDecoder: ContentDecoderInterface
   let timestamp: number
 
-  const createHandler = () => new ExtensionKeyGrantedEventHandler(
-    userRepository,
-    settingService,
-    offlineSettingService,
-    contentDecoder,
-    logger
-  )
+  const createHandler = () =>
+    new ExtensionKeyGrantedEventHandler(userRepository, settingService, offlineSettingService, contentDecoder, logger)
 
   beforeEach(() => {
     user = {

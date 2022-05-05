@@ -36,10 +36,7 @@ describe('MySQLRevokedSessionRepository', () => {
 
     const result = await repository.findAllByUserUuid('123')
 
-    expect(queryBuilder.where).toHaveBeenCalledWith(
-      'revoked_session.user_uuid = :user_uuid',
-      { user_uuid: '123' }
-    )
+    expect(queryBuilder.where).toHaveBeenCalledWith('revoked_session.user_uuid = :user_uuid', { user_uuid: '123' })
     expect(result).toEqual([session])
   })
 })

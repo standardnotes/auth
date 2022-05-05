@@ -18,7 +18,7 @@ describe('GetUserFeatures', () => {
     userRepository = {} as jest.Mocked<UserRepositoryInterface>
     userRepository.findOneByUuid = jest.fn().mockReturnValue(user)
 
-    feature1 = { name: 'foobar' }  as jest.Mocked<FeatureDescription>
+    feature1 = { name: 'foobar' } as jest.Mocked<FeatureDescription>
     featureService = {} as jest.Mocked<FeatureServiceInterface>
     featureService.getFeaturesForUser = jest.fn().mockReturnValue([feature1])
     featureService.getFeaturesForOfflineUser = jest.fn().mockReturnValue([feature1])
@@ -39,18 +39,22 @@ describe('GetUserFeatures', () => {
     expect(await createUseCase().execute({ userUuid: 'user-1-1-1', offline: false })).toEqual({
       success: true,
       userUuid: 'user-1-1-1',
-      features: [{
-        name: 'foobar',
-      }],
+      features: [
+        {
+          name: 'foobar',
+        },
+      ],
     })
   })
 
   it('should return offline user features', async () => {
     expect(await createUseCase().execute({ email: 'test@test.com', offline: true })).toEqual({
       success: true,
-      features: [{
-        name: 'foobar',
-      }],
+      features: [
+        {
+          name: 'foobar',
+        },
+      ],
     })
   })
 })

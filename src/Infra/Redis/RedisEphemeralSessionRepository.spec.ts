@@ -39,19 +39,22 @@ describe('RedisEphemeralSessionRepository', () => {
     expect(redisClient.setex).toHaveBeenCalledWith(
       'session:1-2-3:2-3-4',
       3600,
-      '{"uuid":"1-2-3","userUuid":"2-3-4","userAgent":"Mozilla Firefox","createdAt":"1970-01-01T00:00:00.001Z","updatedAt":"1970-01-01T00:00:00.002Z"}'
+      '{"uuid":"1-2-3","userUuid":"2-3-4","userAgent":"Mozilla Firefox","createdAt":"1970-01-01T00:00:00.001Z","updatedAt":"1970-01-01T00:00:00.002Z"}',
     )
   })
 
   it('should find all ephemeral sessions by user uuid', async () => {
-    redisClient.scan = jest.fn()
+    redisClient.scan = jest
+      .fn()
       .mockReturnValueOnce(['1', ['session:1-2-3:2-3-4']])
       .mockReturnValueOnce(['0', ['session:2-3-4:2-3-4']])
 
-    redisClient.mget = jest.fn().mockReturnValue([
-      '{"uuid":"1-2-3","userUuid":"2-3-4","userAgent":"Mozilla Firefox","createdAt":"1970-01-01T00:00:00.001Z","updatedAt":"1970-01-01T00:00:00.002Z"}',
-      '{"uuid":"2-3-4","userUuid":"2-3-4","userAgent":"Google Chrome","createdAt":"1970-01-01T00:00:00.001Z","updatedAt":"1970-01-01T00:00:00.002Z"}',
-    ])
+    redisClient.mget = jest
+      .fn()
+      .mockReturnValue([
+        '{"uuid":"1-2-3","userUuid":"2-3-4","userAgent":"Mozilla Firefox","createdAt":"1970-01-01T00:00:00.001Z","updatedAt":"1970-01-01T00:00:00.002Z"}',
+        '{"uuid":"2-3-4","userUuid":"2-3-4","userAgent":"Google Chrome","createdAt":"1970-01-01T00:00:00.001Z","updatedAt":"1970-01-01T00:00:00.002Z"}',
+      ])
 
     const ephemeralSessions = await createRepository().findAllByUserUuid('2-3-4')
 
@@ -60,8 +63,7 @@ describe('RedisEphemeralSessionRepository', () => {
   })
 
   it('should not look for ephemeral sessions if keys are not found', async () => {
-    redisClient.scan = jest.fn()
-      .mockReturnValueOnce(['0', []])
+    redisClient.scan = jest.fn().mockReturnValueOnce(['0', []])
 
     const ephemeralSessions = await createRepository().findAllByUserUuid('2-3-4')
 
@@ -70,18 +72,26 @@ describe('RedisEphemeralSessionRepository', () => {
   })
 
   it('should find an ephemeral session by uuid', async () => {
-    redisClient.get = jest.fn().mockReturnValue('{"uuid":"1-2-3","userUuid":"2-3-4","userAgent":"Mozilla Firefox","createdAt":"1970-01-01T00:00:00.001Z","updatedAt":"1970-01-01T00:00:00.002Z"}')
+    redisClient.get = jest
+      .fn()
+      .mockReturnValue(
+        '{"uuid":"1-2-3","userUuid":"2-3-4","userAgent":"Mozilla Firefox","createdAt":"1970-01-01T00:00:00.001Z","updatedAt":"1970-01-01T00:00:00.002Z"}',
+      )
 
-    const ephemeralSession = <EphemeralSession> await createRepository().findOneByUuid('1-2-3')
+    const ephemeralSession = <EphemeralSession>await createRepository().findOneByUuid('1-2-3')
 
     expect(ephemeralSession).not.toBeUndefined()
     expect(ephemeralSession.userAgent).toEqual('Mozilla Firefox')
   })
 
   it('should find an ephemeral session by uuid and user uuid', async () => {
-    redisClient.get = jest.fn().mockReturnValue('{"uuid":"1-2-3","userUuid":"2-3-4","userAgent":"Mozilla Firefox","createdAt":"1970-01-01T00:00:00.001Z","updatedAt":"1970-01-01T00:00:00.002Z"}')
+    redisClient.get = jest
+      .fn()
+      .mockReturnValue(
+        '{"uuid":"1-2-3","userUuid":"2-3-4","userAgent":"Mozilla Firefox","createdAt":"1970-01-01T00:00:00.001Z","updatedAt":"1970-01-01T00:00:00.002Z"}',
+      )
 
-    const ephemeralSession = <EphemeralSession> await createRepository().findOneByUuidAndUserUuid('1-2-3', '2-3-4')
+    const ephemeralSession = <EphemeralSession>await createRepository().findOneByUuidAndUserUuid('1-2-3', '2-3-4')
 
     expect(ephemeralSession).not.toBeUndefined()
     expect(ephemeralSession.userAgent).toEqual('Mozilla Firefox')
@@ -90,7 +100,7 @@ describe('RedisEphemeralSessionRepository', () => {
   it('should return undefined if session is not found', async () => {
     redisClient.get = jest.fn().mockReturnValue(null)
 
-    const ephemeralSession = <EphemeralSession> await createRepository().findOneByUuid('1-2-3')
+    const ephemeralSession = <EphemeralSession>await createRepository().findOneByUuid('1-2-3')
 
     expect(ephemeralSession).toBeUndefined()
   })
@@ -98,27 +108,31 @@ describe('RedisEphemeralSessionRepository', () => {
   it('should return undefined if ephemeral session is not found', async () => {
     redisClient.get = jest.fn().mockReturnValue(null)
 
-    const ephemeralSession = <EphemeralSession> await createRepository().findOneByUuidAndUserUuid('1-2-3', '2-3-4')
+    const ephemeralSession = <EphemeralSession>await createRepository().findOneByUuidAndUserUuid('1-2-3', '2-3-4')
 
     expect(ephemeralSession).toBeUndefined()
   })
 
   it('should update tokens and expirations dates', async () => {
     redisClient.scan = jest.fn().mockReturnValue(['0', ['session:1-2-3:2-3-4']])
-    redisClient.get = jest.fn().mockReturnValue('{"uuid":"1-2-3","userUuid":"2-3-4","userAgent":"Mozilla Firefox","createdAt":"1970-01-01T00:00:00.001Z","updatedAt":"1970-01-01T00:00:00.002Z"}')
+    redisClient.get = jest
+      .fn()
+      .mockReturnValue(
+        '{"uuid":"1-2-3","userUuid":"2-3-4","userAgent":"Mozilla Firefox","createdAt":"1970-01-01T00:00:00.001Z","updatedAt":"1970-01-01T00:00:00.002Z"}',
+      )
 
     await createRepository().updateTokensAndExpirationDates(
       '1-2-3',
       'dummy_access_token',
       'dummy_refresh_token',
       new Date(3),
-      new Date(4)
+      new Date(4),
     )
 
     expect(redisClient.setex).toHaveBeenCalledWith(
       'session:1-2-3:2-3-4',
       3600,
-      '{"uuid":"1-2-3","userUuid":"2-3-4","userAgent":"Mozilla Firefox","createdAt":"1970-01-01T00:00:00.001Z","updatedAt":"1970-01-01T00:00:00.002Z","hashedAccessToken":"dummy_access_token","hashedRefreshToken":"dummy_refresh_token","accessExpiration":"1970-01-01T00:00:00.003Z","refreshExpiration":"1970-01-01T00:00:00.004Z"}'
+      '{"uuid":"1-2-3","userUuid":"2-3-4","userAgent":"Mozilla Firefox","createdAt":"1970-01-01T00:00:00.001Z","updatedAt":"1970-01-01T00:00:00.002Z","hashedAccessToken":"dummy_access_token","hashedRefreshToken":"dummy_refresh_token","accessExpiration":"1970-01-01T00:00:00.003Z","refreshExpiration":"1970-01-01T00:00:00.004Z"}',
     )
   })
 
@@ -130,7 +144,7 @@ describe('RedisEphemeralSessionRepository', () => {
       'dummy_access_token',
       'dummy_refresh_token',
       new Date(3),
-      new Date(4)
+      new Date(4),
     )
 
     expect(redisClient.setex).not.toHaveBeenCalled()

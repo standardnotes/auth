@@ -22,7 +22,10 @@ export class WebSocketsController extends BaseHttpController {
   }
 
   @httpPost('/:connectionId', TYPES.ApiGatewayAuthMiddleware)
-  async storeWebSocketsConnection(request: Request, response: Response): Promise<results.JsonResult | results.BadRequestErrorMessageResult> {
+  async storeWebSocketsConnection(
+    request: Request,
+    response: Response,
+  ): Promise<results.JsonResult | results.BadRequestErrorMessageResult> {
     await this.addWebSocketsConnection.execute({
       userUuid: response.locals.user.uuid,
       connectionId: request.params.connectionId,
@@ -32,7 +35,9 @@ export class WebSocketsController extends BaseHttpController {
   }
 
   @httpDelete('/:connectionId')
-  async deleteWebSocketsConnection(request: Request): Promise<results.JsonResult | results.BadRequestErrorMessageResult> {
+  async deleteWebSocketsConnection(
+    request: Request,
+  ): Promise<results.JsonResult | results.BadRequestErrorMessageResult> {
     await this.removeWebSocketsConnection.execute({ connectionId: request.params.connectionId })
 
     return this.json({ success: true })

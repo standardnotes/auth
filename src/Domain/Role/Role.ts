@@ -7,17 +7,17 @@ import { User } from '../User/User'
 @Index('name_and_version', ['name', 'version'], { unique: true })
 export class Role {
   @PrimaryGeneratedColumn('uuid')
-  uuid: string
+  uuid!: string
 
   @Column({
     length: 255,
   })
-  name: string
+  name!: string
 
   @Column({
     type: 'smallint',
   })
-  version: number
+  version!: number
 
   @Column({
     name: 'created_at',
@@ -26,7 +26,7 @@ export class Role {
       /* istanbul ignore next */
       () => 'CURRENT_TIMESTAMP',
   })
-  createdAt: Date
+  createdAt!: Date
 
   @Column({
     name: 'updated_at',
@@ -35,11 +35,11 @@ export class Role {
       /* istanbul ignore next */
       () => 'CURRENT_TIMESTAMP',
   })
-  updatedAt: Date
+  updatedAt!: Date
 
   @ManyToMany(
     /* istanbul ignore next */
-    () => User
+    () => User,
   )
   @JoinTable({
     name: 'user_roles',
@@ -52,11 +52,11 @@ export class Role {
       referencedColumnName: 'uuid',
     },
   })
-  users: Promise<Array<User>>
+  users!: Promise<Array<User>>
 
   @ManyToMany(
     /* istanbul ignore next */
-    () => Permission
+    () => Permission,
   )
   @JoinTable({
     name: 'role_permissions',
@@ -69,11 +69,11 @@ export class Role {
       referencedColumnName: 'uuid',
     },
   })
-  permissions: Promise<Array<Permission>>
+  permissions!: Promise<Array<Permission>>
 
   @ManyToMany(
     /* istanbul ignore next */
-    () => OfflineUserSubscription
+    () => OfflineUserSubscription,
   )
   @JoinTable({
     name: 'offline_user_roles',
@@ -86,5 +86,5 @@ export class Role {
       referencedColumnName: 'uuid',
     },
   })
-  offlineUserSubscriptions: Promise<Array<OfflineUserSubscription>>
+  offlineUserSubscriptions!: Promise<Array<OfflineUserSubscription>>
 }

@@ -19,7 +19,7 @@ export class SessionController extends BaseHttpController {
   constructor(
     @inject(TYPES.DeleteSessionForUser) private deleteSessionForUser: DeleteSessionForUser,
     @inject(TYPES.DeletePreviousSessionsForUser) private deletePreviousSessionsForUser: DeletePreviousSessionsForUser,
-    @inject(TYPES.RefreshSessionToken) private refreshSessionToken: RefreshSessionToken
+    @inject(TYPES.RefreshSessionToken) private refreshSessionToken: RefreshSessionToken,
   ) {
     super()
   }
@@ -27,28 +27,37 @@ export class SessionController extends BaseHttpController {
   @httpDelete('/', TYPES.AuthMiddleware, TYPES.SessionMiddleware)
   async deleteSession(request: Request, response: Response): Promise<results.JsonResult | results.StatusCodeResult> {
     if (response.locals.readOnlyAccess) {
-      return this.json({
-        error: {
-          tag: ErrorTag.ReadOnlyAccess,
-          message: 'Session has read-only access.',
+      return this.json(
+        {
+          error: {
+            tag: ErrorTag.ReadOnlyAccess,
+            message: 'Session has read-only access.',
+          },
         },
-      }, 401)
+        401,
+      )
     }
 
     if (!request.body.uuid) {
-      return this.json({
-        error: {
-          message: 'Please provide the session identifier.',
+      return this.json(
+        {
+          error: {
+            message: 'Please provide the session identifier.',
+          },
         },
-      }, 400)
+        400,
+      )
     }
 
-    if(request.body.uuid === response.locals.session.uuid) {
-      return this.json({
-        error: {
-          message: 'You can not delete your current session.',
+    if (request.body.uuid === response.locals.session.uuid) {
+      return this.json(
+        {
+          error: {
+            message: 'You can not delete your current session.',
+          },
         },
-      }, 400)
+        400,
+      )
     }
 
     const useCaseResponse = await this.deleteSessionForUser.execute({
@@ -57,25 +66,34 @@ export class SessionController extends BaseHttpController {
     })
 
     if (!useCaseResponse.success) {
-      return this.json({
-        error: {
-          message: useCaseResponse.errorMessage,
+      return this.json(
+        {
+          error: {
+            message: useCaseResponse.errorMessage,
+          },
         },
-      }, 400)
+        400,
+      )
     }
 
     return this.statusCode(204)
   }
 
   @httpDelete('/all', TYPES.AuthMiddleware, TYPES.SessionMiddleware)
-  async deleteAllSessions(_request: Request, response: Response): Promise<results.JsonResult | results.StatusCodeResult> {
+  async deleteAllSessions(
+    _request: Request,
+    response: Response,
+  ): Promise<results.JsonResult | results.StatusCodeResult> {
     if (response.locals.readOnlyAccess) {
-      return this.json({
-        error: {
-          tag: ErrorTag.ReadOnlyAccess,
-          message: 'Session has read-only access.',
+      return this.json(
+        {
+          error: {
+            tag: ErrorTag.ReadOnlyAccess,
+            message: 'Session has read-only access.',
+          },
         },
-      }, 401)
+        401,
+      )
     }
 
     if (!response.locals.user) {
@@ -85,7 +103,7 @@ export class SessionController extends BaseHttpController {
             message: 'No session exists with the provided identifier.',
           },
         },
-        401
+        401,
       )
     }
 
@@ -100,11 +118,14 @@ export class SessionController extends BaseHttpController {
   @httpPost('/refresh')
   async refresh(request: Request, _response: Response): Promise<results.JsonResult> {
     if (!request.body.access_token || !request.body.refresh_token) {
-      return this.json({
-        error: {
-          message: 'Please provide all required parameters.',
+      return this.json(
+        {
+          error: {
+            message: 'Please provide all required parameters.',
+          },
         },
-      }, 400)
+        400,
+      )
     }
 
     const result = await this.refreshSessionToken.execute({
@@ -113,12 +134,15 @@ export class SessionController extends BaseHttpController {
     })
 
     if (!result.success) {
-      return this.json({
-        error: {
-          tag: result.errorTag,
-          message: result.errorMessage,
+      return this.json(
+        {
+          error: {
+            tag: result.errorTag,
+            message: result.errorMessage,
+          },
         },
-      }, 400)
+        400,
+      )
     }
 
     return this.json({

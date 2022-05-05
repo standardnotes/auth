@@ -22,15 +22,14 @@ describe('DeletePreviousSessionsForUser', () => {
 
     sessionRepository = {} as jest.Mocked<SessionRepositoryInterface>
     sessionRepository.deleteAllByUserUuid = jest.fn()
-    sessionRepository.findAllByUserUuid = jest.fn().mockReturnValue([ session, currentSession ])
+    sessionRepository.findAllByUserUuid = jest.fn().mockReturnValue([session, currentSession])
 
     sessionService = {} as jest.Mocked<SessionServiceInterface>
     sessionService.createRevokedSession = jest.fn()
   })
 
   it('should delete all sessions except current for a given user', async () => {
-    expect(await createUseCase().execute({ userUuid: '1-2-3', currentSessionUuid: '2-3-4' }))
-      .toEqual({ success: true })
+    expect(await createUseCase().execute({ userUuid: '1-2-3', currentSessionUuid: '2-3-4' })).toEqual({ success: true })
 
     expect(sessionRepository.deleteAllByUserUuid).toHaveBeenCalledWith('1-2-3', '2-3-4')
 

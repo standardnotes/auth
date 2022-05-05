@@ -14,9 +14,7 @@ describe('SubscriptionSettingsController', () => {
   let response: express.Response
   let user: User
 
-  const createController = () => new SubscriptionSettingsController(
-    getSubscriptionSetting,
-  )
+  const createController = () => new SubscriptionSettingsController(getSubscriptionSetting)
 
   beforeEach(() => {
     user = {} as jest.Mocked<User>
@@ -45,7 +43,7 @@ describe('SubscriptionSettingsController', () => {
 
     getSubscriptionSetting.execute = jest.fn().mockReturnValue({ success: true })
 
-    const httpResponse = <results.JsonResult> await createController().getSubscriptionSetting(request, response)
+    const httpResponse = <results.JsonResult>await createController().getSubscriptionSetting(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(getSubscriptionSetting.execute).toHaveBeenCalledWith({ userUuid: '1-2-3', subscriptionSettingName: 'test' })
@@ -62,7 +60,7 @@ describe('SubscriptionSettingsController', () => {
 
     getSubscriptionSetting.execute = jest.fn().mockReturnValue({ success: false })
 
-    const httpResponse = <results.JsonResult> await createController().getSubscriptionSetting(request, response)
+    const httpResponse = <results.JsonResult>await createController().getSubscriptionSetting(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(getSubscriptionSetting.execute).toHaveBeenCalledWith({ userUuid: '1-2-3', subscriptionSettingName: 'test' })

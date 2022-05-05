@@ -15,11 +15,7 @@ describe('AdminController', () => {
   let request: express.Request
   let user: User
 
-  const createController = () => new AdminController(
-    deleteSetting,
-    userRepository,
-    createSubscriptionToken,
-  )
+  const createController = () => new AdminController(deleteSetting, userRepository, createSubscriptionToken)
 
   beforeEach(() => {
     user = {} as jest.Mocked<User>
@@ -66,10 +62,12 @@ describe('AdminController', () => {
     expect(httpResponse).toBeInstanceOf(results.JsonResult)
 
     expect(result.statusCode).toBe(400)
-    expect(await result.content.readAsStringAsync()).toEqual('{"error":{"message":"No user with email \'test@sn.org\'."}}')
+    expect(await result.content.readAsStringAsync()).toEqual(
+      '{"error":{"message":"No user with email \'test@sn.org\'."}}',
+    )
   })
 
-  it('should return the user\'s uuid', async () => {
+  it("should return the user's uuid", async () => {
     request.params.email = 'test@sn.org'
 
     const httpResponse = await createController().getUser(request)
@@ -86,10 +84,14 @@ describe('AdminController', () => {
 
     deleteSetting.execute = jest.fn().mockReturnValue({ success: true })
 
-    const httpResponse = <results.JsonResult> await createController().deleteMFASetting(request)
+    const httpResponse = <results.JsonResult>await createController().deleteMFASetting(request)
     const result = await httpResponse.executeAsync()
 
-    expect(deleteSetting.execute).toHaveBeenCalledWith({ userUuid: '1-2-3', settingName: 'MFA_SECRET', softDelete: true })
+    expect(deleteSetting.execute).toHaveBeenCalledWith({
+      userUuid: '1-2-3',
+      settingName: 'MFA_SECRET',
+      softDelete: true,
+    })
 
     expect(result.statusCode).toEqual(200)
   })
@@ -99,15 +101,19 @@ describe('AdminController', () => {
 
     deleteSetting.execute = jest.fn().mockReturnValue({ success: false })
 
-    const httpResponse = <results.JsonResult> await createController().deleteMFASetting(request)
+    const httpResponse = <results.JsonResult>await createController().deleteMFASetting(request)
     const result = await httpResponse.executeAsync()
 
-    expect(deleteSetting.execute).toHaveBeenCalledWith({ userUuid: '1-2-3', settingName: 'MFA_SECRET', softDelete: true })
+    expect(deleteSetting.execute).toHaveBeenCalledWith({
+      userUuid: '1-2-3',
+      settingName: 'MFA_SECRET',
+      softDelete: true,
+    })
 
     expect(result.statusCode).toEqual(400)
   })
 
-  it('should return a new subscription token for the user\'s uuid', async () => {
+  it("should return a new subscription token for the user's uuid", async () => {
     request.params.userUuid = '1-2-3'
 
     const httpResponse = await createController().createToken(request)
@@ -127,7 +133,7 @@ describe('AdminController', () => {
 
     deleteSetting.execute = jest.fn().mockReturnValue({ success: false })
 
-    const httpResponse = <results.OkResult> await createController().disableEmailBackups(request)
+    const httpResponse = <results.OkResult>await createController().disableEmailBackups(request)
     const result = await httpResponse.executeAsync()
 
     expect(result.statusCode).toEqual(400)
@@ -142,7 +148,7 @@ describe('AdminController', () => {
 
     deleteSetting.execute = jest.fn().mockReturnValue({ success: true })
 
-    const httpResponse = <results.OkResult> await createController().disableEmailBackups(request)
+    const httpResponse = <results.OkResult>await createController().disableEmailBackups(request)
     const result = await httpResponse.executeAsync()
 
     expect(result.statusCode).toEqual(200)

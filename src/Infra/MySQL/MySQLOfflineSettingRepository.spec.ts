@@ -31,7 +31,10 @@ describe('MySQLOfflineSettingRepository', () => {
 
     const result = await repository.findOneByNameAndEmail(OfflineSettingName.FeaturesToken, 'test@test.com')
 
-    expect(queryBuilder.where).toHaveBeenCalledWith('offline_setting.name = :name AND offline_setting.email = :email', { name: 'FEATURES_TOKEN', email: 'test@test.com' })
+    expect(queryBuilder.where).toHaveBeenCalledWith('offline_setting.name = :name AND offline_setting.email = :email', {
+      name: 'FEATURES_TOKEN',
+      email: 'test@test.com',
+    })
     expect(result).toEqual(offlineSetting)
   })
 
@@ -41,7 +44,10 @@ describe('MySQLOfflineSettingRepository', () => {
 
     const result = await repository.findOneByNameAndValue(OfflineSettingName.FeaturesToken, 'features-token')
 
-    expect(queryBuilder.where).toHaveBeenCalledWith('offline_setting.name = :name AND offline_setting.value = :value', { name: 'FEATURES_TOKEN', value: 'features-token' })
+    expect(queryBuilder.where).toHaveBeenCalledWith('offline_setting.name = :name AND offline_setting.value = :value', {
+      name: 'FEATURES_TOKEN',
+      value: 'features-token',
+    })
     expect(result).toEqual(offlineSetting)
   })
 })

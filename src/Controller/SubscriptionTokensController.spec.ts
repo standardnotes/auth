@@ -29,20 +29,21 @@ describe('SubscriptionTokensController', () => {
   let user: User
   let role: Role
 
-  const createController = () => new SubscriptionTokensController(
-    createSubscriptionToken,
-    authenticateToken,
-    settingService,
-    userProjector,
-    roleProjector,
-    tokenEncoder,
-    jwtTTL
-  )
+  const createController = () =>
+    new SubscriptionTokensController(
+      createSubscriptionToken,
+      authenticateToken,
+      settingService,
+      userProjector,
+      roleProjector,
+      tokenEncoder,
+      jwtTTL,
+    )
 
   beforeEach(() => {
     user = {} as jest.Mocked<User>
     user.uuid = '123'
-    user.roles = Promise.resolve([ role ])
+    user.roles = Promise.resolve([role])
 
     createSubscriptionToken = {} as jest.Mocked<CreateSubscriptionToken>
     createSubscriptionToken.execute = jest.fn().mockReturnValue({
@@ -86,11 +87,11 @@ describe('SubscriptionTokensController', () => {
   })
 
   it('should create an subscription token for authenticated user', async () => {
-    response.locals.user =  {
+    response.locals.user = {
       uuid: '1-2-3',
     }
 
-    const httpResponse = <results.JsonResult> await createController().createToken(request, response)
+    const httpResponse = <results.JsonResult>await createController().createToken(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(createSubscriptionToken.execute).toHaveBeenCalledWith({
@@ -101,12 +102,12 @@ describe('SubscriptionTokensController', () => {
   })
 
   it('should not create an subscription token if session has read only access', async () => {
-    response.locals.user =  {
+    response.locals.user = {
       uuid: '1-2-3',
     }
     response.locals.readOnlyAccess = true
 
-    const httpResponse = <results.JsonResult> await createController().createToken(request, response)
+    const httpResponse = <results.JsonResult>await createController().createToken(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(createSubscriptionToken.execute).not.toHaveBeenCalled()
@@ -117,7 +118,7 @@ describe('SubscriptionTokensController', () => {
   it('should validate an subscription token for user', async () => {
     request.params.token = 'test'
 
-    const httpResponse = <results.JsonResult> await createController().validate(request)
+    const httpResponse = <results.JsonResult>await createController().validate(request)
     const result = await httpResponse.executeAsync()
 
     expect(authenticateToken.execute).toHaveBeenCalledWith({
@@ -134,7 +135,7 @@ describe('SubscriptionTokensController', () => {
 
     settingService.findSettingWithDecryptedValue = jest.fn().mockReturnValue(undefined)
 
-    const httpResponse = <results.JsonResult> await createController().validate(request)
+    const httpResponse = <results.JsonResult>await createController().validate(request)
     const result = await httpResponse.executeAsync()
 
     expect(authenticateToken.execute).toHaveBeenCalledWith({
@@ -154,7 +155,7 @@ describe('SubscriptionTokensController', () => {
       success: false,
     })
 
-    const httpResponse = <results.JsonResult> await createController().validate(request)
+    const httpResponse = <results.JsonResult>await createController().validate(request)
     const result = await httpResponse.executeAsync()
 
     expect(authenticateToken.execute).toHaveBeenCalledWith({

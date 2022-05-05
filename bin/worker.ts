@@ -11,8 +11,8 @@ import { DomainEventSubscriberFactoryInterface } from '@standardnotes/domain-eve
 import * as dayjs from 'dayjs'
 import * as utc from 'dayjs/plugin/utc'
 
-const container = new ContainerConfigLoader
-void container.load().then(container => {
+const container = new ContainerConfigLoader()
+void container.load().then((container) => {
   dayjs.extend(utc)
 
   const env: Env = new Env()
@@ -25,8 +25,5 @@ void container.load().then(container => {
   const subscriberFactory: DomainEventSubscriberFactoryInterface = container.get(TYPES.DomainEventSubscriberFactory)
   subscriberFactory.create().start()
 
-  setInterval(
-    () => logger.info('Alive and kicking!'),
-    20 * 60 * 1000
-  )
+  setInterval(() => logger.info('Alive and kicking!'), 20 * 60 * 1000)
 })

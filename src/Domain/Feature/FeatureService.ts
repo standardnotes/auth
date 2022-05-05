@@ -16,13 +16,16 @@ import { TimerInterface } from '@standardnotes/time'
 export class FeatureService implements FeatureServiceInterface {
   constructor(
     @inject(TYPES.RoleToSubscriptionMap) private roleToSubscriptionMap: RoleToSubscriptionMapInterface,
-    @inject(TYPES.OfflineUserSubscriptionRepository) private offlineUserSubscriptionRepository: OfflineUserSubscriptionRepositoryInterface,
+    @inject(TYPES.OfflineUserSubscriptionRepository)
+    private offlineUserSubscriptionRepository: OfflineUserSubscriptionRepositoryInterface,
     @inject(TYPES.Timer) private timer: TimerInterface,
-  ) {
-  }
+  ) {}
 
   async getFeaturesForOfflineUser(email: string): Promise<FeatureDescription[]> {
-    const userSubscriptions = await this.offlineUserSubscriptionRepository.findByEmail(email, this.timer.getTimestampInMicroseconds())
+    const userSubscriptions = await this.offlineUserSubscriptionRepository.findByEmail(
+      email,
+      this.timer.getTimestampInMicroseconds(),
+    )
     const userRolesMap: Map<string, Role> = new Map()
     for (const userSubscription of userSubscriptions) {
       const subscriptionRoles = await userSubscription.roles
@@ -55,7 +58,7 @@ export class FeatureService implements FeatureServiceInterface {
 
   private async appendFeaturesBasedOnNonSubscriptionRoles(
     userRoles: Array<Role>,
-    userFeatures: Map<string, FeatureDescription>
+    userFeatures: Map<string, FeatureDescription>,
   ): Promise<void> {
     const nonSubscriptionRolesOfUser = this.roleToSubscriptionMap.filterNonSubscriptionRoles(userRoles)
 
@@ -67,11 +70,11 @@ export class FeatureService implements FeatureServiceInterface {
   private async appendFeaturesBasedOnSubscriptions(
     userSubscriptions: Array<UserSubscription | OfflineUserSubscription>,
     userRoles: Array<Role>,
-    userFeatures: Map<string, FeatureDescription>
+    userFeatures: Map<string, FeatureDescription>,
   ): Promise<void> {
     const userSubscriptionNames: Array<SubscriptionName> = []
 
-    userSubscriptions.map((userSubscription: UserSubscription) => {
+    userSubscriptions.map((userSubscription: UserSubscription | OfflineUserSubscription) => {
       const subscriptionName = userSubscription.planName as SubscriptionName
       if (!userSubscriptionNames.includes(subscriptionName)) {
         userSubscriptionNames.push(subscriptionName)
@@ -97,11 +100,13 @@ export class FeatureService implements FeatureServiceInterface {
   private async appendFeaturesAssociatedWithRole(
     role: Role,
     userFeatures: Map<string, FeatureDescription>,
-    longestLastingSubscription?: UserSubscription | OfflineUserSubscription
+    longestLastingSubscription?: UserSubscription | OfflineUserSubscription,
   ): Promise<void> {
     const rolePermissions = await role.permissions
     for (const rolePermission of rolePermissions) {
-      const featureForPermission = GetFeatures().find(feature => feature.permission_name === rolePermission.name) as FeatureDescription
+      const featureForPermission = GetFeatures().find(
+        (feature) => feature.permission_name === rolePermission.name,
+      ) as FeatureDescription
       if (featureForPermission === undefined) {
         continue
       }
@@ -118,18 +123,28 @@ export class FeatureService implements FeatureServiceInterface {
         continue
       }
 
-      if (longestLastingSubscription !== undefined && longestLastingSubscription.endsAt > (alreadyAddedFeature.expires_at as number)) {
+      if (
+        longestLastingSubscription !== undefined &&
+        longestLastingSubscription.endsAt > (alreadyAddedFeature.expires_at as number)
+      ) {
         alreadyAddedFeature.expires_at = longestLastingSubscription.endsAt
       }
     }
   }
 
-  private getLongestLastingSubscription(userSubscriptions: Array<UserSubscription | OfflineUserSubscription>, subscriptionName?: SubscriptionName): UserSubscription | OfflineUserSubscription {
+  private getLongestLastingSubscription(
+    userSubscriptions: Array<UserSubscription | OfflineUserSubscription>,
+    subscriptionName?: SubscriptionName,
+  ): UserSubscription | OfflineUserSubscription {
     return userSubscriptions
-      .filter(subscription => subscription.planName === subscriptionName)
+      .filter((subscription) => subscription.planName === subscriptionName)
       .sort((a, b) => {
-        if (a.endsAt < b.endsAt) { return 1 }
-        if (a.endsAt > b.endsAt) { return -1 }
+        if (a.endsAt < b.endsAt) {
+          return 1
+        }
+        if (a.endsAt > b.endsAt) {
+          return -1
+        }
         return 0
       })[0]
   }

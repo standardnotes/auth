@@ -13,8 +13,7 @@ export class RedisSubscriptionTokenRepository implements SubscriptionTokenReposi
   constructor(
     @inject(TYPES.Redis) private redisClient: IORedis.Redis,
     @inject(TYPES.Timer) private timer: TimerInterface,
-  ) {
-  }
+  ) {}
 
   async getUserUuidByToken(token: string): Promise<string | undefined> {
     const userUuid = await this.redisClient.get(`${this.PREFIX}:${token}`)

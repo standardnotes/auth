@@ -7,14 +7,14 @@ import TYPES from '../Bootstrap/Types'
 
 @injectable()
 export class ApiGatewayAuthMiddleware extends BaseMiddleware {
-  constructor (
+  constructor(
     @inject(TYPES.CrossServiceTokenDecoder) private tokenDecoder: TokenDecoderInterface<CrossServiceTokenData>,
     @inject(TYPES.Logger) private logger: Logger,
   ) {
     super()
   }
 
-  async handler (request: Request, response: Response, next: NextFunction): Promise<void> {
+  async handler(request: Request, response: Response, next: NextFunction): Promise<void> {
     try {
       if (!request.headers['x-auth-token']) {
         this.logger.debug('ApiGatewayAuthMiddleware missing x-auth-token header.')
@@ -29,7 +29,9 @@ export class ApiGatewayAuthMiddleware extends BaseMiddleware {
         return
       }
 
-      const token: CrossServiceTokenData | undefined = this.tokenDecoder.decodeToken(request.headers['x-auth-token'] as string)
+      const token: CrossServiceTokenData | undefined = this.tokenDecoder.decodeToken(
+        request.headers['x-auth-token'] as string,
+      )
 
       if (token === undefined) {
         this.logger.debug('ApiGatewayAuthMiddleware authentication failure.')

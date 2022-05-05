@@ -13,9 +13,7 @@ import { GetSubscriptionSetting } from '../Domain/UseCase/GetSubscriptionSetting
 
 @controller('/users/:userUuid')
 export class SubscriptionSettingsController extends BaseHttpController {
-  constructor(
-    @inject(TYPES.GetSubscriptionSetting) private doGetSubscriptionSetting: GetSubscriptionSetting,
-  ) {
+  constructor(@inject(TYPES.GetSubscriptionSetting) private doGetSubscriptionSetting: GetSubscriptionSetting) {
     super()
   }
 

@@ -28,15 +28,16 @@ describe('UsersController', () => {
   let response: express.Response
   let user: User
 
-  const createController = () => new UsersController(
-    updateUser,
-    getUserKeyParams,
-    deleteAccount,
-    getUserSubscription,
-    clearLoginAttempts,
-    increaseLoginAttempts,
-    changeCredentials,
-  )
+  const createController = () =>
+    new UsersController(
+      updateUser,
+      getUserKeyParams,
+      deleteAccount,
+      getUserSubscription,
+      clearLoginAttempts,
+      increaseLoginAttempts,
+      changeCredentials,
+    )
 
   beforeEach(() => {
     updateUser = {} as jest.Mocked<UpdateUser>
@@ -88,7 +89,7 @@ describe('UsersController', () => {
 
     updateUser.execute = jest.fn().mockReturnValue({ success: true, authResponse: { foo: 'bar' } })
 
-    const httpResponse = <results.JsonResult> await createController().update(request, response)
+    const httpResponse = <results.JsonResult>await createController().update(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(updateUser.execute).toHaveBeenCalledWith({
@@ -115,7 +116,7 @@ describe('UsersController', () => {
     response.locals.user = user
     response.locals.readOnlyAccess = true
 
-    const httpResponse = <results.JsonResult> await createController().update(request, response)
+    const httpResponse = <results.JsonResult>await createController().update(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(updateUser.execute).not.toHaveBeenCalled()
@@ -133,7 +134,7 @@ describe('UsersController', () => {
 
     updateUser.execute = jest.fn().mockReturnValue({ success: false })
 
-    const httpResponse = <results.JsonResult> await createController().update(request, response)
+    const httpResponse = <results.JsonResult>await createController().update(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(updateUser.execute).toHaveBeenCalledWith({
@@ -159,7 +160,7 @@ describe('UsersController', () => {
     request.headers['user-agent'] = 'Google Chrome'
     response.locals.user = user
 
-    const httpResponse = <results.JsonResult> await createController().update(request, response)
+    const httpResponse = <results.JsonResult>await createController().update(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(updateUser.execute).not.toHaveBeenCalled()
@@ -171,7 +172,7 @@ describe('UsersController', () => {
   it('should delete user', async () => {
     request.params.email = 'test@test.te'
 
-    const httpResponse = <results.JsonResult> await createController().deleteAccount(request)
+    const httpResponse = <results.JsonResult>await createController().deleteAccount(request)
     const result = await httpResponse.executeAsync()
 
     expect(deleteAccount.execute).toHaveBeenCalledWith({ email: 'test@test.te' })
@@ -188,7 +189,7 @@ describe('UsersController', () => {
 
     getUserKeyParams.execute = jest.fn().mockReturnValue({ foo: 'bar' })
 
-    const httpResponse = <results.JsonResult> await createController().keyParams(request)
+    const httpResponse = <results.JsonResult>await createController().keyParams(request)
     const result = await httpResponse.executeAsync()
 
     expect(getUserKeyParams.execute).toHaveBeenCalledWith({
@@ -209,7 +210,7 @@ describe('UsersController', () => {
 
     getUserKeyParams.execute = jest.fn().mockReturnValue({ foo: 'bar' })
 
-    const httpResponse = <results.JsonResult> await createController().keyParams(request)
+    const httpResponse = <results.JsonResult>await createController().keyParams(request)
     const result = await httpResponse.executeAsync()
 
     expect(getUserKeyParams.execute).toHaveBeenCalledWith({
@@ -222,12 +223,11 @@ describe('UsersController', () => {
   })
 
   it('should not get user key params if email and user uuid is missing', async () => {
-    request.query = {
-    }
+    request.query = {}
 
     getUserKeyParams.execute = jest.fn().mockReturnValue({ foo: 'bar' })
 
-    const httpResponse = <results.JsonResult> await createController().keyParams(request)
+    const httpResponse = <results.JsonResult>await createController().keyParams(request)
     const result = await httpResponse.executeAsync()
 
     expect(getUserKeyParams.execute).not.toHaveBeenCalled()
@@ -245,7 +245,7 @@ describe('UsersController', () => {
       success: true,
     })
 
-    const httpResponse = <results.JsonResult> await createController().getSubscription(request, response)
+    const httpResponse = <results.JsonResult>await createController().getSubscription(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(getUserSubscription.execute).toHaveBeenCalledWith({
@@ -265,13 +265,12 @@ describe('UsersController', () => {
       success: false,
     })
 
-    const httpResponse = <results.JsonResult> await createController().getSubscription(request, response)
+    const httpResponse = <results.JsonResult>await createController().getSubscription(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(getUserSubscription.execute).toHaveBeenCalledWith({ userUuid: '1-2-3' })
 
     expect(result.statusCode).toEqual(400)
-
   })
 
   it('should not get user subscription if not allowed', async () => {
@@ -282,7 +281,7 @@ describe('UsersController', () => {
 
     getUserSubscription.execute = jest.fn()
 
-    const httpResponse = <results.JsonResult> await createController().getSubscription(request, response)
+    const httpResponse = <results.JsonResult>await createController().getSubscription(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(getUserSubscription.execute).not.toHaveBeenCalled()
@@ -303,7 +302,7 @@ describe('UsersController', () => {
 
     changeCredentials.execute = jest.fn().mockReturnValue({ success: true, authResponse: { foo: 'bar' } })
 
-    const httpResponse = <results.JsonResult> await createController().changeCredentials(request, response)
+    const httpResponse = <results.JsonResult>await createController().changeCredentials(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(changeCredentials.execute).toHaveBeenCalledWith({
@@ -339,7 +338,7 @@ describe('UsersController', () => {
     response.locals.user = user
     response.locals.readOnlyAccess = true
 
-    const httpResponse = <results.JsonResult> await createController().changeCredentials(request, response)
+    const httpResponse = <results.JsonResult>await createController().changeCredentials(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(changeCredentials.execute).not.toHaveBeenCalled()
@@ -360,7 +359,7 @@ describe('UsersController', () => {
 
     changeCredentials.execute = jest.fn().mockReturnValue({ success: false, errorMessage: 'Something bad happened' })
 
-    const httpResponse = <results.JsonResult> await createController().changeCredentials(request, response)
+    const httpResponse = <results.JsonResult>await createController().changeCredentials(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(increaseLoginAttempts.execute).toHaveBeenCalled()
@@ -377,13 +376,15 @@ describe('UsersController', () => {
     request.headers['user-agent'] = 'Google Chrome'
     response.locals.user = user
 
-    const httpResponse = <results.JsonResult> await createController().changeCredentials(request, response)
+    const httpResponse = <results.JsonResult>await createController().changeCredentials(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(changeCredentials.execute).not.toHaveBeenCalled()
 
     expect(result.statusCode).toEqual(400)
-    expect(await result.content.readAsStringAsync()).toEqual('{"error":{"message":"Your current password is required to change your password. Please update your application if you do not see this option."}}')
+    expect(await result.content.readAsStringAsync()).toEqual(
+      '{"error":{"message":"Your current password is required to change your password. Please update your application if you do not see this option."}}',
+    )
   })
 
   it('should not change a password if new password is missing', async () => {
@@ -394,13 +395,15 @@ describe('UsersController', () => {
     request.headers['user-agent'] = 'Google Chrome'
     response.locals.user = user
 
-    const httpResponse = <results.JsonResult> await createController().changeCredentials(request, response)
+    const httpResponse = <results.JsonResult>await createController().changeCredentials(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(changeCredentials.execute).not.toHaveBeenCalled()
 
     expect(result.statusCode).toEqual(400)
-    expect(await result.content.readAsStringAsync()).toEqual('{"error":{"message":"Your new password is required to change your password. Please try again."}}')
+    expect(await result.content.readAsStringAsync()).toEqual(
+      '{"error":{"message":"Your new password is required to change your password. Please try again."}}',
+    )
   })
 
   it('should not change a password if password nonce is missing', async () => {
@@ -411,12 +414,14 @@ describe('UsersController', () => {
     request.headers['user-agent'] = 'Google Chrome'
     response.locals.user = user
 
-    const httpResponse = <results.JsonResult> await createController().changeCredentials(request, response)
+    const httpResponse = <results.JsonResult>await createController().changeCredentials(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(changeCredentials.execute).not.toHaveBeenCalled()
 
     expect(result.statusCode).toEqual(400)
-    expect(await result.content.readAsStringAsync()).toEqual('{"error":{"message":"The change password request is missing new auth parameters. Please try again."}}')
+    expect(await result.content.readAsStringAsync()).toEqual(
+      '{"error":{"message":"The change password request is missing new auth parameters. Please try again."}}',
+    )
   })
 })

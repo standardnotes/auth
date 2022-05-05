@@ -9,11 +9,10 @@ import { Setting } from '../../Setting/Setting'
 
 @injectable()
 export class DeleteSetting implements UseCaseInterface {
-  constructor (
+  constructor(
     @inject(TYPES.SettingRepository) private settingRepository: SettingRepositoryInterface,
     @inject(TYPES.Timer) private timer: TimerInterface,
-  ) {
-  }
+  ) {}
 
   async execute(dto: DeleteSettingDto): Promise<DeleteSettingResponse> {
     const { userUuid, settingName } = dto

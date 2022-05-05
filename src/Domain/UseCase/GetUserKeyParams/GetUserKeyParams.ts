@@ -13,13 +13,12 @@ import { KeyParamsData } from '@standardnotes/responses'
 
 @injectable()
 export class GetUserKeyParams implements UseCaseInterface {
-  constructor (
+  constructor(
     @inject(TYPES.KeyParamsFactory) private keyParamsFactory: KeyParamsFactoryInterface,
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
     @inject(TYPES.PKCERepository) private pkceRepository: PKCERepositoryInterface,
-    @inject(TYPES.Logger) private logger: Logger
-  ) {
-  }
+    @inject(TYPES.Logger) private logger: Logger,
+  ) {}
 
   async execute(dto: GetUserKeyParamsDTO): Promise<GetUserKeyParamsResponse> {
     if (dto.authenticatedUser) {

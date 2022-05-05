@@ -19,13 +19,8 @@ describe('VerifyMFA', () => {
   let lockRepository: LockRepositoryInterface
   const pseudoKeyParamsKey = 'foobar'
 
-  const createVerifyMFA = () => new VerifyMFA(
-    userRepository,
-    settingService,
-    booleanSelector,
-    lockRepository,
-    pseudoKeyParamsKey,
-  )
+  const createVerifyMFA = () =>
+    new VerifyMFA(userRepository, settingService, booleanSelector, lockRepository, pseudoKeyParamsKey)
 
   beforeEach(() => {
     user = {} as jest.Mocked<User>
@@ -52,7 +47,9 @@ describe('VerifyMFA', () => {
   it('should pass MFA verification if user has no MFA enabled', async () => {
     settingService.findSettingWithDecryptedValue = jest.fn().mockReturnValue(undefined)
 
-    expect(await createVerifyMFA().execute({ email: 'test@test.te', requestParams: {}, preventOTPFromFurtherUsage: true })).toEqual({
+    expect(
+      await createVerifyMFA().execute({ email: 'test@test.te', requestParams: {}, preventOTPFromFurtherUsage: true }),
+    ).toEqual({
       success: true,
     })
 
@@ -67,7 +64,9 @@ describe('VerifyMFA', () => {
 
     settingService.findSettingWithDecryptedValue = jest.fn().mockReturnValue(setting)
 
-    expect(await createVerifyMFA().execute({ email: 'test@test.te', requestParams: {}, preventOTPFromFurtherUsage: true })).toEqual({
+    expect(
+      await createVerifyMFA().execute({ email: 'test@test.te', requestParams: {}, preventOTPFromFurtherUsage: true }),
+    ).toEqual({
       success: true,
     })
 
@@ -76,7 +75,9 @@ describe('VerifyMFA', () => {
 
   it('should pass MFA verification if user is not found and pseudo mfa is not required', async () => {
     userRepository.findOneByEmail = jest.fn().mockReturnValue(undefined)
-    expect(await createVerifyMFA().execute({ email: 'test@test.te', requestParams: {}, preventOTPFromFurtherUsage: true })).toEqual({
+    expect(
+      await createVerifyMFA().execute({ email: 'test@test.te', requestParams: {}, preventOTPFromFurtherUsage: true }),
+    ).toEqual({
       success: true,
     })
 
@@ -87,7 +88,9 @@ describe('VerifyMFA', () => {
     booleanSelector.select = jest.fn().mockReturnValue(true)
     userRepository.findOneByEmail = jest.fn().mockReturnValue(undefined)
 
-    expect(await createVerifyMFA().execute({ email: 'test@test.te', requestParams: {}, preventOTPFromFurtherUsage: true })).toEqual({
+    expect(
+      await createVerifyMFA().execute({ email: 'test@test.te', requestParams: {}, preventOTPFromFurtherUsage: true }),
+    ).toEqual({
       success: false,
       errorTag: 'mfa-required',
       errorMessage: 'Please enter your two-factor authentication code.',
@@ -96,7 +99,13 @@ describe('VerifyMFA', () => {
   })
 
   it('should pass MFA verification if mfa key is correctly encrypted', async () => {
-    expect(await createVerifyMFA().execute({ email: 'test@test.te', requestParams: { 'mfa_1-2-3': authenticator.generate('shhhh') }, preventOTPFromFurtherUsage: true })).toEqual({
+    expect(
+      await createVerifyMFA().execute({
+        email: 'test@test.te',
+        requestParams: { 'mfa_1-2-3': authenticator.generate('shhhh') },
+        preventOTPFromFurtherUsage: true,
+      }),
+    ).toEqual({
       success: true,
     })
 
@@ -104,7 +113,13 @@ describe('VerifyMFA', () => {
   })
 
   it('should pass MFA verification without locking otp', async () => {
-    expect(await createVerifyMFA().execute({ email: 'test@test.te', requestParams: { 'mfa_1-2-3': authenticator.generate('shhhh') }, preventOTPFromFurtherUsage: false })).toEqual({
+    expect(
+      await createVerifyMFA().execute({
+        email: 'test@test.te',
+        requestParams: { 'mfa_1-2-3': authenticator.generate('shhhh') },
+        preventOTPFromFurtherUsage: false,
+      }),
+    ).toEqual({
       success: true,
     })
 
@@ -114,10 +129,17 @@ describe('VerifyMFA', () => {
   it('should not pass MFA verification if otp is already used within lock out period', async () => {
     lockRepository.isOTPLocked = jest.fn().mockReturnValue(true)
 
-    expect(await createVerifyMFA().execute({ email: 'test@test.te', requestParams: { 'mfa_1-2-3': authenticator.generate('shhhh') }, preventOTPFromFurtherUsage: true })).toEqual({
+    expect(
+      await createVerifyMFA().execute({
+        email: 'test@test.te',
+        requestParams: { 'mfa_1-2-3': authenticator.generate('shhhh') },
+        preventOTPFromFurtherUsage: true,
+      }),
+    ).toEqual({
       success: false,
       errorTag: 'mfa-invalid',
-      errorMessage: 'The two-factor authentication code you entered has been already utilized. Please try again in a while.',
+      errorMessage:
+        'The two-factor authentication code you entered has been already utilized. Please try again in a while.',
       errorPayload: { mfa_key: 'mfa_1-2-3' },
     })
 
@@ -133,7 +155,13 @@ describe('VerifyMFA', () => {
     settingService = {} as jest.Mocked<SettingServiceInterface>
     settingService.findSettingWithDecryptedValue = jest.fn().mockReturnValue(setting)
 
-    expect(await createVerifyMFA().execute({ email: 'test@test.te', requestParams: { 'mfa_1-2-3': 'test' }, preventOTPFromFurtherUsage: true })).toEqual({
+    expect(
+      await createVerifyMFA().execute({
+        email: 'test@test.te',
+        requestParams: { 'mfa_1-2-3': 'test' },
+        preventOTPFromFurtherUsage: true,
+      }),
+    ).toEqual({
       success: false,
       errorTag: 'mfa-invalid',
       errorMessage: 'The two-factor authentication code you entered is incorrect. Please try again.',
@@ -142,7 +170,13 @@ describe('VerifyMFA', () => {
   })
 
   it('should not pass MFA verification if no mfa param is found in the request', async () => {
-    expect(await createVerifyMFA().execute({ email: 'test@test.te', requestParams: { 'foo': 'bar' }, preventOTPFromFurtherUsage: true })).toEqual({
+    expect(
+      await createVerifyMFA().execute({
+        email: 'test@test.te',
+        requestParams: { foo: 'bar' },
+        preventOTPFromFurtherUsage: true,
+      }),
+    ).toEqual({
       success: false,
       errorTag: 'mfa-required',
       errorMessage: 'Please enter your two-factor authentication code.',
@@ -157,7 +191,11 @@ describe('VerifyMFA', () => {
 
     let error = null
     try {
-      await createVerifyMFA().execute({ email: 'test@test.te', requestParams: { 'mfa_1-2-3': 'test' }, preventOTPFromFurtherUsage: true })
+      await createVerifyMFA().execute({
+        email: 'test@test.te',
+        requestParams: { 'mfa_1-2-3': 'test' },
+        preventOTPFromFurtherUsage: true,
+      })
     } catch (caughtError) {
       error = caughtError
     }

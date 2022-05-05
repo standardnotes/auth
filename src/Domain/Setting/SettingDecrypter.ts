@@ -12,8 +12,7 @@ export class SettingDecrypter implements SettingDecrypterInterface {
   constructor(
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
     @inject(TYPES.Crypter) private crypter: CrypterInterface,
-  ) {
-  }
+  ) {}
 
   async decryptSettingValue(setting: Setting | SubscriptionSetting, userUuid: string): Promise<string | null> {
     if (setting.value !== null && setting.serverEncryptionVersion === EncryptionVersion.Default) {
@@ -28,5 +27,4 @@ export class SettingDecrypter implements SettingDecrypterInterface {
 
     return setting.value
   }
-
 }

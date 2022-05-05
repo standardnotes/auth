@@ -40,18 +40,21 @@ export class SessionsController extends BaseHttpController {
     })
 
     if (!authenticateRequestResponse.success) {
-      return this.json({
-        error: {
-          tag: authenticateRequestResponse.errorTag,
-          message: authenticateRequestResponse.errorMessage,
+      return this.json(
+        {
+          error: {
+            tag: authenticateRequestResponse.errorTag,
+            message: authenticateRequestResponse.errorMessage,
+          },
         },
-      }, authenticateRequestResponse.responseCode)
+        authenticateRequestResponse.responseCode,
+      )
     }
 
-    const roles = await (<User> authenticateRequestResponse.user).roles
+    const roles = await (<User>authenticateRequestResponse.user).roles
 
     const authTokenData: CrossServiceTokenData = {
-      user: this.projectUser(<User> authenticateRequestResponse.user),
+      user: this.projectUser(<User>authenticateRequestResponse.user),
       roles: this.projectRoles(roles),
     }
 
@@ -71,40 +74,41 @@ export class SessionsController extends BaseHttpController {
     })
 
     return this.json(
-      useCaseResponse.sessions.map(
-        (session) => this.sessionProjector.projectCustom(
+      useCaseResponse.sessions.map((session) =>
+        this.sessionProjector.projectCustom(
           SessionProjector.CURRENT_SESSION_PROJECTION.toString(),
           session,
-          response.locals.session
-        )
-      )
+          response.locals.session,
+        ),
+      ),
     )
   }
 
-  private projectUser(user: User): { uuid: string, email: string} {
-    return <{ uuid: string, email: string}> this.userProjector.projectSimple(user)
+  private projectUser(user: User): { uuid: string; email: string } {
+    return <{ uuid: string; email: string }>this.userProjector.projectSimple(user)
   }
 
-  private projectSession(session: Session):
-  {
-    uuid: string,
-    api_version: string,
-    created_at: string,
-    updated_at: string,
-    device_info: string,
-    readonly_access: boolean,
+  private projectSession(session: Session): {
+    uuid: string
+    api_version: string
+    created_at: string
+    updated_at: string
+    device_info: string
+    readonly_access: boolean
   } {
-    return <{
-      uuid: string,
-      api_version: string,
-      created_at: string,
-      updated_at: string,
-      device_info: string,
-      readonly_access: boolean,
-    }> this.sessionProjector.projectSimple(session)
+    return <
+      {
+        uuid: string
+        api_version: string
+        created_at: string
+        updated_at: string
+        device_info: string
+        readonly_access: boolean
+      }
+    >this.sessionProjector.projectSimple(session)
   }
 
-  private projectRoles(roles: Array<Role>): Array<{ uuid: string, name: RoleName }> {
-    return roles.map(role => <{ uuid: string, name: RoleName }> this.roleProjector.projectSimple(role))
+  private projectRoles(roles: Array<Role>): Array<{ uuid: string; name: RoleName }> {
+    return roles.map((role) => <{ uuid: string; name: RoleName }>this.roleProjector.projectSimple(role))
   }
 }

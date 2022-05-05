@@ -26,7 +26,8 @@ import { SignInDTOV2Challenged } from './SignInDTOV2Challenged'
 export class SignIn implements UseCaseInterface {
   constructor(
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
-    @inject(TYPES.AuthResponseFactoryResolver) private authResponseFactoryResolver: AuthResponseFactoryResolverInterface,
+    @inject(TYPES.AuthResponseFactoryResolver)
+    private authResponseFactoryResolver: AuthResponseFactoryResolverInterface,
     @inject(TYPES.DomainEventPublisher) private domainEventPublisher: DomainEventPublisherInterface,
     @inject(TYPES.DomainEventFactory) private domainEventFactory: DomainEventFactoryInterface,
     @inject(TYPES.SessionService) private sessionService: SessionServiceInterface,
@@ -34,9 +35,8 @@ export class SignIn implements UseCaseInterface {
     @inject(TYPES.SettingService) private settingService: SettingServiceInterface,
     @inject(TYPES.PKCERepository) private pkceRepository: PKCERepositoryInterface,
     @inject(TYPES.Crypter) private crypter: CrypterInterface,
-    @inject(TYPES.Logger) private logger: Logger
-  ){
-  }
+    @inject(TYPES.Logger) private logger: Logger,
+  ) {}
 
   async execute(dto: SignInDTO): Promise<SignInResponse> {
     if (this.isCodeChallengedVersion(dto)) {
@@ -89,9 +89,7 @@ export class SignIn implements UseCaseInterface {
   }
 
   private async validateCodeVerifier(codeVerifier: string): Promise<boolean> {
-    const codeChallenge = this.crypter.base64URLEncode(
-      this.crypter.sha256Hash(codeVerifier)
-    )
+    const codeChallenge = this.crypter.base64URLEncode(this.crypter.sha256Hash(codeVerifier))
 
     const matchingCodeChallengeWasPresentAndRemoved = await this.pkceRepository.removeCodeChallenge(codeChallenge)
 
@@ -108,9 +106,11 @@ export class SignIn implements UseCaseInterface {
           userEmail: user.email,
           device: this.sessionService.getOperatingSystemInfoFromUserAgent(userAgent),
           browser: this.sessionService.getBrowserInfoFromUserAgent(userAgent),
-          signInAlertEnabled: await this.roleService.userHasPermission(user.uuid, PermissionName.SignInAlerts) && muteSignInEmailsSetting.value === MuteSignInEmailsOption.NotMuted,
+          signInAlertEnabled:
+            (await this.roleService.userHasPermission(user.uuid, PermissionName.SignInAlerts)) &&
+            muteSignInEmailsSetting.value === MuteSignInEmailsOption.NotMuted,
           muteSignInEmailsSettingUuid: muteSignInEmailsSetting.uuid,
-        })
+        }),
       )
     } catch (error) {
       this.logger.error(`Could not publish sign in event: ${error.message}`)

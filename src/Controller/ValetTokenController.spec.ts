@@ -10,9 +10,7 @@ describe('ValetTokenController', () => {
   let request: Request
   let response: Response
 
-  const createController = () => new ValetTokenController(
-    createValetToken
-  )
+  const createController = () => new ValetTokenController(createValetToken)
 
   beforeEach(() => {
     createValetToken = {} as jest.Mocked<CreateValetToken>
@@ -33,13 +31,13 @@ describe('ValetTokenController', () => {
   })
 
   it('should create a valet token', async () => {
-    const httpResponse = <results.JsonResult> await createController().create(request, response)
+    const httpResponse = <results.JsonResult>await createController().create(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(createValetToken.execute).toHaveBeenCalledWith({
       operation: 'write',
       userUuid: '1-2-3',
-      resources: [ '1-2-3/2-3-4' ],
+      resources: ['1-2-3/2-3-4'],
     })
     expect(await result.content.readAsStringAsync()).toEqual('{"success":true,"valetToken":"foobar"}')
   })
@@ -48,13 +46,13 @@ describe('ValetTokenController', () => {
     response.locals.readOnlyAccess = true
     request.body.operation = 'read'
 
-    const httpResponse = <results.JsonResult> await createController().create(request, response)
+    const httpResponse = <results.JsonResult>await createController().create(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(createValetToken.execute).toHaveBeenCalledWith({
       operation: 'read',
       userUuid: '1-2-3',
-      resources: [ '1-2-3/2-3-4' ],
+      resources: ['1-2-3/2-3-4'],
     })
     expect(await result.content.readAsStringAsync()).toEqual('{"success":true,"valetToken":"foobar"}')
   })
@@ -63,7 +61,7 @@ describe('ValetTokenController', () => {
     response.locals.readOnlyAccess = true
     request.body.operation = 'write'
 
-    const httpResponse = <results.JsonResult> await createController().create(request, response)
+    const httpResponse = <results.JsonResult>await createController().create(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(createValetToken.execute).not.toHaveBeenCalled()
@@ -75,7 +73,7 @@ describe('ValetTokenController', () => {
     response.locals.readOnlyAccess = true
     request.body.operation = 'delete'
 
-    const httpResponse = <results.JsonResult> await createController().create(request, response)
+    const httpResponse = <results.JsonResult>await createController().create(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(createValetToken.execute).not.toHaveBeenCalled()
@@ -86,13 +84,13 @@ describe('ValetTokenController', () => {
   it('should not create a valet token if use case fails', async () => {
     createValetToken.execute = jest.fn().mockReturnValue({ success: false })
 
-    const httpResponse = <results.JsonResult> await createController().create(request, response)
+    const httpResponse = <results.JsonResult>await createController().create(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(createValetToken.execute).toHaveBeenCalledWith({
       operation: 'write',
       userUuid: '1-2-3',
-      resources: [ '1-2-3/2-3-4' ],
+      resources: ['1-2-3/2-3-4'],
     })
 
     expect(await result.content.readAsStringAsync()).toEqual('{"success":false}')

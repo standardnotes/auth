@@ -1,3 +1,3 @@
 export type GetUserOfflineSubscriptionDto = {
-  userEmail: string,
+  userEmail: string
 }

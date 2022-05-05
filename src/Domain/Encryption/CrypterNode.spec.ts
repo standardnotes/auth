@@ -57,13 +57,9 @@ describe('CrypterNode', () => {
   })
 
   it('should encrypt a value for user', async () => {
-    expect(await createCrypter().encryptForUser(unencrypted, user))
-      .toEqual(version(encrypted))
+    expect(await createCrypter().encryptForUser(unencrypted, user)).toEqual(version(encrypted))
 
-    expect(crypto.aes256GcmDecrypt).toHaveBeenCalledWith(
-      encryptedUserKey,
-      serverKey,
-    )
+    expect(crypto.aes256GcmDecrypt).toHaveBeenCalledWith(encryptedUserKey, serverKey)
 
     expect(crypto.aes256GcmEncrypt).toHaveBeenCalledWith({ unencrypted, iv, key: decrypted })
   })
@@ -78,12 +74,9 @@ describe('CrypterNode', () => {
 
   it('should generate an encrypted user server key', async () => {
     const anotherUserKey = 'anotherUserKey'
-    crypto.generateRandomKey = jest.fn()
-      .mockReturnValueOnce(anotherUserKey)
-      .mockReturnValueOnce(iv)
+    crypto.generateRandomKey = jest.fn().mockReturnValueOnce(anotherUserKey).mockReturnValueOnce(iv)
 
-    expect(await createCrypter().generateEncryptedUserServerKey())
-      .toEqual(version(encrypted))
+    expect(await createCrypter().generateEncryptedUserServerKey()).toEqual(version(encrypted))
 
     expect(crypto.aes256GcmEncrypt).toHaveBeenCalledWith({
       unencrypted: anotherUserKey,

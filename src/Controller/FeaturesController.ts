@@ -12,20 +12,21 @@ import { GetUserFeatures } from '../Domain/UseCase/GetUserFeatures/GetUserFeatur
 
 @controller('/users/:userUuid/features')
 export class FeaturesController extends BaseHttpController {
-  constructor(
-    @inject(TYPES.GetUserFeatures) private doGetUserFeatures: GetUserFeatures,
-  ) {
+  constructor(@inject(TYPES.GetUserFeatures) private doGetUserFeatures: GetUserFeatures) {
     super()
   }
 
   @httpGet('/', TYPES.ApiGatewayAuthMiddleware)
   async getFeatures(request: Request, response: Response): Promise<results.JsonResult> {
     if (request.params.userUuid !== response.locals.user.uuid) {
-      return this.json({
-        error: {
-          message: 'Operation not allowed.',
+      return this.json(
+        {
+          error: {
+            message: 'Operation not allowed.',
+          },
         },
-      }, 401)
+        401,
+      )
     }
 
     const result = await this.doGetUserFeatures.execute({

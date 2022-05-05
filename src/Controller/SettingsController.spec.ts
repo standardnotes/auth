@@ -21,12 +21,7 @@ describe('SettingsController', () => {
   let response: express.Response
   let user: User
 
-  const createController = () => new SettingsController(
-    getSettings,
-    getSetting,
-    updateSetting,
-    deleteSetting,
-  )
+  const createController = () => new SettingsController(getSettings, getSetting, updateSetting, deleteSetting)
 
   beforeEach(() => {
     deleteSetting = {} as jest.Mocked<DeleteSetting>
@@ -61,7 +56,7 @@ describe('SettingsController', () => {
       uuid: '1-2-3',
     }
 
-    const httpResponse = <results.JsonResult> await createController().getSettings(request, response)
+    const httpResponse = <results.JsonResult>await createController().getSettings(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(getSettings.execute).toHaveBeenCalledWith({ userUuid: '1-2-3' })
@@ -75,7 +70,7 @@ describe('SettingsController', () => {
       uuid: '2-3-4',
     }
 
-    const httpResponse = <results.JsonResult> await createController().getSettings(request, response)
+    const httpResponse = <results.JsonResult>await createController().getSettings(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(getSettings.execute).not.toHaveBeenCalled()
@@ -92,7 +87,7 @@ describe('SettingsController', () => {
 
     getSetting.execute = jest.fn().mockReturnValue({ success: true })
 
-    const httpResponse = <results.JsonResult> await createController().getSetting(request, response)
+    const httpResponse = <results.JsonResult>await createController().getSetting(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(getSetting.execute).toHaveBeenCalledWith({ userUuid: '1-2-3', settingName: 'test' })
@@ -109,7 +104,7 @@ describe('SettingsController', () => {
 
     getSetting.execute = jest.fn()
 
-    const httpResponse = <results.JsonResult> await createController().getSetting(request, response)
+    const httpResponse = <results.JsonResult>await createController().getSetting(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(getSetting.execute).not.toHaveBeenCalled()
@@ -126,7 +121,7 @@ describe('SettingsController', () => {
 
     getSetting.execute = jest.fn().mockReturnValue({ success: false })
 
-    const httpResponse = <results.JsonResult> await createController().getSetting(request, response)
+    const httpResponse = <results.JsonResult>await createController().getSetting(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(getSetting.execute).toHaveBeenCalledWith({ userUuid: '1-2-3', settingName: 'test' })
@@ -147,7 +142,7 @@ describe('SettingsController', () => {
 
     updateSetting.execute = jest.fn().mockReturnValue({ success: true, statusCode: 200 })
 
-    const httpResponse = <results.JsonResult> await createController().updateSetting(request, response)
+    const httpResponse = <results.JsonResult>await createController().updateSetting(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(updateSetting.execute).toHaveBeenCalledWith({
@@ -177,7 +172,7 @@ describe('SettingsController', () => {
 
     updateSetting.execute = jest.fn().mockReturnValue({ success: true, statusCode: 200 })
 
-    const httpResponse = <results.JsonResult> await createController().updateSetting(request, response)
+    const httpResponse = <results.JsonResult>await createController().updateSetting(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(updateSetting.execute).toHaveBeenCalledWith({
@@ -205,7 +200,7 @@ describe('SettingsController', () => {
       value: 'bar',
     }
 
-    const httpResponse = <results.JsonResult> await createController().updateSetting(request, response)
+    const httpResponse = <results.JsonResult>await createController().updateSetting(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(updateSetting.execute).not.toHaveBeenCalled()
@@ -227,7 +222,7 @@ describe('SettingsController', () => {
 
     updateSetting.execute = jest.fn()
 
-    const httpResponse = <results.JsonResult> await createController().updateSetting(request, response)
+    const httpResponse = <results.JsonResult>await createController().updateSetting(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(updateSetting.execute).not.toHaveBeenCalled()
@@ -249,7 +244,7 @@ describe('SettingsController', () => {
 
     updateSetting.execute = jest.fn().mockReturnValue({ success: false, statusCode: 404 })
 
-    const httpResponse = <results.JsonResult> await createController().updateSetting(request, response)
+    const httpResponse = <results.JsonResult>await createController().updateSetting(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(updateSetting.execute).toHaveBeenCalledWith({
@@ -274,7 +269,7 @@ describe('SettingsController', () => {
 
     deleteSetting.execute = jest.fn().mockReturnValue({ success: true })
 
-    const httpResponse = <results.JsonResult> await createController().deleteSetting(request, response)
+    const httpResponse = <results.JsonResult>await createController().deleteSetting(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(deleteSetting.execute).toHaveBeenCalledWith({ userUuid: '1-2-3', settingName: 'foo' })
@@ -290,7 +285,7 @@ describe('SettingsController', () => {
     }
     response.locals.readOnlyAccess = true
 
-    const httpResponse = <results.JsonResult> await createController().deleteSetting(request, response)
+    const httpResponse = <results.JsonResult>await createController().deleteSetting(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(deleteSetting.execute).not.toHaveBeenCalled()
@@ -307,7 +302,7 @@ describe('SettingsController', () => {
 
     deleteSetting.execute = jest.fn()
 
-    const httpResponse = <results.JsonResult> await createController().deleteSetting(request, response)
+    const httpResponse = <results.JsonResult>await createController().deleteSetting(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(deleteSetting.execute).not.toHaveBeenCalled()
@@ -324,7 +319,7 @@ describe('SettingsController', () => {
 
     deleteSetting.execute = jest.fn().mockReturnValue({ success: false })
 
-    const httpResponse = <results.JsonResult> await createController().deleteSetting(request, response)
+    const httpResponse = <results.JsonResult>await createController().deleteSetting(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(deleteSetting.execute).toHaveBeenCalledWith({ userUuid: '1-2-3', settingName: 'foo' })
