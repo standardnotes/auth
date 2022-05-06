@@ -9,6 +9,7 @@ import { RoleServiceInterface } from '../Role/RoleServiceInterface'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { Logger } from 'winston'
 import { OfflineUserSubscription } from '../Subscription/OfflineUserSubscription'
+import { User } from '../User/User'
 
 @injectable()
 export class SubscriptionRenewedEventHandler implements DomainEventHandlerInterface {
@@ -60,7 +61,7 @@ export class SubscriptionRenewedEventHandler implements DomainEventHandlerInterf
   private async addRoleToSubscriptionUsers(subscriptionId: number, subscriptionName: SubscriptionName): Promise<void> {
     const userSubscriptions = await this.userSubscriptionRepository.findBySubscriptionId(subscriptionId)
     for (const userSubscription of userSubscriptions) {
-      const user = await userSubscription.user
+      const user = await (userSubscription.user as Promise<User>)
 
       await this.roleService.addUserRole(user, subscriptionName)
     }

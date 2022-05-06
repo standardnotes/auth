@@ -52,7 +52,7 @@ export class Role {
       referencedColumnName: 'uuid',
     },
   })
-  users!: Promise<Array<User>>
+  users: Promise<Array<User>> | undefined
 
   @ManyToMany(
     /* istanbul ignore next */
@@ -69,7 +69,7 @@ export class Role {
       referencedColumnName: 'uuid',
     },
   })
-  permissions!: Promise<Array<Permission>>
+  permissions: Promise<Array<Permission>> | undefined
 
   @ManyToMany(
     /* istanbul ignore next */
@@ -86,5 +86,5 @@ export class Role {
       referencedColumnName: 'uuid',
     },
   })
-  offlineUserSubscriptions!: Promise<Array<OfflineUserSubscription>>
+  offlineUserSubscriptions: Promise<Array<OfflineUserSubscription>> | undefined
 }

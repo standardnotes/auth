@@ -48,7 +48,7 @@ export class SubscriptionSetting {
     { onDelete: 'CASCADE', nullable: false },
   )
   @JoinColumn({ name: 'user_subscription_uuid', referencedColumnName: 'uuid' })
-  userSubscription!: Promise<UserSubscription>
+  userSubscription: Promise<UserSubscription> | undefined
 
   @Column({
     type: 'tinyint',

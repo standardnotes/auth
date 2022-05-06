@@ -68,5 +68,5 @@ export class OfflineUserSubscription {
       referencedColumnName: 'uuid',
     },
   })
-  roles!: Promise<Array<Role>>
+  roles: Promise<Array<Role>> | undefined
 }

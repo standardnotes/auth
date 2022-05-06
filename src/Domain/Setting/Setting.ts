@@ -48,7 +48,7 @@ export class Setting {
     { onDelete: 'CASCADE', nullable: false },
   )
   @JoinColumn({ name: 'user_uuid', referencedColumnName: 'uuid' })
-  user!: Promise<User>
+  user: Promise<User> | undefined
 
   @Column({
     type: 'tinyint',

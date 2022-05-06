@@ -138,7 +138,7 @@ export class User {
     /* istanbul ignore next */
     (revokedSession) => revokedSession.user,
   )
-  revokedSessions!: Promise<RevokedSession[]>
+  revokedSessions: Promise<RevokedSession[]> | undefined
 
   @OneToMany(
     /* istanbul ignore next */
@@ -146,7 +146,7 @@ export class User {
     /* istanbul ignore next */
     (setting) => setting.user,
   )
-  settings!: Promise<Setting[]>
+  settings: Promise<Setting[]> | undefined
 
   @ManyToMany(
     /* istanbul ignore next */
@@ -163,7 +163,7 @@ export class User {
       referencedColumnName: 'uuid',
     },
   })
-  roles!: Promise<Array<Role>>
+  roles: Promise<Array<Role>> | undefined
 
   @OneToMany(
     /* istanbul ignore next */
@@ -171,7 +171,7 @@ export class User {
     /* istanbul ignore next */
     (subscription) => subscription.user,
   )
-  subscriptions!: Promise<UserSubscription[]>
+  subscriptions!: Promise<UserSubscription[]> | undefined
 
   supportsSessions(): boolean {
     return parseInt(this.version) >= this.SESSIONS_PROTOCOL_VERSION

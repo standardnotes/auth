@@ -12,6 +12,7 @@ import { SubscriptionSettingServiceInterface } from '../../Setting/SubscriptionS
 import { CreateValetTokenDTO } from './CreateValetTokenDTO'
 import { SubscriptionSettingsAssociationServiceInterface } from '../../Setting/SubscriptionSettingsAssociationServiceInterface'
 import { UserSubscriptionServiceInterface } from '../../Subscription/UserSubscriptionServiceInterface'
+import { User } from '../../User/User'
 
 @injectable()
 export class CreateValetToken implements UseCaseInterface {
@@ -50,7 +51,7 @@ export class CreateValetToken implements UseCaseInterface {
       }
     }
 
-    const regularSubscriptionUserUuid = (await regularSubscription.user).uuid
+    const regularSubscriptionUserUuid = (await (regularSubscription.user as Promise<User>)).uuid
 
     let uploadBytesUsed = 0
     const uploadBytesUsedSetting = await this.subscriptionSettingService.findSubscriptionSettingWithDecryptedValue({

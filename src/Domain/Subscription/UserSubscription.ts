@@ -66,7 +66,7 @@ export class UserSubscription {
     { onDelete: 'CASCADE', nullable: false },
   )
   @JoinColumn({ name: 'user_uuid', referencedColumnName: 'uuid' })
-  user!: Promise<User>
+  user: Promise<User> | undefined
 
   @OneToMany(
     /* istanbul ignore next */
@@ -74,5 +74,5 @@ export class UserSubscription {
     /* istanbul ignore next */
     (subscriptionSetting) => subscriptionSetting.userSubscription,
   )
-  subscriptionSettings!: Promise<SubscriptionSetting[]>
+  subscriptionSettings: Promise<SubscriptionSetting[]> | undefined
 }

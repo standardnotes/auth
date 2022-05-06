@@ -7,6 +7,7 @@ import TYPES from '../../../Bootstrap/Types'
 import { SubscriptionSettingServiceInterface } from '../../Setting/SubscriptionSettingServiceInterface'
 import { UserSubscriptionServiceInterface } from '../../Subscription/UserSubscriptionServiceInterface'
 import { SubscriptionSettingProjector } from '../../../Projection/SubscriptionSettingProjector'
+import { User } from '../../User/User'
 
 @injectable()
 export class GetSubscriptionSetting implements UseCaseInterface {
@@ -27,7 +28,7 @@ export class GetSubscriptionSetting implements UseCaseInterface {
       }
     }
 
-    const regularSubscriptionUser = await regularSubscription.user
+    const regularSubscriptionUser = await (regularSubscription.user as Promise<User>)
 
     const setting = await this.subscriptionSettingService.findSubscriptionSettingWithDecryptedValue({
       userUuid: regularSubscriptionUser.uuid,

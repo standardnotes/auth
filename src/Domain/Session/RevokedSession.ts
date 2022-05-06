@@ -35,5 +35,5 @@ export class RevokedSession {
     { onDelete: 'CASCADE' },
   )
   @JoinColumn({ name: 'user_uuid', referencedColumnName: 'uuid' })
-  user!: Promise<User>
+  user: Promise<User> | undefined
 }
