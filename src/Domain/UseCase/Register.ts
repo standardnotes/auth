@@ -43,8 +43,6 @@ export class Register implements UseCaseInterface {
     const { email, password, apiVersion, ephemeralSession, ...registrationFields } = dto
 
     const existingUser = await this.userRepository.findOneByEmail(email)
-    this.logger.debug('[Registration] Search result for existing user: %O', existingUser)
-
     if (existingUser) {
       return {
         success: false,
@@ -60,8 +58,6 @@ export class Register implements UseCaseInterface {
     user.encryptedPassword = await bcrypt.hash(password, User.PASSWORD_HASH_COST)
     user.encryptedServerKey = await this.crypter.generateEncryptedUserServerKey()
     user.serverEncryptionVersion = User.DEFAULT_ENCRYPTION_VERSION
-
-    this.logger.debug('[Registration] Basic registration user structure: %O', user)
 
     const defaultRole = await this.roleRepository.findOneByName(RoleName.BasicUser)
     this.logger.debug('[Registration] Found default role for user: %O', defaultRole)
