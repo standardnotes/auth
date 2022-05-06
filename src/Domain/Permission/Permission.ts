@@ -33,6 +33,8 @@ export class Permission {
   @ManyToMany(
     /* istanbul ignore next */
     () => Role,
+    /* istanbul ignore next */
+    { lazy: true, eager: false },
   )
   @JoinTable({
     name: 'role_permissions',

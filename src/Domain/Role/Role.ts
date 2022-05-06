@@ -40,6 +40,8 @@ export class Role {
   @ManyToMany(
     /* istanbul ignore next */
     () => User,
+    /* istanbul ignore next */
+    { lazy: true, eager: false },
   )
   @JoinTable({
     name: 'user_roles',
@@ -57,6 +59,8 @@ export class Role {
   @ManyToMany(
     /* istanbul ignore next */
     () => Permission,
+    /* istanbul ignore next */
+    { lazy: true, eager: false },
   )
   @JoinTable({
     name: 'role_permissions',
@@ -74,6 +78,8 @@ export class Role {
   @ManyToMany(
     /* istanbul ignore next */
     () => OfflineUserSubscription,
+    /* istanbul ignore next */
+    { lazy: true, eager: false },
   )
   @JoinTable({
     name: 'offline_user_roles',

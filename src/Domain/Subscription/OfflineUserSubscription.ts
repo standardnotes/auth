@@ -56,6 +56,8 @@ export class OfflineUserSubscription {
   @ManyToMany(
     /* istanbul ignore next */
     () => Role,
+    /* istanbul ignore next */
+    { lazy: true, eager: false },
   )
   @JoinTable({
     name: 'offline_user_roles',

@@ -63,7 +63,7 @@ export class UserSubscription {
     /* istanbul ignore next */
     (user) => user.subscriptions,
     /* istanbul ignore next */
-    { onDelete: 'CASCADE', nullable: false },
+    { onDelete: 'CASCADE', nullable: false, lazy: true, eager: false },
   )
   @JoinColumn({ name: 'user_uuid', referencedColumnName: 'uuid' })
   user: Promise<User> | undefined
@@ -73,6 +73,8 @@ export class UserSubscription {
     () => SubscriptionSetting,
     /* istanbul ignore next */
     (subscriptionSetting) => subscriptionSetting.userSubscription,
+    /* istanbul ignore next */
+    { lazy: true, eager: false },
   )
   subscriptionSettings: Promise<SubscriptionSetting[]> | undefined
 }

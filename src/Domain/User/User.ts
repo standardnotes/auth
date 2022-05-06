@@ -137,6 +137,8 @@ export class User {
     () => RevokedSession,
     /* istanbul ignore next */
     (revokedSession) => revokedSession.user,
+    /* istanbul ignore next */
+    { lazy: true, eager: false },
   )
   revokedSessions: Promise<RevokedSession[]> | undefined
 
@@ -145,12 +147,16 @@ export class User {
     () => Setting,
     /* istanbul ignore next */
     (setting) => setting.user,
+    /* istanbul ignore next */
+    { lazy: true, eager: false },
   )
   settings: Promise<Setting[]> | undefined
 
   @ManyToMany(
     /* istanbul ignore next */
     () => Role,
+    /* istanbul ignore next */
+    { lazy: true, eager: false },
   )
   @JoinTable({
     name: 'user_roles',
@@ -170,6 +176,8 @@ export class User {
     () => UserSubscription,
     /* istanbul ignore next */
     (subscription) => subscription.user,
+    /* istanbul ignore next */
+    { lazy: true, eager: false },
   )
   subscriptions!: Promise<UserSubscription[]> | undefined
 

@@ -45,7 +45,7 @@ export class Setting {
     /* istanbul ignore next */
     (user) => user.settings,
     /* istanbul ignore next */
-    { onDelete: 'CASCADE', nullable: false },
+    { onDelete: 'CASCADE', nullable: false, lazy: true, eager: false },
   )
   @JoinColumn({ name: 'user_uuid', referencedColumnName: 'uuid' })
   user: Promise<User> | undefined
