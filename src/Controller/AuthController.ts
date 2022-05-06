@@ -290,8 +290,6 @@ export class AuthController extends BaseHttpController {
       )
     }
 
-    this.logger.debug('[Controller] Attempting to register user %s', request.body.email)
-
     const registerResult = await this.registerUser.execute({
       email: request.body.email,
       password: request.body.password,
@@ -308,8 +306,6 @@ export class AuthController extends BaseHttpController {
       kpCreated: request.body.created,
       version: request.body.version ? request.body.version : request.body.pw_nonce ? '001' : '002',
     })
-
-    this.logger.debug('[Controller] Registration result for user %s: %O', request.body.email, registerResult)
 
     if (!registerResult.success || !registerResult.authResponse) {
       return this.json(

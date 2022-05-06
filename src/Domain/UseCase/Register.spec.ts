@@ -10,7 +10,6 @@ import { User } from '../User/User'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { Register } from './Register'
 import { SettingServiceInterface } from '../Setting/SettingServiceInterface'
-import { Logger } from 'winston'
 
 describe('Register', () => {
   let userRepository: UserRepositoryInterface
@@ -21,19 +20,9 @@ describe('Register', () => {
   let user: User
   let crypter: CrypterInterface
   let timer: TimerInterface
-  let logger: Logger
 
   const createUseCase = () =>
-    new Register(
-      userRepository,
-      roleRepository,
-      authResponseFactoryResolver,
-      crypter,
-      false,
-      settingService,
-      timer,
-      logger,
-    )
+    new Register(userRepository, roleRepository, authResponseFactoryResolver, crypter, false, settingService, timer)
 
   beforeEach(() => {
     userRepository = {} as jest.Mocked<UserRepositoryInterface>
@@ -59,9 +48,6 @@ describe('Register', () => {
 
     timer = {} as jest.Mocked<TimerInterface>
     timer.getUTCDate = jest.fn().mockReturnValue(new Date(1))
-
-    logger = {} as jest.Mocked<Logger>
-    logger.debug = jest.fn()
   })
 
   it('should register a new user', async () => {
@@ -170,7 +156,6 @@ describe('Register', () => {
         true,
         settingService,
         timer,
-        logger,
       ).execute({
         email: 'test@test.te',
         password: 'asdzxc',
