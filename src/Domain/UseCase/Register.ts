@@ -14,6 +14,7 @@ import { RoleRepositoryInterface } from '../Role/RoleRepositoryInterface'
 import { CrypterInterface } from '../Encryption/CrypterInterface'
 import { TimerInterface } from '@standardnotes/time'
 import { SettingServiceInterface } from '../Setting/SettingServiceInterface'
+import { Logger } from 'winston'
 
 @injectable()
 export class Register implements UseCaseInterface {
@@ -26,6 +27,7 @@ export class Register implements UseCaseInterface {
     @inject(TYPES.DISABLE_USER_REGISTRATION) private disableUserRegistration: boolean,
     @inject(TYPES.SettingService) private settingService: SettingServiceInterface,
     @inject(TYPES.Timer) private timer: TimerInterface,
+    @inject(TYPES.Logger) private logger: Logger,
   ) {}
 
   async execute(dto: RegisterDTO): Promise<RegisterResponse> {
@@ -35,6 +37,8 @@ export class Register implements UseCaseInterface {
         errorMessage: 'User registration is currently not allowed.',
       }
     }
+
+    this.logger.debug('[Registration] Registering user with following parameters: %O', dto)
 
     const { email, password, apiVersion, ephemeralSession, ...registrationFields } = dto
 
@@ -56,15 +60,20 @@ export class Register implements UseCaseInterface {
     user.serverEncryptionVersion = User.DEFAULT_ENCRYPTION_VERSION
 
     const defaultRole = await this.roleRepository.findOneByName(RoleName.BasicUser)
+    this.logger.debug('[Registration] Found default role for user: %O', defaultRole)
     if (defaultRole) {
       user.roles = Promise.resolve([defaultRole])
     }
 
     Object.assign(user, registrationFields)
 
+    this.logger.debug('[Registration] Saving user %O', user)
     user = await this.userRepository.save(user)
+    this.logger.debug('[Registration] Saved user %O', user)
 
     await this.settingService.applyDefaultSettingsUponRegistration(user)
+
+    this.logger.debug('[Registration] applied default settings for newly registered user')
 
     const authResponseFactory = this.authResponseFactoryResolver.resolveAuthResponseFactoryVersion(apiVersion)
 
