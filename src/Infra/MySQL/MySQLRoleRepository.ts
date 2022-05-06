@@ -1,6 +1,5 @@
 import { inject, injectable } from 'inversify'
 import { Repository } from 'typeorm'
-import { Logger } from 'winston'
 
 import TYPES from '../../Bootstrap/Types'
 import { Role } from '../../Domain/Role/Role'
@@ -11,7 +10,6 @@ export class MySQLRoleRepository implements RoleRepositoryInterface {
   constructor(
     @inject(TYPES.ORMRoleRepository)
     private ormRepository: Repository<Role>,
-    @inject(TYPES.Logger) private logger: Logger,
   ) {}
 
   async findOneByName(name: string): Promise<Role | null> {
@@ -22,8 +20,6 @@ export class MySQLRoleRepository implements RoleRepositoryInterface {
       .cache(`role_${name}`, 600000)
       .take(1)
       .getMany()
-
-    this.logger.debug('[Repository] Found roles %O', roles)
 
     if (roles.length === 0) {
       return null
