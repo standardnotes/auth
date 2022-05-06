@@ -102,7 +102,7 @@ describe('RedisEphemeralSessionRepository', () => {
 
     const ephemeralSession = <EphemeralSession>await createRepository().findOneByUuid('1-2-3')
 
-    expect(ephemeralSession).toBeUndefined()
+    expect(ephemeralSession).toBeNull()
   })
 
   it('should return undefined if ephemeral session is not found', async () => {
@@ -110,7 +110,7 @@ describe('RedisEphemeralSessionRepository', () => {
 
     const ephemeralSession = <EphemeralSession>await createRepository().findOneByUuidAndUserUuid('1-2-3', '2-3-4')
 
-    expect(ephemeralSession).toBeUndefined()
+    expect(ephemeralSession).toBeNull()
   })
 
   it('should update tokens and expirations dates', async () => {

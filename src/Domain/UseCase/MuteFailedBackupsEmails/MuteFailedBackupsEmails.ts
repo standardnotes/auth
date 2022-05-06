@@ -16,7 +16,7 @@ export class MuteFailedBackupsEmails implements UseCaseInterface {
       SettingName.MuteFailedCloudBackupsEmails,
     ])
 
-    if (setting === undefined) {
+    if (setting === null) {
       return {
         success: false,
         message: 'Could not find setting setting.',

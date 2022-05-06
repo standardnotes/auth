@@ -38,8 +38,8 @@ describe('SettingInterpreter', () => {
     } as jest.Mocked<User>
 
     settingRepository = {} as jest.Mocked<SettingRepositoryInterface>
-    settingRepository.findLastByNameAndUserUuid = jest.fn().mockReturnValue(undefined)
-    settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue(undefined)
+    settingRepository.findLastByNameAndUserUuid = jest.fn().mockReturnValue(null)
+    settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue(null)
 
     settingDecrypter = {} as jest.Mocked<SettingDecrypterInterface>
     settingDecrypter.decryptSettingValue = jest.fn().mockReturnValue('decrypted')
@@ -113,7 +113,7 @@ describe('SettingInterpreter', () => {
       name: SettingName.EmailBackupFrequency,
       value: EmailBackupFrequency.Disabled,
     } as jest.Mocked<Setting>
-    settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue(undefined)
+    settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue(null)
 
     await createInterpreter().interpretSettingUpdated(setting, user, EmailBackupFrequency.Disabled)
 
@@ -126,7 +126,7 @@ describe('SettingInterpreter', () => {
       name: SettingName.DropboxBackupToken,
       value: 'test-token',
     } as jest.Mocked<Setting>
-    settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue(undefined)
+    settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue(null)
 
     await createInterpreter().interpretSettingUpdated(setting, user, 'test-token')
 
@@ -168,7 +168,7 @@ describe('SettingInterpreter', () => {
       name: SettingName.GoogleDriveBackupToken,
       value: 'test-token',
     } as jest.Mocked<Setting>
-    settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue(undefined)
+    settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue(null)
 
     await createInterpreter().interpretSettingUpdated(setting, user, 'test-token')
 
@@ -187,7 +187,7 @@ describe('SettingInterpreter', () => {
       name: SettingName.OneDriveBackupToken,
       value: 'test-token',
     } as jest.Mocked<Setting>
-    settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue(undefined)
+    settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue(null)
 
     await createInterpreter().interpretSettingUpdated(setting, user, 'test-token')
 
@@ -248,7 +248,7 @@ describe('SettingInterpreter', () => {
   })
 
   it('should not trigger cloud backup if backup frequency setting is updated and a backup token setting is not present', async () => {
-    settingRepository.findLastByNameAndUserUuid = jest.fn().mockReturnValueOnce(undefined)
+    settingRepository.findLastByNameAndUserUuid = jest.fn().mockReturnValueOnce(null)
     const setting = {
       name: SettingName.OneDriveBackupFrequency,
       serverEncryptionVersion: 0,

@@ -108,7 +108,7 @@ describe('AcceptSharedSubscriptionInvitation', () => {
   })
 
   it('should not create a shared subscription if invitiation is not found', async () => {
-    sharedSubscriptionInvitationRepository.findOneByUuidAndStatus = jest.fn().mockReturnValue(undefined)
+    sharedSubscriptionInvitationRepository.findOneByUuidAndStatus = jest.fn().mockReturnValue(null)
     expect(
       await createUseCase().execute({
         sharedSubscriptionInvitationUuid: '1-2-3',
@@ -124,7 +124,7 @@ describe('AcceptSharedSubscriptionInvitation', () => {
   })
 
   it('should not create a shared subscription if invitee is not found', async () => {
-    userRepository.findOneByEmail = jest.fn().mockReturnValue(undefined)
+    userRepository.findOneByEmail = jest.fn().mockReturnValue(null)
     expect(
       await createUseCase().execute({
         sharedSubscriptionInvitationUuid: '1-2-3',

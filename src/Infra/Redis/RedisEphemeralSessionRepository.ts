@@ -58,19 +58,19 @@ export class RedisEphemeralSessionRepository implements EphemeralSessionReposito
     return (<string[]>sessions.filter((value) => value)).map((stringifiedSession) => JSON.parse(stringifiedSession))
   }
 
-  async findOneByUuid(uuid: string): Promise<EphemeralSession | undefined> {
+  async findOneByUuid(uuid: string): Promise<EphemeralSession | null> {
     const stringifiedSession = await this.redisClient.get(`${this.PREFIX}:${uuid}`)
     if (!stringifiedSession) {
-      return undefined
+      return null
     }
 
     return JSON.parse(stringifiedSession)
   }
 
-  async findOneByUuidAndUserUuid(uuid: string, userUuid: string): Promise<EphemeralSession | undefined> {
+  async findOneByUuidAndUserUuid(uuid: string, userUuid: string): Promise<EphemeralSession | null> {
     const stringifiedSession = await this.redisClient.get(`${this.PREFIX}:${uuid}:${userUuid}`)
     if (!stringifiedSession) {
-      return undefined
+      return null
     }
 
     return JSON.parse(stringifiedSession)

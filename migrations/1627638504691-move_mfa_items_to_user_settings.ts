@@ -25,7 +25,7 @@ export class moveMfaItemsToUserSettings1627638504691 implements MigrationInterfa
 
     for (const item of items) {
       const user = await queryRunner.manager.findOne(User, item['user_uuid'])
-      if (user === undefined) {
+      if (user === null) {
         continue
       }
 

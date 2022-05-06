@@ -21,6 +21,17 @@ const TYPES = {
   OfflineSubscriptionTokenRepository: Symbol.for('OfflineSubscriptionTokenRepository'),
   SharedSubscriptionInvitationRepository: Symbol.for('SharedSubscriptionInvitationRepository'),
   PKCERepository: Symbol.for('PKCERepository'),
+  // ORM
+  ORMOfflineSettingRepository: Symbol.for('ORMOfflineSettingRepository'),
+  ORMOfflineUserSubscriptionRepository: Symbol.for('ORMOfflineUserSubscriptionRepository'),
+  ORMRevokedSessionRepository: Symbol.for('ORMRevokedSessionRepository'),
+  ORMRoleRepository: Symbol.for('ORMRoleRepository'),
+  ORMSessionRepository: Symbol.for('ORMSessionRepository'),
+  ORMSettingRepository: Symbol.for('ORMSettingRepository'),
+  ORMSharedSubscriptionInvitationRepository: Symbol.for('ORMSharedSubscriptionInvitationRepository'),
+  ORMSubscriptionSettingRepository: Symbol.for('ORMSubscriptionSettingRepository'),
+  ORMUserRepository: Symbol.for('ORMUserRepository'),
+  ORMUserSubscriptionRepository: Symbol.for('ORMUserSubscriptionRepository'),
   // Middleware
   AuthMiddleware: Symbol.for('AuthMiddleware'),
   ApiGatewayAuthMiddleware: Symbol.for('ApiGatewayAuthMiddleware'),

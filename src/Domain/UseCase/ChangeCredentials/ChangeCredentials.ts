@@ -36,7 +36,7 @@ export class ChangeCredentials implements UseCaseInterface {
     let userEmailChangedEvent: UserEmailChangedEvent | undefined = undefined
     if (dto.newEmail !== undefined) {
       const existingUser = await this.userRepository.findOneByEmail(dto.newEmail)
-      if (existingUser !== undefined) {
+      if (existingUser !== null) {
         return {
           success: false,
           errorMessage: 'The email you entered is already taken. Please try again.',

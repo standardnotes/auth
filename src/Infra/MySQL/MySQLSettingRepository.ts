@@ -1,16 +1,26 @@
 import { SettingName } from '@standardnotes/settings'
 import { ReadStream } from 'fs'
-import { injectable } from 'inversify'
-import { EntityRepository, Repository } from 'typeorm'
+import { inject, injectable } from 'inversify'
+import { Repository } from 'typeorm'
+import TYPES from '../../Bootstrap/Types'
 import { Setting } from '../../Domain/Setting/Setting'
 import { SettingRepositoryInterface } from '../../Domain/Setting/SettingRepositoryInterface'
 import { DeleteSettingDto } from '../../Domain/UseCase/DeleteSetting/DeleteSettingDto'
 
 @injectable()
-@EntityRepository(Setting)
-export class MySQLSettingRepository extends Repository<Setting> implements SettingRepositoryInterface {
-  async findOneByUuidAndNames(uuid: string, names: SettingName[]): Promise<Setting | undefined> {
-    return this.createQueryBuilder('setting')
+export class MySQLSettingRepository implements SettingRepositoryInterface {
+  constructor(
+    @inject(TYPES.ORMSettingRepository)
+    private ormRepository: Repository<Setting>,
+  ) {}
+
+  async save(setting: Setting): Promise<Setting> {
+    return this.ormRepository.save(setting)
+  }
+
+  async findOneByUuidAndNames(uuid: string, names: SettingName[]): Promise<Setting | null> {
+    return this.ormRepository
+      .createQueryBuilder('setting')
       .where('setting.uuid = :uuid AND setting.name IN (:...names)', {
         names,
         uuid,
@@ -19,7 +29,8 @@ export class MySQLSettingRepository extends Repository<Setting> implements Setti
   }
 
   async streamAllByNameAndValue(name: SettingName, value: string): Promise<ReadStream> {
-    return this.createQueryBuilder('setting')
+    return this.ormRepository
+      .createQueryBuilder('setting')
       .where('setting.name = :name AND setting.value = :value', {
         name,
         value,
@@ -28,16 +39,18 @@ export class MySQLSettingRepository extends Repository<Setting> implements Setti
       .stream()
   }
 
-  async findOneByUuid(uuid: string): Promise<Setting | undefined> {
-    return this.createQueryBuilder('setting')
+  async findOneByUuid(uuid: string): Promise<Setting | null> {
+    return this.ormRepository
+      .createQueryBuilder('setting')
       .where('setting.uuid = :uuid', {
         uuid,
       })
       .getOne()
   }
 
-  async findOneByNameAndUserUuid(name: string, userUuid: string): Promise<Setting | undefined> {
-    return this.createQueryBuilder('setting')
+  async findOneByNameAndUserUuid(name: string, userUuid: string): Promise<Setting | null> {
+    return this.ormRepository
+      .createQueryBuilder('setting')
       .where('setting.name = :name AND setting.user_uuid = :user_uuid', {
         name,
         user_uuid: userUuid,
@@ -45,8 +58,9 @@ export class MySQLSettingRepository extends Repository<Setting> implements Setti
       .getOne()
   }
 
-  async findLastByNameAndUserUuid(name: string, userUuid: string): Promise<Setting | undefined> {
-    const settings = await this.createQueryBuilder('setting')
+  async findLastByNameAndUserUuid(name: string, userUuid: string): Promise<Setting | null> {
+    const settings = await this.ormRepository
+      .createQueryBuilder('setting')
       .where('setting.name = :name AND setting.user_uuid = :user_uuid', {
         name,
         user_uuid: userUuid,
@@ -55,11 +69,16 @@ export class MySQLSettingRepository extends Repository<Setting> implements Setti
       .limit(1)
       .getMany()
 
-    return settings.pop()
+    if (settings.length === 0) {
+      return null
+    }
+
+    return settings.pop() as Setting
   }
 
   async findAllByUserUuid(userUuid: string): Promise<Setting[]> {
-    return this.createQueryBuilder('setting')
+    return this.ormRepository
+      .createQueryBuilder('setting')
       .where('setting.user_uuid = :user_uuid', {
         user_uuid: userUuid,
       })
@@ -67,7 +86,8 @@ export class MySQLSettingRepository extends Repository<Setting> implements Setti
   }
 
   async deleteByUserUuid({ settingName, userUuid }: DeleteSettingDto): Promise<void> {
-    await this.createQueryBuilder('setting')
+    await this.ormRepository
+      .createQueryBuilder('setting')
       .delete()
       .where('name = :name AND user_uuid = :user_uuid', {
         user_uuid: userUuid,

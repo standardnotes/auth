@@ -4,7 +4,7 @@ export type GetUserSubscriptionResponse =
   | {
       success: true
       user: { uuid: string; email: string }
-      subscription?: UserSubscription
+      subscription: UserSubscription | null
     }
   | {
       success: false

@@ -90,7 +90,7 @@ const requestBackups = async (
               muteEmailsSettingName,
               setting.setting_user_uuid,
             )
-            if (emailsMutedSetting !== undefined && emailsMutedSetting.value !== null) {
+            if (emailsMutedSetting !== null && emailsMutedSetting.value !== null) {
               userHasEmailsMuted = emailsMutedSetting.value === muteEmailsSettingValue
             }
 
@@ -111,7 +111,7 @@ const requestBackups = async (
               settingName: providerTokenSettingName,
               userUuid: setting.setting_user_uuid,
             })
-            if (cloudBackupProviderToken === undefined || cloudBackupProviderToken.value === null) {
+            if (cloudBackupProviderToken === null || cloudBackupProviderToken.value === null) {
               callback()
 
               return

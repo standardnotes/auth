@@ -45,7 +45,7 @@ describe('VerifyMFA', () => {
   })
 
   it('should pass MFA verification if user has no MFA enabled', async () => {
-    settingService.findSettingWithDecryptedValue = jest.fn().mockReturnValue(undefined)
+    settingService.findSettingWithDecryptedValue = jest.fn().mockReturnValue(null)
 
     expect(
       await createVerifyMFA().execute({ email: 'test@test.te', requestParams: {}, preventOTPFromFurtherUsage: true }),
@@ -74,7 +74,7 @@ describe('VerifyMFA', () => {
   })
 
   it('should pass MFA verification if user is not found and pseudo mfa is not required', async () => {
-    userRepository.findOneByEmail = jest.fn().mockReturnValue(undefined)
+    userRepository.findOneByEmail = jest.fn().mockReturnValue(null)
     expect(
       await createVerifyMFA().execute({ email: 'test@test.te', requestParams: {}, preventOTPFromFurtherUsage: true }),
     ).toEqual({
@@ -86,7 +86,7 @@ describe('VerifyMFA', () => {
 
   it('should not pass MFA verification if user is not found and pseudo mfa is required', async () => {
     booleanSelector.select = jest.fn().mockReturnValue(true)
-    userRepository.findOneByEmail = jest.fn().mockReturnValue(undefined)
+    userRepository.findOneByEmail = jest.fn().mockReturnValue(null)
 
     expect(
       await createVerifyMFA().execute({ email: 'test@test.te', requestParams: {}, preventOTPFromFurtherUsage: true }),

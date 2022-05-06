@@ -31,7 +31,7 @@ export class GetUserKeyParams implements UseCaseInterface {
       }
     }
 
-    let user: User | undefined
+    let user: User | null = null
     if (dto.email !== undefined) {
       user = await this.userRepository.findOneByEmail(dto.email)
       if (!user) {

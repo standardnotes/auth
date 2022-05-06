@@ -43,7 +43,7 @@ export class SubscriptionPurchasedEventHandler implements DomainEventHandlerInte
 
     const user = await this.userRepository.findOneByEmail(event.payload.userEmail)
 
-    if (user === undefined) {
+    if (user === null) {
       this.logger.warn(`Could not find user with email: ${event.payload.userEmail}`)
       return
     }

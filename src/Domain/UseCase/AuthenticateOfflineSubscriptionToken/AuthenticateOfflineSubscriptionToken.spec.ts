@@ -50,7 +50,7 @@ describe('AuthenticateOfflineSubscriptionToken', () => {
   })
 
   it('should not authenticate an dashboard token if user has no features token', async () => {
-    offlineSettingRepository.findOneByNameAndEmail = jest.fn().mockReturnValue(undefined)
+    offlineSettingRepository.findOneByNameAndEmail = jest.fn().mockReturnValue(null)
 
     const response = await createUseCase().execute({ token: 'test', userEmail: 'test@test.com' })
 

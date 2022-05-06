@@ -18,7 +18,7 @@ export class GetSubscriptionSetting implements UseCaseInterface {
 
   async execute(dto: GetSubscriptionSettingDTO): Promise<GetSubscriptionSettingResponse> {
     const { regularSubscription } = await this.userSubscriptionService.findRegularSubscriptionForUserUuid(dto.userUuid)
-    if (regularSubscription === undefined) {
+    if (regularSubscription === null) {
       return {
         success: false,
         error: {
@@ -35,7 +35,7 @@ export class GetSubscriptionSetting implements UseCaseInterface {
       subscriptionSettingName: dto.subscriptionSettingName,
     })
 
-    if (setting === undefined) {
+    if (setting === null) {
       return {
         success: false,
         error: {

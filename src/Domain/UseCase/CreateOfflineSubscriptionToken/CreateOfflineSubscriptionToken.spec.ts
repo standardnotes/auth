@@ -79,7 +79,7 @@ describe('CreateOfflineSubscriptionToken', () => {
   })
 
   it('should not create an offline subscription token if email has no offline subscription', async () => {
-    offlineUserSubscriptionRepository.findOneByEmail = jest.fn().mockReturnValue(undefined)
+    offlineUserSubscriptionRepository.findOneByEmail = jest.fn().mockReturnValue(null)
 
     expect(
       await createUseCase().execute({

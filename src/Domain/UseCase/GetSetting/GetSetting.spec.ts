@@ -32,7 +32,7 @@ describe('GetSetting', () => {
   })
 
   it('should not get a setting for user if it does not exist', async () => {
-    settingService.findSettingWithDecryptedValue = jest.fn().mockReturnValue(undefined)
+    settingService.findSettingWithDecryptedValue = jest.fn().mockReturnValue(null)
 
     expect(await createUseCase().execute({ userUuid: '1-2-3', settingName: 'test' })).toEqual({
       success: false,

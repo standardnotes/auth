@@ -18,7 +18,7 @@ describe('OfflineSettingService', () => {
     offlineSetting = {} as jest.Mocked<OfflineSetting>
 
     offlineSettingRepository = {} as jest.Mocked<OfflineSettingRepositoryInterface>
-    offlineSettingRepository.findOneByNameAndEmail = jest.fn().mockReturnValue(undefined)
+    offlineSettingRepository.findOneByNameAndEmail = jest.fn().mockReturnValue(null)
     offlineSettingRepository.save = jest.fn()
 
     timer = {} as jest.Mocked<TimerInterface>

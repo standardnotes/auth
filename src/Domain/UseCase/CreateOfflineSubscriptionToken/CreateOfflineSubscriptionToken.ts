@@ -28,7 +28,7 @@ export class CreateOfflineSubscriptionToken implements UseCaseInterface {
 
   async execute(dto: CreateOfflineSubscriptionTokenDTO): Promise<CreateOfflineSubscriptionTokenResponse> {
     const existingSubscription = await this.offlineUserSubscriptionRepository.findOneByEmail(dto.userEmail)
-    if (existingSubscription === undefined) {
+    if (existingSubscription === null) {
       return {
         success: false,
         error: 'no-subscription',

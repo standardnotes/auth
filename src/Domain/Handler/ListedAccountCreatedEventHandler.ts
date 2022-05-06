@@ -17,7 +17,7 @@ export class ListedAccountCreatedEventHandler implements DomainEventHandlerInter
 
   async handle(event: ListedAccountCreatedEvent): Promise<void> {
     const user = await this.userRepository.findOneByEmail(event.payload.userEmail)
-    if (user === undefined) {
+    if (user === null) {
       this.logger.warn(`Could not find user with email ${event.payload.userEmail}`)
 
       return
@@ -31,7 +31,7 @@ export class ListedAccountCreatedEventHandler implements DomainEventHandlerInter
       settingName: SettingName.ListedAuthorSecrets,
       userUuid: user.uuid,
     })
-    if (listedAuthorSecretsSetting !== undefined) {
+    if (listedAuthorSecretsSetting !== null) {
       const existingSecrets: ListedAuthorSecretsData = JSON.parse(listedAuthorSecretsSetting.value as string)
       existingSecrets.push(newSecret)
       authSecrets = existingSecrets

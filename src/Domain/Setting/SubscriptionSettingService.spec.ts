@@ -48,7 +48,7 @@ describe('SubscriptionSettingService', () => {
     factory.createSubscriptionSettingReplacement = jest.fn().mockReturnValue(setting)
 
     subscriptionSettingRepository = {} as jest.Mocked<SubscriptionSettingRepositoryInterface>
-    subscriptionSettingRepository.findLastByNameAndUserSubscriptionUuid = jest.fn().mockReturnValue(undefined)
+    subscriptionSettingRepository.findLastByNameAndUserSubscriptionUuid = jest.fn().mockReturnValue(null)
     subscriptionSettingRepository.save = jest.fn().mockImplementation((setting) => setting)
 
     subscriptionSettingsAssociationService = {} as jest.Mocked<SubscriptionSettingsAssociationServiceInterface>
@@ -105,7 +105,7 @@ describe('SubscriptionSettingService', () => {
   })
 
   it('should create setting with a given uuid if it does not exist', async () => {
-    subscriptionSettingRepository.findOneByUuid = jest.fn().mockReturnValue(undefined)
+    subscriptionSettingRepository.findOneByUuid = jest.fn().mockReturnValue(null)
 
     const result = await createService().createOrReplace({
       userSubscription,

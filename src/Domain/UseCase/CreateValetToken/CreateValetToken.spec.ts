@@ -62,7 +62,7 @@ describe('CreateValetToken', () => {
     userSubscriptionService = {} as jest.Mocked<UserSubscriptionServiceInterface>
     userSubscriptionService.findRegularSubscriptionForUserUuid = jest
       .fn()
-      .mockReturnValue({ regularSubscription, sharedSubscription: undefined })
+      .mockReturnValue({ regularSubscription, sharedSubscription: null })
 
     timer = {} as jest.Mocked<TimerInterface>
     timer.getTimestampInMicroseconds = jest.fn().mockReturnValue(100)
@@ -89,7 +89,7 @@ describe('CreateValetToken', () => {
   it('should not create a valet token if a user has no subscription', async () => {
     userSubscriptionService.findRegularSubscriptionForUserUuid = jest
       .fn()
-      .mockReturnValue({ regularSubscription: undefined, sharedSubscription: undefined })
+      .mockReturnValue({ regularSubscription: null, sharedSubscription: null })
 
     const response = await createUseCase().execute({
       operation: 'read',
@@ -112,7 +112,7 @@ describe('CreateValetToken', () => {
     regularSubscription.endsAt = 1
     userSubscriptionService.findRegularSubscriptionForUserUuid = jest
       .fn()
-      .mockReturnValue({ regularSubscription, sharedSubscription: undefined })
+      .mockReturnValue({ regularSubscription, sharedSubscription: null })
 
     timer.getTimestampInMicroseconds = jest.fn().mockReturnValue(150)
 
@@ -229,7 +229,7 @@ describe('CreateValetToken', () => {
   it('should not create a write valet token for shared subscription if regular subscription could not be found', async () => {
     userSubscriptionService.findRegularSubscriptionForUserUuid = jest
       .fn()
-      .mockReturnValue({ regularSubscription: undefined, sharedSubscription })
+      .mockReturnValue({ regularSubscription: null, sharedSubscription })
 
     const response = await createUseCase().execute({
       operation: 'write',
@@ -249,7 +249,7 @@ describe('CreateValetToken', () => {
   })
 
   it('should create a write valet token with default subscription upload limit if upload bytes settings do not exist', async () => {
-    subscriptionSettingService.findSubscriptionSettingWithDecryptedValue = jest.fn().mockReturnValue(undefined)
+    subscriptionSettingService.findSubscriptionSettingWithDecryptedValue = jest.fn().mockReturnValue(null)
 
     const response = await createUseCase().execute({
       operation: 'write',

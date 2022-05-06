@@ -18,7 +18,7 @@ export interface SessionServiceInterface {
   }): Promise<SessionBody>
   refreshTokens(session: Session): Promise<SessionBody>
   getSessionFromToken(token: string): Promise<Session | undefined>
-  getRevokedSessionFromToken(token: string): Promise<RevokedSession | undefined>
+  getRevokedSessionFromToken(token: string): Promise<RevokedSession | null>
   markRevokedSessionAsReceived(revokedSession: RevokedSession): Promise<RevokedSession>
   deleteSessionByToken(token: string): Promise<void>
   isRefreshTokenValid(session: Session, token: string): boolean

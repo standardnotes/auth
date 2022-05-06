@@ -58,7 +58,7 @@ describe('SettingDecrypter', () => {
       value: 'encrypted',
       serverEncryptionVersion: EncryptionVersion.Default,
     } as jest.Mocked<Setting>
-    userRepository.findOneByUuid = jest.fn().mockReturnValue(undefined)
+    userRepository.findOneByUuid = jest.fn().mockReturnValue(null)
 
     let caughtError = null
     try {

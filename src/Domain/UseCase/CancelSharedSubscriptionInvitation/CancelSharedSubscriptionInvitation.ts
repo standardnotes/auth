@@ -35,7 +35,7 @@ export class CancelSharedSubscriptionInvitation implements UseCaseInterface {
     const sharedSubscriptionInvitation = await this.sharedSubscriptionInvitationRepository.findOneByUuid(
       dto.sharedSubscriptionInvitationUuid,
     )
-    if (sharedSubscriptionInvitation === undefined) {
+    if (sharedSubscriptionInvitation === null) {
       return {
         success: false,
       }
@@ -48,7 +48,7 @@ export class CancelSharedSubscriptionInvitation implements UseCaseInterface {
     }
 
     const invitee = await this.userRepository.findOneByEmail(sharedSubscriptionInvitation.inviteeIdentifier)
-    if (invitee === undefined) {
+    if (invitee === null) {
       return {
         success: false,
       }
@@ -96,7 +96,7 @@ export class CancelSharedSubscriptionInvitation implements UseCaseInterface {
       subscriptionId,
     )
 
-    if (subscription === undefined) {
+    if (subscription === null) {
       return
     }
 

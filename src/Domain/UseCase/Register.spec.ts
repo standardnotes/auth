@@ -27,10 +27,10 @@ describe('Register', () => {
   beforeEach(() => {
     userRepository = {} as jest.Mocked<UserRepositoryInterface>
     userRepository.save = jest.fn()
-    userRepository.findOneByEmail = jest.fn()
+    userRepository.findOneByEmail = jest.fn().mockReturnValue(null)
 
     roleRepository = {} as jest.Mocked<RoleRepositoryInterface>
-    roleRepository.findOneByName = jest.fn()
+    roleRepository.findOneByName = jest.fn().mockReturnValue(null)
 
     authResponseFactory = {} as jest.Mocked<AuthResponseFactoryInterface>
     authResponseFactory.createResponse = jest.fn().mockReturnValue({ foo: 'bar' })

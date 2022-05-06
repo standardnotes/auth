@@ -3,7 +3,7 @@ import { OfflineUserSubscription } from '../../Subscription/OfflineUserSubscript
 export type GetUserOfflineSubscriptionResponse =
   | {
       success: true
-      subscription?: OfflineUserSubscription
+      subscription: OfflineUserSubscription | null
     }
   | {
       success: false

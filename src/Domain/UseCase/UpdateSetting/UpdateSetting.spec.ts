@@ -85,7 +85,7 @@ describe('UpdateSetting', () => {
   })
 
   it('should not create a setting if user does not exist', async () => {
-    userRepository.findOneByUuid = jest.fn().mockReturnValue(undefined)
+    userRepository.findOneByUuid = jest.fn().mockReturnValue(null)
 
     const props = {
       name: SettingName.ExtensionKey,

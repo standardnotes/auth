@@ -41,10 +41,10 @@ describe('FileRemovedEventHandler', () => {
     userSubscriptionService = {} as jest.Mocked<UserSubscriptionServiceInterface>
     userSubscriptionService.findRegularSubscriptionForUserUuid = jest
       .fn()
-      .mockReturnValue({ regularSubscription, sharedSubscription: undefined })
+      .mockReturnValue({ regularSubscription, sharedSubscription: null })
 
     subscriptionSettingService = {} as jest.Mocked<SubscriptionSettingServiceInterface>
-    subscriptionSettingService.findSubscriptionSettingWithDecryptedValue = jest.fn().mockReturnValue(undefined)
+    subscriptionSettingService.findSubscriptionSettingWithDecryptedValue = jest.fn().mockReturnValue(null)
     subscriptionSettingService.createOrReplace = jest.fn()
 
     event = {} as jest.Mocked<FileRemovedEvent>
@@ -73,7 +73,7 @@ describe('FileRemovedEventHandler', () => {
     })
     userSubscriptionService.findRegularSubscriptionForUserUuid = jest
       .fn()
-      .mockReturnValue({ regularSubscription: undefined, sharedSubscription: undefined })
+      .mockReturnValue({ regularSubscription: null, sharedSubscription: null })
 
     await createHandler().handle(event)
 

@@ -60,7 +60,7 @@ describe('OfflineUserAuthMiddleware', () => {
   it('should not authorize if offline token setting is not found', async () => {
     request.headers['x-offline-token'] = 'offline-features-token'
 
-    offlineSettingRepository.findOneByNameAndValue = jest.fn().mockReturnValue(undefined)
+    offlineSettingRepository.findOneByNameAndValue = jest.fn().mockReturnValue(null)
 
     await createMiddleware().handler(request, response, next)
 

@@ -21,7 +21,7 @@ export class FileUploadedEventHandler implements DomainEventHandlerInterface {
 
   async handle(event: FileUploadedEvent): Promise<void> {
     const user = await this.userRepository.findOneByUuid(event.payload.userUuid)
-    if (user === undefined) {
+    if (user === null) {
       this.logger.warn(`Could not find user with uuid: ${event.payload.userUuid}`)
 
       return
@@ -29,7 +29,7 @@ export class FileUploadedEventHandler implements DomainEventHandlerInterface {
 
     const { regularSubscription, sharedSubscription } =
       await this.userSubscriptionService.findRegularSubscriptionForUserUuid(event.payload.userUuid)
-    if (regularSubscription === undefined) {
+    if (regularSubscription === null) {
       this.logger.warn(`Could not find regular user subscription for user with uuid: ${event.payload.userUuid}`)
 
       return
@@ -37,7 +37,7 @@ export class FileUploadedEventHandler implements DomainEventHandlerInterface {
 
     await this.updateUploadBytesUsedSetting(regularSubscription, event.payload.fileByteSize)
 
-    if (sharedSubscription !== undefined) {
+    if (sharedSubscription !== null) {
       await this.updateUploadBytesUsedSetting(sharedSubscription, event.payload.fileByteSize)
     }
   }
@@ -49,7 +49,7 @@ export class FileUploadedEventHandler implements DomainEventHandlerInterface {
       userSubscriptionUuid: subscription.uuid,
       subscriptionSettingName: SubscriptionSettingName.FileUploadBytesUsed,
     })
-    if (bytesUsedSetting !== undefined) {
+    if (bytesUsedSetting !== null) {
       bytesUsed = bytesUsedSetting.value as string
     }
 

@@ -18,7 +18,7 @@ export class GetUserSubscription implements UseCaseInterface {
 
     const user = await this.userRepository.findOneByUuid(userUuid)
 
-    if (user === undefined) {
+    if (user === null) {
       return {
         success: false,
         error: {

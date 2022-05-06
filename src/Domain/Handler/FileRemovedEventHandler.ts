@@ -20,7 +20,7 @@ export class FileRemovedEventHandler implements DomainEventHandlerInterface {
   async handle(event: FileRemovedEvent): Promise<void> {
     const { regularSubscription, sharedSubscription } =
       await this.userSubscriptionService.findRegularSubscriptionForUserUuid(event.payload.userUuid)
-    if (regularSubscription === undefined) {
+    if (regularSubscription === null) {
       this.logger.warn(`Could not find regular user subscription for user with uuid: ${event.payload.userUuid}`)
 
       return
@@ -28,7 +28,7 @@ export class FileRemovedEventHandler implements DomainEventHandlerInterface {
 
     await this.updateUploadBytesUsedSetting(regularSubscription, event.payload.fileByteSize)
 
-    if (sharedSubscription !== undefined) {
+    if (sharedSubscription !== null) {
       await this.updateUploadBytesUsedSetting(sharedSubscription, event.payload.fileByteSize)
     }
   }
@@ -40,7 +40,7 @@ export class FileRemovedEventHandler implements DomainEventHandlerInterface {
       userSubscriptionUuid: subscription.uuid,
       subscriptionSettingName: SubscriptionSettingName.FileUploadBytesUsed,
     })
-    if (bytesUsedSetting === undefined) {
+    if (bytesUsedSetting === null) {
       this.logger.warn(`Could not find bytes used setting for user with uuid: ${user.uuid}`)
 
       return

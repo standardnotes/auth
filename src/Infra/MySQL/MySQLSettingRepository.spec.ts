@@ -1,29 +1,33 @@
 import 'reflect-metadata'
 
 import { ReadStream } from 'fs'
-import { SelectQueryBuilder } from 'typeorm'
+import { Repository, SelectQueryBuilder } from 'typeorm'
 import { Setting } from '../../Domain/Setting/Setting'
 
 import { MySQLSettingRepository } from './MySQLSettingRepository'
 import { EmailBackupFrequency, SettingName } from '@standardnotes/settings'
 
 describe('MySQLSettingRepository', () => {
-  let repository: MySQLSettingRepository
+  let ormRepository: Repository<Setting>
   let queryBuilder: SelectQueryBuilder<Setting>
   let setting: Setting
 
-  const makeSubject = () => {
-    return new MySQLSettingRepository()
-  }
+  const createRepository = () => new MySQLSettingRepository(ormRepository)
 
   beforeEach(() => {
     queryBuilder = {} as jest.Mocked<SelectQueryBuilder<Setting>>
 
     setting = {} as jest.Mocked<Setting>
 
-    repository = makeSubject()
-    jest.spyOn(repository, 'createQueryBuilder')
-    repository.createQueryBuilder = jest.fn().mockImplementation(() => queryBuilder)
+    ormRepository = {} as jest.Mocked<Repository<Setting>>
+    ormRepository.createQueryBuilder = jest.fn().mockImplementation(() => queryBuilder)
+    ormRepository.save = jest.fn()
+  })
+
+  it('should save', async () => {
+    await createRepository().save(setting)
+
+    expect(ormRepository.save).toHaveBeenCalledWith(setting)
   })
 
   it('should stream all settings by name and value', async () => {
@@ -32,7 +36,7 @@ describe('MySQLSettingRepository', () => {
     queryBuilder.orderBy = jest.fn().mockReturnThis()
     queryBuilder.stream = jest.fn().mockReturnValue(stream)
 
-    const result = await repository.streamAllByNameAndValue(
+    const result = await createRepository().streamAllByNameAndValue(
       SettingName.EmailBackupFrequency,
       EmailBackupFrequency.Daily,
     )
@@ -44,7 +48,7 @@ describe('MySQLSettingRepository', () => {
     queryBuilder.where = jest.fn().mockReturnThis()
     queryBuilder.getOne = jest.fn().mockReturnValue(setting)
 
-    const result = await repository.findOneByUuid('1-2-3')
+    const result = await createRepository().findOneByUuid('1-2-3')
 
     expect(queryBuilder.where).toHaveBeenCalledWith('setting.uuid = :uuid', { uuid: '1-2-3' })
     expect(result).toEqual(setting)
@@ -54,7 +58,7 @@ describe('MySQLSettingRepository', () => {
     queryBuilder.where = jest.fn().mockReturnThis()
     queryBuilder.getOne = jest.fn().mockReturnValue(setting)
 
-    const result = await repository.findOneByNameAndUserUuid('test', '1-2-3')
+    const result = await createRepository().findOneByNameAndUserUuid('test', '1-2-3')
 
     expect(queryBuilder.where).toHaveBeenCalledWith('setting.name = :name AND setting.user_uuid = :user_uuid', {
       name: 'test',
@@ -67,7 +71,7 @@ describe('MySQLSettingRepository', () => {
     queryBuilder.where = jest.fn().mockReturnThis()
     queryBuilder.getOne = jest.fn().mockReturnValue(setting)
 
-    const result = await repository.findOneByUuidAndNames('1-2-3', ['test' as SettingName])
+    const result = await createRepository().findOneByUuidAndNames('1-2-3', ['test' as SettingName])
 
     expect(queryBuilder.where).toHaveBeenCalledWith('setting.uuid = :uuid AND setting.name IN (:...names)', {
       names: ['test'],
@@ -82,7 +86,7 @@ describe('MySQLSettingRepository', () => {
     queryBuilder.limit = jest.fn().mockReturnThis()
     queryBuilder.getMany = jest.fn().mockReturnValue([setting])
 
-    const result = await repository.findLastByNameAndUserUuid('test', '1-2-3')
+    const result = await createRepository().findLastByNameAndUserUuid('test', '1-2-3')
 
     expect(queryBuilder.where).toHaveBeenCalledWith('setting.name = :name AND setting.user_uuid = :user_uuid', {
       name: 'test',
@@ -93,6 +97,17 @@ describe('MySQLSettingRepository', () => {
     expect(result).toEqual(setting)
   })
 
+  it('should return null if not found last setting by name and user uuid', async () => {
+    queryBuilder.where = jest.fn().mockReturnThis()
+    queryBuilder.orderBy = jest.fn().mockReturnThis()
+    queryBuilder.limit = jest.fn().mockReturnThis()
+    queryBuilder.getMany = jest.fn().mockReturnValue([])
+
+    const result = await createRepository().findLastByNameAndUserUuid('test', '1-2-3')
+
+    expect(result).toBeNull()
+  })
+
   it('should find all by user uuid', async () => {
     queryBuilder.where = jest.fn().mockReturnThis()
 
@@ -100,7 +115,7 @@ describe('MySQLSettingRepository', () => {
     queryBuilder.getMany = jest.fn().mockReturnValue(settings)
 
     const userUuid = '123'
-    const result = await repository.findAllByUserUuid(userUuid)
+    const result = await createRepository().findAllByUserUuid(userUuid)
 
     expect(queryBuilder.where).toHaveBeenCalledWith('setting.user_uuid = :user_uuid', { user_uuid: userUuid })
     expect(result).toEqual(settings)
@@ -112,10 +127,10 @@ describe('MySQLSettingRepository', () => {
       where: () => queryBuilder,
       execute: () => undefined,
     }
-    const repository = Object.assign(makeSubject(), {
-      createQueryBuilder: () => queryBuilder,
-    })
-    const result = await repository.deleteByUserUuid({
+
+    ormRepository.createQueryBuilder = jest.fn().mockImplementation(() => queryBuilder)
+
+    const result = await createRepository().deleteByUserUuid({
       userUuid: 'userUuid',
       settingName: 'settingName',
     })

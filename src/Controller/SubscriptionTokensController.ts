@@ -80,7 +80,7 @@ export class SubscriptionTokensController extends BaseHttpController {
       settingName: SettingName.ExtensionKey,
       userUuid: user.uuid,
     })
-    if (extensionKeySetting !== undefined) {
+    if (extensionKeySetting !== null) {
       extensionKey = extensionKeySetting.value as string
     }
 

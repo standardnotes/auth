@@ -34,14 +34,14 @@ export class AcceptSharedSubscriptionInvitation implements UseCaseInterface {
       dto.sharedSubscriptionInvitationUuid,
       InvitationStatus.Sent,
     )
-    if (sharedSubscriptionInvitation === undefined) {
+    if (sharedSubscriptionInvitation === null) {
       return {
         success: false,
       }
     }
 
     const invitee = await this.userRepository.findOneByEmail(sharedSubscriptionInvitation.inviteeIdentifier)
-    if (invitee === undefined) {
+    if (invitee === null) {
       return {
         success: false,
       }

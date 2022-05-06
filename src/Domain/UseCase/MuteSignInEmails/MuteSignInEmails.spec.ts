@@ -18,7 +18,7 @@ describe('MuteSignInEmails', () => {
   })
 
   it('should not succeed if extension setting is not found', async () => {
-    settingRepository.findOneByUuidAndNames = jest.fn().mockReturnValue(undefined)
+    settingRepository.findOneByUuidAndNames = jest.fn().mockReturnValue(null)
 
     expect(await createUseCase().execute({ settingUuid: '1-2-3' })).toEqual({
       success: false,

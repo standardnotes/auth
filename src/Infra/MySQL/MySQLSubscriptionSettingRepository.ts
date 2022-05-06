@@ -1,17 +1,24 @@
-import { injectable } from 'inversify'
-import { EntityRepository, Repository } from 'typeorm'
+import { inject, injectable } from 'inversify'
+import { Repository } from 'typeorm'
+import TYPES from '../../Bootstrap/Types'
 
 import { SubscriptionSetting } from '../../Domain/Setting/SubscriptionSetting'
 import { SubscriptionSettingRepositoryInterface } from '../../Domain/Setting/SubscriptionSettingRepositoryInterface'
 
 @injectable()
-@EntityRepository(SubscriptionSetting)
-export class MySQLSubscriptionSettingRepository
-  extends Repository<SubscriptionSetting>
-  implements SubscriptionSettingRepositoryInterface
-{
-  async findOneByUuid(uuid: string): Promise<SubscriptionSetting | undefined> {
-    return this.createQueryBuilder('setting')
+export class MySQLSubscriptionSettingRepository implements SubscriptionSettingRepositoryInterface {
+  constructor(
+    @inject(TYPES.ORMSubscriptionSettingRepository)
+    private ormRepository: Repository<SubscriptionSetting>,
+  ) {}
+
+  async save(subscriptionSetting: SubscriptionSetting): Promise<SubscriptionSetting> {
+    return this.ormRepository.save(subscriptionSetting)
+  }
+
+  async findOneByUuid(uuid: string): Promise<SubscriptionSetting | null> {
+    return this.ormRepository
+      .createQueryBuilder('setting')
       .where('setting.uuid = :uuid', {
         uuid,
       })
@@ -21,8 +28,9 @@ export class MySQLSubscriptionSettingRepository
   async findLastByNameAndUserSubscriptionUuid(
     name: string,
     userSubscriptionUuid: string,
-  ): Promise<SubscriptionSetting | undefined> {
-    const settings = await this.createQueryBuilder('setting')
+  ): Promise<SubscriptionSetting | null> {
+    const settings = await this.ormRepository
+      .createQueryBuilder('setting')
       .where('setting.name = :name AND setting.user_subscription_uuid = :userSubscriptionUuid', {
         name,
         userSubscriptionUuid,
@@ -31,6 +39,10 @@ export class MySQLSubscriptionSettingRepository
       .limit(1)
       .getMany()
 
-    return settings.pop()
+    if (settings.length === 0) {
+      return null
+    }
+
+    return settings.pop() as SubscriptionSetting
   }
 }

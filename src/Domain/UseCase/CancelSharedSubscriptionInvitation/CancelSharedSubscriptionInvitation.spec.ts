@@ -127,7 +127,7 @@ describe('CancelSharedSubscriptionInvitation', () => {
   })
 
   it('should cancel a shared subscription invitation without subscription removal is subscription is not found', async () => {
-    userSubscriptionRepository.findOneByUserUuidAndSubscriptionId = jest.fn().mockReturnValue(undefined)
+    userSubscriptionRepository.findOneByUserUuidAndSubscriptionId = jest.fn().mockReturnValue(null)
 
     expect(
       await createUseCase().execute({
@@ -153,7 +153,7 @@ describe('CancelSharedSubscriptionInvitation', () => {
   })
 
   it('should not cancel a shared subscription invitation if it is not found', async () => {
-    sharedSubscriptionInvitationRepository.findOneByUuid = jest.fn().mockReturnValue(undefined)
+    sharedSubscriptionInvitationRepository.findOneByUuid = jest.fn().mockReturnValue(null)
     expect(
       await createUseCase().execute({
         sharedSubscriptionInvitationUuid: '1-2-3',
@@ -176,7 +176,7 @@ describe('CancelSharedSubscriptionInvitation', () => {
   })
 
   it('should not cancel a shared subscription invitation if invitee is not found', async () => {
-    userRepository.findOneByEmail = jest.fn().mockReturnValue(undefined)
+    userRepository.findOneByEmail = jest.fn().mockReturnValue(null)
     expect(
       await createUseCase().execute({
         sharedSubscriptionInvitationUuid: '1-2-3',
@@ -188,7 +188,7 @@ describe('CancelSharedSubscriptionInvitation', () => {
   })
 
   it('should not cancel a shared subscription invitation if invitee is not found', async () => {
-    userRepository.findOneByEmail = jest.fn().mockReturnValue(undefined)
+    userRepository.findOneByEmail = jest.fn().mockReturnValue(null)
     expect(
       await createUseCase().execute({
         sharedSubscriptionInvitationUuid: '1-2-3',

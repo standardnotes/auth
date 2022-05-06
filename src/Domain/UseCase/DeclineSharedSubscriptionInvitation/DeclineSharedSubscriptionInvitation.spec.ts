@@ -44,7 +44,7 @@ describe('DeclineSharedSubscriptionInvitation', () => {
   })
 
   it('should not decline the invitation if it does not exist', async () => {
-    sharedSubscriptionInvitationRepository.findOneByUuidAndStatus = jest.fn().mockReturnValue(undefined)
+    sharedSubscriptionInvitationRepository.findOneByUuidAndStatus = jest.fn().mockReturnValue(null)
     expect(
       await createUseCase().execute({
         sharedSubscriptionInvitationUuid: '1-2-3',

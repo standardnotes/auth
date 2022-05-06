@@ -68,7 +68,7 @@ export class SettingInterpreter implements SettingInterpreterInterface {
       SettingName.MuteFailedBackupsEmails,
       userUuid,
     )
-    if (muteFailedEmailsBackupSetting !== undefined) {
+    if (muteFailedEmailsBackupSetting !== null) {
       userHasEmailsMuted = muteFailedEmailsBackupSetting.value === MuteFailedBackupsEmailsOption.Muted
       muteEmailsSettingUuid = muteFailedEmailsBackupSetting.uuid
     }
@@ -132,7 +132,7 @@ export class SettingInterpreter implements SettingInterpreterInterface {
         tokenSettingName as SettingName,
         userUuid,
       )
-      if (tokenSetting !== undefined) {
+      if (tokenSetting !== null) {
         backupToken = await this.settingDecrypter.decryptSettingValue(tokenSetting, userUuid)
       }
     } else {
@@ -151,7 +151,7 @@ export class SettingInterpreter implements SettingInterpreterInterface {
       SettingName.MuteFailedCloudBackupsEmails,
       userUuid,
     )
-    if (muteFailedCloudBackupSetting !== undefined) {
+    if (muteFailedCloudBackupSetting !== null) {
       userHasEmailsMuted = muteFailedCloudBackupSetting.value === MuteFailedCloudBackupsEmailsOption.Muted
       muteEmailsSettingUuid = muteFailedCloudBackupSetting.uuid
     }

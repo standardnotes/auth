@@ -37,7 +37,7 @@ describe('ClearLoginAttempts', () => {
   })
 
   it('should unlock an user by email and uuid if user does not exist', async () => {
-    userRepository.findOneByEmail = jest.fn().mockReturnValue(undefined)
+    userRepository.findOneByEmail = jest.fn().mockReturnValue(null)
 
     expect(await createUseCase().execute({ email: 'test@test.te' })).toEqual({ success: true })
 

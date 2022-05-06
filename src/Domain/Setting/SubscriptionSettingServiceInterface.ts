@@ -12,5 +12,5 @@ export interface SubscriptionSettingServiceInterface {
     subscriptionName: SubscriptionName,
   ): Promise<void>
   createOrReplace(dto: CreateOrReplaceSubscriptionSettingDTO): Promise<CreateOrReplaceSubscriptionSettingResponse>
-  findSubscriptionSettingWithDecryptedValue(dto: FindSubscriptionSettingDTO): Promise<SubscriptionSetting | undefined>
+  findSubscriptionSettingWithDecryptedValue(dto: FindSubscriptionSettingDTO): Promise<SubscriptionSetting | null>
 }

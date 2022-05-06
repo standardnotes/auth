@@ -49,7 +49,7 @@ describe('InviteToSharedSubscription', () => {
   })
 
   it('should not create an inivitation for sharing the subscription if inviter has no subscription', async () => {
-    userSubscriptionRepository.findOneByUserUuid = jest.fn().mockReturnValue(undefined)
+    userSubscriptionRepository.findOneByUserUuid = jest.fn().mockReturnValue(null)
 
     await createUseCase().execute({
       inviteeIdentifier: 'invitee@test.te',

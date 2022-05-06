@@ -20,7 +20,7 @@ export class AccountDeletionRequestedEventHandler implements DomainEventHandlerI
   async handle(event: AccountDeletionRequestedEvent): Promise<void> {
     const user = await this.userRepository.findOneByUuid(event.payload.userUuid)
 
-    if (user === undefined) {
+    if (user === null) {
       this.logger.warn(`Could not find user with uuid: ${event.payload.userUuid}`)
 
       return

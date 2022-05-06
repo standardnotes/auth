@@ -34,7 +34,7 @@ export class OfflineUserAuthMiddleware extends BaseMiddleware {
         OfflineSettingName.FeaturesToken,
         request.headers['x-offline-token'] as string,
       )
-      if (offlineFeaturesTokenSetting === undefined) {
+      if (offlineFeaturesTokenSetting === null) {
         this.logger.debug('OfflineUserAuthMiddleware authentication failure.')
 
         response.status(401).send({

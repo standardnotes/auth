@@ -183,7 +183,7 @@ describe('SignIn', () => {
   })
 
   it('should sign in a user and create mute sign in email setting if it does not exist', async () => {
-    settingService.findSettingWithDecryptedValue = jest.fn().mockReturnValue(undefined)
+    settingService.findSettingWithDecryptedValue = jest.fn().mockReturnValue(null)
 
     expect(
       await createUseCase().execute({
@@ -275,7 +275,7 @@ describe('SignIn', () => {
   })
 
   it('should not sign in a user that does not exist', async () => {
-    userRepository.findOneByEmail = jest.fn().mockReturnValue(undefined)
+    userRepository.findOneByEmail = jest.fn().mockReturnValue(null)
 
     expect(
       await createUseCase().execute({

@@ -46,7 +46,7 @@ export class InviteToSharedSubscription implements UseCaseInterface {
     }
 
     const inviterUserSubscription = await this.userSubscriptionRepository.findOneByUserUuid(dto.inviterUuid)
-    if (inviterUserSubscription === undefined) {
+    if (inviterUserSubscription === null) {
       return {
         success: false,
       }

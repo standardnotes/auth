@@ -123,7 +123,7 @@ export class SignIn implements UseCaseInterface {
       settingName: SettingName.MuteSignInEmails,
     })
 
-    if (existingMuteSignInEmailsSetting !== undefined) {
+    if (existingMuteSignInEmailsSetting !== null) {
       return existingMuteSignInEmailsSetting
     }
 

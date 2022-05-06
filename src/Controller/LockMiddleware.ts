@@ -20,7 +20,7 @@ export class LockMiddleware extends BaseMiddleware {
       let identifier = request.body.email
 
       const user = await this.userRepository.findOneByEmail(identifier)
-      if (user !== undefined) {
+      if (user !== null) {
         identifier = user.uuid
       }
 

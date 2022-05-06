@@ -133,7 +133,7 @@ describe('SubscriptionTokensController', () => {
   it('should validate an subscription token for user without an extension key setting', async () => {
     request.params.token = 'test'
 
-    settingService.findSettingWithDecryptedValue = jest.fn().mockReturnValue(undefined)
+    settingService.findSettingWithDecryptedValue = jest.fn().mockReturnValue(null)
 
     const httpResponse = <results.JsonResult>await createController().validate(request)
     const result = await httpResponse.executeAsync()

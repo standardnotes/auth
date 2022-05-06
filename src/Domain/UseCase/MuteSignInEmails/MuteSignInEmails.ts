@@ -13,7 +13,7 @@ export class MuteSignInEmails implements UseCaseInterface {
   async execute(dto: MuteSignInEmailsDTO): Promise<MuteSignInEmailsResponse> {
     const setting = await this.settingRepository.findOneByUuidAndNames(dto.settingUuid, [SettingName.MuteSignInEmails])
 
-    if (setting === undefined) {
+    if (setting === null) {
       return {
         success: false,
         message: 'Could not find setting setting.',

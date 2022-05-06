@@ -46,7 +46,7 @@ describe('AuthenticateSubscriptionToken', () => {
   })
 
   it('should not authenticate an subscription token if user is not found', async () => {
-    userRepository.findOneByUuid = jest.fn().mockReturnValue(undefined)
+    userRepository.findOneByUuid = jest.fn().mockReturnValue(null)
 
     const response = await createUseCase().execute({ token: 'test' })
 

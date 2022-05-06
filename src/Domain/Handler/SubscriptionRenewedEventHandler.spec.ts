@@ -117,7 +117,7 @@ describe('SubscriptionRenewedEventHandler', () => {
   })
 
   it('should not do anything if no user is found for specified email', async () => {
-    userRepository.findOneByEmail = jest.fn().mockReturnValue(undefined)
+    userRepository.findOneByEmail = jest.fn().mockReturnValue(null)
 
     await createHandler().handle(event)
 
@@ -128,7 +128,7 @@ describe('SubscriptionRenewedEventHandler', () => {
   it('should not do anything if no offline subscription is found for specified id', async () => {
     event.payload.offline = true
 
-    offlineUserSubscriptionRepository.findOneBySubscriptionId = jest.fn().mockReturnValue(undefined)
+    offlineUserSubscriptionRepository.findOneBySubscriptionId = jest.fn().mockReturnValue(null)
 
     await createHandler().handle(event)
 

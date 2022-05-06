@@ -105,7 +105,7 @@ describe('SubscriptionSettingsAssociationService', () => {
       name: PermissionName.Files,
     } as jest.Mocked<Permission>
     role.permissions = Promise.resolve([permission])
-    roleRepository.findOneByName = jest.fn().mockReturnValue(undefined)
+    roleRepository.findOneByName = jest.fn().mockReturnValue(null)
 
     let caughtError = null
     try {

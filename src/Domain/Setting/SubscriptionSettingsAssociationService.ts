@@ -74,7 +74,7 @@ export class SubscriptionSettingsAssociationService implements SubscriptionSetti
     const roleName = this.roleToSubscriptionMap.getRoleNameForSubscriptionName(subscriptionName)
 
     const role = await this.roleRepository.findOneByName(roleName as RoleName)
-    if (role == undefined) {
+    if (role === null) {
       throw new Error(`Could not find role with name: ${roleName}`)
     }
 

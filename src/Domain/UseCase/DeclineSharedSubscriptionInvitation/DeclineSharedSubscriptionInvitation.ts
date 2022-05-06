@@ -22,7 +22,7 @@ export class DeclineSharedSubscriptionInvitation implements UseCaseInterface {
       dto.sharedSubscriptionInvitationUuid,
       InvitationStatus.Sent,
     )
-    if (sharedSubscriptionInvitation === undefined) {
+    if (sharedSubscriptionInvitation === null) {
       return {
         success: false,
       }

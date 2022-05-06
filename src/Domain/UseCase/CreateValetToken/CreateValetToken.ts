@@ -29,7 +29,7 @@ export class CreateValetToken implements UseCaseInterface {
     const { userUuid, ...payload } = dto
     const { regularSubscription, sharedSubscription } =
       await this.userSubscriptionService.findRegularSubscriptionForUserUuid(userUuid)
-    if (regularSubscription === undefined) {
+    if (regularSubscription === null) {
       return {
         success: false,
         reason: 'no-subscription',
@@ -58,7 +58,7 @@ export class CreateValetToken implements UseCaseInterface {
       userSubscriptionUuid: regularSubscription.uuid,
       subscriptionSettingName: SubscriptionSettingName.FileUploadBytesUsed,
     })
-    if (uploadBytesUsedSetting !== undefined) {
+    if (uploadBytesUsedSetting !== null) {
       uploadBytesUsed = +(uploadBytesUsedSetting.value as string)
     }
 
@@ -72,12 +72,12 @@ export class CreateValetToken implements UseCaseInterface {
         userSubscriptionUuid: regularSubscription.uuid,
         subscriptionSettingName: SubscriptionSettingName.FileUploadBytesLimit,
       })
-    if (overwriteWithUserUploadBytesLimitSetting !== undefined) {
+    if (overwriteWithUserUploadBytesLimitSetting !== null) {
       uploadBytesLimit = +(overwriteWithUserUploadBytesLimitSetting.value as string)
     }
 
     let sharedSubscriptionUuid = undefined
-    if (sharedSubscription !== undefined) {
+    if (sharedSubscription !== null) {
       sharedSubscriptionUuid = sharedSubscription.uuid
     }
 

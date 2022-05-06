@@ -22,7 +22,7 @@ export class OfflineSettingService implements OfflineSettingServiceInterface {
     value: string
   }): Promise<{ success: boolean; offlineSetting?: OfflineSetting | undefined }> {
     let offlineSetting = await this.offlineSettingRepository.findOneByNameAndEmail(dto.name, dto.email)
-    if (offlineSetting === undefined) {
+    if (offlineSetting === null) {
       offlineSetting = new OfflineSetting()
       offlineSetting.name = dto.name
       offlineSetting.email = dto.email

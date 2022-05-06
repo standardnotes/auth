@@ -52,7 +52,7 @@ describe('IncreaseLoginAttempts', () => {
 
   it('should should update the lock counter based on email if user is not found', async () => {
     lockRepository.getLockCounter = jest.fn().mockReturnValue(4)
-    userRepository.findOneByEmail = jest.fn().mockReturnValue(undefined)
+    userRepository.findOneByEmail = jest.fn().mockReturnValue(null)
 
     expect(await createUseCase().execute({ email: 'test@test.te' })).toEqual({ success: true })
 

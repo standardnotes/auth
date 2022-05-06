@@ -28,19 +28,19 @@ export class UserSubscriptionService implements UserSubscriptionServiceInterface
   }
 
   private async findRegularSubscription(
-    userSubscription: UserSubscription | undefined,
+    userSubscription: UserSubscription | null,
   ): Promise<FindRegularSubscriptionResponse> {
-    if (userSubscription === undefined) {
+    if (userSubscription === null) {
       return {
-        regularSubscription: undefined,
-        sharedSubscription: undefined,
+        regularSubscription: null,
+        sharedSubscription: null,
       }
     }
 
     if (userSubscription.subscriptionType === UserSubscriptionType.Regular) {
       return {
         regularSubscription: userSubscription,
-        sharedSubscription: undefined,
+        sharedSubscription: null,
       }
     }
 
@@ -50,7 +50,7 @@ export class UserSubscriptionService implements UserSubscriptionServiceInterface
     )
     if (regularSubscriptions.length === 0) {
       return {
-        regularSubscription: undefined,
+        regularSubscription: null,
         sharedSubscription: userSubscription,
       }
     }

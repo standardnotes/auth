@@ -2,15 +2,17 @@ import 'reflect-metadata'
 
 import { ReadStream } from 'fs'
 
-import { SelectQueryBuilder } from 'typeorm'
+import { Repository, SelectQueryBuilder } from 'typeorm'
 import { User } from '../../Domain/User/User'
 
 import { MySQLUserRepository } from './MySQLUserRepository'
 
 describe('MySQLUserRepository', () => {
-  let repository: MySQLUserRepository
+  let ormRepository: Repository<User>
   let queryBuilder: SelectQueryBuilder<User>
   let user: User
+
+  const createRepository = () => new MySQLUserRepository(ormRepository)
 
   beforeEach(() => {
     queryBuilder = {} as jest.Mocked<SelectQueryBuilder<User>>
@@ -18,16 +20,29 @@ describe('MySQLUserRepository', () => {
 
     user = {} as jest.Mocked<User>
 
-    repository = new MySQLUserRepository()
-    jest.spyOn(repository, 'createQueryBuilder')
-    repository.createQueryBuilder = jest.fn().mockImplementation(() => queryBuilder)
+    ormRepository = {} as jest.Mocked<Repository<User>>
+    ormRepository.createQueryBuilder = jest.fn().mockImplementation(() => queryBuilder)
+    ormRepository.save = jest.fn()
+    ormRepository.remove = jest.fn()
+  })
+
+  it('should save', async () => {
+    await createRepository().save(user)
+
+    expect(ormRepository.save).toHaveBeenCalledWith(user)
+  })
+
+  it('should remove', async () => {
+    await createRepository().remove(user)
+
+    expect(ormRepository.remove).toHaveBeenCalledWith(user)
   })
 
   it('should find one user by id', async () => {
     queryBuilder.where = jest.fn().mockReturnThis()
     queryBuilder.getOne = jest.fn().mockReturnValue(user)
 
-    const result = await repository.findOneByUuid('123')
+    const result = await createRepository().findOneByUuid('123')
 
     expect(queryBuilder.where).toHaveBeenCalledWith('user.uuid = :uuid', { uuid: '123' })
     expect(result).toEqual(user)
@@ -37,7 +52,7 @@ describe('MySQLUserRepository', () => {
     const stream = {} as jest.Mocked<ReadStream>
     queryBuilder.stream = jest.fn().mockReturnValue(stream)
 
-    const result = await repository.streamAll()
+    const result = await createRepository().streamAll()
 
     expect(result).toEqual(stream)
   })
@@ -46,7 +61,7 @@ describe('MySQLUserRepository', () => {
     queryBuilder.where = jest.fn().mockReturnThis()
     queryBuilder.getOne = jest.fn().mockReturnValue(user)
 
-    const result = await repository.findOneByEmail('test@test.te')
+    const result = await createRepository().findOneByEmail('test@test.te')
 
     expect(queryBuilder.where).toHaveBeenCalledWith('user.email = :email', { email: 'test@test.te' })
     expect(result).toEqual(user)

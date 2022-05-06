@@ -22,7 +22,7 @@ export class GetSetting implements UseCaseInterface {
       settingName: settingName as SettingName,
     })
 
-    if (setting === undefined) {
+    if (setting === null) {
       return {
         success: false,
         error: {

@@ -38,7 +38,7 @@ export class AuthenticateOfflineSubscriptionToken implements UseCaseInterface {
       OfflineSettingName.FeaturesToken,
       userEmail,
     )
-    if (offlineFeaturesTokenSetting === undefined) {
+    if (offlineFeaturesTokenSetting === null) {
       return {
         success: false,
       }

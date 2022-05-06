@@ -189,11 +189,11 @@ export class SessionService implements SessionServiceInterface {
     return undefined
   }
 
-  async getRevokedSessionFromToken(token: string): Promise<RevokedSession | undefined> {
+  async getRevokedSessionFromToken(token: string): Promise<RevokedSession | null> {
     const tokenParts = token.split(':')
     const sessionUuid = tokenParts[1]
     if (!sessionUuid) {
-      return undefined
+      return null
     }
 
     return this.revokedSessionRepository.findOneByUuid(sessionUuid)
@@ -247,7 +247,7 @@ export class SessionService implements SessionServiceInterface {
     return session
   }
 
-  private async getSession(uuid: string): Promise<Session | undefined> {
+  private async getSession(uuid: string): Promise<Session | null> {
     let session = await this.ephemeralSessionRepository.findOneByUuid(uuid)
 
     if (!session) {
@@ -286,7 +286,7 @@ export class SessionService implements SessionServiceInterface {
       userUuid: user.uuid,
     })
 
-    if (loggingSetting === undefined) {
+    if (loggingSetting === null) {
       return true
     }
 

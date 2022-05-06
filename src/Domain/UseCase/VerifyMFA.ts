@@ -28,7 +28,7 @@ export class VerifyMFA implements UseCaseInterface {
   async execute(dto: VerifyMFADTO): Promise<VerifyMFAResponse> {
     try {
       const user = await this.userRepository.findOneByEmail(dto.email)
-      if (user == undefined) {
+      if (user == null) {
         const mfaSelectorHash = crypto
           .createHash('sha256')
           .update(`mfa-selector-${dto.email}${this.pseudoKeyParamsKey}`)
@@ -52,7 +52,7 @@ export class VerifyMFA implements UseCaseInterface {
         userUuid: user.uuid,
         settingName: SettingName.MfaSecret,
       })
-      if (mfaSecret === undefined || mfaSecret.value === null) {
+      if (mfaSecret === null || mfaSecret.value === null) {
         return {
           success: true,
         }

@@ -74,7 +74,7 @@ describe('SubscriptionSyncRequestedEventHandler', () => {
     offlineUserSubscription = {} as jest.Mocked<OfflineUserSubscription>
 
     offlineUserSubscriptionRepository = {} as jest.Mocked<OfflineUserSubscriptionRepositoryInterface>
-    offlineUserSubscriptionRepository.findOneBySubscriptionId = jest.fn().mockReturnValue(undefined)
+    offlineUserSubscriptionRepository.findOneBySubscriptionId = jest.fn().mockReturnValue(null)
     offlineUserSubscriptionRepository.save = jest.fn().mockReturnValue(offlineUserSubscription)
 
     offlineSettingService = {} as jest.Mocked<OfflineSettingServiceInterface>
@@ -242,7 +242,7 @@ describe('SubscriptionSyncRequestedEventHandler', () => {
   })
 
   it('should not do anything if no user is found for specified email', async () => {
-    userRepository.findOneByEmail = jest.fn().mockReturnValue(undefined)
+    userRepository.findOneByEmail = jest.fn().mockReturnValue(null)
 
     await createHandler().handle(event)
 

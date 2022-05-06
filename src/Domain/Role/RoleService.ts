@@ -28,7 +28,7 @@ export class RoleService implements RoleServiceInterface {
 
   async userHasPermission(userUuid: string, permissionName: PermissionName): Promise<boolean> {
     const user = await this.userRepository.findOneByUuid(userUuid)
-    if (user === undefined) {
+    if (user === null) {
       this.logger.warn(`Could not find user with uuid ${userUuid} for permissions check`)
 
       return false
@@ -57,7 +57,7 @@ export class RoleService implements RoleServiceInterface {
 
     const role = await this.roleRepository.findOneByName(roleName)
 
-    if (role === undefined) {
+    if (role === null) {
       this.logger.warn(`Could not find role for role name: ${roleName}`)
       return
     }
@@ -89,7 +89,7 @@ export class RoleService implements RoleServiceInterface {
 
     const role = await this.roleRepository.findOneByName(roleName)
 
-    if (role === undefined) {
+    if (role === null) {
       this.logger.warn(`Could not find role for role name: ${roleName}`)
 
       return

@@ -72,6 +72,7 @@ describe('AuthenticationMethodResolver', () => {
     expect(await createResolver().resolve('test')).toEqual({
       revokedSession,
       type: 'revoked',
+      user: null,
     })
 
     expect(sessionService.markRevokedSessionAsReceived).toHaveBeenCalled()

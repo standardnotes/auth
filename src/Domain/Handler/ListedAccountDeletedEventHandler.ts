@@ -17,7 +17,7 @@ export class ListedAccountDeletedEventHandler implements DomainEventHandlerInter
 
   async handle(event: ListedAccountDeletedEvent): Promise<void> {
     const user = await this.userRepository.findOneByEmail(event.payload.userEmail)
-    if (user === undefined) {
+    if (user === null) {
       this.logger.warn(`Could not find user with email ${event.payload.userEmail}`)
 
       return
@@ -27,7 +27,7 @@ export class ListedAccountDeletedEventHandler implements DomainEventHandlerInter
       settingName: SettingName.ListedAuthorSecrets,
       userUuid: user.uuid,
     })
-    if (listedAuthorSecretsSetting === undefined) {
+    if (listedAuthorSecretsSetting === null) {
       this.logger.warn(`Could not find listed secrets setting for user ${user.uuid}`)
 
       return

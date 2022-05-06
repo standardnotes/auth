@@ -20,7 +20,7 @@ export class IncreaseLoginAttempts implements UseCaseInterface {
     let identifier = dto.email
 
     const user = await this.userRepository.findOneByEmail(identifier)
-    if (user !== undefined) {
+    if (user !== null) {
       identifier = user.uuid
     }
 

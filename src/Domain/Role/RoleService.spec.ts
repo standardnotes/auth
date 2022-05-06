@@ -133,7 +133,7 @@ describe('RoleService', () => {
     })
 
     it('should not add role if no role exists for role name', async () => {
-      roleRepository.findOneByName = jest.fn().mockReturnValue(undefined)
+      roleRepository.findOneByName = jest.fn().mockReturnValue(null)
       await createService().addUserRole(user, SubscriptionName.ProPlan)
 
       expect(userRepository.save).not.toHaveBeenCalled()
@@ -160,7 +160,7 @@ describe('RoleService', () => {
     })
 
     it('should not set offline role if no role exists for role name', async () => {
-      roleRepository.findOneByName = jest.fn().mockReturnValue(undefined)
+      roleRepository.findOneByName = jest.fn().mockReturnValue(null)
 
       await createService().setOfflineUserRole(offlineUserSubscription)
 
@@ -225,7 +225,7 @@ describe('RoleService', () => {
     })
 
     it('should indicate user does not have a permission if user could not be found', async () => {
-      userRepository.findOneByUuid = jest.fn().mockReturnValue(undefined)
+      userRepository.findOneByUuid = jest.fn().mockReturnValue(null)
 
       const userHasPermission = await createService().userHasPermission('1-2-3', PermissionName.DailyGDriveBackup)
 

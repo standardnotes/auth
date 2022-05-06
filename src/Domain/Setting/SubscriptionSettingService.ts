@@ -58,8 +58,8 @@ export class SubscriptionSettingService implements SubscriptionSettingServiceInt
 
   async findSubscriptionSettingWithDecryptedValue(
     dto: FindSubscriptionSettingDTO,
-  ): Promise<SubscriptionSetting | undefined> {
-    let setting: SubscriptionSetting | undefined
+  ): Promise<SubscriptionSetting | null> {
+    let setting: SubscriptionSetting | null
     if (dto.settingUuid !== undefined) {
       setting = await this.subscriptionSettingRepository.findOneByUuid(dto.settingUuid)
     } else {
@@ -69,8 +69,8 @@ export class SubscriptionSettingService implements SubscriptionSettingServiceInt
       )
     }
 
-    if (setting === undefined) {
-      return undefined
+    if (setting === null) {
+      return null
     }
 
     setting.value = await this.settingDecrypter.decryptSettingValue(setting, dto.userUuid)
@@ -90,7 +90,7 @@ export class SubscriptionSettingService implements SubscriptionSettingServiceInt
       settingUuid: props.uuid,
     })
 
-    if (existing === undefined) {
+    if (existing === null) {
       const subscriptionSetting = await this.subscriptionSettingRepository.save(
         await this.factory.createSubscriptionSetting(props, userSubscription),
       )

@@ -19,7 +19,7 @@ export class DeleteSetting implements UseCaseInterface {
 
     const setting = await this.getSetting(dto)
 
-    if (setting === undefined) {
+    if (setting === null) {
       return {
         success: false,
         error: {
@@ -47,7 +47,7 @@ export class DeleteSetting implements UseCaseInterface {
     }
   }
 
-  private async getSetting(dto: DeleteSettingDto): Promise<Setting | undefined> {
+  private async getSetting(dto: DeleteSettingDto): Promise<Setting | null> {
     if (dto.uuid !== undefined) {
       return this.settingRepository.findOneByUuid(dto.uuid)
     }

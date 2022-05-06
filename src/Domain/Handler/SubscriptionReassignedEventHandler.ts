@@ -29,7 +29,7 @@ export class SubscriptionReassignedEventHandler implements DomainEventHandlerInt
   async handle(event: SubscriptionReassignedEvent): Promise<void> {
     const user = await this.userRepository.findOneByEmail(event.payload.userEmail)
 
-    if (user === undefined) {
+    if (user === null) {
       this.logger.warn(`Could not find user with email: ${event.payload.userEmail}`)
 
       return

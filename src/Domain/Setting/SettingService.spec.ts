@@ -46,8 +46,8 @@ describe('SettingService', () => {
     factory.createReplacement = jest.fn().mockReturnValue(setting)
 
     settingRepository = {} as jest.Mocked<SettingRepositoryInterface>
-    settingRepository.findLastByNameAndUserUuid = jest.fn().mockReturnValue(undefined)
-    settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue(undefined)
+    settingRepository.findLastByNameAndUserUuid = jest.fn().mockReturnValue(null)
+    settingRepository.findOneByNameAndUserUuid = jest.fn().mockReturnValue(null)
     settingRepository.save = jest.fn().mockImplementation((setting) => setting)
 
     settingsAssociationService = {} as jest.Mocked<SettingsAssociationServiceInterface>
@@ -118,7 +118,7 @@ describe('SettingService', () => {
   })
 
   it('should create setting with a given uuid if it does not exist', async () => {
-    settingRepository.findOneByUuid = jest.fn().mockReturnValue(undefined)
+    settingRepository.findOneByUuid = jest.fn().mockReturnValue(null)
 
     const result = await createService().createOrReplace({
       user,

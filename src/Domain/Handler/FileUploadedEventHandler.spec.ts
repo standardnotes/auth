@@ -47,10 +47,10 @@ describe('FileUploadedEventHandler', () => {
     userSubscriptionService = {} as jest.Mocked<UserSubscriptionServiceInterface>
     userSubscriptionService.findRegularSubscriptionForUserUuid = jest
       .fn()
-      .mockReturnValue({ regularSubscription, sharedSubscription: undefined })
+      .mockReturnValue({ regularSubscription, sharedSubscription: null })
 
     subscriptionSettingService = {} as jest.Mocked<SubscriptionSettingServiceInterface>
-    subscriptionSettingService.findSubscriptionSettingWithDecryptedValue = jest.fn().mockReturnValue(undefined)
+    subscriptionSettingService.findSubscriptionSettingWithDecryptedValue = jest.fn().mockReturnValue(null)
     subscriptionSettingService.createOrReplace = jest.fn()
 
     event = {} as jest.Mocked<FileUploadedEvent>
@@ -85,7 +85,7 @@ describe('FileUploadedEventHandler', () => {
   })
 
   it('should not do anything if a user is not found', async () => {
-    userRepository.findOneByUuid = jest.fn().mockReturnValue(undefined)
+    userRepository.findOneByUuid = jest.fn().mockReturnValue(null)
 
     await createHandler().handle(event)
 
@@ -98,7 +98,7 @@ describe('FileUploadedEventHandler', () => {
     })
     userSubscriptionService.findRegularSubscriptionForUserUuid = jest
       .fn()
-      .mockReturnValue({ regularSubscription: undefined, sharedSubscription: undefined })
+      .mockReturnValue({ regularSubscription: null, sharedSubscription: null })
 
     await createHandler().handle(event)
 

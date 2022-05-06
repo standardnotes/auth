@@ -14,7 +14,7 @@ import { Env } from './Env'
 import TYPES from './Types'
 import { AuthMiddleware } from '../Controller/AuthMiddleware'
 import { AuthenticateUser } from '../Domain/UseCase/AuthenticateUser'
-import { Connection, createConnection, LoggerOptions } from 'typeorm'
+import { Connection, createConnection, LoggerOptions, Repository } from 'typeorm'
 import { User } from '../Domain/User/User'
 import { Session } from '../Domain/Session/Session'
 import { SessionService } from '../Domain/Session/SessionService'
@@ -178,6 +178,10 @@ import { SubscriptionSettingsAssociationService } from '../Domain/Setting/Subscr
 import { SubscriptionSettingsAssociationServiceInterface } from '../Domain/Setting/SubscriptionSettingsAssociationServiceInterface'
 import { PKCERepositoryInterface } from '../Domain/User/PKCERepositoryInterface'
 import { RedisPKCERepository } from '../Infra/Redis/RedisPKCERepository'
+import { RoleRepositoryInterface } from '../Domain/Role/RoleRepositoryInterface'
+import { RevokedSessionRepositoryInterface } from '../Domain/Session/RevokedSessionRepositoryInterface'
+import { SessionRepositoryInterface } from '../Domain/Session/SessionRepositoryInterface'
+import { UserRepositoryInterface } from '../Domain/User/UserRepositoryInterface'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const newrelicWinstonEnricher = require('@newrelic/winston-enricher')
@@ -283,33 +287,21 @@ export class ContainerConfigLoader {
     }
 
     // Repositories
-    container
-      .bind<MySQLSessionRepository>(TYPES.SessionRepository)
-      .toConstantValue(connection.getCustomRepository(MySQLSessionRepository))
-    container
-      .bind<MySQLRevokedSessionRepository>(TYPES.RevokedSessionRepository)
-      .toConstantValue(connection.getCustomRepository(MySQLRevokedSessionRepository))
-    container
-      .bind<MySQLUserRepository>(TYPES.UserRepository)
-      .toConstantValue(connection.getCustomRepository(MySQLUserRepository))
-    container
-      .bind<SettingRepositoryInterface>(TYPES.SettingRepository)
-      .toConstantValue(connection.getCustomRepository(MySQLSettingRepository))
+    container.bind<SessionRepositoryInterface>(TYPES.SessionRepository).to(MySQLSessionRepository)
+    container.bind<RevokedSessionRepositoryInterface>(TYPES.RevokedSessionRepository).to(MySQLRevokedSessionRepository)
+    container.bind<UserRepositoryInterface>(TYPES.UserRepository).to(MySQLUserRepository)
+    container.bind<SettingRepositoryInterface>(TYPES.SettingRepository).to(MySQLSettingRepository)
     container
       .bind<SubscriptionSettingRepositoryInterface>(TYPES.SubscriptionSettingRepository)
-      .toConstantValue(connection.getCustomRepository(MySQLSubscriptionSettingRepository))
-    container
-      .bind<OfflineSettingRepositoryInterface>(TYPES.OfflineSettingRepository)
-      .toConstantValue(connection.getCustomRepository(MySQLOfflineSettingRepository))
-    container
-      .bind<MySQLRoleRepository>(TYPES.RoleRepository)
-      .toConstantValue(connection.getCustomRepository(MySQLRoleRepository))
+      .to(MySQLSubscriptionSettingRepository)
+    container.bind<OfflineSettingRepositoryInterface>(TYPES.OfflineSettingRepository).to(MySQLOfflineSettingRepository)
+    container.bind<RoleRepositoryInterface>(TYPES.RoleRepository).to(MySQLRoleRepository)
     container
       .bind<UserSubscriptionRepositoryInterface>(TYPES.UserSubscriptionRepository)
-      .toConstantValue(connection.getCustomRepository(MySQLUserSubscriptionRepository))
+      .to(MySQLUserSubscriptionRepository)
     container
       .bind<OfflineUserSubscriptionRepositoryInterface>(TYPES.OfflineUserSubscriptionRepository)
-      .toConstantValue(connection.getCustomRepository(MySQLOfflineUserSubscriptionRepository))
+      .to(MySQLOfflineUserSubscriptionRepository)
     container
       .bind<RedisEphemeralSessionRepository>(TYPES.EphemeralSessionRepository)
       .to(RedisEphemeralSessionRepository)
@@ -325,8 +317,32 @@ export class ContainerConfigLoader {
       .to(RedisOfflineSubscriptionTokenRepository)
     container
       .bind<SharedSubscriptionInvitationRepositoryInterface>(TYPES.SharedSubscriptionInvitationRepository)
-      .toConstantValue(connection.getCustomRepository(MySQLSharedSubscriptionInvitationRepository))
+      .to(MySQLSharedSubscriptionInvitationRepository)
     container.bind<PKCERepositoryInterface>(TYPES.PKCERepository).to(RedisPKCERepository)
+
+    // ORM
+    container
+      .bind<Repository<OfflineSetting>>(TYPES.ORMOfflineSettingRepository)
+      .toConstantValue(connection.getRepository(OfflineSetting))
+    container
+      .bind<Repository<OfflineUserSubscription>>(TYPES.ORMOfflineUserSubscriptionRepository)
+      .toConstantValue(connection.getRepository(OfflineUserSubscription))
+    container
+      .bind<Repository<RevokedSession>>(TYPES.ORMRevokedSessionRepository)
+      .toConstantValue(connection.getRepository(RevokedSession))
+    container.bind<Repository<Role>>(TYPES.ORMRoleRepository).toConstantValue(connection.getRepository(Role))
+    container.bind<Repository<Session>>(TYPES.ORMSessionRepository).toConstantValue(connection.getRepository(Session))
+    container.bind<Repository<Setting>>(TYPES.ORMSettingRepository).toConstantValue(connection.getRepository(Setting))
+    container
+      .bind<Repository<SharedSubscriptionInvitation>>(TYPES.ORMSharedSubscriptionInvitationRepository)
+      .toConstantValue(connection.getRepository(SharedSubscriptionInvitation))
+    container
+      .bind<Repository<SubscriptionSetting>>(TYPES.ORMSubscriptionSettingRepository)
+      .toConstantValue(connection.getRepository(SubscriptionSetting))
+    container.bind<Repository<User>>(TYPES.ORMUserRepository).toConstantValue(connection.getRepository(User))
+    container
+      .bind<Repository<UserSubscription>>(TYPES.ORMUserSubscriptionRepository)
+      .toConstantValue(connection.getRepository(UserSubscription))
 
     // Middleware
     container.bind<AuthMiddleware>(TYPES.AuthMiddleware).to(AuthMiddleware)

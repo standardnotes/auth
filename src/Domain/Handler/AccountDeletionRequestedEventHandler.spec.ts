@@ -84,7 +84,7 @@ describe('AccountDeletionRequestedEventHandler', () => {
   })
 
   it('should not remove a user if one does not exist', async () => {
-    userRepository.findOneByUuid = jest.fn().mockReturnValue(undefined)
+    userRepository.findOneByUuid = jest.fn().mockReturnValue(null)
 
     await createHandler().handle(event)
 

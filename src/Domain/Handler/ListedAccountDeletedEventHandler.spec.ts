@@ -43,7 +43,7 @@ describe('ListedAccountDeletedEventHandler', () => {
   })
 
   it('should not remove the listed secret if user is not found', async () => {
-    userRepository.findOneByEmail = jest.fn().mockReturnValue(undefined)
+    userRepository.findOneByEmail = jest.fn().mockReturnValue(null)
 
     await createHandler().handle(event)
 
@@ -51,7 +51,7 @@ describe('ListedAccountDeletedEventHandler', () => {
   })
 
   it('should not remove the listed secret if setting is not found', async () => {
-    settingService.findSettingWithDecryptedValue = jest.fn().mockReturnValue(undefined)
+    settingService.findSettingWithDecryptedValue = jest.fn().mockReturnValue(null)
 
     await createHandler().handle(event)
 

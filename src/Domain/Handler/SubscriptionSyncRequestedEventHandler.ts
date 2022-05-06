@@ -70,7 +70,7 @@ export class SubscriptionSyncRequestedEventHandler implements DomainEventHandler
 
     const user = await this.userRepository.findOneByEmail(event.payload.userEmail)
 
-    if (user === undefined) {
+    if (user === null) {
       this.logger.warn(`Could not find user with email: ${event.payload.userEmail}`)
       return
     }
@@ -141,7 +141,7 @@ export class SubscriptionSyncRequestedEventHandler implements DomainEventHandler
     timestamp: number,
   ): Promise<OfflineUserSubscription> {
     let subscription = await this.offlineUserSubscriptionRepository.findOneBySubscriptionId(subscriptionId)
-    if (subscription === undefined) {
+    if (subscription === null) {
       subscription = new OfflineUserSubscription()
     }
 

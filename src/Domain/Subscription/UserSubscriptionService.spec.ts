@@ -31,16 +31,16 @@ describe('UserSubscriptionService', () => {
     } as jest.Mocked<UserSubscription>
 
     userSubscriptionRepository = {} as jest.Mocked<UserSubscriptionRepositoryInterface>
-    userSubscriptionRepository.findOneByUserUuid = jest.fn().mockReturnValue(undefined)
-    userSubscriptionRepository.findOneByUuid = jest.fn().mockReturnValue(undefined)
+    userSubscriptionRepository.findOneByUserUuid = jest.fn().mockReturnValue(null)
+    userSubscriptionRepository.findOneByUuid = jest.fn().mockReturnValue(null)
     userSubscriptionRepository.findBySubscriptionIdAndType = jest.fn().mockReturnValue([])
   })
 
   describe('by uuid', () => {
     it('should return undefined if there is no user subscription', async () => {
       expect(await createService().findRegularSubscriptionForUuid('1-2-3')).toEqual({
-        regularSubscription: undefined,
-        sharedSubscription: undefined,
+        regularSubscription: null,
+        sharedSubscription: null,
       })
     })
 
@@ -49,7 +49,7 @@ describe('UserSubscriptionService', () => {
 
       expect(await createService().findRegularSubscriptionForUuid('1-2-3')).toEqual({
         regularSubscription,
-        sharedSubscription: undefined,
+        sharedSubscription: null,
       })
     })
 
@@ -68,7 +68,7 @@ describe('UserSubscriptionService', () => {
       userSubscriptionRepository.findBySubscriptionIdAndType = jest.fn().mockReturnValue([])
 
       expect(await createService().findRegularSubscriptionForUuid('1-2-3')).toEqual({
-        regularSubscription: undefined,
+        regularSubscription: null,
         sharedSubscription,
       })
     })
@@ -77,8 +77,8 @@ describe('UserSubscriptionService', () => {
   describe('by user uuid', () => {
     it('should return undefined if there is no user subscription', async () => {
       expect(await createService().findRegularSubscriptionForUserUuid('1-2-3')).toEqual({
-        regularSubscription: undefined,
-        sharedSubscription: undefined,
+        regularSubscription: null,
+        sharedSubscription: null,
       })
     })
 
@@ -87,7 +87,7 @@ describe('UserSubscriptionService', () => {
 
       expect(await createService().findRegularSubscriptionForUserUuid('1-2-3')).toEqual({
         regularSubscription,
-        sharedSubscription: undefined,
+        sharedSubscription: null,
       })
     })
 
@@ -106,7 +106,7 @@ describe('UserSubscriptionService', () => {
       userSubscriptionRepository.findBySubscriptionIdAndType = jest.fn().mockReturnValue([])
 
       expect(await createService().findRegularSubscriptionForUserUuid('1-2-3')).toEqual({
-        regularSubscription: undefined,
+        regularSubscription: null,
         sharedSubscription,
       })
     })

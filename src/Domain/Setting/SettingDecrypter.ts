@@ -18,7 +18,7 @@ export class SettingDecrypter implements SettingDecrypterInterface {
     if (setting.value !== null && setting.serverEncryptionVersion === EncryptionVersion.Default) {
       const user = await this.userRepository.findOneByUuid(userUuid)
 
-      if (user === undefined) {
+      if (user === null) {
         throw new Error(`Could not find user with uuid: ${userUuid}`)
       }
 

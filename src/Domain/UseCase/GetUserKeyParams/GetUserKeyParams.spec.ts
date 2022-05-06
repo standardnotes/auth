@@ -87,7 +87,7 @@ describe('GetUserKeyParams', () => {
   })
 
   it('should get pseudo key params for a non existing user - when searching by email', async () => {
-    userRepository.findOneByEmail = jest.fn().mockReturnValue(undefined)
+    userRepository.findOneByEmail = jest.fn().mockReturnValue(null)
 
     expect(await createUseCase().execute({ email: 'test@test.te', authenticated: false })).toEqual({
       keyParams: {
@@ -99,7 +99,7 @@ describe('GetUserKeyParams', () => {
   })
 
   it('should throw error for a non existing user - when searching by uuid', async () => {
-    userRepository.findOneByUuid = jest.fn().mockReturnValue(undefined)
+    userRepository.findOneByUuid = jest.fn().mockReturnValue(null)
 
     let error = null
     try {
@@ -112,7 +112,7 @@ describe('GetUserKeyParams', () => {
   })
 
   it('should throw error for a non existing user - when search parameters are not given', async () => {
-    userRepository.findOneByUuid = jest.fn().mockReturnValue(undefined)
+    userRepository.findOneByUuid = jest.fn().mockReturnValue(null)
 
     let error = null
     try {

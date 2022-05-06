@@ -25,7 +25,7 @@ export class GetUserFeatures implements UseCaseInterface {
 
     const user = await this.userRepository.findOneByUuid(dto.userUuid)
 
-    if (user === undefined) {
+    if (user === null) {
       return {
         success: false,
         error: {

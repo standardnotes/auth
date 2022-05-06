@@ -82,7 +82,7 @@ describe('ChangeCredentials', () => {
   })
 
   it('should change email', async () => {
-    userRepository.findOneByEmail = jest.fn().mockReturnValue(undefined)
+    userRepository.findOneByEmail = jest.fn().mockReturnValue(null)
 
     expect(
       await createUseCase().execute({

@@ -20,7 +20,7 @@ export class DeleteAccount implements UseCaseInterface {
   async execute(dto: DeleteAccountDTO): Promise<DeleteAccountResponse> {
     const user = await this.userRepository.findOneByEmail(dto.email)
 
-    if (user === undefined) {
+    if (user === null) {
       return {
         success: false,
         responseCode: 404,
@@ -30,7 +30,7 @@ export class DeleteAccount implements UseCaseInterface {
 
     let regularSubscriptionUuid = undefined
     const { regularSubscription } = await this.userSubscriptionService.findRegularSubscriptionForUserUuid(user.uuid)
-    if (regularSubscription !== undefined) {
+    if (regularSubscription !== null) {
       regularSubscriptionUuid = regularSubscription.uuid
     }
 

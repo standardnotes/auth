@@ -47,7 +47,7 @@ describe('DeleteSetting', () => {
   })
 
   it('should not delete a setting by name and user uuid if not found', async () => {
-    settingRepository.findLastByNameAndUserUuid = jest.fn().mockReturnValue(undefined)
+    settingRepository.findLastByNameAndUserUuid = jest.fn().mockReturnValue(null)
 
     await createUseCase().execute({
       settingName: 'test',
@@ -58,7 +58,7 @@ describe('DeleteSetting', () => {
   })
 
   it('should not delete a setting by uuid if not found', async () => {
-    settingRepository.findOneByUuid = jest.fn().mockReturnValue(undefined)
+    settingRepository.findOneByUuid = jest.fn().mockReturnValue(null)
 
     await createUseCase().execute({
       settingName: 'test',
