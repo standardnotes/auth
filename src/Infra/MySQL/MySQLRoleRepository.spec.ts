@@ -1,6 +1,7 @@
 import 'reflect-metadata'
 
 import { Repository, SelectQueryBuilder } from 'typeorm'
+import { Logger } from 'winston'
 import { Role } from '../../Domain/Role/Role'
 
 import { MySQLRoleRepository } from './MySQLRoleRepository'
@@ -9,8 +10,9 @@ describe('MySQLRoleRepository', () => {
   let ormRepository: Repository<Role>
   let queryBuilder: SelectQueryBuilder<Role>
   let role: Role
+  let logger: Logger
 
-  const createRepository = () => new MySQLRoleRepository(ormRepository)
+  const createRepository = () => new MySQLRoleRepository(ormRepository, logger)
 
   beforeEach(() => {
     queryBuilder = {} as jest.Mocked<SelectQueryBuilder<Role>>
@@ -20,6 +22,9 @@ describe('MySQLRoleRepository', () => {
 
     ormRepository = {} as jest.Mocked<Repository<Role>>
     ormRepository.createQueryBuilder = jest.fn().mockImplementation(() => queryBuilder)
+
+    logger = {} as jest.Mocked<Logger>
+    logger.debug = jest.fn()
   })
 
   it('should find latest version of a role by name', async () => {
