@@ -9,7 +9,6 @@ import { User } from '../User/User'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 
 import { AuthenticationMethodResolver } from './AuthenticationMethodResolver'
-import { Logger } from 'winston'
 
 describe('AuthenticationMethodResolver', () => {
   let userRepository: UserRepositoryInterface
@@ -19,10 +18,9 @@ describe('AuthenticationMethodResolver', () => {
   let user: User
   let session: Session
   let revokedSession: RevokedSession
-  let logger: Logger
 
   const createResolver = () =>
-    new AuthenticationMethodResolver(userRepository, sessionService, sessionTokenDecoder, fallbackTokenDecoder, logger)
+    new AuthenticationMethodResolver(userRepository, sessionService, sessionTokenDecoder, fallbackTokenDecoder)
 
   beforeEach(() => {
     user = {} as jest.Mocked<User>
@@ -44,9 +42,6 @@ describe('AuthenticationMethodResolver', () => {
 
     fallbackTokenDecoder = {} as jest.Mocked<TokenDecoderInterface<SessionTokenData>>
     fallbackTokenDecoder.decodeToken = jest.fn()
-
-    logger = {} as jest.Mocked<Logger>
-    logger.debug = jest.fn()
   })
 
   it('should resolve jwt authentication method', async () => {

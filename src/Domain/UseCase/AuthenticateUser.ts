@@ -1,7 +1,6 @@
 import * as crypto from 'crypto'
 import * as dayjs from 'dayjs'
 import { inject, injectable } from 'inversify'
-import { Logger } from 'winston'
 
 import TYPES from '../../Bootstrap/Types'
 import { AuthenticationMethodResolverInterface } from '../Auth/AuthenticationMethodResolverInterface'
@@ -15,16 +14,10 @@ export class AuthenticateUser implements UseCaseInterface {
   constructor(
     @inject(TYPES.AuthenticationMethodResolver)
     private authenticationMethodResolver: AuthenticationMethodResolverInterface,
-    @inject(TYPES.Logger) private logger: Logger,
   ) {}
 
   async execute(dto: AuthenticateUserDTO): Promise<AuthenticateUserResponse> {
-    this.logger.debug('Attempting to authenticate user with token %s', dto.token)
-
     const authenticationMethod = await this.authenticationMethodResolver.resolve(dto.token)
-
-    this.logger.debug('Resolved authentication method: %O', authenticationMethod)
-
     if (!authenticationMethod) {
       return {
         success: false,

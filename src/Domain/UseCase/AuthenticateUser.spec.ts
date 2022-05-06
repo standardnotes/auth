@@ -7,16 +7,14 @@ import { User } from '../User/User'
 import { AuthenticateUser } from './AuthenticateUser'
 import { RevokedSession } from '../Session/RevokedSession'
 import { AuthenticationMethodResolverInterface } from '../Auth/AuthenticationMethodResolverInterface'
-import { Logger } from 'winston'
 
 describe('AuthenticateUser', () => {
   let user: User
   let session: Session
   let revokedSession: RevokedSession
   let authenticationMethodResolver: AuthenticationMethodResolverInterface
-  let logger: Logger
 
-  const createUseCase = () => new AuthenticateUser(authenticationMethodResolver, logger)
+  const createUseCase = () => new AuthenticateUser(authenticationMethodResolver)
 
   beforeEach(() => {
     user = {} as jest.Mocked<User>
@@ -31,9 +29,6 @@ describe('AuthenticateUser', () => {
 
     authenticationMethodResolver = {} as jest.Mocked<AuthenticationMethodResolverInterface>
     authenticationMethodResolver.resolve = jest.fn()
-
-    logger = {} as jest.Mocked<Logger>
-    logger.debug = jest.fn()
   })
 
   it('should authenticate a user based on a JWT token', async () => {
