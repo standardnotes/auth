@@ -4,13 +4,13 @@ import { Role } from '../Role/Role'
 @Entity({ name: 'permissions' })
 export class Permission {
   @PrimaryGeneratedColumn('uuid')
-  uuid!: string
+  declare uuid: string
 
   @Column({
     length: 255,
   })
   @Index('index_permissions_on_name', { unique: true })
-  name!: string
+  declare name: string
 
   @Column({
     name: 'created_at',
@@ -19,7 +19,7 @@ export class Permission {
       /* istanbul ignore next */
       () => 'CURRENT_TIMESTAMP',
   })
-  createdAt!: Date
+  declare createdAt: Date
 
   @Column({
     name: 'updated_at',
@@ -28,7 +28,7 @@ export class Permission {
       /* istanbul ignore next */
       () => 'CURRENT_TIMESTAMP',
   })
-  updatedAt!: Date
+  declare updatedAt: Date
 
   @ManyToMany(
     /* istanbul ignore next */
@@ -47,5 +47,5 @@ export class Permission {
       referencedColumnName: 'uuid',
     },
   })
-  roles: Promise<Array<Role>> | undefined
+  declare roles: Promise<Array<Role>>
 }

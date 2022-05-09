@@ -11,7 +11,6 @@ import { OfflineUserSubscriptionRepositoryInterface } from '../Subscription/Offl
 import { Role } from '../Role/Role'
 import { OfflineUserSubscription } from '../Subscription/OfflineUserSubscription'
 import { TimerInterface } from '@standardnotes/time'
-import { Permission } from '../Permission/Permission'
 
 @injectable()
 export class FeatureService implements FeatureServiceInterface {
@@ -29,7 +28,7 @@ export class FeatureService implements FeatureServiceInterface {
     )
     const userRolesMap: Map<string, Role> = new Map()
     for (const userSubscription of userSubscriptions) {
-      const subscriptionRoles = await (userSubscription.roles as Promise<Role[]>)
+      const subscriptionRoles = await userSubscription.roles
       for (const subscriptionRole of subscriptionRoles) {
         userRolesMap.set(subscriptionRole.name, subscriptionRole)
       }
@@ -39,9 +38,9 @@ export class FeatureService implements FeatureServiceInterface {
   }
 
   async getFeaturesForUser(user: User): Promise<Array<FeatureDescription>> {
-    const userSubscriptions = await (user.subscriptions as Promise<UserSubscription[]>)
+    const userSubscriptions = await user.subscriptions
 
-    return this.getFeaturesForSubscriptions(userSubscriptions, await (user.roles as Promise<Role[]>))
+    return this.getFeaturesForSubscriptions(userSubscriptions, await user.roles)
   }
 
   private async getFeaturesForSubscriptions(
@@ -103,7 +102,7 @@ export class FeatureService implements FeatureServiceInterface {
     userFeatures: Map<string, FeatureDescription>,
     longestLastingSubscription?: UserSubscription | OfflineUserSubscription,
   ): Promise<void> {
-    const rolePermissions = await (role.permissions as Promise<Permission[]>)
+    const rolePermissions = await role.permissions
     for (const rolePermission of rolePermissions) {
       const featureForPermission = GetFeatures().find(
         (feature) => feature.permission_name === rolePermission.name,

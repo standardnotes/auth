@@ -8,7 +8,6 @@ import { EncryptionVersion } from '../Encryption/EncryptionVersion'
 import { SubscriptionSettingServiceInterface } from '../Setting/SubscriptionSettingServiceInterface'
 import { UserSubscription } from '../Subscription/UserSubscription'
 import { UserSubscriptionServiceInterface } from '../Subscription/UserSubscriptionServiceInterface'
-import { User } from '../User/User'
 
 @injectable()
 export class FileRemovedEventHandler implements DomainEventHandlerInterface {
@@ -35,7 +34,7 @@ export class FileRemovedEventHandler implements DomainEventHandlerInterface {
   }
 
   private async updateUploadBytesUsedSetting(subscription: UserSubscription, byteSize: number): Promise<void> {
-    const user = await (subscription.user as Promise<User>)
+    const user = await subscription.user
     const bytesUsedSetting = await this.subscriptionSettingService.findSubscriptionSettingWithDecryptedValue({
       userUuid: user.uuid,
       userSubscriptionUuid: subscription.uuid,

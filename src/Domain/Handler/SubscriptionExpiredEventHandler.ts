@@ -8,7 +8,6 @@ import { RoleServiceInterface } from '../Role/RoleServiceInterface'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { UserSubscriptionRepositoryInterface } from '../Subscription/UserSubscriptionRepositoryInterface'
 import { OfflineUserSubscriptionRepositoryInterface } from '../Subscription/OfflineUserSubscriptionRepositoryInterface'
-import { User } from '../User/User'
 
 @injectable()
 export class SubscriptionExpiredEventHandler implements DomainEventHandlerInterface {
@@ -45,7 +44,7 @@ export class SubscriptionExpiredEventHandler implements DomainEventHandlerInterf
   ): Promise<void> {
     const userSubscriptions = await this.userSubscriptionRepository.findBySubscriptionId(subscriptionId)
     for (const userSubscription of userSubscriptions) {
-      await this.roleService.removeUserRole(await (userSubscription.user as Promise<User>), subscriptionName)
+      await this.roleService.removeUserRole(await userSubscription.user, subscriptionName)
     }
   }
 

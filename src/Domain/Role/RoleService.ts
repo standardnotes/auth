@@ -13,7 +13,6 @@ import { RoleToSubscriptionMapInterface } from './RoleToSubscriptionMapInterface
 import { OfflineUserSubscriptionRepositoryInterface } from '../Subscription/OfflineUserSubscriptionRepositoryInterface'
 import { Role } from './Role'
 import { OfflineUserSubscription } from '../Subscription/OfflineUserSubscription'
-import { Permission } from '../Permission/Permission'
 
 @injectable()
 export class RoleService implements RoleServiceInterface {
@@ -35,9 +34,9 @@ export class RoleService implements RoleServiceInterface {
       return false
     }
 
-    const roles = await (user.roles as Promise<Role[]>)
+    const roles = await user.roles
     for (const role of roles) {
-      const permissions = await (role.permissions as Promise<Permission[]>)
+      const permissions = await role.permissions
       for (const permission of permissions) {
         if (permission.name === permissionName) {
           return true
@@ -64,7 +63,7 @@ export class RoleService implements RoleServiceInterface {
     }
 
     const rolesMap = new Map<string, Role>()
-    const currentRoles = await (user.roles as Promise<Role[]>)
+    const currentRoles = await user.roles
     for (const currentRole of currentRoles) {
       rolesMap.set(currentRole.name, currentRole)
     }
@@ -109,7 +108,7 @@ export class RoleService implements RoleServiceInterface {
       return
     }
 
-    const currentRoles = await (user.roles as Promise<Role[]>)
+    const currentRoles = await user.roles
     user.roles = Promise.resolve(currentRoles.filter((role) => role.name !== roleName))
     await this.userRepository.save(user)
     await this.webSocketsClientService.sendUserRolesChangedEvent(user)

@@ -14,7 +14,8 @@ import { Env } from './Env'
 import TYPES from './Types'
 import { AuthMiddleware } from '../Controller/AuthMiddleware'
 import { AuthenticateUser } from '../Domain/UseCase/AuthenticateUser'
-import { Connection, createConnection, LoggerOptions, Repository } from 'typeorm'
+import { Repository } from 'typeorm'
+import { AppDataSource } from './DataSource'
 import { User } from '../Domain/User/User'
 import { Session } from '../Domain/Session/Session'
 import { SessionService } from '../Domain/Session/SessionService'
@@ -50,7 +51,6 @@ import { UserRegisteredEventHandler } from '../Domain/Handler/UserRegisteredEven
 import { DomainEventFactory } from '../Domain/Event/DomainEventFactory'
 import { AuthenticateRequest } from '../Domain/UseCase/AuthenticateRequest'
 import { Role } from '../Domain/Role/Role'
-import { Permission } from '../Domain/Permission/Permission'
 import { RoleProjector } from '../Projection/RoleProjector'
 import { PermissionProjector } from '../Projection/PermissionProjector'
 import { MySQLRoleRepository } from '../Infra/MySQL/MySQLRoleRepository'
@@ -193,52 +193,7 @@ export class ContainerConfigLoader {
 
     const container = new Container()
 
-    const maxQueryExecutionTime = env.get('DB_MAX_QUERY_EXECUTION_TIME', true)
-      ? +env.get('DB_MAX_QUERY_EXECUTION_TIME', true)
-      : 45_000
-
-    const connection: Connection = await createConnection({
-      type: 'mysql',
-      supportBigNumbers: true,
-      bigNumberStrings: false,
-      maxQueryExecutionTime,
-      replication: {
-        master: {
-          host: env.get('DB_HOST'),
-          port: parseInt(env.get('DB_PORT')),
-          username: env.get('DB_USERNAME'),
-          password: env.get('DB_PASSWORD'),
-          database: env.get('DB_DATABASE'),
-        },
-        slaves: [
-          {
-            host: env.get('DB_REPLICA_HOST'),
-            port: parseInt(env.get('DB_PORT')),
-            username: env.get('DB_USERNAME'),
-            password: env.get('DB_PASSWORD'),
-            database: env.get('DB_DATABASE'),
-          },
-        ],
-        removeNodeErrorCount: 10,
-      },
-      entities: [
-        User,
-        UserSubscription,
-        OfflineUserSubscription,
-        Session,
-        RevokedSession,
-        Role,
-        Permission,
-        Setting,
-        OfflineSetting,
-        SharedSubscriptionInvitation,
-        SubscriptionSetting,
-      ],
-      migrations: [env.get('DB_MIGRATIONS_PATH')],
-      migrationsRun: true,
-      logging: <LoggerOptions>env.get('DB_DEBUG_LEVEL'),
-    })
-    container.bind<Connection>(TYPES.DBConnection).toConstantValue(connection)
+    await AppDataSource.initialize()
 
     const redisUrl = env.get('REDIS_URL')
     const isRedisInClusterMode = redisUrl.indexOf(',') > 0
@@ -323,26 +278,30 @@ export class ContainerConfigLoader {
     // ORM
     container
       .bind<Repository<OfflineSetting>>(TYPES.ORMOfflineSettingRepository)
-      .toConstantValue(connection.getRepository(OfflineSetting))
+      .toConstantValue(AppDataSource.getRepository(OfflineSetting))
     container
       .bind<Repository<OfflineUserSubscription>>(TYPES.ORMOfflineUserSubscriptionRepository)
-      .toConstantValue(connection.getRepository(OfflineUserSubscription))
+      .toConstantValue(AppDataSource.getRepository(OfflineUserSubscription))
     container
       .bind<Repository<RevokedSession>>(TYPES.ORMRevokedSessionRepository)
-      .toConstantValue(connection.getRepository(RevokedSession))
-    container.bind<Repository<Role>>(TYPES.ORMRoleRepository).toConstantValue(connection.getRepository(Role))
-    container.bind<Repository<Session>>(TYPES.ORMSessionRepository).toConstantValue(connection.getRepository(Session))
-    container.bind<Repository<Setting>>(TYPES.ORMSettingRepository).toConstantValue(connection.getRepository(Setting))
+      .toConstantValue(AppDataSource.getRepository(RevokedSession))
+    container.bind<Repository<Role>>(TYPES.ORMRoleRepository).toConstantValue(AppDataSource.getRepository(Role))
+    container
+      .bind<Repository<Session>>(TYPES.ORMSessionRepository)
+      .toConstantValue(AppDataSource.getRepository(Session))
+    container
+      .bind<Repository<Setting>>(TYPES.ORMSettingRepository)
+      .toConstantValue(AppDataSource.getRepository(Setting))
     container
       .bind<Repository<SharedSubscriptionInvitation>>(TYPES.ORMSharedSubscriptionInvitationRepository)
-      .toConstantValue(connection.getRepository(SharedSubscriptionInvitation))
+      .toConstantValue(AppDataSource.getRepository(SharedSubscriptionInvitation))
     container
       .bind<Repository<SubscriptionSetting>>(TYPES.ORMSubscriptionSettingRepository)
-      .toConstantValue(connection.getRepository(SubscriptionSetting))
-    container.bind<Repository<User>>(TYPES.ORMUserRepository).toConstantValue(connection.getRepository(User))
+      .toConstantValue(AppDataSource.getRepository(SubscriptionSetting))
+    container.bind<Repository<User>>(TYPES.ORMUserRepository).toConstantValue(AppDataSource.getRepository(User))
     container
       .bind<Repository<UserSubscription>>(TYPES.ORMUserSubscriptionRepository)
-      .toConstantValue(connection.getRepository(UserSubscription))
+      .toConstantValue(AppDataSource.getRepository(UserSubscription))
 
     // Middleware
     container.bind<AuthMiddleware>(TYPES.AuthMiddleware).to(AuthMiddleware)

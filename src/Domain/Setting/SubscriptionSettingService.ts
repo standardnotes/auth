@@ -16,7 +16,6 @@ import { FindSubscriptionSettingDTO } from './FindSubscriptionSettingDTO'
 import { SubscriptionSettingRepositoryInterface } from './SubscriptionSettingRepositoryInterface'
 import { SettingFactoryInterface } from './SettingFactoryInterface'
 import { SubscriptionSettingsAssociationServiceInterface } from './SubscriptionSettingsAssociationServiceInterface'
-import { User } from '../User/User'
 
 @injectable()
 export class SubscriptionSettingService implements SubscriptionSettingServiceInterface {
@@ -85,7 +84,7 @@ export class SubscriptionSettingService implements SubscriptionSettingServiceInt
     const { userSubscription, props } = dto
 
     const existing = await this.findSubscriptionSettingWithDecryptedValue({
-      userUuid: (await (userSubscription.user as Promise<User>)).uuid,
+      userUuid: (await userSubscription.user).uuid,
       userSubscriptionUuid: userSubscription.uuid,
       subscriptionSettingName: props.name as SubscriptionSettingName,
       settingUuid: props.uuid,

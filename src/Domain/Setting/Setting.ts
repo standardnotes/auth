@@ -6,38 +6,38 @@ import { User } from '../User/User'
 @Index('index_settings_on_name_and_user_uuid', ['name', 'user'])
 export class Setting {
   @PrimaryGeneratedColumn('uuid')
-  uuid!: string
+  declare uuid: string
 
   @Column({
     length: 255,
   })
-  name!: string
+  declare name: string
 
   @Column({
     type: 'text',
     nullable: true,
   })
-  value!: string | null
+  declare value: string | null
 
   @Column({
     name: 'server_encryption_version',
     type: 'tinyint',
     default: EncryptionVersion.Unencrypted,
   })
-  serverEncryptionVersion!: number
+  declare serverEncryptionVersion: number
 
   @Column({
     name: 'created_at',
     type: 'bigint',
   })
-  createdAt!: number
+  declare createdAt: number
 
   @Column({
     name: 'updated_at',
     type: 'bigint',
   })
   @Index('index_settings_on_updated_at')
-  updatedAt!: number
+  declare updatedAt: number
 
   @ManyToOne(
     /* istanbul ignore next */
@@ -48,7 +48,7 @@ export class Setting {
     { onDelete: 'CASCADE', nullable: false, lazy: true, eager: false },
   )
   @JoinColumn({ name: 'user_uuid', referencedColumnName: 'uuid' })
-  user: Promise<User> | undefined
+  declare user: Promise<User>
 
   @Column({
     type: 'tinyint',
@@ -56,5 +56,5 @@ export class Setting {
     nullable: false,
     default: 0,
   })
-  sensitive!: boolean
+  declare sensitive: boolean
 }

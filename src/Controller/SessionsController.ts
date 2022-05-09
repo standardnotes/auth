@@ -51,7 +51,7 @@ export class SessionsController extends BaseHttpController {
       )
     }
 
-    const roles = await ((authenticateRequestResponse.user as User).roles as Promise<Role[]>)
+    const roles = await (authenticateRequestResponse.user as User).roles
 
     const authTokenData: CrossServiceTokenData = {
       user: this.projectUser(<User>authenticateRequestResponse.user),

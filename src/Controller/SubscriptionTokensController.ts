@@ -84,7 +84,7 @@ export class SubscriptionTokensController extends BaseHttpController {
       extensionKey = extensionKeySetting.value as string
     }
 
-    const roles = await (user.roles as Promise<Role[]>)
+    const roles = await user.roles
 
     const authTokenData: CrossServiceTokenData = {
       user: await this.projectUser(user),

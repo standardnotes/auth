@@ -37,7 +37,7 @@ export class SettingFactory implements SettingFactoryInterface {
       value: await this.createValue({
         unencryptedValue,
         serverEncryptionVersion,
-        user: await (userSubscription.user as Promise<User>),
+        user: await userSubscription.user,
       }),
       serverEncryptionVersion,
       createdAt,
@@ -54,10 +54,7 @@ export class SettingFactory implements SettingFactoryInterface {
   ): Promise<SubscriptionSetting> {
     const { uuid, userSubscription } = original
 
-    const subscriptionSetting = await this.createSubscriptionSetting(
-      props,
-      await (userSubscription as Promise<UserSubscription>),
-    )
+    const subscriptionSetting = await this.createSubscriptionSetting(props, await userSubscription)
     subscriptionSetting.uuid = uuid
 
     return subscriptionSetting
@@ -71,7 +68,7 @@ export class SettingFactory implements SettingFactoryInterface {
 
     const { name, unencryptedValue, serverEncryptionVersion = EncryptionVersion.Default, sensitive } = props
 
-    const setting: Setting = {
+    const setting = {
       uuid,
       user: Promise.resolve(user),
       name,
@@ -86,16 +83,15 @@ export class SettingFactory implements SettingFactoryInterface {
       sensitive,
     }
 
-    return setting
+    return Object.assign(new Setting(), setting)
   }
 
   async createReplacement(original: Setting, props: SettingProps): Promise<Setting> {
     const { uuid, user } = original
 
-    const setting = await this.create(props, await (user as Promise<User>))
-    setting.uuid = uuid
-
-    return setting
+    return Object.assign(await this.create(props, await user), {
+      uuid,
+    })
   }
 
   async createValue({

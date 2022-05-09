@@ -7,17 +7,17 @@ import { User } from '../User/User'
 @Index('name_and_version', ['name', 'version'], { unique: true })
 export class Role {
   @PrimaryGeneratedColumn('uuid')
-  uuid!: string
+  declare uuid: string
 
   @Column({
     length: 255,
   })
-  name!: string
+  declare name: string
 
   @Column({
     type: 'smallint',
   })
-  version!: number
+  declare version: number
 
   @Column({
     name: 'created_at',
@@ -26,7 +26,7 @@ export class Role {
       /* istanbul ignore next */
       () => 'CURRENT_TIMESTAMP',
   })
-  createdAt!: Date
+  declare createdAt: Date
 
   @Column({
     name: 'updated_at',
@@ -35,7 +35,7 @@ export class Role {
       /* istanbul ignore next */
       () => 'CURRENT_TIMESTAMP',
   })
-  updatedAt!: Date
+  declare updatedAt: Date
 
   @ManyToMany(
     /* istanbul ignore next */
@@ -54,7 +54,7 @@ export class Role {
       referencedColumnName: 'uuid',
     },
   })
-  users: Promise<Array<User>> | undefined
+  declare users: Promise<Array<User>>
 
   @ManyToMany(
     /* istanbul ignore next */
@@ -73,7 +73,7 @@ export class Role {
       referencedColumnName: 'uuid',
     },
   })
-  permissions: Promise<Array<Permission>> | undefined
+  declare permissions: Promise<Array<Permission>>
 
   @ManyToMany(
     /* istanbul ignore next */
@@ -92,5 +92,5 @@ export class Role {
       referencedColumnName: 'uuid',
     },
   })
-  offlineUserSubscriptions: Promise<Array<OfflineUserSubscription>> | undefined
+  declare offlineUserSubscriptions: Promise<Array<OfflineUserSubscription>>
 }

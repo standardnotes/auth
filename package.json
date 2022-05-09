@@ -18,12 +18,14 @@
     "pretest": "yarn lint && yarn build",
     "test": "jest --coverage",
     "start": "node dist/bin/server.js",
+    "start:local": "npx nodemon -L bin/server.ts",
     "worker": "node dist/bin/worker.js",
     "daily-backup:email": "node dist/bin/backup.js email daily",
     "daily-backup:dropbox": "node dist/bin/backup.js dropbox daily",
     "daily-backup:google_drive": "node dist/bin/backup.js google_drive daily",
     "daily-backup:one_drive": "node dist/bin/backup.js one_drive daily",
-    "weekly-backup:email": "node dist/bin/backup.js email weekly"
+    "weekly-backup:email": "node dist/bin/backup.js email weekly",
+    "typeorm": "typeorm-ts-node-commonjs"
   },
   "dependencies": {
     "@newrelic/native-metrics": "7.0.2",
@@ -49,7 +51,7 @@
     "inversify": "5.0.5",
     "inversify-express-utils": "6.3.2",
     "ioredis": "4.19.4",
-    "mysql2": "2.2.5",
+    "mysql2": "^2.3.3",
     "newrelic": "8.6.0",
     "otplib": "12.0.1",
     "prettyjson": "1.2.1",
@@ -73,8 +75,10 @@
     "@types/uuid": "^8.3.0",
     "eslint": "^8.14.0",
     "jest": "^28.0.3",
+    "nodemon": "^2.0.16",
     "pre-push": "^0.1.1",
     "ts-jest": "^28.0.1",
+    "ts-node": "^10.7.0",
     "typescript": "4.3.5"
   },
   "pre-push": [

@@ -1,5 +1,4 @@
 const TYPES = {
-  DBConnection: Symbol.for('DBConnection'),
   Logger: Symbol.for('Logger'),
   Redis: Symbol.for('Redis'),
   SNS: Symbol.for('SNS'),

@@ -1,7 +1,6 @@
 version: '3.8'
 services:
   web:
-    image: auth-local
     build: .
     entrypoint: ["./wait-for.sh", "db", "3306", "./wait-for.sh", "cache", "6379", "./docker/entrypoint.sh", "start-local"]
     healthcheck:
@@ -25,7 +24,7 @@ services:
       - .:/var/www
 
   worker:
-    image: auth-local
+    build: .
     entrypoint: ["./wait-for.sh", "web", "3000", "./docker/entrypoint.sh", "start-worker"]
     env_file: .env
     restart: unless-stopped

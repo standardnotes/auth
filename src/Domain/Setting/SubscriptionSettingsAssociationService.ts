@@ -78,7 +78,7 @@ export class SubscriptionSettingsAssociationService implements SubscriptionSetti
       throw new Error(`Could not find role with name: ${roleName}`)
     }
 
-    const permissions = await (role.permissions as Promise<Permission[]>)
+    const permissions = await role.permissions
 
     const uploadLimit100GB = permissions.find(
       (permission: Permission) => permission.name === PermissionName.FilesMaximumStorageTier,
