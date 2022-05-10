@@ -46,8 +46,15 @@ export class MySQLOfflineUserSubscriptionRepository implements OfflineUserSubscr
       .getMany()
 
     const uncanceled = subscriptions.find((subscription) => !subscription.cancelled)
+    if (uncanceled !== undefined) {
+      return uncanceled
+    }
 
-    return uncanceled || subscriptions[0]
+    if (subscriptions.length !== 0) {
+      return subscriptions[0]
+    }
+
+    return null
   }
 
   async updateCancelled(subscriptionId: number, cancelled: boolean, updatedAt: number): Promise<void> {

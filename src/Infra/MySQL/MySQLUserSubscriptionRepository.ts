@@ -66,8 +66,15 @@ export class MySQLUserSubscriptionRepository implements UserSubscriptionReposito
       .getMany()
 
     const uncanceled = subscriptions.find((subscription) => !subscription.cancelled)
+    if (uncanceled !== undefined) {
+      return uncanceled
+    }
 
-    return uncanceled || subscriptions[0]
+    if (subscriptions.length !== 0) {
+      return subscriptions[0]
+    }
+
+    return null
   }
 
   async updateEndsAt(subscriptionId: number, endsAt: number, updatedAt: number): Promise<void> {

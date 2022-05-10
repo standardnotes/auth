@@ -76,6 +76,25 @@ describe('MySQLOfflineUserSubscriptionRepository', () => {
     expect(result).toEqual(offlineSubscription)
   })
 
+  it('should find one, longest lasting subscription by user email if there are no ucanceled ones', async () => {
+    offlineSubscription.cancelled = true
+
+    ormRepository.createQueryBuilder = jest.fn().mockImplementation(() => selectQueryBuilder)
+
+    selectQueryBuilder.where = jest.fn().mockReturnThis()
+    selectQueryBuilder.orderBy = jest.fn().mockReturnThis()
+    selectQueryBuilder.getMany = jest.fn().mockReturnValue([offlineSubscription])
+
+    const result = await createRepository().findOneByEmail('test@test.com')
+
+    expect(selectQueryBuilder.where).toHaveBeenCalledWith('email = :email', {
+      email: 'test@test.com',
+    })
+    expect(selectQueryBuilder.orderBy).toHaveBeenCalledWith('ends_at', 'DESC')
+    expect(selectQueryBuilder.getMany).toHaveBeenCalled()
+    expect(result).toEqual(offlineSubscription)
+  })
+
   it('should find none if there are no subscriptions for the user', async () => {
     ormRepository.createQueryBuilder = jest.fn().mockImplementation(() => selectQueryBuilder)
 
@@ -90,7 +109,7 @@ describe('MySQLOfflineUserSubscriptionRepository', () => {
     })
     expect(selectQueryBuilder.orderBy).toHaveBeenCalledWith('ends_at', 'DESC')
     expect(selectQueryBuilder.getMany).toHaveBeenCalled()
-    expect(result).toBeUndefined()
+    expect(result).toBeNull()
   })
 
   it('should find multiple by user email active after', async () => {

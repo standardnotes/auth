@@ -75,6 +75,25 @@ describe('MySQLUserSubscriptionRepository', () => {
     expect(result).toEqual(subscription)
   })
 
+  it('should find one, longest lasting subscription by user uuid if there are no ucanceled ones', async () => {
+    subscription.cancelled = true
+
+    ormRepository.createQueryBuilder = jest.fn().mockImplementation(() => selectQueryBuilder)
+
+    selectQueryBuilder.where = jest.fn().mockReturnThis()
+    selectQueryBuilder.orderBy = jest.fn().mockReturnThis()
+    selectQueryBuilder.getMany = jest.fn().mockReturnValue([subscription])
+
+    const result = await createRepository().findOneByUserUuid('123')
+
+    expect(selectQueryBuilder.where).toHaveBeenCalledWith('user_uuid = :user_uuid', {
+      user_uuid: '123',
+    })
+    expect(selectQueryBuilder.orderBy).toHaveBeenCalledWith('ends_at', 'DESC')
+    expect(selectQueryBuilder.getMany).toHaveBeenCalled()
+    expect(result).toEqual(subscription)
+  })
+
   it('should find none if there are no subscriptions for the user', async () => {
     ormRepository.createQueryBuilder = jest.fn().mockImplementation(() => selectQueryBuilder)
 
@@ -89,7 +108,7 @@ describe('MySQLUserSubscriptionRepository', () => {
     })
     expect(selectQueryBuilder.orderBy).toHaveBeenCalledWith('ends_at', 'DESC')
     expect(selectQueryBuilder.getMany).toHaveBeenCalled()
-    expect(result).toBeUndefined()
+    expect(result).toBeNull()
   })
 
   it('should update ends at by subscription id', async () => {
