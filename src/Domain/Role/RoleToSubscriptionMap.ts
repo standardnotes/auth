@@ -7,12 +7,11 @@ import { RoleToSubscriptionMapInterface } from './RoleToSubscriptionMapInterface
 @injectable()
 export class RoleToSubscriptionMap implements RoleToSubscriptionMapInterface {
   private readonly roleNameToSubscriptionNameMap = new Map<RoleName, SubscriptionName>([
-    [RoleName.CoreUser, SubscriptionName.CorePlan],
     [RoleName.PlusUser, SubscriptionName.PlusPlan],
     [RoleName.ProUser, SubscriptionName.ProPlan],
   ])
 
-  private readonly nonSubscriptionRoles = [RoleName.BasicUser, RoleName.FilesBetaUser]
+  private readonly nonSubscriptionRoles = [RoleName.CoreUser, RoleName.FilesBetaUser]
 
   filterNonSubscriptionRoles(roles: Role[]): Array<Role> {
     return roles.filter((role) => this.nonSubscriptionRoles.includes(role.name as RoleName))

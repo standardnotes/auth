@@ -24,15 +24,6 @@ export class SubscriptionSettingsAssociationService implements SubscriptionSetti
     Map<SubscriptionSettingName, SettingDescription>
   >([
     [
-      SubscriptionName.CorePlan,
-      new Map([
-        [
-          SubscriptionSettingName.FileUploadBytesUsed,
-          { sensitive: false, serverEncryptionVersion: EncryptionVersion.Unencrypted, value: '0' },
-        ],
-      ]),
-    ],
-    [
       SubscriptionName.PlusPlan,
       new Map([
         [

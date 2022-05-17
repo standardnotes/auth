@@ -891,6 +891,11 @@
   resolved "https://registry.yarnpkg.com/@standardnotes/common/-/common-1.19.7.tgz#0f22762667002a9b89a1e692d8c9eb62213dd13d"
   integrity sha512-K0BypGlS2e4Wq6QokWBtICM1JHZT/eO5xGvOnQdI6XUIaNPvLDd5KZpyvj5UfA+Pmr69nsk/cSJSedWk+H6zlw==
 
+"@standardnotes/common@^1.21.0":
+  version "1.21.0"
+  resolved "https://registry.yarnpkg.com/@standardnotes/common/-/common-1.21.0.tgz#57cd8ddd65ca827966d65801c5270f17aa16189d"
+  integrity sha512-TZKH/l2colOc68mn8FRTCoILpRHw5ZaJjpt/LPtPoRDy0ZPYbyKzRRzYVdoqZeEvJwDmGG24o3QB4xQpf3K0dA==
+
 "@standardnotes/config@^2.4.3":
   version "2.4.3"
   resolved "https://registry.yarnpkg.com/@standardnotes/config/-/config-2.4.3.tgz#0f0b0fb590d802572b6831f0fd60a4e359c40685"

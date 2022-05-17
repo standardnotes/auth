@@ -58,9 +58,9 @@ describe('AcceptSharedSubscriptionInvitation', () => {
     userRepository = {} as jest.Mocked<UserRepositoryInterface>
     userRepository.findOneByEmail = jest.fn().mockReturnValue(invitee)
 
-    inviteeSubscription = { endsAt: 3, planName: SubscriptionName.CorePlan } as jest.Mocked<UserSubscription>
+    inviteeSubscription = { endsAt: 3, planName: SubscriptionName.PlusPlan } as jest.Mocked<UserSubscription>
 
-    inviterSubscription = { endsAt: 3, planName: SubscriptionName.CorePlan } as jest.Mocked<UserSubscription>
+    inviterSubscription = { endsAt: 3, planName: SubscriptionName.PlusPlan } as jest.Mocked<UserSubscription>
 
     userSubscriptionRepository = {} as jest.Mocked<UserSubscriptionRepositoryInterface>
     userSubscriptionRepository.findBySubscriptionIdAndType = jest.fn().mockReturnValue([inviterSubscription])
@@ -94,16 +94,16 @@ describe('AcceptSharedSubscriptionInvitation', () => {
       cancelled: false,
       createdAt: 1,
       endsAt: 3,
-      planName: 'CORE_PLAN',
+      planName: 'PLUS_PLAN',
       subscriptionId: 3,
       subscriptionType: 'shared',
       updatedAt: 1,
       user: Promise.resolve(invitee),
     })
-    expect(roleService.addUserRole).toHaveBeenCalledWith(invitee, 'CORE_PLAN')
+    expect(roleService.addUserRole).toHaveBeenCalledWith(invitee, 'PLUS_PLAN')
     expect(subscriptionSettingService.applyDefaultSubscriptionSettingsForSubscription).toHaveBeenCalledWith(
       inviteeSubscription,
-      'CORE_PLAN',
+      'PLUS_PLAN',
     )
   })
 

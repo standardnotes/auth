@@ -67,7 +67,7 @@ describe('CancelSharedSubscriptionInvitation', () => {
     userRepository = {} as jest.Mocked<UserRepositoryInterface>
     userRepository.findOneByEmail = jest.fn().mockReturnValue(invitee)
 
-    inviterSubscription = { endsAt: 3, planName: SubscriptionName.CorePlan } as jest.Mocked<UserSubscription>
+    inviterSubscription = { endsAt: 3, planName: SubscriptionName.PlusPlan } as jest.Mocked<UserSubscription>
 
     userSubscriptionRepository = {} as jest.Mocked<UserSubscriptionRepositoryInterface>
     userSubscriptionRepository.findBySubscriptionIdAndType = jest.fn().mockReturnValue([inviterSubscription])
@@ -115,7 +115,7 @@ describe('CancelSharedSubscriptionInvitation', () => {
       endsAt: 1,
       user: Promise.resolve(invitee),
     })
-    expect(roleService.removeUserRole).toHaveBeenCalledWith(invitee, 'CORE_PLAN')
+    expect(roleService.removeUserRole).toHaveBeenCalledWith(invitee, 'PLUS_PLAN')
     expect(domainEventPublisher.publish).toHaveBeenCalled()
     expect(domainEventFactory.createSharedSubscriptionInvitationCanceledEvent).toHaveBeenCalledWith({
       inviteeIdentifier: '123',
@@ -149,7 +149,7 @@ describe('CancelSharedSubscriptionInvitation', () => {
       inviteeIdentifierType: 'email',
     })
     expect(userSubscriptionRepository.save).not.toHaveBeenCalled()
-    expect(roleService.removeUserRole).toHaveBeenCalledWith(invitee, 'CORE_PLAN')
+    expect(roleService.removeUserRole).toHaveBeenCalledWith(invitee, 'PLUS_PLAN')
   })
 
   it('should not cancel a shared subscription invitation if it is not found', async () => {

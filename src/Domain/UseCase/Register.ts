@@ -55,7 +55,7 @@ export class Register implements UseCaseInterface {
     user.encryptedServerKey = await this.crypter.generateEncryptedUserServerKey()
     user.serverEncryptionVersion = User.DEFAULT_ENCRYPTION_VERSION
 
-    const defaultRole = await this.roleRepository.findOneByName(RoleName.BasicUser)
+    const defaultRole = await this.roleRepository.findOneByName(RoleName.CoreUser)
     if (defaultRole) {
       user.roles = Promise.resolve([defaultRole])
     }

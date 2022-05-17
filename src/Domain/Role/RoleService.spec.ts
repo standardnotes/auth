@@ -39,7 +39,7 @@ describe('RoleService', () => {
 
   beforeEach(() => {
     basicRole = {
-      name: RoleName.BasicUser,
+      name: RoleName.CoreUser,
       permissions: Promise.resolve([
         {
           name: PermissionName.MarkdownBasicEditor,

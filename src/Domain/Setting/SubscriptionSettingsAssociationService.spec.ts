@@ -9,7 +9,6 @@ import { RoleRepositoryInterface } from '../Role/RoleRepositoryInterface'
 import { RoleToSubscriptionMapInterface } from '../Role/RoleToSubscriptionMapInterface'
 import { Role } from '../Role/Role'
 import { Permission } from '../Permission/Permission'
-import { SettingDescription } from './SettingDescription'
 import { SubscriptionSettingsAssociationService } from './SubscriptionSettingsAssociationService'
 
 describe('SubscriptionSettingsAssociationService', () => {
@@ -21,7 +20,7 @@ describe('SubscriptionSettingsAssociationService', () => {
 
   beforeEach(() => {
     roleToSubscriptionMap = {} as jest.Mocked<RoleToSubscriptionMapInterface>
-    roleToSubscriptionMap.getRoleNameForSubscriptionName = jest.fn().mockReturnValue(RoleName.CoreUser)
+    roleToSubscriptionMap.getRoleNameForSubscriptionName = jest.fn().mockReturnValue(RoleName.PlusUser)
 
     role = {} as jest.Mocked<Role>
 
@@ -29,21 +28,13 @@ describe('SubscriptionSettingsAssociationService', () => {
     roleRepository.findOneByName = jest.fn().mockReturnValue(role)
   })
 
-  it('should return the default set of setting values for a core subscription', async () => {
+  it('should return default to 0 on file upload limit if user subscription permissions could not be found', async () => {
     role.permissions = Promise.resolve([])
     roleRepository.findOneByName = jest.fn().mockReturnValue(role)
 
-    const settings = await createService().getDefaultSettingsAndValuesForSubscriptionName(SubscriptionName.CorePlan)
+    const limit = await createService().getFileUploadLimit(SubscriptionName.PlusPlan)
 
-    expect(settings).not.toBeUndefined()
-
-    const flatSettings = [...(settings as Map<SubscriptionSettingName, SettingDescription>).keys()]
-    expect(flatSettings).toEqual(['FILE_UPLOAD_BYTES_USED', 'FILE_UPLOAD_BYTES_LIMIT'])
-    expect(settings?.get(SubscriptionSettingName.FileUploadBytesLimit)).toEqual({
-      sensitive: false,
-      serverEncryptionVersion: 0,
-      value: '0',
-    })
+    expect(limit).toEqual(0)
   })
 
   it('should return the default set of setting values for a pro subscription', async () => {

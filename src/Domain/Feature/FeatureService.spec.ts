@@ -39,9 +39,6 @@ describe('FeatureService', () => {
     roleToSubscriptionMap.getRoleNameForSubscriptionName = jest
       .fn()
       .mockImplementation((subscriptionName: SubscriptionName) => {
-        if (subscriptionName === SubscriptionName.CorePlan) {
-          return RoleName.CoreUser
-        }
         if (subscriptionName === SubscriptionName.PlusPlan) {
           return RoleName.PlusUser
         }
@@ -70,7 +67,7 @@ describe('FeatureService', () => {
     }
 
     role1 = {
-      name: RoleName.CoreUser,
+      name: RoleName.PlusUser,
       uuid: 'role-1-1-1',
       permissions: Promise.resolve([permission1, permission3]),
     } as jest.Mocked<Role>
@@ -85,7 +82,7 @@ describe('FeatureService', () => {
       uuid: 'subscription-1-1-1',
       createdAt: 111,
       updatedAt: 222,
-      planName: SubscriptionName.CorePlan,
+      planName: SubscriptionName.PlusPlan,
       endsAt: 555,
       user: Promise.resolve(user),
       cancelled: false,
@@ -111,7 +108,7 @@ describe('FeatureService', () => {
       uuid: 'subscription-3-3-3-canceled',
       createdAt: 111,
       updatedAt: 222,
-      planName: SubscriptionName.CorePlan,
+      planName: SubscriptionName.PlusPlan,
       endsAt: 333,
       user: Promise.resolve(user),
       cancelled: true,
@@ -124,7 +121,7 @@ describe('FeatureService', () => {
       uuid: 'subscription-4-4-4-canceled',
       createdAt: 111,
       updatedAt: 222,
-      planName: SubscriptionName.CorePlan,
+      planName: SubscriptionName.PlusPlan,
       endsAt: 333,
       user: Promise.resolve(user),
       cancelled: true,
@@ -144,7 +141,7 @@ describe('FeatureService', () => {
       uuid: 'subscription-1-1-1',
       createdAt: 111,
       updatedAt: 222,
-      planName: SubscriptionName.CorePlan,
+      planName: SubscriptionName.PlusPlan,
       endsAt: 555,
       cancelled: false,
     } as jest.Mocked<OfflineUserSubscription>
@@ -227,6 +224,8 @@ describe('FeatureService', () => {
         permissions: Promise.resolve([permission4]),
       } as jest.Mocked<Role>
 
+      roleToSubscriptionMap.filterNonSubscriptionRoles = jest.fn().mockReturnValue([role1])
+
       user = {
         uuid: 'user-1-1-1',
         roles: Promise.resolve([role1]),
@@ -268,7 +267,7 @@ describe('FeatureService', () => {
     it('should return user features with `expires_at` field when user has more than 1 role & subscription', async () => {
       roleToSubscriptionMap.getSubscriptionNameForRoleName = jest
         .fn()
-        .mockReturnValueOnce(SubscriptionName.CorePlan)
+        .mockReturnValueOnce(SubscriptionName.PlusPlan)
         .mockReturnValueOnce(SubscriptionName.ProPlan)
 
       user = {
@@ -307,7 +306,7 @@ describe('FeatureService', () => {
       roleToSubscriptionMap.filterNonSubscriptionRoles = jest.fn().mockReturnValue([nonSubscriptionRole])
       roleToSubscriptionMap.getSubscriptionNameForRoleName = jest
         .fn()
-        .mockReturnValueOnce(SubscriptionName.CorePlan)
+        .mockReturnValueOnce(SubscriptionName.PlusPlan)
         .mockReturnValueOnce(SubscriptionName.ProPlan)
 
       user = {
@@ -339,7 +338,7 @@ describe('FeatureService', () => {
     it('should set the longest expiration date for feature that matches duplicated permissions', async () => {
       roleToSubscriptionMap.getSubscriptionNameForRoleName = jest
         .fn()
-        .mockReturnValueOnce(SubscriptionName.CorePlan)
+        .mockReturnValueOnce(SubscriptionName.PlusPlan)
         .mockReturnValueOnce(SubscriptionName.ProPlan)
 
       role2 = {
@@ -373,7 +372,7 @@ describe('FeatureService', () => {
     it('should not set the lesser expiration date for feature that matches duplicated permissions', async () => {
       roleToSubscriptionMap.getSubscriptionNameForRoleName = jest
         .fn()
-        .mockReturnValueOnce(SubscriptionName.CorePlan)
+        .mockReturnValueOnce(SubscriptionName.PlusPlan)
         .mockReturnValueOnce(SubscriptionName.ProPlan)
 
       const lesserExpireAt = 111

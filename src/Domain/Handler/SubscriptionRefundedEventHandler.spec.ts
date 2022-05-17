@@ -67,7 +67,7 @@ describe('SubscriptionRefundedEventHandler', () => {
     event.payload = {
       subscriptionId: 1,
       userEmail: 'test@test.com',
-      subscriptionName: SubscriptionName.CorePlan,
+      subscriptionName: SubscriptionName.PlusPlan,
       timestamp,
       offline: false,
     }
@@ -81,7 +81,7 @@ describe('SubscriptionRefundedEventHandler', () => {
     await createHandler().handle(event)
 
     expect(userRepository.findOneByEmail).toHaveBeenCalledWith('test@test.com')
-    expect(roleService.removeUserRole).toHaveBeenCalledWith(user, SubscriptionName.CorePlan)
+    expect(roleService.removeUserRole).toHaveBeenCalledWith(user, SubscriptionName.PlusPlan)
   })
 
   it('should update subscription ends at', async () => {
