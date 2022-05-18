@@ -14,6 +14,8 @@ import { RoleRepositoryInterface } from '../Role/RoleRepositoryInterface'
 import { CrypterInterface } from '../Encryption/CrypterInterface'
 import { TimerInterface } from '@standardnotes/time'
 import { SettingServiceInterface } from '../Setting/SettingServiceInterface'
+import { AnalyticsEntityRepositoryInterface } from '../Analytics/AnalyticsEntityRepositoryInterface'
+import { AnalyticsEntity } from '../Analytics/AnalyticsEntity'
 
 @injectable()
 export class Register implements UseCaseInterface {
@@ -26,6 +28,7 @@ export class Register implements UseCaseInterface {
     @inject(TYPES.DISABLE_USER_REGISTRATION) private disableUserRegistration: boolean,
     @inject(TYPES.SettingService) private settingService: SettingServiceInterface,
     @inject(TYPES.Timer) private timer: TimerInterface,
+    @inject(TYPES.AnalyticsEntityRepository) private analyticsEntityRepository: AnalyticsEntityRepositoryInterface,
   ) {}
 
   async execute(dto: RegisterDTO): Promise<RegisterResponse> {
@@ -65,6 +68,10 @@ export class Register implements UseCaseInterface {
     user = await this.userRepository.save(user)
 
     await this.settingService.applyDefaultSettingsUponRegistration(user)
+
+    const analyticsEntity = new AnalyticsEntity()
+    analyticsEntity.user = Promise.resolve(user)
+    await this.analyticsEntityRepository.save(analyticsEntity)
 
     const authResponseFactory = this.authResponseFactoryResolver.resolveAuthResponseFactoryVersion(apiVersion)
 

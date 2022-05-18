@@ -182,6 +182,9 @@ import { RoleRepositoryInterface } from '../Domain/Role/RoleRepositoryInterface'
 import { RevokedSessionRepositoryInterface } from '../Domain/Session/RevokedSessionRepositoryInterface'
 import { SessionRepositoryInterface } from '../Domain/Session/SessionRepositoryInterface'
 import { UserRepositoryInterface } from '../Domain/User/UserRepositoryInterface'
+import { AnalyticsEntity } from '../Domain/Analytics/AnalyticsEntity'
+import { AnalyticsEntityRepositoryInterface } from '../Domain/Analytics/AnalyticsEntityRepositoryInterface'
+import { MySQLAnalyticsEntityRepository } from '../Infra/MySQL/MySQLAnalyticsEntityRepository'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const newrelicWinstonEnricher = require('@newrelic/winston-enricher')
@@ -274,6 +277,9 @@ export class ContainerConfigLoader {
       .bind<SharedSubscriptionInvitationRepositoryInterface>(TYPES.SharedSubscriptionInvitationRepository)
       .to(MySQLSharedSubscriptionInvitationRepository)
     container.bind<PKCERepositoryInterface>(TYPES.PKCERepository).to(RedisPKCERepository)
+    container
+      .bind<AnalyticsEntityRepositoryInterface>(TYPES.AnalyticsEntityRepository)
+      .to(MySQLAnalyticsEntityRepository)
 
     // ORM
     container
@@ -302,6 +308,9 @@ export class ContainerConfigLoader {
     container
       .bind<Repository<UserSubscription>>(TYPES.ORMUserSubscriptionRepository)
       .toConstantValue(AppDataSource.getRepository(UserSubscription))
+    container
+      .bind<Repository<AnalyticsEntity>>(TYPES.ORMAnalyticsEntityRepository)
+      .toConstantValue(AppDataSource.getRepository(AnalyticsEntity))
 
     // Middleware
     container.bind<AuthMiddleware>(TYPES.AuthMiddleware).to(AuthMiddleware)
