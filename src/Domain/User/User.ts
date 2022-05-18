@@ -1,12 +1,13 @@
-import { Column, Entity, Index, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
+import { Column, Entity, Index, JoinTable, ManyToMany, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm'
 import { RevokedSession } from '../Session/RevokedSession'
 import { Role } from '../Role/Role'
 import { Setting } from '../Setting/Setting'
 import { UserSubscription } from '../Subscription/UserSubscription'
+import { AnalyticsEntity } from '../Analytics/AnalyticsEntity'
+import { ProtocolVersion } from '@standardnotes/common'
 
 @Entity({ name: 'users' })
 export class User {
-  private readonly SESSIONS_PROTOCOL_VERSION = 4
   static readonly PASSWORD_HASH_COST = 11
   static readonly DEFAULT_ENCRYPTION_VERSION = 1
 
@@ -181,8 +182,18 @@ export class User {
   )
   declare subscriptions: Promise<UserSubscription[]>
 
+  @OneToOne(
+    /* istanbul ignore next */
+    () => AnalyticsEntity,
+    /* istanbul ignore next */
+    (analyticsEntity) => analyticsEntity.user,
+    /* istanbul ignore next */
+    { lazy: true, eager: false },
+  )
+  declare analyticsEntity: Promise<AnalyticsEntity>
+
   supportsSessions(): boolean {
-    return parseInt(this.version) >= this.SESSIONS_PROTOCOL_VERSION
+    return parseInt(this.version) >= parseInt(ProtocolVersion.V004)
   }
 
   isPotentiallyAVaultAccount(): boolean {

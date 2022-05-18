@@ -1,4 +1,5 @@
 import { DataSource, LoggerOptions } from 'typeorm'
+import { AnalyticsEntity } from '../Domain/Analytics/AnalyticsEntity'
 import { Permission } from '../Domain/Permission/Permission'
 import { Role } from '../Domain/Role/Role'
 import { RevokedSession } from '../Domain/Session/RevokedSession'
@@ -55,6 +56,7 @@ export const AppDataSource = new DataSource({
     OfflineSetting,
     SharedSubscriptionInvitation,
     SubscriptionSetting,
+    AnalyticsEntity,
   ],
   migrations: [env.get('DB_MIGRATIONS_PATH')],
   migrationsRun: true,
