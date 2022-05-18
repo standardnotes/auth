@@ -181,14 +181,6 @@ export class User {
   )
   declare subscriptions: Promise<UserSubscription[]>
 
-  @Column({
-    name: 'analytics_id',
-    generated: 'increment',
-    nullable: true,
-    type: 'int',
-  })
-  declare analyticsId: number | null
-
   supportsSessions(): boolean {
     return parseInt(this.version) >= this.SESSIONS_PROTOCOL_VERSION
   }
