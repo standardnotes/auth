@@ -10,18 +10,17 @@ import { DeleteAccountResponse } from './DeleteAccountResponse'
 
 @injectable()
 export class DeleteAccount implements UseCaseInterface {
-  constructor (
+  constructor(
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
     @inject(TYPES.UserSubscriptionService) private userSubscriptionService: UserSubscriptionServiceInterface,
     @inject(TYPES.DomainEventPublisher) private domainEventPublisher: DomainEventPublisherInterface,
     @inject(TYPES.DomainEventFactory) private domainEventFactory: DomainEventFactoryInterface,
-  ) {
-  }
+  ) {}
 
   async execute(dto: DeleteAccountDTO): Promise<DeleteAccountResponse> {
     const user = await this.userRepository.findOneByEmail(dto.email)
 
-    if (user === undefined) {
+    if (user === null) {
       return {
         success: false,
         responseCode: 404,
@@ -31,7 +30,7 @@ export class DeleteAccount implements UseCaseInterface {
 
     let regularSubscriptionUuid = undefined
     const { regularSubscription } = await this.userSubscriptionService.findRegularSubscriptionForUserUuid(user.uuid)
-    if (regularSubscription !== undefined) {
+    if (regularSubscription !== null) {
       regularSubscriptionUuid = regularSubscription.uuid
     }
 
@@ -39,7 +38,7 @@ export class DeleteAccount implements UseCaseInterface {
       this.domainEventFactory.createAccountDeletionRequestedEvent({
         userUuid: user.uuid,
         regularSubscriptionUuid,
-      })
+      }),
     )
 
     return {

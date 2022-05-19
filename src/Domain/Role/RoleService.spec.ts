@@ -27,18 +27,19 @@ describe('RoleService', () => {
   let basicRole: Role
   let proRole: Role
 
-  const createService = () => new RoleService(
-    userRepository,
-    roleRepository,
-    offlineUserSubscriptionRepository,
-    webSocketsClientService,
-    roleToSubscriptionMap,
-    logger,
-  )
+  const createService = () =>
+    new RoleService(
+      userRepository,
+      roleRepository,
+      offlineUserSubscriptionRepository,
+      webSocketsClientService,
+      roleToSubscriptionMap,
+      logger,
+    )
 
   beforeEach(() => {
     basicRole = {
-      name: RoleName.BasicUser,
+      name: RoleName.CoreUser,
       permissions: Promise.resolve([
         {
           name: PermissionName.MarkdownBasicEditor,
@@ -86,9 +87,7 @@ describe('RoleService', () => {
       user = {
         uuid: '123',
         email: 'test@test.com',
-        roles: Promise.resolve([
-          basicRole,
-        ]),
+        roles: Promise.resolve([basicRole]),
       } as jest.Mocked<User>
 
       userRepository.findOneByEmail = jest.fn().mockReturnValue(user)
@@ -99,10 +98,7 @@ describe('RoleService', () => {
       await createService().addUserRole(user, SubscriptionName.ProPlan)
 
       expect(roleRepository.findOneByName).toHaveBeenCalledWith(RoleName.ProUser)
-      user.roles = Promise.resolve([
-        basicRole,
-        proRole,
-      ])
+      user.roles = Promise.resolve([basicRole, proRole])
       expect(userRepository.save).toHaveBeenCalledWith(user)
     })
 
@@ -110,10 +106,7 @@ describe('RoleService', () => {
       user = {
         uuid: '123',
         email: 'test@test.com',
-        roles: Promise.resolve([
-          basicRole,
-          proRole,
-        ]),
+        roles: Promise.resolve([basicRole, proRole]),
       } as jest.Mocked<User>
 
       userRepository.findOneByEmail = jest.fn().mockReturnValue(user)
@@ -128,9 +121,7 @@ describe('RoleService', () => {
     it('should send websockets event', async () => {
       await createService().addUserRole(user, SubscriptionName.ProPlan)
 
-      expect(webSocketsClientService.sendUserRolesChangedEvent).toHaveBeenCalledWith(
-        user,
-      )
+      expect(webSocketsClientService.sendUserRolesChangedEvent).toHaveBeenCalledWith(user)
     })
 
     it('should not add role if no role name exists for subscription name', async () => {
@@ -142,7 +133,7 @@ describe('RoleService', () => {
     })
 
     it('should not add role if no role exists for role name', async () => {
-      roleRepository.findOneByName = jest.fn().mockReturnValue(undefined)
+      roleRepository.findOneByName = jest.fn().mockReturnValue(null)
       await createService().addUserRole(user, SubscriptionName.ProPlan)
 
       expect(userRepository.save).not.toHaveBeenCalled()
@@ -156,7 +147,7 @@ describe('RoleService', () => {
         endsAt: 100,
         cancelled: false,
         planName: SubscriptionName.ProPlan,
-        roles: Promise.resolve([ proRole ]),
+        roles: Promise.resolve([proRole]),
       })
     })
 
@@ -169,7 +160,7 @@ describe('RoleService', () => {
     })
 
     it('should not set offline role if no role exists for role name', async () => {
-      roleRepository.findOneByName = jest.fn().mockReturnValue(undefined)
+      roleRepository.findOneByName = jest.fn().mockReturnValue(null)
 
       await createService().setOfflineUserRole(offlineUserSubscription)
 
@@ -182,10 +173,7 @@ describe('RoleService', () => {
       user = {
         uuid: '123',
         email: 'test@test.com',
-        roles: Promise.resolve([
-          basicRole,
-          proRole,
-        ]),
+        roles: Promise.resolve([basicRole, proRole]),
       } as jest.Mocked<User>
 
       userRepository.findOneByEmail = jest.fn().mockReturnValue(user)
@@ -201,9 +189,7 @@ describe('RoleService', () => {
     it('should send websockets event', async () => {
       await createService().removeUserRole(user, SubscriptionName.ProPlan)
 
-      expect(webSocketsClientService.sendUserRolesChangedEvent).toHaveBeenCalledWith(
-        user,
-      )
+      expect(webSocketsClientService.sendUserRolesChangedEvent).toHaveBeenCalledWith(user)
     })
 
     it('should not remove role if role name does not exist for subscription name', async () => {
@@ -220,10 +206,7 @@ describe('RoleService', () => {
       user = {
         uuid: '123',
         email: 'test@test.com',
-        roles: Promise.resolve([
-          basicRole,
-          proRole,
-        ]),
+        roles: Promise.resolve([basicRole, proRole]),
       } as jest.Mocked<User>
 
       userRepository.findOneByUuid = jest.fn().mockReturnValue(user)
@@ -242,7 +225,7 @@ describe('RoleService', () => {
     })
 
     it('should indicate user does not have a permission if user could not be found', async () => {
-      userRepository.findOneByUuid = jest.fn().mockReturnValue(undefined)
+      userRepository.findOneByUuid = jest.fn().mockReturnValue(null)
 
       const userHasPermission = await createService().userHasPermission('1-2-3', PermissionName.DailyGDriveBackup)
 

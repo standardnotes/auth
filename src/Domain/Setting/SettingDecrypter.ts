@@ -12,14 +12,13 @@ export class SettingDecrypter implements SettingDecrypterInterface {
   constructor(
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
     @inject(TYPES.Crypter) private crypter: CrypterInterface,
-  ) {
-  }
+  ) {}
 
   async decryptSettingValue(setting: Setting | SubscriptionSetting, userUuid: string): Promise<string | null> {
     if (setting.value !== null && setting.serverEncryptionVersion === EncryptionVersion.Default) {
       const user = await this.userRepository.findOneByUuid(userUuid)
 
-      if (user === undefined) {
+      if (user === null) {
         throw new Error(`Could not find user with uuid: ${userUuid}`)
       }
 
@@ -28,5 +27,4 @@ export class SettingDecrypter implements SettingDecrypterInterface {
 
     return setting.value
   }
-
 }

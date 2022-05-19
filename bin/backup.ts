@@ -36,98 +36,107 @@ const requestBackups = async (
     muteEmailsSettingValue: string,
     providerTokenSettingName: SettingName
   switch (backupProvider) {
-  case 'email':
-    settingName = SettingName.EmailBackupFrequency
-    permissionName = PermissionName.DailyEmailBackup
-    muteEmailsSettingName = SettingName.MuteFailedBackupsEmails
-    muteEmailsSettingValue = MuteFailedBackupsEmailsOption.Muted
-    break
-  case 'dropbox':
-    settingName = SettingName.DropboxBackupFrequency
-    permissionName = PermissionName.DailyDropboxBackup
-    muteEmailsSettingName = SettingName.MuteFailedCloudBackupsEmails
-    muteEmailsSettingValue = MuteFailedCloudBackupsEmailsOption.Muted
-    providerTokenSettingName = SettingName.DropboxBackupToken
-    break
-  case 'one_drive':
-    settingName = SettingName.OneDriveBackupFrequency
-    permissionName = PermissionName.DailyOneDriveBackup
-    muteEmailsSettingName = SettingName.MuteFailedCloudBackupsEmails
-    muteEmailsSettingValue = MuteFailedCloudBackupsEmailsOption.Muted
-    providerTokenSettingName = SettingName.OneDriveBackupToken
-    break
-  case 'google_drive':
-    settingName = SettingName.GoogleDriveBackupFrequency
-    permissionName = PermissionName.DailyGDriveBackup
-    muteEmailsSettingName = SettingName.MuteFailedCloudBackupsEmails
-    muteEmailsSettingValue = MuteFailedCloudBackupsEmailsOption.Muted
-    providerTokenSettingName = SettingName.GoogleDriveBackupToken
-    break
-  default:
-    throw new Error(`Not handled backup provider: ${backupProvider}`)
+    case 'email':
+      settingName = SettingName.EmailBackupFrequency
+      permissionName = PermissionName.DailyEmailBackup
+      muteEmailsSettingName = SettingName.MuteFailedBackupsEmails
+      muteEmailsSettingValue = MuteFailedBackupsEmailsOption.Muted
+      break
+    case 'dropbox':
+      settingName = SettingName.DropboxBackupFrequency
+      permissionName = PermissionName.DailyDropboxBackup
+      muteEmailsSettingName = SettingName.MuteFailedCloudBackupsEmails
+      muteEmailsSettingValue = MuteFailedCloudBackupsEmailsOption.Muted
+      providerTokenSettingName = SettingName.DropboxBackupToken
+      break
+    case 'one_drive':
+      settingName = SettingName.OneDriveBackupFrequency
+      permissionName = PermissionName.DailyOneDriveBackup
+      muteEmailsSettingName = SettingName.MuteFailedCloudBackupsEmails
+      muteEmailsSettingValue = MuteFailedCloudBackupsEmailsOption.Muted
+      providerTokenSettingName = SettingName.OneDriveBackupToken
+      break
+    case 'google_drive':
+      settingName = SettingName.GoogleDriveBackupFrequency
+      permissionName = PermissionName.DailyGDriveBackup
+      muteEmailsSettingName = SettingName.MuteFailedCloudBackupsEmails
+      muteEmailsSettingValue = MuteFailedCloudBackupsEmailsOption.Muted
+      providerTokenSettingName = SettingName.GoogleDriveBackupToken
+      break
+    default:
+      throw new Error(`Not handled backup provider: ${backupProvider}`)
   }
 
   const stream = await settingRepository.streamAllByNameAndValue(settingName, backupFrequency)
 
   return new Promise((resolve, reject) => {
-    stream.pipe(new Stream.Transform({
-      objectMode: true,
-      transform: async (setting, _encoding, callback) => {
-        const userIsPermittedForEmailBackups = await roleService.userHasPermission(setting.setting_user_uuid, permissionName)
-        if (!userIsPermittedForEmailBackups) {
-          callback()
-
-          return
-        }
-
-        let userHasEmailsMuted = false
-        const emailsMutedSetting = await settingRepository.findOneByNameAndUserUuid(muteEmailsSettingName, setting.setting_user_uuid)
-        if (emailsMutedSetting !== undefined && emailsMutedSetting.value !== null) {
-          userHasEmailsMuted = emailsMutedSetting.value === muteEmailsSettingValue
-        }
-
-        if (backupProvider === 'email') {
-          await domainEventPublisher.publish(
-            domainEventFactory.createEmailBackupRequestedEvent(
+    stream
+      .pipe(
+        new Stream.Transform({
+          objectMode: true,
+          transform: async (setting, _encoding, callback) => {
+            const userIsPermittedForEmailBackups = await roleService.userHasPermission(
               setting.setting_user_uuid,
-              emailsMutedSetting?.uuid as string,
-              userHasEmailsMuted,
+              permissionName,
             )
-          )
-          callback()
+            if (!userIsPermittedForEmailBackups) {
+              callback()
 
-          return
-        }
+              return
+            }
 
-        const cloudBackupProviderToken = await settingService.findSettingWithDecryptedValue({
-          settingName: providerTokenSettingName,
-          userUuid: setting.setting_user_uuid,
-        })
-        if (cloudBackupProviderToken === undefined || cloudBackupProviderToken.value === null) {
-          callback()
+            let userHasEmailsMuted = false
+            const emailsMutedSetting = await settingRepository.findOneByNameAndUserUuid(
+              muteEmailsSettingName,
+              setting.setting_user_uuid,
+            )
+            if (emailsMutedSetting !== null && emailsMutedSetting.value !== null) {
+              userHasEmailsMuted = emailsMutedSetting.value === muteEmailsSettingValue
+            }
 
-          return
-        }
+            if (backupProvider === 'email') {
+              await domainEventPublisher.publish(
+                domainEventFactory.createEmailBackupRequestedEvent(
+                  setting.setting_user_uuid,
+                  emailsMutedSetting?.uuid as string,
+                  userHasEmailsMuted,
+                ),
+              )
+              callback()
 
-        await domainEventPublisher.publish(
-          domainEventFactory.createCloudBackupRequestedEvent(
-            backupProvider.toUpperCase() as 'DROPBOX' | 'ONE_DRIVE' | 'GOOGLE_DRIVE',
-            cloudBackupProviderToken.value,
-            setting.setting_user_uuid,
-            emailsMutedSetting?.uuid as string,
-            userHasEmailsMuted,
-          )
-        )
-        callback()
-      },
-    }))
+              return
+            }
+
+            const cloudBackupProviderToken = await settingService.findSettingWithDecryptedValue({
+              settingName: providerTokenSettingName,
+              userUuid: setting.setting_user_uuid,
+            })
+            if (cloudBackupProviderToken === null || cloudBackupProviderToken.value === null) {
+              callback()
+
+              return
+            }
+
+            await domainEventPublisher.publish(
+              domainEventFactory.createCloudBackupRequestedEvent(
+                backupProvider.toUpperCase() as 'DROPBOX' | 'ONE_DRIVE' | 'GOOGLE_DRIVE',
+                cloudBackupProviderToken.value,
+                setting.setting_user_uuid,
+                emailsMutedSetting?.uuid as string,
+                userHasEmailsMuted,
+              ),
+            )
+            callback()
+          },
+        }),
+      )
       .on('finish', resolve)
       .on('error', reject)
   })
 }
 
-const container = new ContainerConfigLoader
-void container.load().then(container => {
+const container = new ContainerConfigLoader()
+void container.load().then((container) => {
   dayjs.extend(utc)
 
   const env: Env = new Env()
@@ -143,14 +152,9 @@ void container.load().then(container => {
   const domainEventFactory: DomainEventFactoryInterface = container.get(TYPES.DomainEventFactory)
   const domainEventPublisher: DomainEventPublisherInterface = container.get(TYPES.DomainEventPublisher)
 
-  Promise
-    .resolve(requestBackups(
-      settingRepository,
-      roleService,
-      settingService,
-      domainEventFactory,
-      domainEventPublisher,
-    ))
+  Promise.resolve(
+    requestBackups(settingRepository, roleService, settingService, domainEventFactory, domainEventPublisher),
+  )
     .then(() => {
       logger.info(`${backupFrequency} ${backupProvider} backup requesting complete`)
 

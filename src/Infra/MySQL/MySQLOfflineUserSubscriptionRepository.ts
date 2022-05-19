@@ -1,80 +1,87 @@
-import { injectable } from 'inversify'
-import { EntityRepository, Repository } from 'typeorm'
+import { inject, injectable } from 'inversify'
+import { Repository } from 'typeorm'
+
+import TYPES from '../../Bootstrap/Types'
 import { OfflineUserSubscription } from '../../Domain/Subscription/OfflineUserSubscription'
 import { OfflineUserSubscriptionRepositoryInterface } from '../../Domain/Subscription/OfflineUserSubscriptionRepositoryInterface'
 
 @injectable()
-@EntityRepository(OfflineUserSubscription)
-export class MySQLOfflineUserSubscriptionRepository extends Repository<OfflineUserSubscription> implements OfflineUserSubscriptionRepositoryInterface {
-  async findOneBySubscriptionId(subscriptionId: number): Promise<OfflineUserSubscription | undefined> {
-    return await this.createQueryBuilder()
-      .where(
-        'subscription_id = :subscriptionId',
-        {
-          subscriptionId,
-        }
-      )
+export class MySQLOfflineUserSubscriptionRepository implements OfflineUserSubscriptionRepositoryInterface {
+  constructor(
+    @inject(TYPES.ORMOfflineUserSubscriptionRepository)
+    private ormRepository: Repository<OfflineUserSubscription>,
+  ) {}
+
+  async save(offlineUserSubscription: OfflineUserSubscription): Promise<OfflineUserSubscription> {
+    return this.ormRepository.save(offlineUserSubscription)
+  }
+
+  async findOneBySubscriptionId(subscriptionId: number): Promise<OfflineUserSubscription | null> {
+    return await this.ormRepository
+      .createQueryBuilder()
+      .where('subscription_id = :subscriptionId', {
+        subscriptionId,
+      })
       .getOne()
   }
 
   async findByEmail(email: string, activeAfter: number): Promise<OfflineUserSubscription[]> {
-    return await this.createQueryBuilder()
-      .where(
-        'email = :email AND ends_at > :endsAt',
-        {
-          email,
-          endsAt: activeAfter,
-        }
-      )
+    return await this.ormRepository
+      .createQueryBuilder()
+      .where('email = :email AND ends_at > :endsAt', {
+        email,
+        endsAt: activeAfter,
+      })
       .orderBy('ends_at', 'DESC')
       .getMany()
   }
 
-  async findOneByEmail(email: string): Promise<OfflineUserSubscription | undefined> {
-    const subscriptions = await this.createQueryBuilder()
-      .where(
-        'email = :email',
-        {
-          email,
-        }
-      )
+  async findOneByEmail(email: string): Promise<OfflineUserSubscription | null> {
+    const subscriptions = await this.ormRepository
+      .createQueryBuilder()
+      .where('email = :email', {
+        email,
+      })
       .orderBy('ends_at', 'DESC')
       .getMany()
 
     const uncanceled = subscriptions.find((subscription) => !subscription.cancelled)
+    if (uncanceled !== undefined) {
+      return uncanceled
+    }
 
-    return uncanceled || subscriptions[0]
+    if (subscriptions.length !== 0) {
+      return subscriptions[0]
+    }
+
+    return null
   }
 
   async updateCancelled(subscriptionId: number, cancelled: boolean, updatedAt: number): Promise<void> {
-    await this.createQueryBuilder()
+    await this.ormRepository
+      .createQueryBuilder()
       .update()
       .set({
         cancelled,
         updatedAt,
       })
-      .where(
-        'subscription_id = :subscriptionId',
-        {
-          subscriptionId,
-        }
-      )
+      .where('subscription_id = :subscriptionId', {
+        subscriptionId,
+      })
       .execute()
   }
 
   async updateEndsAt(subscriptionId: number, endsAt: number, updatedAt: number): Promise<void> {
-    await this.createQueryBuilder()
+    await this.ormRepository
+      .createQueryBuilder()
       .update()
       .set({
         endsAt,
         updatedAt,
       })
-      .where(
-        'subscription_id = :subscriptionId',
-        {
-          subscriptionId,
-        }
-      )
+      .where('subscription_id = :subscriptionId', {
+        subscriptionId,
+      })
       .execute()
   }
 }

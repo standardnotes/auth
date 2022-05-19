@@ -9,20 +9,18 @@ import { UseCaseInterface } from './UseCaseInterface'
 
 @injectable()
 export class UpdateUser implements UseCaseInterface {
-  constructor (
+  constructor(
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
-    @inject(TYPES.AuthResponseFactoryResolver) private authResponseFactoryResolver: AuthResponseFactoryResolverInterface,
-    @inject(TYPES.Timer) private timer: TimerInterface
-  ) {
-  }
+    @inject(TYPES.AuthResponseFactoryResolver)
+    private authResponseFactoryResolver: AuthResponseFactoryResolverInterface,
+    @inject(TYPES.Timer) private timer: TimerInterface,
+  ) {}
 
   async execute(dto: UpdateUserDTO): Promise<UpdateUserResponse> {
     const { user, apiVersion, ...updateFields } = dto
 
     Object.keys(updateFields).forEach(
-      key =>
-        (updateFields[key] === undefined || updateFields[key] === null)
-        && delete updateFields[key]
+      (key) => (updateFields[key] === undefined || updateFields[key] === null) && delete updateFields[key],
     )
 
     Object.assign(user, updateFields)

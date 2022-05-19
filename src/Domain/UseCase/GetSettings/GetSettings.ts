@@ -12,20 +12,19 @@ import { EncryptionVersion } from '../../Encryption/EncryptionVersion'
 
 @injectable()
 export class GetSettings implements UseCaseInterface {
-  constructor (
+  constructor(
     @inject(TYPES.SettingRepository) private settingRepository: SettingRepositoryInterface,
     @inject(TYPES.SettingProjector) private settingProjector: SettingProjector,
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
     @inject(TYPES.Crypter) private crypter: CrypterInterface,
-  ) {
-  }
+  ) {}
 
   async execute(dto: GetSettingsDto): Promise<GetSettingsResponse> {
     const { userUuid } = dto
 
     const user = await this.userRepository.findOneByUuid(userUuid)
 
-    if (user === undefined) {
+    if (user === null) {
       return {
         success: false,
         error: {

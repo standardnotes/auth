@@ -14,19 +14,22 @@ import { RoleRepositoryInterface } from '../Role/RoleRepositoryInterface'
 import { CrypterInterface } from '../Encryption/CrypterInterface'
 import { TimerInterface } from '@standardnotes/time'
 import { SettingServiceInterface } from '../Setting/SettingServiceInterface'
+import { AnalyticsEntityRepositoryInterface } from '../Analytics/AnalyticsEntityRepositoryInterface'
+import { AnalyticsEntity } from '../Analytics/AnalyticsEntity'
 
 @injectable()
 export class Register implements UseCaseInterface {
   constructor(
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
     @inject(TYPES.RoleRepository) private roleRepository: RoleRepositoryInterface,
-    @inject(TYPES.AuthResponseFactoryResolver) private authResponseFactoryResolver: AuthResponseFactoryResolverInterface,
+    @inject(TYPES.AuthResponseFactoryResolver)
+    private authResponseFactoryResolver: AuthResponseFactoryResolverInterface,
     @inject(TYPES.Crypter) private crypter: CrypterInterface,
     @inject(TYPES.DISABLE_USER_REGISTRATION) private disableUserRegistration: boolean,
     @inject(TYPES.SettingService) private settingService: SettingServiceInterface,
     @inject(TYPES.Timer) private timer: TimerInterface,
-  ) {
-  }
+    @inject(TYPES.AnalyticsEntityRepository) private analyticsEntityRepository: AnalyticsEntityRepositoryInterface,
+  ) {}
 
   async execute(dto: RegisterDTO): Promise<RegisterResponse> {
     if (this.disableUserRegistration) {
@@ -55,9 +58,9 @@ export class Register implements UseCaseInterface {
     user.encryptedServerKey = await this.crypter.generateEncryptedUserServerKey()
     user.serverEncryptionVersion = User.DEFAULT_ENCRYPTION_VERSION
 
-    const defaultRole = await this.roleRepository.findOneByName(RoleName.BasicUser)
+    const defaultRole = await this.roleRepository.findOneByName(RoleName.CoreUser)
     if (defaultRole) {
-      user.roles = Promise.resolve([ defaultRole ])
+      user.roles = Promise.resolve([defaultRole])
     }
 
     Object.assign(user, registrationFields)
@@ -65,6 +68,10 @@ export class Register implements UseCaseInterface {
     user = await this.userRepository.save(user)
 
     await this.settingService.applyDefaultSettingsUponRegistration(user)
+
+    const analyticsEntity = new AnalyticsEntity()
+    analyticsEntity.user = Promise.resolve(user)
+    await this.analyticsEntityRepository.save(analyticsEntity)
 
     const authResponseFactory = this.authResponseFactoryResolver.resolveAuthResponseFactoryVersion(apiVersion)
 

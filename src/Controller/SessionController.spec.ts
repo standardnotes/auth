@@ -15,11 +15,8 @@ describe('SessionController', () => {
   let request: express.Request
   let response: express.Response
 
-  const createController = () => new SessionController(
-    deleteSessionForUser,
-    deletePreviousSessionsForUser,
-    refreshSessionToken
-  )
+  const createController = () =>
+    new SessionController(deleteSessionForUser, deletePreviousSessionsForUser, refreshSessionToken)
 
   beforeEach(() => {
     deleteSessionForUser = {} as jest.Mocked<DeleteSessionForUser>
@@ -144,7 +141,7 @@ describe('SessionController', () => {
       },
     }
 
-    const httpResponse = <results.JsonResult> await createController().deleteSession(request, response)
+    const httpResponse = <results.JsonResult>await createController().deleteSession(request, response)
 
     expect(deleteSessionForUser.execute).not.toHaveBeenCalled()
 
@@ -162,7 +159,7 @@ describe('SessionController', () => {
     }
     request.body.uuid = '234'
 
-    const httpResponse = <results.JsonResult> await createController().deleteSession(request, response)
+    const httpResponse = <results.JsonResult>await createController().deleteSession(request, response)
 
     expect(deleteSessionForUser.execute).not.toHaveBeenCalled()
 
@@ -182,7 +179,7 @@ describe('SessionController', () => {
 
     deleteSessionForUser.execute = jest.fn().mockReturnValue({ success: false })
 
-    const httpResponse = <results.JsonResult> await createController().deleteSession(request, response)
+    const httpResponse = <results.JsonResult>await createController().deleteSession(request, response)
 
     expect(httpResponse.statusCode).toEqual(400)
   })
@@ -231,7 +228,7 @@ describe('SessionController', () => {
         uuid: '234',
       },
     }
-    const httpResponse = <results.JsonResult> await createController().deleteAllSessions(request, response)
+    const httpResponse = <results.JsonResult>await createController().deleteAllSessions(request, response)
 
     expect(httpResponse.json).toEqual({ error: { message: 'No session exists with the provided identifier.' } })
     expect(httpResponse.statusCode).toEqual(401)

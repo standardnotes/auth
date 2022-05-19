@@ -1,7 +1,4 @@
-import {
-  DomainEventHandlerInterface,
-  FileUploadedEvent,
-} from '@standardnotes/domain-events'
+import { DomainEventHandlerInterface, FileUploadedEvent } from '@standardnotes/domain-events'
 import { SubscriptionSettingName } from '@standardnotes/settings'
 import { inject, injectable } from 'inversify'
 import { Logger } from 'winston'
@@ -13,27 +10,26 @@ import { UserSubscription } from '../Subscription/UserSubscription'
 import { UserSubscriptionServiceInterface } from '../Subscription/UserSubscriptionServiceInterface'
 import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 
-
 @injectable()
 export class FileUploadedEventHandler implements DomainEventHandlerInterface {
   constructor(
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
     @inject(TYPES.UserSubscriptionService) private userSubscriptionService: UserSubscriptionServiceInterface,
     @inject(TYPES.SubscriptionSettingService) private subscriptionSettingService: SubscriptionSettingServiceInterface,
-    @inject(TYPES.Logger) private logger: Logger
-  ) {
-  }
+    @inject(TYPES.Logger) private logger: Logger,
+  ) {}
 
   async handle(event: FileUploadedEvent): Promise<void> {
     const user = await this.userRepository.findOneByUuid(event.payload.userUuid)
-    if (user === undefined) {
+    if (user === null) {
       this.logger.warn(`Could not find user with uuid: ${event.payload.userUuid}`)
 
       return
     }
 
-    const { regularSubscription, sharedSubscription } = await this.userSubscriptionService.findRegularSubscriptionForUserUuid(event.payload.userUuid)
-    if (regularSubscription === undefined) {
+    const { regularSubscription, sharedSubscription } =
+      await this.userSubscriptionService.findRegularSubscriptionForUserUuid(event.payload.userUuid)
+    if (regularSubscription === null) {
       this.logger.warn(`Could not find regular user subscription for user with uuid: ${event.payload.userUuid}`)
 
       return
@@ -41,7 +37,7 @@ export class FileUploadedEventHandler implements DomainEventHandlerInterface {
 
     await this.updateUploadBytesUsedSetting(regularSubscription, event.payload.fileByteSize)
 
-    if (sharedSubscription !== undefined) {
+    if (sharedSubscription !== null) {
       await this.updateUploadBytesUsedSetting(sharedSubscription, event.payload.fileByteSize)
     }
   }
@@ -53,7 +49,7 @@ export class FileUploadedEventHandler implements DomainEventHandlerInterface {
       userSubscriptionUuid: subscription.uuid,
       subscriptionSettingName: SubscriptionSettingName.FileUploadBytesUsed,
     })
-    if (bytesUsedSetting !== undefined) {
+    if (bytesUsedSetting !== null) {
       bytesUsed = bytesUsedSetting.value as string
     }
 
@@ -61,7 +57,7 @@ export class FileUploadedEventHandler implements DomainEventHandlerInterface {
       userSubscription: subscription,
       props: {
         name: SubscriptionSettingName.FileUploadBytesUsed,
-        unencryptedValue: (+(bytesUsed) + byteSize).toString(),
+        unencryptedValue: (+bytesUsed + byteSize).toString(),
         sensitive: false,
         serverEncryptionVersion: EncryptionVersion.Unencrypted,
       },

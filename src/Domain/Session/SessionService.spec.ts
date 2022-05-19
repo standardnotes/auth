@@ -26,17 +26,18 @@ describe('SessionService', () => {
   let timer: TimerInterface
   let logger: winston.Logger
 
-  const createService = () => new SessionService(
-    sessionRepository,
-    ephemeralSessionRepository,
-    revokedSessionRepository,
-    deviceDetector,
-    timer,
-    logger,
-    123,
-    234,
-    settingService
-  )
+  const createService = () =>
+    new SessionService(
+      sessionRepository,
+      ephemeralSessionRepository,
+      revokedSessionRepository,
+      deviceDetector,
+      timer,
+      logger,
+      123,
+      234,
+      settingService,
+    )
 
   beforeEach(() => {
     session = {} as jest.Mocked<Session>
@@ -50,14 +51,14 @@ describe('SessionService', () => {
     revokedSession.uuid = '2e1e43'
 
     sessionRepository = {} as jest.Mocked<SessionRepositoryInterface>
-    sessionRepository.findOneByUuid = jest.fn()
+    sessionRepository.findOneByUuid = jest.fn().mockReturnValue(null)
     sessionRepository.deleteOneByUuid = jest.fn()
     sessionRepository.save = jest.fn().mockReturnValue(session)
     sessionRepository.updateHashedTokens = jest.fn()
     sessionRepository.updatedTokenExpirationDates = jest.fn()
 
     settingService = {} as jest.Mocked<SettingServiceInterface>
-    settingService.findSettingWithDecryptedValue = jest.fn().mockReturnValue(undefined)
+    settingService.findSettingWithDecryptedValue = jest.fn().mockReturnValue(null)
 
     ephemeralSessionRepository = {} as jest.Mocked<EphemeralSessionRepositoryInterface>
     ephemeralSessionRepository.save = jest.fn()
@@ -233,7 +234,7 @@ describe('SessionService', () => {
         return session
       }
 
-      return undefined
+      return null
     })
 
     await createService().deleteSessionByToken('1:2:3')
@@ -248,7 +249,7 @@ describe('SessionService', () => {
         return session
       }
 
-      return undefined
+      return null
     })
 
     await createService().deleteSessionByToken('1:4:3')
@@ -409,7 +410,7 @@ describe('SessionService', () => {
         return session
       }
 
-      return undefined
+      return null
     })
 
     const result = await createService().getSessionFromToken('1:2:3')
@@ -432,7 +433,7 @@ describe('SessionService', () => {
         return session
       }
 
-      return undefined
+      return null
     })
 
     const result = await createService().getSessionFromToken('1:2')
@@ -454,7 +455,7 @@ describe('SessionService', () => {
         return session
       }
 
-      return undefined
+      return null
     })
 
     const result = await createService().getSessionFromToken('1:2:4')
@@ -481,10 +482,10 @@ describe('SessionService', () => {
   })
 
   it('should not retrieve an archvied session if session id is missing from token', async () => {
-    revokedSessionRepository.findOneByUuid = jest.fn()
+    revokedSessionRepository.findOneByUuid = jest.fn().mockReturnValue(null)
 
     const result = await createService().getRevokedSessionFromToken('1::3')
 
-    expect(result).toBeUndefined()
+    expect(result).toBeNull()
   })
 })

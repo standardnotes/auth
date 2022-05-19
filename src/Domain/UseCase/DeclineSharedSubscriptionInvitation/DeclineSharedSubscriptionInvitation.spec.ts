@@ -12,10 +12,7 @@ describe('DeclineSharedSubscriptionInvitation', () => {
   let timer: TimerInterface
   let invitation: SharedSubscriptionInvitation
 
-  const createUseCase = () => new DeclineSharedSubscriptionInvitation(
-    sharedSubscriptionInvitationRepository,
-    timer
-  )
+  const createUseCase = () => new DeclineSharedSubscriptionInvitation(sharedSubscriptionInvitationRepository, timer)
 
   beforeEach(() => {
     invitation = {
@@ -31,9 +28,11 @@ describe('DeclineSharedSubscriptionInvitation', () => {
   })
 
   it('should decline the invitation', async () => {
-    expect(await createUseCase().execute({
-      sharedSubscriptionInvitationUuid: '1-2-3',
-    })).toEqual({
+    expect(
+      await createUseCase().execute({
+        sharedSubscriptionInvitationUuid: '1-2-3',
+      }),
+    ).toEqual({
       success: true,
     })
 
@@ -45,10 +44,12 @@ describe('DeclineSharedSubscriptionInvitation', () => {
   })
 
   it('should not decline the invitation if it does not exist', async () => {
-    sharedSubscriptionInvitationRepository.findOneByUuidAndStatus = jest.fn().mockReturnValue(undefined)
-    expect(await createUseCase().execute({
-      sharedSubscriptionInvitationUuid: '1-2-3',
-    })).toEqual({
+    sharedSubscriptionInvitationRepository.findOneByUuidAndStatus = jest.fn().mockReturnValue(null)
+    expect(
+      await createUseCase().execute({
+        sharedSubscriptionInvitationUuid: '1-2-3',
+      }),
+    ).toEqual({
       success: false,
     })
 

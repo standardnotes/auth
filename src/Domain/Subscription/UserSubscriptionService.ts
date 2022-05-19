@@ -13,8 +13,7 @@ import { UserSubscriptionType } from './UserSubscriptionType'
 export class UserSubscriptionService implements UserSubscriptionServiceInterface {
   constructor(
     @inject(TYPES.UserSubscriptionRepository) private userSubscriptionRepository: UserSubscriptionRepositoryInterface,
-  ){
-  }
+  ) {}
 
   async findRegularSubscriptionForUserUuid(userUuid: string): Promise<FindRegularSubscriptionResponse> {
     const userSubscription = await this.userSubscriptionRepository.findOneByUserUuid(userUuid)
@@ -28,28 +27,30 @@ export class UserSubscriptionService implements UserSubscriptionServiceInterface
     return this.findRegularSubscription(userSubscription)
   }
 
-  private async findRegularSubscription(userSubscription: UserSubscription | undefined): Promise<FindRegularSubscriptionResponse> {
-    if (userSubscription === undefined) {
+  private async findRegularSubscription(
+    userSubscription: UserSubscription | null,
+  ): Promise<FindRegularSubscriptionResponse> {
+    if (userSubscription === null) {
       return {
-        regularSubscription: undefined,
-        sharedSubscription: undefined,
+        regularSubscription: null,
+        sharedSubscription: null,
       }
     }
 
     if (userSubscription.subscriptionType === UserSubscriptionType.Regular) {
       return {
         regularSubscription: userSubscription,
-        sharedSubscription: undefined,
+        sharedSubscription: null,
       }
     }
 
     const regularSubscriptions = await this.userSubscriptionRepository.findBySubscriptionIdAndType(
       userSubscription.subscriptionId as number,
-      UserSubscriptionType.Regular
+      UserSubscriptionType.Regular,
     )
     if (regularSubscriptions.length === 0) {
       return {
-        regularSubscription: undefined,
+        regularSubscription: null,
         sharedSubscription: userSubscription,
       }
     }

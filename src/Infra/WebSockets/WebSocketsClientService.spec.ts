@@ -21,13 +21,14 @@ describe('WebSocketsClientService', () => {
 
   let webSocketsApiUrl = 'http://test-websockets'
 
-  const createService = () => new WebSocketsClientService(
-    webSocketsConnectionRepository,
-    domainEventFactory,
-    httpClient,
-    webSocketsApiUrl,
-    logger
-  )
+  const createService = () =>
+    new WebSocketsClientService(
+      webSocketsConnectionRepository,
+      domainEventFactory,
+      httpClient,
+      webSocketsApiUrl,
+      logger,
+    )
 
   beforeEach(() => {
     connectionIds = ['1', '2']
@@ -41,7 +42,6 @@ describe('WebSocketsClientService', () => {
         },
       ]),
     } as jest.Mocked<User>
-
 
     event = {} as jest.Mocked<UserRolesChangedEvent>
 
@@ -61,20 +61,19 @@ describe('WebSocketsClientService', () => {
   it('should send a user role changed event to all user connections', async () => {
     await createService().sendUserRolesChangedEvent(user)
 
-    expect(domainEventFactory.createUserRolesChangedEvent).toHaveBeenCalledWith(
-      '123',
-      'test@test.com',
-      [
-        RoleName.ProUser,
-      ]
-    )
+    expect(domainEventFactory.createUserRolesChangedEvent).toHaveBeenCalledWith('123', 'test@test.com', [
+      RoleName.ProUser,
+    ])
     expect(httpClient.request).toHaveBeenCalledTimes(connectionIds.length)
     connectionIds.map((id, index) => {
-      expect(httpClient.request).toHaveBeenNthCalledWith(index + 1, expect.objectContaining({
-        method: 'POST',
-        url: `${webSocketsApiUrl}/${id}`,
-        data: JSON.stringify(event),
-      }))
+      expect(httpClient.request).toHaveBeenNthCalledWith(
+        index + 1,
+        expect.objectContaining({
+          method: 'POST',
+          url: `${webSocketsApiUrl}/${id}`,
+          data: JSON.stringify(event),
+        }),
+      )
     })
   })
 

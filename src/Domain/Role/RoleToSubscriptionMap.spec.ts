@@ -29,15 +29,15 @@ describe('RoleToSubscriptionMap', () => {
         name: RoleName.FilesBetaUser,
       } as jest.Mocked<Role>,
       {
-        name: RoleName.BasicUser,
+        name: RoleName.PlusUser,
       } as jest.Mocked<Role>,
     ]
     expect(createMap().filterNonSubscriptionRoles(roles)).toEqual([
       {
-        name: RoleName.FilesBetaUser,
+        name: RoleName.CoreUser,
       },
       {
-        name: RoleName.BasicUser,
+        name: RoleName.FilesBetaUser,
       },
     ])
   })

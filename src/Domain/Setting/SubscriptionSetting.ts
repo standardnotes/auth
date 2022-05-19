@@ -6,49 +6,49 @@ import { UserSubscription } from '../Subscription/UserSubscription'
 @Index('index_settings_on_name_and_user_subscription_uuid', ['name', 'userSubscription'])
 export class SubscriptionSetting {
   @PrimaryGeneratedColumn('uuid')
-  uuid: string
+  declare uuid: string
 
   @Column({
     length: 255,
   })
-  name: string
+  declare name: string
 
   @Column({
     type: 'text',
     nullable: true,
   })
-  value: string | null
+  declare value: string | null
 
   @Column({
     name: 'server_encryption_version',
     type: 'tinyint',
     default: EncryptionVersion.Unencrypted,
   })
-  serverEncryptionVersion: number
+  declare serverEncryptionVersion: number
 
   @Column({
     name: 'created_at',
     type: 'bigint',
   })
-  createdAt: number
+  declare createdAt: number
 
   @Column({
     name: 'updated_at',
     type: 'bigint',
   })
   @Index('index_subcsription_settings_on_updated_at')
-  updatedAt: number
+  declare updatedAt: number
 
   @ManyToOne(
     /* istanbul ignore next */
     () => UserSubscription,
     /* istanbul ignore next */
-    userSubscription => userSubscription.subscriptionSettings,
+    (userSubscription) => userSubscription.subscriptionSettings,
     /* istanbul ignore next */
-    { onDelete: 'CASCADE', nullable: false }
+    { onDelete: 'CASCADE', nullable: false, lazy: true, eager: false },
   )
   @JoinColumn({ name: 'user_subscription_uuid', referencedColumnName: 'uuid' })
-  userSubscription: Promise<UserSubscription>
+  declare userSubscription: Promise<UserSubscription>
 
   @Column({
     type: 'tinyint',
@@ -56,5 +56,5 @@ export class SubscriptionSetting {
     nullable: false,
     default: 0,
   })
-  sensitive: boolean
+  declare sensitive: boolean
 }

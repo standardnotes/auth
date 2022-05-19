@@ -1,11 +1,11 @@
 import { Aes256GcmEncrypted } from '@standardnotes/sncrypto-common'
-import { SnCryptoNode } from '@standardnotes/sncrypto-node'
+import { CryptoNode } from '@standardnotes/sncrypto-node'
 import { Logger } from 'winston'
 import { User } from '../User/User'
 import { CrypterNode } from './CrypterNode'
 
 describe('CrypterNode', () => {
-  let crypto: SnCryptoNode
+  let crypto: CryptoNode
   let user: User
   let logger: Logger
 
@@ -38,10 +38,12 @@ describe('CrypterNode', () => {
   const encrypted = makeEncrypted('encrypted')
 
   beforeEach(() => {
-    crypto = {} as jest.Mocked<SnCryptoNode>
+    crypto = {} as jest.Mocked<CryptoNode>
     crypto.aes256GcmEncrypt = jest.fn().mockReturnValue(encrypted)
     crypto.aes256GcmDecrypt = jest.fn().mockReturnValue(decrypted)
     crypto.generateRandomKey = jest.fn().mockReturnValue(iv)
+    crypto.sha256 = jest.fn().mockReturnValue('sha256-hashed')
+    crypto.base64URLEncode = jest.fn().mockReturnValue('base64-url-encoded')
 
     user = {} as jest.Mocked<User>
     user.encryptedServerKey = version(encryptedUserKey)
@@ -55,13 +57,9 @@ describe('CrypterNode', () => {
   })
 
   it('should encrypt a value for user', async () => {
-    expect(await createCrypter().encryptForUser(unencrypted, user))
-      .toEqual(version(encrypted))
+    expect(await createCrypter().encryptForUser(unencrypted, user)).toEqual(version(encrypted))
 
-    expect(crypto.aes256GcmDecrypt).toHaveBeenCalledWith(
-      encryptedUserKey,
-      serverKey,
-    )
+    expect(crypto.aes256GcmDecrypt).toHaveBeenCalledWith(encryptedUserKey, serverKey)
 
     expect(crypto.aes256GcmEncrypt).toHaveBeenCalledWith({ unencrypted, iv, key: decrypted })
   })
@@ -76,12 +74,9 @@ describe('CrypterNode', () => {
 
   it('should generate an encrypted user server key', async () => {
     const anotherUserKey = 'anotherUserKey'
-    crypto.generateRandomKey = jest.fn()
-      .mockReturnValueOnce(anotherUserKey)
-      .mockReturnValueOnce(iv)
+    crypto.generateRandomKey = jest.fn().mockReturnValueOnce(anotherUserKey).mockReturnValueOnce(iv)
 
-    expect(await createCrypter().generateEncryptedUserServerKey())
-      .toEqual(version(encrypted))
+    expect(await createCrypter().generateEncryptedUserServerKey()).toEqual(version(encrypted))
 
     expect(crypto.aes256GcmEncrypt).toHaveBeenCalledWith({
       unencrypted: anotherUserKey,
@@ -143,5 +138,13 @@ describe('CrypterNode', () => {
     }
 
     expect(error).not.toBeNull()
+  })
+
+  it('should encrypt a string with sha256', () => {
+    expect(createCrypter().sha256Hash('test')).toEqual('sha256-hashed')
+  })
+
+  it('should encode a string with base64 url-safe', () => {
+    expect(createCrypter().base64URLEncode('test')).toEqual('base64-url-encoded')
   })
 })

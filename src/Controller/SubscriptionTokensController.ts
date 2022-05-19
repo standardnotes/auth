@@ -36,12 +36,15 @@ export class SubscriptionTokensController extends BaseHttpController {
   @httpPost('/', TYPES.ApiGatewayAuthMiddleware)
   async createToken(_request: Request, response: Response): Promise<results.JsonResult> {
     if (response.locals.readOnlyAccess) {
-      return this.json({
-        error: {
-          tag: ErrorTag.ReadOnlyAccess,
-          message: 'Session has read-only access.',
+      return this.json(
+        {
+          error: {
+            tag: ErrorTag.ReadOnlyAccess,
+            message: 'Session has read-only access.',
+          },
         },
-      }, 401)
+        401,
+      )
     }
 
     const result = await this.createSubscriptionToken.execute({
@@ -60,12 +63,15 @@ export class SubscriptionTokensController extends BaseHttpController {
     })
 
     if (!authenticateTokenResponse.success) {
-      return this.json({
-        error: {
-          tag: 'invalid-auth',
-          message: 'Invalid login credentials.',
+      return this.json(
+        {
+          error: {
+            tag: 'invalid-auth',
+            message: 'Invalid login credentials.',
+          },
         },
-      }, 401)
+        401,
+      )
     }
 
     const user = authenticateTokenResponse.user as User
@@ -74,7 +80,7 @@ export class SubscriptionTokensController extends BaseHttpController {
       settingName: SettingName.ExtensionKey,
       userUuid: user.uuid,
     })
-    if (extensionKeySetting !== undefined) {
+    if (extensionKeySetting !== null) {
       extensionKey = extensionKeySetting.value as string
     }
 
@@ -91,14 +97,14 @@ export class SubscriptionTokensController extends BaseHttpController {
     return this.json({ authToken })
   }
 
-  private async projectUser(user: User): Promise<{ uuid: string, email: string}> {
-    return <{ uuid: string, email: string}> await this.userProjector.projectSimple(user)
+  private async projectUser(user: User): Promise<{ uuid: string; email: string }> {
+    return <{ uuid: string; email: string }>await this.userProjector.projectSimple(user)
   }
 
-  private async projectRoles(roles: Array<Role>): Promise<Array<{ uuid: string, name: RoleName }>> {
+  private async projectRoles(roles: Array<Role>): Promise<Array<{ uuid: string; name: RoleName }>> {
     const roleProjections = []
     for (const role of roles) {
-      roleProjections.push(<{ uuid: string, name: RoleName }> await this.roleProjector.projectSimple(role))
+      roleProjections.push(<{ uuid: string; name: RoleName }>await this.roleProjector.projectSimple(role))
     }
 
     return roleProjections

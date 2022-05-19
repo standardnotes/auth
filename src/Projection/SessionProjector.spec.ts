@@ -45,7 +45,7 @@ describe('SessionProjector', () => {
     const projection = createProjector().projectCustom(
       SessionProjector.CURRENT_SESSION_PROJECTION.toString(),
       session,
-      currentSession
+      currentSession,
     )
 
     expect(projection).toMatchObject({
@@ -65,7 +65,7 @@ describe('SessionProjector', () => {
     const projection = createProjector().projectCustom(
       SessionProjector.CURRENT_SESSION_PROJECTION.toString(),
       session,
-      currentSession
+      currentSession,
     )
 
     expect(projection).toMatchObject({
@@ -82,11 +82,7 @@ describe('SessionProjector', () => {
   it('should throw error on unknown custom projection', () => {
     let error = null
     try {
-      createProjector().projectCustom(
-        'test',
-        session,
-        currentSession
-      )
+      createProjector().projectCustom('test', session, currentSession)
     } catch (e) {
       error = e
     }

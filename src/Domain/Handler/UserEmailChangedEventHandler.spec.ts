@@ -13,12 +13,8 @@ describe('UserEmailChangedEventHandler', () => {
   let event: UserEmailChangedEvent
   let logger: Logger
 
-  const createHandler = () => new UserEmailChangedEventHandler(
-    httpClient,
-    userServerChangeEmailUrl,
-    userServerAuthKey,
-    logger
-  )
+  const createHandler = () =>
+    new UserEmailChangedEventHandler(httpClient, userServerChangeEmailUrl, userServerAuthKey, logger)
 
   beforeEach(() => {
     httpClient = {} as jest.Mocked<AxiosInstance>
@@ -43,7 +39,7 @@ describe('UserEmailChangedEventHandler', () => {
       method: 'POST',
       url: 'https://user-server/change-email',
       headers: {
-        'Accept': 'application/json',
+        Accept: 'application/json',
         'Content-Type': 'application/json',
       },
       data: {
@@ -59,12 +55,7 @@ describe('UserEmailChangedEventHandler', () => {
   })
 
   it('should not send a request to the user management server about an email change if url is not defined', async () => {
-    const handler = new UserEmailChangedEventHandler(
-      httpClient,
-      '',
-      userServerAuthKey,
-      logger
-    )
+    const handler = new UserEmailChangedEventHandler(httpClient, '', userServerAuthKey, logger)
     await handler.handle(event)
 
     expect(httpClient.request).not.toHaveBeenCalled()

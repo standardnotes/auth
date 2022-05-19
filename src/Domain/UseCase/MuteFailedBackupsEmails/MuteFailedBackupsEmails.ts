@@ -8,10 +8,7 @@ import { MuteFailedBackupsEmailsResponse } from './MuteFailedBackupsEmailsRespon
 
 @injectable()
 export class MuteFailedBackupsEmails implements UseCaseInterface {
-  constructor (
-    @inject(TYPES.SettingRepository) private settingRepository: SettingRepositoryInterface,
-  ) {
-  }
+  constructor(@inject(TYPES.SettingRepository) private settingRepository: SettingRepositoryInterface) {}
 
   async execute(dto: MuteFailedBackupsEmailsDTO): Promise<MuteFailedBackupsEmailsResponse> {
     const setting = await this.settingRepository.findOneByUuidAndNames(dto.settingUuid, [
@@ -19,7 +16,7 @@ export class MuteFailedBackupsEmails implements UseCaseInterface {
       SettingName.MuteFailedCloudBackupsEmails,
     ])
 
-    if (setting === undefined) {
+    if (setting === null) {
       return {
         success: false,
         message: 'Could not find setting setting.',

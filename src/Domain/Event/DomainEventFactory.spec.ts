@@ -9,9 +9,7 @@ import { InviteeIdentifierType } from '../SharedSubscription/InviteeIdentifierTy
 describe('DomainEventFactory', () => {
   let timer: TimerInterface
 
-  const createFactory = () => new DomainEventFactory(
-    timer,
-  )
+  const createFactory = () => new DomainEventFactory(timer)
 
   beforeEach(() => {
     timer = {} as jest.Mocked<TimerInterface>
@@ -20,262 +18,260 @@ describe('DomainEventFactory', () => {
   })
 
   it('should create a SHARED_SUBSCRIPTION_INVITATION_CANCELED event', () => {
-    expect(createFactory().createSharedSubscriptionInvitationCanceledEvent({
-      inviterEmail: 'test@test.te',
-      inviterSubscriptionId: 1,
-      inviterSubscriptionUuid: '2-3-4',
-      inviteeIdentifier: 'invitee@test.te',
-      inviteeIdentifierType: InviteeIdentifierType.Email,
-      sharedSubscriptionInvitationUuid: '1-2-3',
-    }))
-      .toEqual({
-        createdAt: expect.any(Date),
-        meta: {
-          correlation: {
-            userIdentifier: 'test@test.te',
-            userIdentifierType: 'email',
-          },
+    expect(
+      createFactory().createSharedSubscriptionInvitationCanceledEvent({
+        inviterEmail: 'test@test.te',
+        inviterSubscriptionId: 1,
+        inviterSubscriptionUuid: '2-3-4',
+        inviteeIdentifier: 'invitee@test.te',
+        inviteeIdentifierType: InviteeIdentifierType.Email,
+        sharedSubscriptionInvitationUuid: '1-2-3',
+      }),
+    ).toEqual({
+      createdAt: expect.any(Date),
+      meta: {
+        correlation: {
+          userIdentifier: 'test@test.te',
+          userIdentifierType: 'email',
         },
-        payload: {
-          inviterEmail: 'test@test.te',
-          inviterSubscriptionId: 1,
-          inviterSubscriptionUuid: '2-3-4',
-          inviteeIdentifier: 'invitee@test.te',
-          inviteeIdentifierType: InviteeIdentifierType.Email,
-          sharedSubscriptionInvitationUuid: '1-2-3',
-        },
-        type: 'SHARED_SUBSCRIPTION_INVITATION_CANCELED',
-      })
+      },
+      payload: {
+        inviterEmail: 'test@test.te',
+        inviterSubscriptionId: 1,
+        inviterSubscriptionUuid: '2-3-4',
+        inviteeIdentifier: 'invitee@test.te',
+        inviteeIdentifierType: InviteeIdentifierType.Email,
+        sharedSubscriptionInvitationUuid: '1-2-3',
+      },
+      type: 'SHARED_SUBSCRIPTION_INVITATION_CANCELED',
+    })
   })
 
   it('should create a SHARED_SUBSCRIPTION_INVITATION_CREATED event', () => {
-    expect(createFactory().createSharedSubscriptionInvitationCreatedEvent({
-      inviterEmail: 'test@test.te',
-      inviterSubscriptionId: 1,
-      inviteeIdentifier: 'invitee@test.te',
-      inviteeIdentifierType: InviteeIdentifierType.Email,
-      sharedSubscriptionInvitationUuid: '1-2-3',
-    }))
-      .toEqual({
-        createdAt: expect.any(Date),
-        meta: {
-          correlation: {
-            userIdentifier: 'test@test.te',
-            userIdentifierType: 'email',
-          },
+    expect(
+      createFactory().createSharedSubscriptionInvitationCreatedEvent({
+        inviterEmail: 'test@test.te',
+        inviterSubscriptionId: 1,
+        inviteeIdentifier: 'invitee@test.te',
+        inviteeIdentifierType: InviteeIdentifierType.Email,
+        sharedSubscriptionInvitationUuid: '1-2-3',
+      }),
+    ).toEqual({
+      createdAt: expect.any(Date),
+      meta: {
+        correlation: {
+          userIdentifier: 'test@test.te',
+          userIdentifierType: 'email',
         },
-        payload: {
-          inviterEmail: 'test@test.te',
-          inviterSubscriptionId: 1,
-          inviteeIdentifier: 'invitee@test.te',
-          inviteeIdentifierType: InviteeIdentifierType.Email,
-          sharedSubscriptionInvitationUuid: '1-2-3',
-        },
-        type: 'SHARED_SUBSCRIPTION_INVITATION_CREATED',
-      })
+      },
+      payload: {
+        inviterEmail: 'test@test.te',
+        inviterSubscriptionId: 1,
+        inviteeIdentifier: 'invitee@test.te',
+        inviteeIdentifierType: InviteeIdentifierType.Email,
+        sharedSubscriptionInvitationUuid: '1-2-3',
+      },
+      type: 'SHARED_SUBSCRIPTION_INVITATION_CREATED',
+    })
   })
 
   it('should create a USER_DISABLED_SESSION_USER_AGENT_LOGGING event', () => {
-    expect(createFactory().createUserDisabledSessionUserAgentLoggingEvent({
-      email: 'test@test.te',
-      userUuid: '1-2-3',
-    }))
-      .toEqual({
-        createdAt: expect.any(Date),
-        meta: {
-          correlation: {
-            userIdentifier: '1-2-3',
-            userIdentifierType: 'uuid',
-          },
+    expect(
+      createFactory().createUserDisabledSessionUserAgentLoggingEvent({
+        email: 'test@test.te',
+        userUuid: '1-2-3',
+      }),
+    ).toEqual({
+      createdAt: expect.any(Date),
+      meta: {
+        correlation: {
+          userIdentifier: '1-2-3',
+          userIdentifierType: 'uuid',
         },
-        payload: {
-          userUuid: '1-2-3',
-          email: 'test@test.te',
-        },
-        type: 'USER_DISABLED_SESSION_USER_AGENT_LOGGING',
-      })
+      },
+      payload: {
+        userUuid: '1-2-3',
+        email: 'test@test.te',
+      },
+      type: 'USER_DISABLED_SESSION_USER_AGENT_LOGGING',
+    })
   })
 
   it('should create a USER_SIGNED_IN event', () => {
-    expect(createFactory().createUserSignedInEvent({
-      browser: 'Firefox 1',
-      device: 'iOS 1',
-      userEmail: 'test@test.te',
-      userUuid: '1-2-3',
-      signInAlertEnabled: true,
-      muteSignInEmailsSettingUuid: '2-3-4',
-    }))
-      .toEqual({
-        createdAt: expect.any(Date),
-        meta: {
-          correlation: {
-            userIdentifier: '1-2-3',
-            userIdentifierType: 'uuid',
-          },
+    expect(
+      createFactory().createUserSignedInEvent({
+        browser: 'Firefox 1',
+        device: 'iOS 1',
+        userEmail: 'test@test.te',
+        userUuid: '1-2-3',
+        signInAlertEnabled: true,
+        muteSignInEmailsSettingUuid: '2-3-4',
+      }),
+    ).toEqual({
+      createdAt: expect.any(Date),
+      meta: {
+        correlation: {
+          userIdentifier: '1-2-3',
+          userIdentifierType: 'uuid',
         },
-        payload: {
-          userUuid: '1-2-3',
-          userEmail: 'test@test.te',
-          browser: 'Firefox 1',
-          device: 'iOS 1',
-          signInAlertEnabled: true,
-          muteSignInEmailsSettingUuid: '2-3-4',
-        },
-        type: 'USER_SIGNED_IN',
-      })
+      },
+      payload: {
+        userUuid: '1-2-3',
+        userEmail: 'test@test.te',
+        browser: 'Firefox 1',
+        device: 'iOS 1',
+        signInAlertEnabled: true,
+        muteSignInEmailsSettingUuid: '2-3-4',
+      },
+      type: 'USER_SIGNED_IN',
+    })
   })
 
   it('should create a LISTED_ACCOUNT_REQUESTED event', () => {
-    expect(createFactory().createListedAccountRequestedEvent('1-2-3', 'test@test.te'))
-      .toEqual({
-        createdAt: expect.any(Date),
-        meta: {
-          correlation: {
-            userIdentifier: '1-2-3',
-            userIdentifierType: 'uuid',
-          },
+    expect(createFactory().createListedAccountRequestedEvent('1-2-3', 'test@test.te')).toEqual({
+      createdAt: expect.any(Date),
+      meta: {
+        correlation: {
+          userIdentifier: '1-2-3',
+          userIdentifierType: 'uuid',
         },
-        payload: {
-          userUuid: '1-2-3',
-          userEmail: 'test@test.te',
-        },
-        type: 'LISTED_ACCOUNT_REQUESTED',
-      })
+      },
+      payload: {
+        userUuid: '1-2-3',
+        userEmail: 'test@test.te',
+      },
+      type: 'LISTED_ACCOUNT_REQUESTED',
+    })
   })
 
   it('should create a USER_REGISTERED event', () => {
-    expect(createFactory().createUserRegisteredEvent('1-2-3', 'test@test.te'))
-      .toEqual({
-        createdAt: expect.any(Date),
-        meta: {
-          correlation: {
-            userIdentifier: '1-2-3',
-            userIdentifierType: 'uuid',
-          },
+    expect(createFactory().createUserRegisteredEvent('1-2-3', 'test@test.te')).toEqual({
+      createdAt: expect.any(Date),
+      meta: {
+        correlation: {
+          userIdentifier: '1-2-3',
+          userIdentifierType: 'uuid',
         },
-        payload: {
-          userUuid: '1-2-3',
-          email: 'test@test.te',
-        },
-        type: 'USER_REGISTERED',
-      })
+      },
+      payload: {
+        userUuid: '1-2-3',
+        email: 'test@test.te',
+      },
+      type: 'USER_REGISTERED',
+    })
   })
 
   it('should create a OFFLINE_SUBSCRIPTION_TOKEN_CREATED event', () => {
-    expect(createFactory().createOfflineSubscriptionTokenCreatedEvent('1-2-3', 'test@test.te'))
-      .toEqual({
-        createdAt: expect.any(Date),
-        meta: {
-          correlation: {
-            userIdentifier: 'test@test.te',
-            userIdentifierType: 'email',
-          },
+    expect(createFactory().createOfflineSubscriptionTokenCreatedEvent('1-2-3', 'test@test.te')).toEqual({
+      createdAt: expect.any(Date),
+      meta: {
+        correlation: {
+          userIdentifier: 'test@test.te',
+          userIdentifierType: 'email',
         },
-        payload: {
-          token: '1-2-3',
-          email: 'test@test.te',
-        },
-        type: 'OFFLINE_SUBSCRIPTION_TOKEN_CREATED',
-      })
+      },
+      payload: {
+        token: '1-2-3',
+        email: 'test@test.te',
+      },
+      type: 'OFFLINE_SUBSCRIPTION_TOKEN_CREATED',
+    })
   })
 
   it('should create a USER_CHANGED_EMAIL event', () => {
-    expect(createFactory().createUserEmailChangedEvent('1-2-3', 'test@test.te', 'test2@test.te'))
-      .toEqual({
-        createdAt: expect.any(Date),
-        meta: {
-          correlation: {
-            userIdentifier: '1-2-3',
-            userIdentifierType: 'uuid',
-          },
+    expect(createFactory().createUserEmailChangedEvent('1-2-3', 'test@test.te', 'test2@test.te')).toEqual({
+      createdAt: expect.any(Date),
+      meta: {
+        correlation: {
+          userIdentifier: '1-2-3',
+          userIdentifierType: 'uuid',
         },
-        payload: {
-          userUuid: '1-2-3',
-          fromEmail: 'test@test.te',
-          toEmail: 'test2@test.te',
-        },
-        type: 'USER_EMAIL_CHANGED',
-      })
+      },
+      payload: {
+        userUuid: '1-2-3',
+        fromEmail: 'test@test.te',
+        toEmail: 'test2@test.te',
+      },
+      type: 'USER_EMAIL_CHANGED',
+    })
   })
 
   it('should create a CLOUD_BACKUP_REQUESTED event', () => {
-    expect(createFactory().createCloudBackupRequestedEvent('GOOGLE_DRIVE', 'test', '1-2-3', '2-3-4', true))
-      .toEqual({
-        createdAt: expect.any(Date),
-        meta: {
-          correlation: {
-            userIdentifier: '1-2-3',
-            userIdentifierType: 'uuid',
-          },
+    expect(createFactory().createCloudBackupRequestedEvent('GOOGLE_DRIVE', 'test', '1-2-3', '2-3-4', true)).toEqual({
+      createdAt: expect.any(Date),
+      meta: {
+        correlation: {
+          userIdentifier: '1-2-3',
+          userIdentifierType: 'uuid',
         },
-        payload: {
-          cloudProvider: 'GOOGLE_DRIVE',
-          cloudProviderToken: 'test',
-          userUuid: '1-2-3',
-          muteEmailsSettingUuid: '2-3-4',
-          userHasEmailsMuted: true,
-        },
-        type: 'CLOUD_BACKUP_REQUESTED',
-      })
+      },
+      payload: {
+        cloudProvider: 'GOOGLE_DRIVE',
+        cloudProviderToken: 'test',
+        userUuid: '1-2-3',
+        muteEmailsSettingUuid: '2-3-4',
+        userHasEmailsMuted: true,
+      },
+      type: 'CLOUD_BACKUP_REQUESTED',
+    })
   })
 
   it('should create a EMAIL_BACKUP_REQUESTED event', () => {
-    expect(createFactory().createEmailBackupRequestedEvent('1-2-3', '2-3-4', true))
-      .toEqual({
-        createdAt: expect.any(Date),
-        meta: {
-          correlation: {
-            userIdentifier: '1-2-3',
-            userIdentifierType: 'uuid',
-          },
+    expect(createFactory().createEmailBackupRequestedEvent('1-2-3', '2-3-4', true)).toEqual({
+      createdAt: expect.any(Date),
+      meta: {
+        correlation: {
+          userIdentifier: '1-2-3',
+          userIdentifierType: 'uuid',
         },
-        payload: {
-          userUuid: '1-2-3',
-          muteEmailsSettingUuid: '2-3-4',
-          userHasEmailsMuted: true,
-        },
-        type: 'EMAIL_BACKUP_REQUESTED',
-      })
+      },
+      payload: {
+        userUuid: '1-2-3',
+        muteEmailsSettingUuid: '2-3-4',
+        userHasEmailsMuted: true,
+      },
+      type: 'EMAIL_BACKUP_REQUESTED',
+    })
   })
 
   it('should create a ACCOUNT_DELETION_REQUESTED event', () => {
-    expect(createFactory().createAccountDeletionRequestedEvent({
-      userUuid: '1-2-3',
-      regularSubscriptionUuid: '2-3-4',
-    }))
-      .toEqual({
-        createdAt: expect.any(Date),
-        meta: {
-          correlation: {
-            userIdentifier: '1-2-3',
-            userIdentifierType: 'uuid',
-          },
+    expect(
+      createFactory().createAccountDeletionRequestedEvent({
+        userUuid: '1-2-3',
+        regularSubscriptionUuid: '2-3-4',
+      }),
+    ).toEqual({
+      createdAt: expect.any(Date),
+      meta: {
+        correlation: {
+          userIdentifier: '1-2-3',
+          userIdentifierType: 'uuid',
         },
-        payload: {
-          userUuid: '1-2-3',
-          regularSubscriptionUuid: '2-3-4',
-        },
-        type: 'ACCOUNT_DELETION_REQUESTED',
-      })
+      },
+      payload: {
+        userUuid: '1-2-3',
+        regularSubscriptionUuid: '2-3-4',
+      },
+      type: 'ACCOUNT_DELETION_REQUESTED',
+    })
   })
 
   it('should create a USER_ROLE_CHANGED event', () => {
-    expect(createFactory().createUserRolesChangedEvent('1-2-3', 'test@test.com', [RoleName.ProUser]))
-      .toEqual({
-        createdAt: expect.any(Date),
-        meta: {
-          correlation: {
-            userIdentifier: '1-2-3',
-            userIdentifierType: 'uuid',
-          },
+    expect(createFactory().createUserRolesChangedEvent('1-2-3', 'test@test.com', [RoleName.ProUser])).toEqual({
+      createdAt: expect.any(Date),
+      meta: {
+        correlation: {
+          userIdentifier: '1-2-3',
+          userIdentifierType: 'uuid',
         },
-        payload: {
-          userUuid: '1-2-3',
-          email: 'test@test.com',
-          currentRoles: [RoleName.ProUser],
-          timestamp: expect.any(Number),
-        },
-        type: 'USER_ROLES_CHANGED',
-      })
+      },
+      payload: {
+        userUuid: '1-2-3',
+        email: 'test@test.com',
+        currentRoles: [RoleName.ProUser],
+        timestamp: expect.any(Number),
+      },
+      type: 'USER_ROLES_CHANGED',
+    })
   })
 })

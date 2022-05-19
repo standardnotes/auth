@@ -22,10 +22,14 @@ import { ListSharedSubscriptionInvitations } from '../Domain/UseCase/ListSharedS
 export class SubscriptionInvitesController extends BaseHttpController {
   constructor(
     @inject(TYPES.InviteToSharedSubscription) private inviteToSharedSubscription: InviteToSharedSubscription,
-    @inject(TYPES.AcceptSharedSubscriptionInvitation) private acceptSharedSubscriptionInvitation: AcceptSharedSubscriptionInvitation,
-    @inject(TYPES.DeclineSharedSubscriptionInvitation) private declineSharedSubscriptionInvitation: DeclineSharedSubscriptionInvitation,
-    @inject(TYPES.CancelSharedSubscriptionInvitation) private cancelSharedSubscriptionInvitation: CancelSharedSubscriptionInvitation,
-    @inject(TYPES.ListSharedSubscriptionInvitations) private listSharedSubscriptionInvitations: ListSharedSubscriptionInvitations,
+    @inject(TYPES.AcceptSharedSubscriptionInvitation)
+    private acceptSharedSubscriptionInvitation: AcceptSharedSubscriptionInvitation,
+    @inject(TYPES.DeclineSharedSubscriptionInvitation)
+    private declineSharedSubscriptionInvitation: DeclineSharedSubscriptionInvitation,
+    @inject(TYPES.CancelSharedSubscriptionInvitation)
+    private cancelSharedSubscriptionInvitation: CancelSharedSubscriptionInvitation,
+    @inject(TYPES.ListSharedSubscriptionInvitations)
+    private listSharedSubscriptionInvitations: ListSharedSubscriptionInvitations,
   ) {
     super()
   }

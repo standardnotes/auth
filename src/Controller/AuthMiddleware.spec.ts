@@ -17,10 +17,7 @@ describe('AuthMiddleware', () => {
     debug: jest.fn(),
   } as unknown as jest.Mocked<Logger>
 
-  const createMiddleware = () => new AuthMiddleware(
-    authenticateRequest,
-    logger,
-  )
+  const createMiddleware = () => new AuthMiddleware(authenticateRequest, logger)
 
   beforeEach(() => {
     authenticateRequest = {} as jest.Mocked<AuthenticateRequest>

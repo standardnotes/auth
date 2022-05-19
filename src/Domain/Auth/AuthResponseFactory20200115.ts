@@ -21,22 +21,18 @@ export class AuthResponseFactory20200115 extends AuthResponseFactory20190520 {
     @inject(TYPES.SessionService) private sessionService: SessionServiceInterface,
     @inject(TYPES.KeyParamsFactory) private keyParamsFactory: KeyParamsFactoryInterface,
     @inject(TYPES.UserProjector) userProjector: ProjectorInterface<User>,
-    @inject(TYPES.SessionTokenEncoder) protected tokenEncoder: TokenEncoderInterface<SessionTokenData>,
-    @inject(TYPES.Logger) logger: Logger
+    @inject(TYPES.SessionTokenEncoder) protected override tokenEncoder: TokenEncoderInterface<SessionTokenData>,
+    @inject(TYPES.Logger) logger: Logger,
   ) {
-    super(
-      userProjector,
-      tokenEncoder,
-      logger
-    )
+    super(userProjector, tokenEncoder, logger)
   }
 
-  async createResponse(dto: {
-    user: User,
-    apiVersion: string,
-    userAgent: string,
-    ephemeralSession: boolean,
-    readonlyAccess: boolean,
+  override async createResponse(dto: {
+    user: User
+    apiVersion: string
+    userAgent: string
+    ephemeralSession: boolean
+    readonlyAccess: boolean
   }): Promise<AuthResponse20161215 | AuthResponse20200115> {
     if (!dto.user.supportsSessions()) {
       this.logger.debug(`User ${dto.user.uuid} does not support sessions. Falling back to JWT auth response`)
@@ -56,11 +52,11 @@ export class AuthResponseFactory20200115 extends AuthResponseFactory20190520 {
   }
 
   private async createSession(dto: {
-    user: User,
-    apiVersion: string,
-    userAgent: string,
-    ephemeralSession: boolean,
-    readonlyAccess: boolean,
+    user: User
+    apiVersion: string
+    userAgent: string
+    ephemeralSession: boolean
+    readonlyAccess: boolean
   }): Promise<SessionBody> {
     if (dto.ephemeralSession) {
       return this.sessionService.createNewEphemeralSessionForUser(dto)

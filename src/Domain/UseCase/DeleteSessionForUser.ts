@@ -14,18 +14,17 @@ export class DeleteSessionForUser implements UseCaseInterface {
   constructor(
     @inject(TYPES.SessionRepository) private sessionRepository: SessionRepositoryInterface,
     @inject(TYPES.EphemeralSessionRepository) private ephemeralSessionRepository: EphemeralSessionRepositoryInterface,
-    @inject(TYPES.SessionService) private sessionService: SessionServiceInterface
-  ) {
-  }
+    @inject(TYPES.SessionService) private sessionService: SessionServiceInterface,
+  ) {}
 
   async execute(dto: DeleteSessionForUserDTO): Promise<DeleteSessionForUserResponse> {
-    let session: Session | EphemeralSession | undefined
+    let session: Session | EphemeralSession | null
 
     session = await this.sessionRepository.findOneByUuidAndUserUuid(dto.sessionUuid, dto.userUuid)
-    if (session === undefined) {
+    if (session === null) {
       session = await this.ephemeralSessionRepository.findOneByUuidAndUserUuid(dto.sessionUuid, dto.userUuid)
 
-      if (session === undefined) {
+      if (session === null) {
         return {
           success: false,
           errorMessage: 'No session exists with the provided identifier.',

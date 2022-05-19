@@ -9,16 +9,15 @@ import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 
 @injectable()
 export class ListedAccountDeletedEventHandler implements DomainEventHandlerInterface {
-  constructor (
+  constructor(
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
     @inject(TYPES.SettingService) private settingService: SettingServiceInterface,
-    @inject(TYPES.Logger) private logger: Logger
-  ) {
-  }
+    @inject(TYPES.Logger) private logger: Logger,
+  ) {}
 
   async handle(event: ListedAccountDeletedEvent): Promise<void> {
     const user = await this.userRepository.findOneByEmail(event.payload.userEmail)
-    if (user === undefined) {
+    if (user === null) {
       this.logger.warn(`Could not find user with email ${event.payload.userEmail}`)
 
       return
@@ -28,7 +27,7 @@ export class ListedAccountDeletedEventHandler implements DomainEventHandlerInter
       settingName: SettingName.ListedAuthorSecrets,
       userUuid: user.uuid,
     })
-    if (listedAuthorSecretsSetting === undefined) {
+    if (listedAuthorSecretsSetting === null) {
       this.logger.warn(`Could not find listed secrets setting for user ${user.uuid}`)
 
       return
@@ -36,8 +35,9 @@ export class ListedAccountDeletedEventHandler implements DomainEventHandlerInter
 
     const existingSecrets: ListedAuthorSecretsData = JSON.parse(listedAuthorSecretsSetting.value as string)
     const filteredSecrets = existingSecrets.filter(
-      secret => secret.authorId !== event.payload.userId ||
-      secret.authorId === event.payload.userId && secret.hostUrl !== event.payload.hostUrl
+      (secret) =>
+        secret.authorId !== event.payload.userId ||
+        (secret.authorId === event.payload.userId && secret.hostUrl !== event.payload.hostUrl),
     )
 
     await this.settingService.createOrReplace({

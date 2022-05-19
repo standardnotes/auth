@@ -11,15 +11,14 @@ export class GetUserSubscription implements UseCaseInterface {
   constructor(
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
     @inject(TYPES.UserSubscriptionRepository) private userSubscriptionRepository: UserSubscriptionRepositoryInterface,
-  ) {
-  }
+  ) {}
 
   async execute(dto: GetUserSubscriptionDto): Promise<GetUserSubscriptionResponse> {
     const { userUuid } = dto
 
     const user = await this.userRepository.findOneByUuid(userUuid)
 
-    if (user === undefined) {
+    if (user === null) {
       return {
         success: false,
         error: {

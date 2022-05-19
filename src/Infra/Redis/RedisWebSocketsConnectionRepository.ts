@@ -8,10 +8,7 @@ export class RedisWebSocketsConnectionRepository implements WebSocketsConnection
   private readonly WEB_SOCKETS_USER_CONNECTIONS_PREFIX = 'ws_user_connections'
   private readonly WEB_SOCKETS_CONNETION_PREFIX = 'ws_connection'
 
-  constructor(
-    @inject(TYPES.Redis) private redisClient: IORedis.Redis
-  ) {
-  }
+  constructor(@inject(TYPES.Redis) private redisClient: IORedis.Redis) {}
 
   async findAllByUserUuid(userUuid: string): Promise<string[]> {
     return await this.redisClient.smembers(`${this.WEB_SOCKETS_USER_CONNECTIONS_PREFIX}:${userUuid}`)

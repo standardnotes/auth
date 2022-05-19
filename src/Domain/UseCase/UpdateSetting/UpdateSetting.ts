@@ -15,15 +15,14 @@ import { SettingsAssociationServiceInterface } from '../../Setting/SettingsAssoc
 
 @injectable()
 export class UpdateSetting implements UseCaseInterface {
-  constructor (
+  constructor(
     @inject(TYPES.SettingService) private settingService: SettingServiceInterface,
     @inject(TYPES.SettingProjector) private settingProjector: SettingProjector,
     @inject(TYPES.SettingsAssociationService) private settingsAssociationService: SettingsAssociationServiceInterface,
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
     @inject(TYPES.RoleService) private roleService: RoleServiceInterface,
     @inject(TYPES.Logger) private logger: Logger,
-  ) {
-  }
+  ) {}
 
   async execute(dto: UpdateSettingDto): Promise<UpdateSettingResponse> {
     if (!Object.values(SettingName).includes(dto.props.name as SettingName)) {
@@ -42,7 +41,7 @@ export class UpdateSetting implements UseCaseInterface {
 
     const user = await this.userRepository.findOneByUuid(userUuid)
 
-    if (user === undefined) {
+    if (user === null) {
       return {
         success: false,
         error: {
@@ -52,7 +51,7 @@ export class UpdateSetting implements UseCaseInterface {
       }
     }
 
-    if (!await this.userHasPermissionToUpdateSetting(user, props.name as SettingName)) {
+    if (!(await this.userHasPermissionToUpdateSetting(user, props.name as SettingName))) {
       return {
         success: false,
         error: {
@@ -62,7 +61,9 @@ export class UpdateSetting implements UseCaseInterface {
       }
     }
 
-    props.serverEncryptionVersion = this.settingsAssociationService.getEncryptionVersionForSetting(props.name as SettingName)
+    props.serverEncryptionVersion = this.settingsAssociationService.getEncryptionVersionForSetting(
+      props.name as SettingName,
+    )
     props.sensitive = this.settingsAssociationService.getSensitivityForSetting(props.name as SettingName)
 
     const response = await this.settingService.createOrReplace({
@@ -96,7 +97,8 @@ export class UpdateSetting implements UseCaseInterface {
       return false
     }
 
-    const permissionAssociatedWithSetting = this.settingsAssociationService.getPermissionAssociatedWithSetting(settingName)
+    const permissionAssociatedWithSetting =
+      this.settingsAssociationService.getPermissionAssociatedWithSetting(settingName)
     if (permissionAssociatedWithSetting === undefined) {
       return true
     }

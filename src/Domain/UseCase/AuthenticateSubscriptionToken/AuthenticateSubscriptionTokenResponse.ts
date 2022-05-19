@@ -1,6 +1,6 @@
 import { User } from '../../User/User'
 
 export type AuthenticateSubscriptionTokenResponse = {
-  success: boolean,
-  user?: User,
+  success: boolean
+  user?: User
 }

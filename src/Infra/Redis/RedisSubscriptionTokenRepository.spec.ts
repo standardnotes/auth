@@ -27,9 +27,7 @@ describe('RedisSubscriptionTokenRepository', () => {
 
     expect(await createRepository().getUserUuidByToken('random-string')).toEqual('1-2-3')
 
-    expect(redisClient.get).toHaveBeenCalledWith(
-      'subscription-token:random-string',
-    )
+    expect(redisClient.get).toHaveBeenCalledWith('subscription-token:random-string')
   })
 
   it('should return undefined if a user uuid is not exchanged for an subscription token', async () => {
@@ -37,9 +35,7 @@ describe('RedisSubscriptionTokenRepository', () => {
 
     expect(await createRepository().getUserUuidByToken('random-string')).toBeUndefined()
 
-    expect(redisClient.get).toHaveBeenCalledWith(
-      'subscription-token:random-string',
-    )
+    expect(redisClient.get).toHaveBeenCalledWith('subscription-token:random-string')
   })
 
   it('should save an subscription token', async () => {
@@ -51,14 +47,8 @@ describe('RedisSubscriptionTokenRepository', () => {
 
     await createRepository().save(subscriptionToken)
 
-    expect(redisClient.set).toHaveBeenCalledWith(
-      'subscription-token:random-string',
-      '1-2-3',
-    )
+    expect(redisClient.set).toHaveBeenCalledWith('subscription-token:random-string', '1-2-3')
 
-    expect(redisClient.expireat).toHaveBeenCalledWith(
-      'subscription-token:random-string',
-      1,
-    )
+    expect(redisClient.expireat).toHaveBeenCalledWith('subscription-token:random-string', 1)
   })
 })

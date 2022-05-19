@@ -16,11 +16,7 @@ describe('UpdateUser', () => {
   let user: User
   let timer: TimerInterface
 
-  const createUseCase = () => new UpdateUser(
-    userRepository,
-    authResponseFactoryResolver,
-    timer,
-  )
+  const createUseCase = () => new UpdateUser(userRepository, authResponseFactoryResolver, timer)
 
   beforeEach(() => {
     userRepository = {} as jest.Mocked<UserRepositoryInterface>
@@ -43,15 +39,17 @@ describe('UpdateUser', () => {
   })
 
   it('should update user fields and save it', async () => {
-    expect(await createUseCase().execute({
-      user,
-      updatedWithUserAgent: 'Mozilla',
-      apiVersion: '20190520',
-      version: '004',
-      pwCost: 11,
-      pwSalt: 'qweqwe',
-      pwNonce: undefined,
-    })).toEqual({ success: true, authResponse: { foo: 'bar' } })
+    expect(
+      await createUseCase().execute({
+        user,
+        updatedWithUserAgent: 'Mozilla',
+        apiVersion: '20190520',
+        version: '004',
+        pwCost: 11,
+        pwSalt: 'qweqwe',
+        pwNonce: undefined,
+      }),
+    ).toEqual({ success: true, authResponse: { foo: 'bar' } })
 
     expect(userRepository.save).toHaveBeenCalledWith({
       createdAt: new Date(1),

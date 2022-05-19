@@ -3,9 +3,9 @@ import { UserSubscription } from './UserSubscription'
 import { UserSubscriptionType } from './UserSubscriptionType'
 
 export interface UserSubscriptionRepositoryInterface {
-  findOneByUuid(uuid: Uuid): Promise<UserSubscription | undefined>
-  findOneByUserUuid(userUuid: Uuid): Promise<UserSubscription | undefined>
-  findOneByUserUuidAndSubscriptionId(userUuid: Uuid, subscriptionId: number): Promise<UserSubscription | undefined>
+  findOneByUuid(uuid: Uuid): Promise<UserSubscription | null>
+  findOneByUserUuid(userUuid: Uuid): Promise<UserSubscription | null>
+  findOneByUserUuidAndSubscriptionId(userUuid: Uuid, subscriptionId: number): Promise<UserSubscription | null>
   findBySubscriptionIdAndType(subscriptionId: number, type: UserSubscriptionType): Promise<UserSubscription[]>
   findBySubscriptionId(subscriptionId: number): Promise<UserSubscription[]>
   updateEndsAt(subscriptionId: number, endsAt: number, updatedAt: number): Promise<void>

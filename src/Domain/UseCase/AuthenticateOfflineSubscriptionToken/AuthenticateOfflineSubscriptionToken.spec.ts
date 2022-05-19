@@ -14,18 +14,21 @@ describe('AuthenticateOfflineSubscriptionToken', () => {
   let offlineSettingRepository: OfflineSettingRepositoryInterface
   let offlineSetting: OfflineSetting
 
-  const createUseCase = () => new AuthenticateOfflineSubscriptionToken(
-    offlineSubscriptionTokenRepository,
-    offlineUserSubscriptionRepository,
-    offlineSettingRepository,
-  )
+  const createUseCase = () =>
+    new AuthenticateOfflineSubscriptionToken(
+      offlineSubscriptionTokenRepository,
+      offlineUserSubscriptionRepository,
+      offlineSettingRepository,
+    )
 
   beforeEach(() => {
     offlineSubscriptionTokenRepository = {} as jest.Mocked<OfflineSubscriptionTokenRepositoryInterface>
     offlineSubscriptionTokenRepository.getUserEmailByToken = jest.fn().mockReturnValue('test@test.com')
 
     offlineUserSubscriptionRepository = {} as jest.Mocked<OfflineUserSubscriptionRepositoryInterface>
-    offlineUserSubscriptionRepository.findByEmail = jest.fn().mockReturnValue([{} as jest.Mocked<OfflineUserSubscription>])
+    offlineUserSubscriptionRepository.findByEmail = jest
+      .fn()
+      .mockReturnValue([{} as jest.Mocked<OfflineUserSubscription>])
 
     offlineSetting = {
       email: 'test@test.com',
@@ -43,11 +46,11 @@ describe('AuthenticateOfflineSubscriptionToken', () => {
 
     expect(response.success).toBeTruthy()
 
-    expect((<{ success: true, email: string }> response).email).toEqual('test@test.com')
+    expect((<{ success: true; email: string }>response).email).toEqual('test@test.com')
   })
 
   it('should not authenticate an dashboard token if user has no features token', async () => {
-    offlineSettingRepository.findOneByNameAndEmail = jest.fn().mockReturnValue(undefined)
+    offlineSettingRepository.findOneByNameAndEmail = jest.fn().mockReturnValue(null)
 
     const response = await createUseCase().execute({ token: 'test', userEmail: 'test@test.com' })
 

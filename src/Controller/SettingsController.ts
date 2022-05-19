@@ -31,11 +31,14 @@ export class SettingsController extends BaseHttpController {
   @httpGet('/settings', TYPES.ApiGatewayAuthMiddleware)
   async getSettings(request: Request, response: Response): Promise<results.JsonResult> {
     if (request.params.userUuid !== response.locals.user.uuid) {
-      return this.json({
-        error: {
-          message: 'Operation not allowed.',
+      return this.json(
+        {
+          error: {
+            message: 'Operation not allowed.',
+          },
         },
-      }, 401)
+        401,
+      )
     }
 
     const { userUuid } = request.params
@@ -47,11 +50,14 @@ export class SettingsController extends BaseHttpController {
   @httpGet('/settings/:settingName', TYPES.ApiGatewayAuthMiddleware)
   async getSetting(request: Request, response: Response): Promise<results.JsonResult> {
     if (request.params.userUuid !== response.locals.user.uuid) {
-      return this.json({
-        error: {
-          message: 'Operation not allowed.',
+      return this.json(
+        {
+          error: {
+            message: 'Operation not allowed.',
+          },
         },
-      }, 401)
+        401,
+      )
     }
 
     const { userUuid, settingName } = request.params
@@ -67,28 +73,29 @@ export class SettingsController extends BaseHttpController {
   @httpPut('/settings', TYPES.ApiGatewayAuthMiddleware)
   async updateSetting(request: Request, response: Response): Promise<results.JsonResult | results.StatusCodeResult> {
     if (response.locals.readOnlyAccess) {
-      return this.json({
-        error: {
-          tag: ErrorTag.ReadOnlyAccess,
-          message: 'Session has read-only access.',
+      return this.json(
+        {
+          error: {
+            tag: ErrorTag.ReadOnlyAccess,
+            message: 'Session has read-only access.',
+          },
         },
-      }, 401)
+        401,
+      )
     }
 
     if (request.params.userUuid !== response.locals.user.uuid) {
-      return this.json({
-        error: {
-          message: 'Operation not allowed.',
+      return this.json(
+        {
+          error: {
+            message: 'Operation not allowed.',
+          },
         },
-      }, 401)
+        401,
+      )
     }
 
-    const {
-      name,
-      value,
-      serverEncryptionVersion = EncryptionVersion.Default,
-      sensitive = false,
-    } = request.body
+    const { name, value, serverEncryptionVersion = EncryptionVersion.Default, sensitive = false } = request.body
 
     const props = {
       name,
@@ -113,20 +120,26 @@ export class SettingsController extends BaseHttpController {
   @httpDelete('/settings/:settingName', TYPES.ApiGatewayAuthMiddleware)
   async deleteSetting(request: Request, response: Response): Promise<results.JsonResult> {
     if (response.locals.readOnlyAccess) {
-      return this.json({
-        error: {
-          tag: ErrorTag.ReadOnlyAccess,
-          message: 'Session has read-only access.',
+      return this.json(
+        {
+          error: {
+            tag: ErrorTag.ReadOnlyAccess,
+            message: 'Session has read-only access.',
+          },
         },
-      }, 401)
+        401,
+      )
     }
 
     if (request.params.userUuid !== response.locals.user.uuid) {
-      return this.json({
-        error: {
-          message: 'Operation not allowed.',
+      return this.json(
+        {
+          error: {
+            message: 'Operation not allowed.',
+          },
         },
-      }, 401)
+        401,
+      )
     }
 
     const { userUuid, settingName } = request.params

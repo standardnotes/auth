@@ -2,8 +2,8 @@ import { Uuid } from '@standardnotes/common'
 import { Session } from './Session'
 
 export interface SessionRepositoryInterface {
-  findOneByUuid(uuid: string): Promise<Session | undefined>
-  findOneByUuidAndUserUuid(uuid: string, userUuid: string): Promise<Session | undefined>
+  findOneByUuid(uuid: string): Promise<Session | null>
+  findOneByUuidAndUserUuid(uuid: string, userUuid: string): Promise<Session | null>
   findAllByRefreshExpirationAndUserUuid(userUuid: string): Promise<Array<Session>>
   findAllByUserUuid(userUuid: string): Promise<Array<Session>>
   deleteAllByUserUuid(userUuid: string, currentSessionUuid: string): Promise<void>

@@ -15,8 +15,7 @@ export class RedisOfflineSubscriptionTokenRepository implements OfflineSubscript
     @inject(TYPES.Redis) private redisClient: IORedis.Redis,
     @inject(TYPES.Timer) private timer: TimerInterface,
     @inject(TYPES.Logger) private logger: Logger,
-  ) {
-  }
+  ) {}
 
   async getUserEmailByToken(token: string): Promise<string | undefined> {
     const userUuid = await this.redisClient.get(`${this.PREFIX}:${token}`)

@@ -8,14 +8,14 @@ import { OfflineSettingRepositoryInterface } from '../Domain/Setting/OfflineSett
 
 @injectable()
 export class OfflineUserAuthMiddleware extends BaseMiddleware {
-  constructor (
+  constructor(
     @inject(TYPES.OfflineSettingRepository) private offlineSettingRepository: OfflineSettingRepositoryInterface,
     @inject(TYPES.Logger) private logger: Logger,
   ) {
     super()
   }
 
-  async handler (request: Request, response: Response, next: NextFunction): Promise<void> {
+  async handler(request: Request, response: Response, next: NextFunction): Promise<void> {
     try {
       if (!request.headers['x-offline-token']) {
         this.logger.debug('OfflineUserAuthMiddleware missing x-offline-token header.')
@@ -32,9 +32,9 @@ export class OfflineUserAuthMiddleware extends BaseMiddleware {
 
       const offlineFeaturesTokenSetting = await this.offlineSettingRepository.findOneByNameAndValue(
         OfflineSettingName.FeaturesToken,
-        request.headers['x-offline-token'] as string
+        request.headers['x-offline-token'] as string,
       )
-      if (offlineFeaturesTokenSetting === undefined) {
+      if (offlineFeaturesTokenSetting === null) {
         this.logger.debug('OfflineUserAuthMiddleware authentication failure.')
 
         response.status(401).send({

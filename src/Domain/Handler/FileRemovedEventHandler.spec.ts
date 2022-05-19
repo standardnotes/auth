@@ -19,11 +19,7 @@ describe('FileRemovedEventHandler', () => {
   let regularSubscription: UserSubscription
   let sharedSubscription: UserSubscription
 
-  const createHandler = () => new FileRemovedEventHandler(
-    userSubscriptionService,
-    subscriptionSettingService,
-    logger
-  )
+  const createHandler = () => new FileRemovedEventHandler(userSubscriptionService, subscriptionSettingService, logger)
 
   beforeEach(() => {
     user = {
@@ -43,10 +39,12 @@ describe('FileRemovedEventHandler', () => {
     } as jest.Mocked<UserSubscription>
 
     userSubscriptionService = {} as jest.Mocked<UserSubscriptionServiceInterface>
-    userSubscriptionService.findRegularSubscriptionForUserUuid = jest.fn().mockReturnValue({ regularSubscription, sharedSubscription: undefined })
+    userSubscriptionService.findRegularSubscriptionForUserUuid = jest
+      .fn()
+      .mockReturnValue({ regularSubscription, sharedSubscription: null })
 
     subscriptionSettingService = {} as jest.Mocked<SubscriptionSettingServiceInterface>
-    subscriptionSettingService.findSubscriptionSettingWithDecryptedValue = jest.fn().mockReturnValue(undefined)
+    subscriptionSettingService.findSubscriptionSettingWithDecryptedValue = jest.fn().mockReturnValue(null)
     subscriptionSettingService.createOrReplace = jest.fn()
 
     event = {} as jest.Mocked<FileRemovedEvent>
@@ -73,7 +71,9 @@ describe('FileRemovedEventHandler', () => {
     subscriptionSettingService.findSubscriptionSettingWithDecryptedValue = jest.fn().mockReturnValue({
       value: 345,
     })
-    userSubscriptionService.findRegularSubscriptionForUserUuid = jest.fn().mockReturnValue({ regularSubscription: undefined, sharedSubscription: undefined })
+    userSubscriptionService.findRegularSubscriptionForUserUuid = jest
+      .fn()
+      .mockReturnValue({ regularSubscription: null, sharedSubscription: null })
 
     await createHandler().handle(event)
 
@@ -87,13 +87,13 @@ describe('FileRemovedEventHandler', () => {
     await createHandler().handle(event)
 
     expect(subscriptionSettingService.createOrReplace).toHaveBeenCalledWith({
-      props:  {
+      props: {
         name: 'FILE_UPLOAD_BYTES_USED',
         sensitive: false,
         unencryptedValue: '222',
         serverEncryptionVersion: 0,
       },
-      userSubscription:  {
+      userSubscription: {
         uuid: '1-2-3',
         subscriptionType: 'regular',
         user: Promise.resolve(user),
@@ -102,7 +102,9 @@ describe('FileRemovedEventHandler', () => {
   })
 
   it('should update a bytes used setting on both shared and regular subscription', async () => {
-    userSubscriptionService.findRegularSubscriptionForUserUuid = jest.fn().mockReturnValue({ regularSubscription, sharedSubscription })
+    userSubscriptionService.findRegularSubscriptionForUserUuid = jest
+      .fn()
+      .mockReturnValue({ regularSubscription, sharedSubscription })
 
     subscriptionSettingService.findSubscriptionSettingWithDecryptedValue = jest.fn().mockReturnValue({
       value: 345,
@@ -110,13 +112,13 @@ describe('FileRemovedEventHandler', () => {
     await createHandler().handle(event)
 
     expect(subscriptionSettingService.createOrReplace).toHaveBeenNthCalledWith(1, {
-      props:  {
+      props: {
         name: 'FILE_UPLOAD_BYTES_USED',
         sensitive: false,
         unencryptedValue: '222',
         serverEncryptionVersion: 0,
       },
-      userSubscription:  {
+      userSubscription: {
         uuid: '1-2-3',
         subscriptionType: 'regular',
         user: Promise.resolve(user),
@@ -124,13 +126,13 @@ describe('FileRemovedEventHandler', () => {
     })
 
     expect(subscriptionSettingService.createOrReplace).toHaveBeenNthCalledWith(2, {
-      props:  {
+      props: {
         name: 'FILE_UPLOAD_BYTES_USED',
         sensitive: false,
         unencryptedValue: '222',
         serverEncryptionVersion: 0,
       },
-      userSubscription:  {
+      userSubscription: {
         uuid: '2-3-4',
         subscriptionType: 'shared',
         user: Promise.resolve(user),

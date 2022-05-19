@@ -1,8 +1,8 @@
 import { User } from '../User/User'
 
 export type UpdateUserDTO = {
-  [key: string]: string | User | Date | undefined | number,
-  user: User,
+  [key: string]: string | User | Date | undefined | number
+  user: User
   updatedWithUserAgent: string
   apiVersion: string
   email?: string

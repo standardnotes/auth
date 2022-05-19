@@ -6,33 +6,33 @@ import { UserSubscriptionType } from './UserSubscriptionType'
 @Entity({ name: 'user_subscriptions' })
 export class UserSubscription {
   @PrimaryGeneratedColumn('uuid')
-  uuid: string
+  declare uuid: string
 
   @Column({
     name: 'plan_name',
     length: 255,
     nullable: false,
   })
-  planName: string
+  declare planName: string
 
   @Column({
     name: 'ends_at',
     type: 'bigint',
   })
-  endsAt: number
+  declare endsAt: number
 
   @Column({
     name: 'created_at',
     type: 'bigint',
   })
-  createdAt: number
+  declare createdAt: number
 
   @Column({
     name: 'updated_at',
     type: 'bigint',
   })
   @Index('updated_at')
-  updatedAt: number
+  declare updatedAt: number
 
   @Column({
     type: 'tinyint',
@@ -40,7 +40,7 @@ export class UserSubscription {
     nullable: false,
     default: 0,
   })
-  cancelled: boolean
+  declare cancelled: boolean
 
   @Column({
     name: 'subscription_id',
@@ -48,31 +48,33 @@ export class UserSubscription {
     width: 11,
     nullable: true,
   })
-  subscriptionId: number | null
+  declare subscriptionId: number | null
 
   @Column({
     name: 'subscription_type',
     length: 24,
     type: 'varchar',
   })
-  subscriptionType: UserSubscriptionType
+  declare subscriptionType: UserSubscriptionType
 
   @ManyToOne(
     /* istanbul ignore next */
     () => User,
     /* istanbul ignore next */
-    user => user.subscriptions,
+    (user) => user.subscriptions,
     /* istanbul ignore next */
-    { onDelete: 'CASCADE', nullable: false }
+    { onDelete: 'CASCADE', nullable: false, lazy: true, eager: false },
   )
   @JoinColumn({ name: 'user_uuid', referencedColumnName: 'uuid' })
-  user: Promise<User>
+  declare user: Promise<User>
 
   @OneToMany(
     /* istanbul ignore next */
     () => SubscriptionSetting,
     /* istanbul ignore next */
-    subscriptionSetting => subscriptionSetting.userSubscription
+    (subscriptionSetting) => subscriptionSetting.userSubscription,
+    /* istanbul ignore next */
+    { lazy: true, eager: false },
   )
-  subscriptionSettings: Promise<SubscriptionSetting[]>
+  declare subscriptionSettings: Promise<SubscriptionSetting[]>
 }

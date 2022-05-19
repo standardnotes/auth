@@ -24,21 +24,24 @@ describe('SubscriptionRefundedEventHandler', () => {
   let event: SubscriptionRefundedEvent
   let timestamp: number
 
-  const createHandler = () => new SubscriptionRefundedEventHandler(
-    userRepository,
-    userSubscriptionRepository,
-    offlineUserSubscriptionRepository,
-    roleService,
-    logger
-  )
+  const createHandler = () =>
+    new SubscriptionRefundedEventHandler(
+      userRepository,
+      userSubscriptionRepository,
+      offlineUserSubscriptionRepository,
+      roleService,
+      logger,
+    )
 
   beforeEach(() => {
     user = {
       uuid: '123',
       email: 'test@test.com',
-      roles: Promise.resolve([{
-        name: RoleName.ProUser,
-      }]),
+      roles: Promise.resolve([
+        {
+          name: RoleName.ProUser,
+        },
+      ]),
     } as jest.Mocked<User>
 
     userRepository = {} as jest.Mocked<UserRepositoryInterface>
@@ -47,7 +50,9 @@ describe('SubscriptionRefundedEventHandler', () => {
 
     userSubscriptionRepository = {} as jest.Mocked<UserSubscriptionRepositoryInterface>
     userSubscriptionRepository.updateEndsAt = jest.fn()
-    userSubscriptionRepository.findBySubscriptionId = jest.fn().mockReturnValue([ { user: Promise.resolve(user) } as jest.Mocked<UserSubscription>])
+    userSubscriptionRepository.findBySubscriptionId = jest
+      .fn()
+      .mockReturnValue([{ user: Promise.resolve(user) } as jest.Mocked<UserSubscription>])
 
     offlineUserSubscriptionRepository = {} as jest.Mocked<OfflineUserSubscriptionRepositoryInterface>
     offlineUserSubscriptionRepository.updateEndsAt = jest.fn()
@@ -62,7 +67,7 @@ describe('SubscriptionRefundedEventHandler', () => {
     event.payload = {
       subscriptionId: 1,
       userEmail: 'test@test.com',
-      subscriptionName: SubscriptionName.CorePlan,
+      subscriptionName: SubscriptionName.PlusPlan,
       timestamp,
       offline: false,
     }
@@ -76,20 +81,14 @@ describe('SubscriptionRefundedEventHandler', () => {
     await createHandler().handle(event)
 
     expect(userRepository.findOneByEmail).toHaveBeenCalledWith('test@test.com')
-    expect(roleService.removeUserRole).toHaveBeenCalledWith(user, SubscriptionName.CorePlan)
+    expect(roleService.removeUserRole).toHaveBeenCalledWith(user, SubscriptionName.PlusPlan)
   })
 
   it('should update subscription ends at', async () => {
     await createHandler().handle(event)
 
     expect(userRepository.findOneByEmail).toHaveBeenCalledWith('test@test.com')
-    expect(
-      userSubscriptionRepository.updateEndsAt
-    ).toHaveBeenCalledWith(
-      1,
-      timestamp,
-      timestamp,
-    )
+    expect(userSubscriptionRepository.updateEndsAt).toHaveBeenCalledWith(1, timestamp, timestamp)
   })
 
   it('should update offline subscription ends at', async () => {
@@ -97,17 +96,11 @@ describe('SubscriptionRefundedEventHandler', () => {
 
     await createHandler().handle(event)
 
-    expect(
-      offlineUserSubscriptionRepository.updateEndsAt
-    ).toHaveBeenCalledWith(
-      1,
-      timestamp,
-      timestamp,
-    )
+    expect(offlineUserSubscriptionRepository.updateEndsAt).toHaveBeenCalledWith(1, timestamp, timestamp)
   })
 
   it('should not do anything if no user is found for specified email', async () => {
-    userRepository.findOneByEmail = jest.fn().mockReturnValue(undefined)
+    userRepository.findOneByEmail = jest.fn().mockReturnValue(null)
 
     await createHandler().handle(event)
 

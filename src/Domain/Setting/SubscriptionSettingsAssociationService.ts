@@ -17,22 +17,35 @@ export class SubscriptionSettingsAssociationService implements SubscriptionSetti
   constructor(
     @inject(TYPES.RoleToSubscriptionMap) private roleToSubscriptionMap: RoleToSubscriptionMapInterface,
     @inject(TYPES.RoleRepository) private roleRepository: RoleRepositoryInterface,
-  ) {
-  }
+  ) {}
 
-  private readonly settingsToSubscriptionNameMap = new Map<SubscriptionName, Map<SubscriptionSettingName, SettingDescription>>([
-    [SubscriptionName.CorePlan, new Map([
-      [SubscriptionSettingName.FileUploadBytesUsed, { sensitive: false, serverEncryptionVersion: EncryptionVersion.Unencrypted, value: '0' }],
-    ])],
-    [SubscriptionName.PlusPlan, new Map([
-      [SubscriptionSettingName.FileUploadBytesUsed, { sensitive: false, serverEncryptionVersion: EncryptionVersion.Unencrypted, value: '0' }],
-    ])],
-    [SubscriptionName.ProPlan, new Map([
-      [SubscriptionSettingName.FileUploadBytesUsed, { sensitive: false, serverEncryptionVersion: EncryptionVersion.Unencrypted, value: '0' }],
-    ])],
+  private readonly settingsToSubscriptionNameMap = new Map<
+    SubscriptionName,
+    Map<SubscriptionSettingName, SettingDescription>
+  >([
+    [
+      SubscriptionName.PlusPlan,
+      new Map([
+        [
+          SubscriptionSettingName.FileUploadBytesUsed,
+          { sensitive: false, serverEncryptionVersion: EncryptionVersion.Unencrypted, value: '0' },
+        ],
+      ]),
+    ],
+    [
+      SubscriptionName.ProPlan,
+      new Map([
+        [
+          SubscriptionSettingName.FileUploadBytesUsed,
+          { sensitive: false, serverEncryptionVersion: EncryptionVersion.Unencrypted, value: '0' },
+        ],
+      ]),
+    ],
   ])
 
-  async getDefaultSettingsAndValuesForSubscriptionName(subscriptionName: SubscriptionName): Promise<Map<SubscriptionSettingName, SettingDescription> | undefined> {
+  async getDefaultSettingsAndValuesForSubscriptionName(
+    subscriptionName: SubscriptionName,
+  ): Promise<Map<SubscriptionSettingName, SettingDescription> | undefined> {
     const defaultSettings = this.settingsToSubscriptionNameMap.get(subscriptionName)
 
     if (defaultSettings === undefined) {
@@ -52,18 +65,22 @@ export class SubscriptionSettingsAssociationService implements SubscriptionSetti
     const roleName = this.roleToSubscriptionMap.getRoleNameForSubscriptionName(subscriptionName)
 
     const role = await this.roleRepository.findOneByName(roleName as RoleName)
-    if (role == undefined) {
+    if (role === null) {
       throw new Error(`Could not find role with name: ${roleName}`)
     }
 
     const permissions = await role.permissions
 
-    const uploadLimit100GB = permissions.find((permission: Permission) => permission.name === PermissionName.FilesMaximumStorageTier)
+    const uploadLimit100GB = permissions.find(
+      (permission: Permission) => permission.name === PermissionName.FilesMaximumStorageTier,
+    )
     if (uploadLimit100GB !== undefined) {
       return 107_374_182_400
     }
 
-    const uploadLimit100MB = permissions.find((permission: Permission) => permission.name === PermissionName.FilesLowStorageTier)
+    const uploadLimit100MB = permissions.find(
+      (permission: Permission) => permission.name === PermissionName.FilesLowStorageTier,
+    )
     if (uploadLimit100MB !== undefined) {
       return 104_857_600
     }

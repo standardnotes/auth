@@ -19,16 +19,16 @@ export class RoleService implements RoleServiceInterface {
   constructor(
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
     @inject(TYPES.RoleRepository) private roleRepository: RoleRepositoryInterface,
-    @inject(TYPES.OfflineUserSubscriptionRepository) private offlineUserSubscriptionRepository: OfflineUserSubscriptionRepositoryInterface,
+    @inject(TYPES.OfflineUserSubscriptionRepository)
+    private offlineUserSubscriptionRepository: OfflineUserSubscriptionRepositoryInterface,
     @inject(TYPES.WebSocketsClientService) private webSocketsClientService: ClientServiceInterface,
     @inject(TYPES.RoleToSubscriptionMap) private roleToSubscriptionMap: RoleToSubscriptionMapInterface,
     @inject(TYPES.Logger) private logger: Logger,
-  ) {
-  }
+  ) {}
 
   async userHasPermission(userUuid: string, permissionName: PermissionName): Promise<boolean> {
     const user = await this.userRepository.findOneByUuid(userUuid)
-    if (user === undefined) {
+    if (user === null) {
       this.logger.warn(`Could not find user with uuid ${userUuid} for permissions check`)
 
       return false
@@ -47,22 +47,17 @@ export class RoleService implements RoleServiceInterface {
     return false
   }
 
-  async addUserRole(
-    user: User,
-    subscriptionName: SubscriptionName,
-  ): Promise<void> {
+  async addUserRole(user: User, subscriptionName: SubscriptionName): Promise<void> {
     const roleName = this.roleToSubscriptionMap.getRoleNameForSubscriptionName(subscriptionName)
 
     if (roleName === undefined) {
-      this.logger.warn(
-        `Could not find role name for subscription name: ${subscriptionName}`
-      )
+      this.logger.warn(`Could not find role name for subscription name: ${subscriptionName}`)
       return
     }
 
     const role = await this.roleRepository.findOneByName(roleName)
 
-    if (role === undefined) {
+    if (role === null) {
       this.logger.warn(`Could not find role for role name: ${roleName}`)
       return
     }
@@ -78,14 +73,13 @@ export class RoleService implements RoleServiceInterface {
 
     user.roles = Promise.resolve([...rolesMap.values()])
     await this.userRepository.save(user)
-    await this.webSocketsClientService.sendUserRolesChangedEvent(
-      user,
-    )
+    await this.webSocketsClientService.sendUserRolesChangedEvent(user)
   }
 
   async setOfflineUserRole(offlineUserSubscription: OfflineUserSubscription): Promise<void> {
-    const roleName = this.roleToSubscriptionMap
-      .getRoleNameForSubscriptionName(offlineUserSubscription.planName as SubscriptionName)
+    const roleName = this.roleToSubscriptionMap.getRoleNameForSubscriptionName(
+      offlineUserSubscription.planName as SubscriptionName,
+    )
 
     if (roleName === undefined) {
       this.logger.warn(`Could not find role name for subscription name: ${offlineUserSubscription.planName}`)
@@ -95,7 +89,7 @@ export class RoleService implements RoleServiceInterface {
 
     const role = await this.roleRepository.findOneByName(roleName)
 
-    if (role === undefined) {
+    if (role === null) {
       this.logger.warn(`Could not find role for role name: ${roleName}`)
 
       return
@@ -106,26 +100,17 @@ export class RoleService implements RoleServiceInterface {
     await this.offlineUserSubscriptionRepository.save(offlineUserSubscription)
   }
 
-  async removeUserRole(
-    user: User,
-    subscriptionName: SubscriptionName,
-  ): Promise<void> {
+  async removeUserRole(user: User, subscriptionName: SubscriptionName): Promise<void> {
     const roleName = this.roleToSubscriptionMap.getRoleNameForSubscriptionName(subscriptionName)
 
     if (roleName === undefined) {
-      this.logger.warn(
-        `Could not find role name for subscription name: ${subscriptionName}`
-      )
+      this.logger.warn(`Could not find role name for subscription name: ${subscriptionName}`)
       return
     }
 
     const currentRoles = await user.roles
-    user.roles = Promise.resolve(
-      currentRoles.filter(role => role.name !== roleName)
-    )
+    user.roles = Promise.resolve(currentRoles.filter((role) => role.name !== roleName))
     await this.userRepository.save(user)
-    await this.webSocketsClientService.sendUserRolesChangedEvent(
-      user,
-    )
+    await this.webSocketsClientService.sendUserRolesChangedEvent(user)
   }
 }

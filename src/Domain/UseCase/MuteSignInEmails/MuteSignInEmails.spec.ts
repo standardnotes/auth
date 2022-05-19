@@ -18,15 +18,19 @@ describe('MuteSignInEmails', () => {
   })
 
   it('should not succeed if extension setting is not found', async () => {
-    settingRepository.findOneByUuidAndNames = jest.fn().mockReturnValue(undefined)
+    settingRepository.findOneByUuidAndNames = jest.fn().mockReturnValue(null)
 
-    expect(await createUseCase().execute({ settingUuid: '1-2-3' }))
-      .toEqual({ success: false, message: 'Could not find setting setting.' })
+    expect(await createUseCase().execute({ settingUuid: '1-2-3' })).toEqual({
+      success: false,
+      message: 'Could not find setting setting.',
+    })
   })
 
   it('should update mute email setting on extension setting', async () => {
-    expect(await createUseCase().execute({ settingUuid: '1-2-3' }))
-      .toEqual({ success: true, message: 'These emails have been muted.' })
+    expect(await createUseCase().execute({ settingUuid: '1-2-3' })).toEqual({
+      success: true,
+      message: 'These emails have been muted.',
+    })
 
     expect(settingRepository.save).toHaveBeenCalledWith({
       value: 'muted',

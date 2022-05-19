@@ -32,21 +32,40 @@ export class SettingsAssociationService implements SettingsAssociationServiceInt
     SettingName.LogSessionUserAgent,
   ]
 
-  private readonly CLIENT_IMMUTABLE_SETTINGS = [
-    SettingName.ListedAuthorSecrets,
-  ]
+  private readonly CLIENT_IMMUTABLE_SETTINGS = [SettingName.ListedAuthorSecrets]
 
   private readonly permissionsAssociatedWithSettings = new Map<SettingName, PermissionName>([
     [SettingName.EmailBackupFrequency, PermissionName.DailyEmailBackup],
   ])
 
   private readonly defaultSettings = new Map<SettingName, SettingDescription>([
-    [SettingName.MuteSignInEmails, { sensitive: false, serverEncryptionVersion: EncryptionVersion.Unencrypted, value: MuteSignInEmailsOption.NotMuted }],
-    [SettingName.LogSessionUserAgent, { sensitive: false, serverEncryptionVersion: EncryptionVersion.Unencrypted, value: LogSessionUserAgentOption.Enabled }],
+    [
+      SettingName.MuteSignInEmails,
+      {
+        sensitive: false,
+        serverEncryptionVersion: EncryptionVersion.Unencrypted,
+        value: MuteSignInEmailsOption.NotMuted,
+      },
+    ],
+    [
+      SettingName.LogSessionUserAgent,
+      {
+        sensitive: false,
+        serverEncryptionVersion: EncryptionVersion.Unencrypted,
+        value: LogSessionUserAgentOption.Enabled,
+      },
+    ],
   ])
 
   private readonly vaultAccountDefaultSettingsOverwrites = new Map<SettingName, SettingDescription>([
-    [SettingName.LogSessionUserAgent, { sensitive: false, serverEncryptionVersion: EncryptionVersion.Unencrypted, value: LogSessionUserAgentOption.Disabled }],
+    [
+      SettingName.LogSessionUserAgent,
+      {
+        sensitive: false,
+        serverEncryptionVersion: EncryptionVersion.Unencrypted,
+        value: LogSessionUserAgentOption.Disabled,
+      },
+    ],
   ])
 
   isSettingMutableByClient(settingName: SettingName): boolean {
@@ -91,7 +110,7 @@ export class SettingsAssociationService implements SettingsAssociationServiceInt
     for (const vaultAccountDefaultSettingOverwriteKey of this.vaultAccountDefaultSettingsOverwrites.keys()) {
       defaultVaultSettings.set(
         vaultAccountDefaultSettingOverwriteKey,
-        this.vaultAccountDefaultSettingsOverwrites.get(vaultAccountDefaultSettingOverwriteKey) as SettingDescription
+        this.vaultAccountDefaultSettingsOverwrites.get(vaultAccountDefaultSettingOverwriteKey) as SettingDescription,
       )
     }
 

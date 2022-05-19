@@ -9,8 +9,11 @@ export class addRoleVersion1639998097029 implements MigrationInterface {
     await queryRunner.query('UPDATE `roles` SET `version` = 1')
     await queryRunner.query('ALTER TABLE `roles` CHANGE `version` `version` smallint NOT NULL')
     await queryRunner.query('CREATE UNIQUE INDEX `name_and_version` ON `roles` (`name`, `version`)')
-    await queryRunner.query('INSERT INTO `roles` (uuid, name, version) VALUES ("23bf88ca-bee1-4a4c-adf0-b7a48749eea7", "CORE_USER", 2)')
-    await queryRunner.query('INSERT INTO `role_permissions` (permission_uuid, role_uuid) VALUES \
+    await queryRunner.query(
+      'INSERT INTO `roles` (uuid, name, version) VALUES ("23bf88ca-bee1-4a4c-adf0-b7a48749eea7", "CORE_USER", 2)',
+    )
+    await queryRunner.query(
+      'INSERT INTO `role_permissions` (permission_uuid, role_uuid) VALUES \
       ("1c6295d7-ffab-4881-bdf9-7c80df3885e9", "23bf88ca-bee1-4a4c-adf0-b7a48749eea7"), \
       ("1cd5d412-cb57-4cc0-a982-10045ef92780", "23bf88ca-bee1-4a4c-adf0-b7a48749eea7"), \
       ("39ebab56-00be-4495-8f59-ba25d5127f06", "23bf88ca-bee1-4a4c-adf0-b7a48749eea7"), \
@@ -26,7 +29,8 @@ export class addRoleVersion1639998097029 implements MigrationInterface {
       ("b9d8488a-59aa-420a-8491-1f12b6484876", "23bf88ca-bee1-4a4c-adf0-b7a48749eea7"), \
       ("db84ebd6-5273-4af9-8d95-5603c6e3f75f", "23bf88ca-bee1-4a4c-adf0-b7a48749eea7"), \
       ("e1a3c091-3479-4d8d-b4df-66ec6c9f13c2", "23bf88ca-bee1-4a4c-adf0-b7a48749eea7") \
-      ')
+      ',
+    )
   }
 
   public async down(): Promise<void> {

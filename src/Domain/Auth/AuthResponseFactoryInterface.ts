@@ -4,10 +4,10 @@ import { AuthResponse20200115 } from './AuthResponse20200115'
 
 export interface AuthResponseFactoryInterface {
   createResponse(dto: {
-    user: User,
-    apiVersion: string,
-    userAgent: string,
-    ephemeralSession: boolean,
-    readonlyAccess: boolean,
+    user: User
+    apiVersion: string
+    userAgent: string
+    ephemeralSession: boolean
+    readonlyAccess: boolean
   }): Promise<AuthResponse20161215 | AuthResponse20200115>
 }

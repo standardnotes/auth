@@ -21,12 +21,8 @@ describe('FileUploadedEventHandler', () => {
   let regularSubscription: UserSubscription
   let sharedSubscription: UserSubscription
 
-  const createHandler = () => new FileUploadedEventHandler(
-    userRepository,
-    userSubscriptionService,
-    subscriptionSettingService,
-    logger
-  )
+  const createHandler = () =>
+    new FileUploadedEventHandler(userRepository, userSubscriptionService, subscriptionSettingService, logger)
 
   beforeEach(() => {
     user = {
@@ -49,10 +45,12 @@ describe('FileUploadedEventHandler', () => {
     } as jest.Mocked<UserSubscription>
 
     userSubscriptionService = {} as jest.Mocked<UserSubscriptionServiceInterface>
-    userSubscriptionService.findRegularSubscriptionForUserUuid = jest.fn().mockReturnValue({ regularSubscription, sharedSubscription: undefined })
+    userSubscriptionService.findRegularSubscriptionForUserUuid = jest
+      .fn()
+      .mockReturnValue({ regularSubscription, sharedSubscription: null })
 
     subscriptionSettingService = {} as jest.Mocked<SubscriptionSettingServiceInterface>
-    subscriptionSettingService.findSubscriptionSettingWithDecryptedValue = jest.fn().mockReturnValue(undefined)
+    subscriptionSettingService.findSubscriptionSettingWithDecryptedValue = jest.fn().mockReturnValue(null)
     subscriptionSettingService.createOrReplace = jest.fn()
 
     event = {} as jest.Mocked<FileUploadedEvent>
@@ -72,13 +70,13 @@ describe('FileUploadedEventHandler', () => {
     await createHandler().handle(event)
 
     expect(subscriptionSettingService.createOrReplace).toHaveBeenCalledWith({
-      props:  {
+      props: {
         name: 'FILE_UPLOAD_BYTES_USED',
         sensitive: false,
         unencryptedValue: '123',
         serverEncryptionVersion: 0,
       },
-      userSubscription:  {
+      userSubscription: {
         uuid: '1-2-3',
         subscriptionType: 'regular',
         user: Promise.resolve(user),
@@ -87,7 +85,7 @@ describe('FileUploadedEventHandler', () => {
   })
 
   it('should not do anything if a user is not found', async () => {
-    userRepository.findOneByUuid = jest.fn().mockReturnValue(undefined)
+    userRepository.findOneByUuid = jest.fn().mockReturnValue(null)
 
     await createHandler().handle(event)
 
@@ -98,7 +96,9 @@ describe('FileUploadedEventHandler', () => {
     subscriptionSettingService.findSubscriptionSettingWithDecryptedValue = jest.fn().mockReturnValue({
       value: 345,
     })
-    userSubscriptionService.findRegularSubscriptionForUserUuid = jest.fn().mockReturnValue({ regularSubscription: undefined, sharedSubscription: undefined })
+    userSubscriptionService.findRegularSubscriptionForUserUuid = jest
+      .fn()
+      .mockReturnValue({ regularSubscription: null, sharedSubscription: null })
 
     await createHandler().handle(event)
 
@@ -112,13 +112,13 @@ describe('FileUploadedEventHandler', () => {
     await createHandler().handle(event)
 
     expect(subscriptionSettingService.createOrReplace).toHaveBeenCalledWith({
-      props:  {
+      props: {
         name: 'FILE_UPLOAD_BYTES_USED',
         sensitive: false,
         unencryptedValue: '468',
         serverEncryptionVersion: 0,
       },
-      userSubscription:  {
+      userSubscription: {
         uuid: '1-2-3',
         subscriptionType: 'regular',
         user: Promise.resolve(user),
@@ -127,7 +127,9 @@ describe('FileUploadedEventHandler', () => {
   })
 
   it('should update a bytes used setting on both regular and shared subscription', async () => {
-    userSubscriptionService.findRegularSubscriptionForUserUuid = jest.fn().mockReturnValue({ regularSubscription, sharedSubscription })
+    userSubscriptionService.findRegularSubscriptionForUserUuid = jest
+      .fn()
+      .mockReturnValue({ regularSubscription, sharedSubscription })
 
     subscriptionSettingService.findSubscriptionSettingWithDecryptedValue = jest.fn().mockReturnValue({
       value: 345,
@@ -135,13 +137,13 @@ describe('FileUploadedEventHandler', () => {
     await createHandler().handle(event)
 
     expect(subscriptionSettingService.createOrReplace).toHaveBeenCalledWith({
-      props:  {
+      props: {
         name: 'FILE_UPLOAD_BYTES_USED',
         sensitive: false,
         unencryptedValue: '468',
         serverEncryptionVersion: 0,
       },
-      userSubscription:  {
+      userSubscription: {
         uuid: '1-2-3',
         subscriptionType: 'regular',
         user: Promise.resolve(user),
@@ -149,13 +151,13 @@ describe('FileUploadedEventHandler', () => {
     })
 
     expect(subscriptionSettingService.createOrReplace).toHaveBeenCalledWith({
-      props:  {
+      props: {
         name: 'FILE_UPLOAD_BYTES_USED',
         sensitive: false,
         unencryptedValue: '468',
         serverEncryptionVersion: 0,
       },
-      userSubscription:  {
+      userSubscription: {
         uuid: '2-3-4',
         subscriptionType: 'shared',
         user: Promise.resolve(user),

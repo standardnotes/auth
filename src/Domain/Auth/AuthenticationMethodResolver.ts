@@ -12,9 +12,9 @@ export class AuthenticationMethodResolver implements AuthenticationMethodResolve
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
     @inject(TYPES.SessionService) private sessionService: SessionServiceInterface,
     @inject(TYPES.SessionTokenDecoder) private sessionTokenDecoder: TokenDecoderInterface<SessionTokenData>,
-    @inject(TYPES.FallbackSessionTokenDecoder) private fallbackSessionTokenDecoder: TokenDecoderInterface<SessionTokenData>
-  ) {
-  }
+    @inject(TYPES.FallbackSessionTokenDecoder)
+    private fallbackSessionTokenDecoder: TokenDecoderInterface<SessionTokenData>,
+  ) {}
 
   async resolve(token: string): Promise<AuthenticationMethod | undefined> {
     let decodedToken: SessionTokenData | undefined = this.sessionTokenDecoder.decodeToken(token)
@@ -25,7 +25,7 @@ export class AuthenticationMethodResolver implements AuthenticationMethodResolve
     if (decodedToken) {
       return {
         type: 'jwt',
-        user: await this.userRepository.findOneByUuid(<string> decodedToken.user_uuid),
+        user: await this.userRepository.findOneByUuid(<string>decodedToken.user_uuid),
         claims: decodedToken,
       }
     }
@@ -44,6 +44,7 @@ export class AuthenticationMethodResolver implements AuthenticationMethodResolve
       return {
         type: 'revoked',
         revokedSession: await this.sessionService.markRevokedSessionAsReceived(revokedSession),
+        user: null,
       }
     }
 

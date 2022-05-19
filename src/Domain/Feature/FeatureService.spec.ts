@@ -31,28 +31,23 @@ describe('FeatureService', () => {
   let timer: TimerInterface
   let offlineUserSubscription: OfflineUserSubscription
 
-  const createService = () => new FeatureService(
-    roleToSubscriptionMap,
-    offlineUserSubscriptionRepository,
-    timer
-  )
+  const createService = () => new FeatureService(roleToSubscriptionMap, offlineUserSubscriptionRepository, timer)
 
   beforeEach(() => {
     roleToSubscriptionMap = {} as jest.Mocked<RoleToSubscriptionMapInterface>
     roleToSubscriptionMap.filterNonSubscriptionRoles = jest.fn().mockReturnValue([])
-    roleToSubscriptionMap.getRoleNameForSubscriptionName = jest.fn().mockImplementation((subscriptionName: SubscriptionName) => {
-      if (subscriptionName === SubscriptionName.CorePlan) {
-        return RoleName.CoreUser
-      }
-      if (subscriptionName === SubscriptionName.PlusPlan) {
-        return RoleName.PlusUser
-      }
-      if (subscriptionName === SubscriptionName.ProPlan) {
-        return RoleName.ProUser
-      }
+    roleToSubscriptionMap.getRoleNameForSubscriptionName = jest
+      .fn()
+      .mockImplementation((subscriptionName: SubscriptionName) => {
+        if (subscriptionName === SubscriptionName.PlusPlan) {
+          return RoleName.PlusUser
+        }
+        if (subscriptionName === SubscriptionName.ProPlan) {
+          return RoleName.ProUser
+        }
 
-      return undefined
-    })
+        return undefined
+      })
 
     permission1 = {
       uuid: 'permission-1-1-1',
@@ -72,13 +67,14 @@ describe('FeatureService', () => {
     }
 
     role1 = {
-      name: RoleName.CoreUser,
+      name: RoleName.PlusUser,
       uuid: 'role-1-1-1',
       permissions: Promise.resolve([permission1, permission3]),
     } as jest.Mocked<Role>
 
     role2 = {
-      name: RoleName.ProUser, uuid: 'role-2-2-2',
+      name: RoleName.ProUser,
+      uuid: 'role-2-2-2',
       permissions: Promise.resolve([permission2]),
     } as jest.Mocked<Role>
 
@@ -86,7 +82,7 @@ describe('FeatureService', () => {
       uuid: 'subscription-1-1-1',
       createdAt: 111,
       updatedAt: 222,
-      planName: SubscriptionName.CorePlan,
+      planName: SubscriptionName.PlusPlan,
       endsAt: 555,
       user: Promise.resolve(user),
       cancelled: false,
@@ -112,7 +108,7 @@ describe('FeatureService', () => {
       uuid: 'subscription-3-3-3-canceled',
       createdAt: 111,
       updatedAt: 222,
-      planName: SubscriptionName.CorePlan,
+      planName: SubscriptionName.PlusPlan,
       endsAt: 333,
       user: Promise.resolve(user),
       cancelled: true,
@@ -125,7 +121,7 @@ describe('FeatureService', () => {
       uuid: 'subscription-4-4-4-canceled',
       createdAt: 111,
       updatedAt: 222,
-      planName: SubscriptionName.CorePlan,
+      planName: SubscriptionName.PlusPlan,
       endsAt: 333,
       user: Promise.resolve(user),
       cancelled: true,
@@ -145,7 +141,7 @@ describe('FeatureService', () => {
       uuid: 'subscription-1-1-1',
       createdAt: 111,
       updatedAt: 222,
-      planName: SubscriptionName.CorePlan,
+      planName: SubscriptionName.PlusPlan,
       endsAt: 555,
       cancelled: false,
     } as jest.Mocked<OfflineUserSubscription>
@@ -159,8 +155,7 @@ describe('FeatureService', () => {
 
   describe('offline subscribers', () => {
     it('should return user features with `expires_at` field', async () => {
-      const features = await createService()
-        .getFeaturesForOfflineUser('test@test.com')
+      const features = await createService().getFeaturesForOfflineUser('test@test.com')
 
       expect(features).toEqual(
         expect.arrayContaining([
@@ -168,7 +163,7 @@ describe('FeatureService', () => {
             identifier: 'org.standardnotes.theme-autobiography',
             expires_at: 555,
           }),
-        ])
+        ]),
       )
     })
 
@@ -188,7 +183,7 @@ describe('FeatureService', () => {
             identifier: 'org.standardnotes.theme-autobiography',
             expires_at: 555,
           }),
-        ])
+        ]),
       )
     })
 
@@ -206,7 +201,7 @@ describe('FeatureService', () => {
             identifier: 'org.standardnotes.theme-autobiography',
             expires_at: 555,
           }),
-        ])
+        ]),
       )
     })
 
@@ -228,6 +223,8 @@ describe('FeatureService', () => {
         uuid: 'role-1-1-1',
         permissions: Promise.resolve([permission4]),
       } as jest.Mocked<Role>
+
+      roleToSubscriptionMap.filterNonSubscriptionRoles = jest.fn().mockReturnValue([role1])
 
       user = {
         uuid: 'user-1-1-1',
@@ -268,8 +265,9 @@ describe('FeatureService', () => {
     })
 
     it('should return user features with `expires_at` field when user has more than 1 role & subscription', async () => {
-      roleToSubscriptionMap.getSubscriptionNameForRoleName = jest.fn()
-        .mockReturnValueOnce(SubscriptionName.CorePlan)
+      roleToSubscriptionMap.getSubscriptionNameForRoleName = jest
+        .fn()
+        .mockReturnValueOnce(SubscriptionName.PlusPlan)
         .mockReturnValueOnce(SubscriptionName.ProPlan)
 
       user = {
@@ -289,7 +287,7 @@ describe('FeatureService', () => {
             identifier: 'org.standardnotes.bold-editor',
             expires_at: 777,
           }),
-        ])
+        ]),
       )
     })
 
@@ -302,12 +300,13 @@ describe('FeatureService', () => {
       const nonSubscriptionRole = {
         name: RoleName.FilesBetaUser,
         uuid: 'role-files-beta',
-        permissions: Promise.resolve([ nonSubscriptionPermission ]),
+        permissions: Promise.resolve([nonSubscriptionPermission]),
       } as jest.Mocked<Role>
 
-      roleToSubscriptionMap.filterNonSubscriptionRoles = jest.fn().mockReturnValue([ nonSubscriptionRole ])
-      roleToSubscriptionMap.getSubscriptionNameForRoleName = jest.fn()
-        .mockReturnValueOnce(SubscriptionName.CorePlan)
+      roleToSubscriptionMap.filterNonSubscriptionRoles = jest.fn().mockReturnValue([nonSubscriptionRole])
+      roleToSubscriptionMap.getSubscriptionNameForRoleName = jest
+        .fn()
+        .mockReturnValueOnce(SubscriptionName.PlusPlan)
         .mockReturnValueOnce(SubscriptionName.ProPlan)
 
       user = {
@@ -332,17 +331,19 @@ describe('FeatureService', () => {
             expires_at: undefined,
             no_expire: true,
           }),
-        ])
+        ]),
       )
     })
 
     it('should set the longest expiration date for feature that matches duplicated permissions', async () => {
-      roleToSubscriptionMap.getSubscriptionNameForRoleName = jest.fn()
-        .mockReturnValueOnce(SubscriptionName.CorePlan)
+      roleToSubscriptionMap.getSubscriptionNameForRoleName = jest
+        .fn()
+        .mockReturnValueOnce(SubscriptionName.PlusPlan)
         .mockReturnValueOnce(SubscriptionName.ProPlan)
 
       role2 = {
-        name: RoleName.ProUser, uuid: 'role-2-2-2',
+        name: RoleName.ProUser,
+        uuid: 'role-2-2-2',
         permissions: Promise.resolve([permission1, permission2]),
       } as jest.Mocked<Role>
       user = {
@@ -364,20 +365,22 @@ describe('FeatureService', () => {
             identifier: 'org.standardnotes.bold-editor',
             expires_at: longestExpireAt,
           }),
-        ])
+        ]),
       )
     })
 
     it('should not set the lesser expiration date for feature that matches duplicated permissions', async () => {
-      roleToSubscriptionMap.getSubscriptionNameForRoleName = jest.fn()
-        .mockReturnValueOnce(SubscriptionName.CorePlan)
+      roleToSubscriptionMap.getSubscriptionNameForRoleName = jest
+        .fn()
+        .mockReturnValueOnce(SubscriptionName.PlusPlan)
         .mockReturnValueOnce(SubscriptionName.ProPlan)
 
       const lesserExpireAt = 111
       subscription2.endsAt = lesserExpireAt
 
       role2 = {
-        name: RoleName.ProUser, uuid: 'role-2-2-2',
+        name: RoleName.ProUser,
+        uuid: 'role-2-2-2',
         permissions: Promise.resolve([permission1, permission2]),
       } as jest.Mocked<Role>
       user = {
@@ -397,7 +400,7 @@ describe('FeatureService', () => {
             identifier: 'org.standardnotes.bold-editor',
             expires_at: lesserExpireAt,
           }),
-        ])
+        ]),
       )
     })
   })

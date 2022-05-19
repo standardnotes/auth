@@ -9,11 +9,10 @@ import { SettingServiceInterface } from '../../Setting/SettingServiceInterface'
 
 @injectable()
 export class GetSetting implements UseCaseInterface {
-  constructor (
+  constructor(
     @inject(TYPES.SettingProjector) private settingProjector: SettingProjector,
     @inject(TYPES.SettingService) private settingService: SettingServiceInterface,
-  ) {
-  }
+  ) {}
 
   async execute(dto: GetSettingDto): Promise<GetSettingResponse> {
     const { userUuid, settingName } = dto
@@ -23,7 +22,7 @@ export class GetSetting implements UseCaseInterface {
       settingName: settingName as SettingName,
     })
 
-    if (setting === undefined) {
+    if (setting === null) {
       return {
         success: false,
         error: {

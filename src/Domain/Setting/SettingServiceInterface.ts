@@ -7,5 +7,5 @@ import { Setting } from './Setting'
 export interface SettingServiceInterface {
   applyDefaultSettingsUponRegistration(user: User): Promise<void>
   createOrReplace(dto: CreateOrReplaceSettingDto): Promise<CreateOrReplaceSettingResponse>
-  findSettingWithDecryptedValue(dto: FindSettingDTO): Promise<Setting | undefined>
+  findSettingWithDecryptedValue(dto: FindSettingDTO): Promise<Setting | null>
 }

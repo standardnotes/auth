@@ -15,7 +15,9 @@ describe('CreateListedAccount', () => {
     domainEventPublisher.publish = jest.fn()
 
     domainEventFactory = {} as jest.Mocked<DomainEventFactoryInterface>
-    domainEventFactory.createListedAccountRequestedEvent = jest.fn().mockReturnValue({} as jest.Mocked<ListedAccountRequestedEvent>)
+    domainEventFactory.createListedAccountRequestedEvent = jest
+      .fn()
+      .mockReturnValue({} as jest.Mocked<ListedAccountRequestedEvent>)
   })
 
   it('should publish a listed account requested event', async () => {

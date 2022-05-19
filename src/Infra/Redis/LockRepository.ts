@@ -12,9 +12,8 @@ export class LockRepository implements LockRepositoryInterface {
   constructor(
     @inject(TYPES.Redis) private redisClient: IORedis.Redis,
     @inject(TYPES.MAX_LOGIN_ATTEMPTS) private maxLoginAttempts: number,
-    @inject(TYPES.FAILED_LOGIN_LOCKOUT) private failedLoginLockout: number
-  ) {
-  }
+    @inject(TYPES.FAILED_LOGIN_LOCKOUT) private failedLoginLockout: number,
+  ) {}
 
   async lockSuccessfullOTP(userIdentifier: string, otp: string): Promise<void> {
     await this.redisClient.setex(`${this.OTP_PREFIX}:${userIdentifier}`, 60, otp)

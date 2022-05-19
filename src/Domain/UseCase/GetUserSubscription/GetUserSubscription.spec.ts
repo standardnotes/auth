@@ -27,7 +27,7 @@ describe('GetUserSubscription', () => {
   })
 
   it('should fail if a user is not found', async () => {
-    userRepository.findOneByUuid = jest.fn().mockReturnValue(undefined)
+    userRepository.findOneByUuid = jest.fn().mockReturnValue(null)
 
     expect(await createUseCase().execute({ userUuid: 'user-1-1-1' })).toEqual({
       success: false,

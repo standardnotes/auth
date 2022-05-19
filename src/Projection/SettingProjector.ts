@@ -20,7 +20,7 @@ export class SettingProjector {
     return Promise.all(
       settings.map(async (setting) => {
         return this.projectSimple(setting)
-      })
+      }),
     )
   }
 }

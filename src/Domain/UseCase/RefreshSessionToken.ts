@@ -8,10 +8,7 @@ import { RefreshSessionTokenDTO } from './RefreshSessionTokenDTO'
 
 @injectable()
 export class RefreshSessionToken {
-  constructor(
-    @inject(TYPES.SessionService) private sessionService: SessionServiceInterface,
-  ) {
-  }
+  constructor(@inject(TYPES.SessionService) private sessionService: SessionServiceInterface) {}
 
   async execute(dto: RefreshSessionTokenDTO): Promise<RefreshSessionTokenResponse> {
     const session = await this.sessionService.getSessionFromToken(dto.accessToken)

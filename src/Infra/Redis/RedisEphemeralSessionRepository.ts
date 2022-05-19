@@ -11,16 +11,21 @@ export class RedisEphemeralSessionRepository implements EphemeralSessionReposito
 
   constructor(
     @inject(TYPES.Redis) private redisClient: IORedis.Redis,
-    @inject(TYPES.EPHEMERAL_SESSION_AGE) private ephemeralSessionAge: number
-  ) {
-  }
+    @inject(TYPES.EPHEMERAL_SESSION_AGE) private ephemeralSessionAge: number,
+  ) {}
 
   async deleteOne(uuid: string, userUuid: string): Promise<void> {
     await this.redisClient.del(`${this.PREFIX}:${uuid}`)
     await this.redisClient.del(`${this.PREFIX}:${uuid}:${userUuid}`)
   }
 
-  async updateTokensAndExpirationDates(uuid: string, hashedAccessToken: string, hashedRefreshToken: string, accessExpiration: Date, refreshExpiration: Date): Promise<void> {
+  async updateTokensAndExpirationDates(
+    uuid: string,
+    hashedAccessToken: string,
+    hashedRefreshToken: string,
+    accessExpiration: Date,
+    refreshExpiration: Date,
+  ): Promise<void> {
     const session = await this.findOneByUuid(uuid)
     if (!session) {
       return
@@ -38,11 +43,7 @@ export class RedisEphemeralSessionRepository implements EphemeralSessionReposito
     let cursor = '0'
     let sessionKeys: Array<string> = []
     do {
-      const scanResult = await this.redisClient.scan(
-        cursor,
-        'MATCH',
-        `${this.PREFIX}:*:${userUuid}`
-      )
+      const scanResult = await this.redisClient.scan(cursor, 'MATCH', `${this.PREFIX}:*:${userUuid}`)
 
       cursor = scanResult[0]
       sessionKeys = sessionKeys.concat(scanResult[1])
@@ -54,22 +55,22 @@ export class RedisEphemeralSessionRepository implements EphemeralSessionReposito
 
     const sessions = await this.redisClient.mget(sessionKeys)
 
-    return (<string[]> sessions.filter(value => value)).map(stringifiedSession => JSON.parse(stringifiedSession))
+    return (<string[]>sessions.filter((value) => value)).map((stringifiedSession) => JSON.parse(stringifiedSession))
   }
 
-  async findOneByUuid(uuid: string): Promise<EphemeralSession | undefined> {
+  async findOneByUuid(uuid: string): Promise<EphemeralSession | null> {
     const stringifiedSession = await this.redisClient.get(`${this.PREFIX}:${uuid}`)
     if (!stringifiedSession) {
-      return undefined
+      return null
     }
 
     return JSON.parse(stringifiedSession)
   }
 
-  async findOneByUuidAndUserUuid(uuid: string, userUuid: string): Promise<EphemeralSession | undefined> {
+  async findOneByUuidAndUserUuid(uuid: string, userUuid: string): Promise<EphemeralSession | null> {
     const stringifiedSession = await this.redisClient.get(`${this.PREFIX}:${uuid}:${userUuid}`)
     if (!stringifiedSession) {
-      return undefined
+      return null
     }
 
     return JSON.parse(stringifiedSession)

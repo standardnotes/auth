@@ -33,7 +33,7 @@ describe('DeleteSetting', () => {
       userUuid: '1-2-3',
     })
 
-    expect(settingRepository.deleteByUserUuid).toHaveBeenCalledWith({ 'settingName': 'test', 'userUuid': '1-2-3' })
+    expect(settingRepository.deleteByUserUuid).toHaveBeenCalledWith({ settingName: 'test', userUuid: '1-2-3' })
   })
 
   it('should delete a setting by uuid', async () => {
@@ -43,11 +43,11 @@ describe('DeleteSetting', () => {
       uuid: '3-4-5',
     })
 
-    expect(settingRepository.deleteByUserUuid).toHaveBeenCalledWith({ 'settingName': 'test', 'userUuid': '1-2-3' })
+    expect(settingRepository.deleteByUserUuid).toHaveBeenCalledWith({ settingName: 'test', userUuid: '1-2-3' })
   })
 
   it('should not delete a setting by name and user uuid if not found', async () => {
-    settingRepository.findLastByNameAndUserUuid = jest.fn().mockReturnValue(undefined)
+    settingRepository.findLastByNameAndUserUuid = jest.fn().mockReturnValue(null)
 
     await createUseCase().execute({
       settingName: 'test',
@@ -58,7 +58,7 @@ describe('DeleteSetting', () => {
   })
 
   it('should not delete a setting by uuid if not found', async () => {
-    settingRepository.findOneByUuid = jest.fn().mockReturnValue(undefined)
+    settingRepository.findOneByUuid = jest.fn().mockReturnValue(null)
 
     await createUseCase().execute({
       settingName: 'test',
@@ -77,8 +77,8 @@ describe('DeleteSetting', () => {
     })
 
     expect(settingRepository.save).toHaveBeenCalledWith({
-      'updatedAt': 1,
-      'value': null,
+      updatedAt: 1,
+      value: null,
     })
   })
 
@@ -91,8 +91,8 @@ describe('DeleteSetting', () => {
     })
 
     expect(settingRepository.save).toHaveBeenCalledWith({
-      'updatedAt': 123,
-      'value': null,
+      updatedAt: 123,
+      value: null,
     })
   })
 })

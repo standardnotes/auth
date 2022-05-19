@@ -3,7 +3,7 @@ import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm'
 @Entity({ name: 'sessions' })
 export class Session {
   @PrimaryGeneratedColumn('uuid')
-  uuid: string
+  declare uuid: string
 
   @Column({
     name: 'user_uuid',
@@ -11,19 +11,19 @@ export class Session {
     nullable: true,
   })
   @Index('index_sessions_on_user_uuid')
-  userUuid: string
+  declare userUuid: string
 
   @Column({
     name: 'hashed_access_token',
     length: 255,
   })
-  hashedAccessToken: string
+  declare hashedAccessToken: string
 
   @Column({
     name: 'hashed_refresh_token',
     length: 255,
   })
-  hashedRefreshToken: string
+  declare hashedRefreshToken: string
 
   @Column({
     name: 'access_expiration',
@@ -32,40 +32,40 @@ export class Session {
       /* istanbul ignore next */
       () => 'CURRENT_TIMESTAMP',
   })
-  accessExpiration: Date
+  declare accessExpiration: Date
 
   @Column({
     name: 'refresh_expiration',
     type: 'datetime',
   })
-  refreshExpiration: Date
+  declare refreshExpiration: Date
 
   @Column({
     name: 'api_version',
     length: 255,
     nullable: true,
   })
-  apiVersion: string
+  declare apiVersion: string
 
   @Column({
     name: 'user_agent',
     type: 'text',
     nullable: true,
   })
-  userAgent: string | null
+  declare userAgent: string | null
 
   @Column({
     name: 'created_at',
     type: 'datetime',
   })
-  createdAt: Date
+  declare createdAt: Date
 
   @Column({
     name: 'updated_at',
     type: 'datetime',
   })
   @Index('index_sessions_on_updated_at')
-  updatedAt: Date
+  declare updatedAt: Date
 
   @Column({
     name: 'readonly_access',
@@ -74,5 +74,5 @@ export class Session {
     nullable: false,
     default: 0,
   })
-  readonlyAccess: boolean
+  declare readonlyAccess: boolean
 }

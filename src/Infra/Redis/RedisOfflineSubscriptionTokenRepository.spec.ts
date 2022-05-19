@@ -32,9 +32,7 @@ describe('RedisOfflineSubscriptionTokenRepository', () => {
 
     expect(await createRepository().getUserEmailByToken('random-string')).toEqual('test@test.com')
 
-    expect(redisClient.get).toHaveBeenCalledWith(
-      'offline-subscription-token:random-string',
-    )
+    expect(redisClient.get).toHaveBeenCalledWith('offline-subscription-token:random-string')
   })
 
   it('should return undefined if a user uuid is not exchanged for an dashboard token', async () => {
@@ -42,9 +40,7 @@ describe('RedisOfflineSubscriptionTokenRepository', () => {
 
     expect(await createRepository().getUserEmailByToken('random-string')).toBeUndefined()
 
-    expect(redisClient.get).toHaveBeenCalledWith(
-      'offline-subscription-token:random-string',
-    )
+    expect(redisClient.get).toHaveBeenCalledWith('offline-subscription-token:random-string')
   })
 
   it('should save an dashboard token', async () => {
@@ -56,14 +52,8 @@ describe('RedisOfflineSubscriptionTokenRepository', () => {
 
     await createRepository().save(offlineSubscriptionToken)
 
-    expect(redisClient.set).toHaveBeenCalledWith(
-      'offline-subscription-token:random-string',
-      'test@test.com',
-    )
+    expect(redisClient.set).toHaveBeenCalledWith('offline-subscription-token:random-string', 'test@test.com')
 
-    expect(redisClient.expireat).toHaveBeenCalledWith(
-      'offline-subscription-token:random-string',
-      1,
-    )
+    expect(redisClient.expireat).toHaveBeenCalledWith('offline-subscription-token:random-string', 1)
   })
 })

@@ -1,8 +1,5 @@
 import { SubscriptionName } from '@standardnotes/common'
-import {
-  DomainEventHandlerInterface,
-  SubscriptionPurchasedEvent,
-} from '@standardnotes/domain-events'
+import { DomainEventHandlerInterface, SubscriptionPurchasedEvent } from '@standardnotes/domain-events'
 import { inject, injectable } from 'inversify'
 import { Logger } from 'winston'
 
@@ -18,22 +15,18 @@ import { UserSubscriptionType } from '../Subscription/UserSubscriptionType'
 import { SubscriptionSettingServiceInterface } from '../Setting/SubscriptionSettingServiceInterface'
 
 @injectable()
-export class SubscriptionPurchasedEventHandler
-implements DomainEventHandlerInterface
-{
+export class SubscriptionPurchasedEventHandler implements DomainEventHandlerInterface {
   constructor(
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
     @inject(TYPES.UserSubscriptionRepository) private userSubscriptionRepository: UserSubscriptionRepositoryInterface,
-    @inject(TYPES.OfflineUserSubscriptionRepository) private offlineUserSubscriptionRepository: OfflineUserSubscriptionRepositoryInterface,
+    @inject(TYPES.OfflineUserSubscriptionRepository)
+    private offlineUserSubscriptionRepository: OfflineUserSubscriptionRepositoryInterface,
     @inject(TYPES.RoleService) private roleService: RoleServiceInterface,
     @inject(TYPES.SubscriptionSettingService) private subscriptionSettingService: SubscriptionSettingServiceInterface,
-    @inject(TYPES.Logger) private logger: Logger
-  ) {
-  }
+    @inject(TYPES.Logger) private logger: Logger,
+  ) {}
 
-  async handle(
-    event: SubscriptionPurchasedEvent
-  ): Promise<void> {
+  async handle(event: SubscriptionPurchasedEvent): Promise<void> {
     if (event.payload.offline) {
       const offlineUserSubscription = await this.createOfflineSubscription(
         event.payload.subscriptionId,
@@ -48,14 +41,10 @@ implements DomainEventHandlerInterface
       return
     }
 
-    const user = await this.userRepository.findOneByEmail(
-      event.payload.userEmail
-    )
+    const user = await this.userRepository.findOneByEmail(event.payload.userEmail)
 
-    if (user === undefined) {
-      this.logger.warn(
-        `Could not find user with email: ${event.payload.userEmail}`
-      )
+    if (user === null) {
+      this.logger.warn(`Could not find user with email: ${event.payload.userEmail}`)
       return
     }
 
@@ -69,13 +58,13 @@ implements DomainEventHandlerInterface
 
     await this.addUserRole(user, event.payload.subscriptionName)
 
-    await this.subscriptionSettingService.applyDefaultSubscriptionSettingsForSubscription(userSubscription, event.payload.subscriptionName)
+    await this.subscriptionSettingService.applyDefaultSubscriptionSettingsForSubscription(
+      userSubscription,
+      event.payload.subscriptionName,
+    )
   }
 
-  private async addUserRole(
-    user: User,
-    subscriptionName: SubscriptionName
-  ): Promise<void> {
+  private async addUserRole(user: User, subscriptionName: SubscriptionName): Promise<void> {
     await this.roleService.addUserRole(user, subscriptionName)
   }
 

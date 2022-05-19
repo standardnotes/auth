@@ -7,17 +7,17 @@ import { User } from '../User/User'
 @Index('name_and_version', ['name', 'version'], { unique: true })
 export class Role {
   @PrimaryGeneratedColumn('uuid')
-  uuid: string
+  declare uuid: string
 
   @Column({
     length: 255,
   })
-  name: string
+  declare name: string
 
   @Column({
     type: 'smallint',
   })
-  version: number
+  declare version: number
 
   @Column({
     name: 'created_at',
@@ -26,7 +26,7 @@ export class Role {
       /* istanbul ignore next */
       () => 'CURRENT_TIMESTAMP',
   })
-  createdAt: Date
+  declare createdAt: Date
 
   @Column({
     name: 'updated_at',
@@ -35,11 +35,13 @@ export class Role {
       /* istanbul ignore next */
       () => 'CURRENT_TIMESTAMP',
   })
-  updatedAt: Date
+  declare updatedAt: Date
 
   @ManyToMany(
     /* istanbul ignore next */
-    () => User
+    () => User,
+    /* istanbul ignore next */
+    { lazy: true, eager: false },
   )
   @JoinTable({
     name: 'user_roles',
@@ -52,11 +54,13 @@ export class Role {
       referencedColumnName: 'uuid',
     },
   })
-  users: Promise<Array<User>>
+  declare users: Promise<Array<User>>
 
   @ManyToMany(
     /* istanbul ignore next */
-    () => Permission
+    () => Permission,
+    /* istanbul ignore next */
+    { lazy: true, eager: false },
   )
   @JoinTable({
     name: 'role_permissions',
@@ -69,11 +73,13 @@ export class Role {
       referencedColumnName: 'uuid',
     },
   })
-  permissions: Promise<Array<Permission>>
+  declare permissions: Promise<Array<Permission>>
 
   @ManyToMany(
     /* istanbul ignore next */
-    () => OfflineUserSubscription
+    () => OfflineUserSubscription,
+    /* istanbul ignore next */
+    { lazy: true, eager: false },
   )
   @JoinTable({
     name: 'offline_user_roles',
@@ -86,5 +92,5 @@ export class Role {
       referencedColumnName: 'uuid',
     },
   })
-  offlineUserSubscriptions: Promise<Array<OfflineUserSubscription>>
+  declare offlineUserSubscriptions: Promise<Array<OfflineUserSubscription>>
 }

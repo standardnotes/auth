@@ -4,14 +4,14 @@ import { User } from '../User/User'
 @Entity({ name: 'revoked_sessions' })
 export class RevokedSession {
   @PrimaryGeneratedColumn('uuid')
-  uuid: string
+  declare uuid: string
 
   @Column({
     name: 'user_uuid',
     length: 36,
   })
   @Index('index_revoked_sessions_on_user_uuid')
-  userUuid: string
+  declare userUuid: string
 
   @Column({
     type: 'tinyint',
@@ -19,20 +19,21 @@ export class RevokedSession {
     nullable: false,
     default: 0,
   })
-  received: boolean
+  declare received: boolean
 
   @Column({
     name: 'created_at',
     type: 'datetime',
   })
-  createdAt: Date
+  declare createdAt: Date
 
   @ManyToOne(
     /* istanbul ignore next */
     () => User,
     /* istanbul ignore next */
-    user => user.revokedSessions, { onDelete: 'CASCADE' }
+    (user) => user.revokedSessions,
+    { onDelete: 'CASCADE', lazy: true, eager: false },
   )
   @JoinColumn({ name: 'user_uuid', referencedColumnName: 'uuid' })
-  user: Promise<User>
+  declare user: Promise<User>
 }

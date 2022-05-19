@@ -1,6 +1,6 @@
 import 'reflect-metadata'
 
-import { SnCryptoNode } from '@standardnotes/sncrypto-node'
+import { CryptoNode } from '@standardnotes/sncrypto-node'
 import { TimerInterface } from '@standardnotes/time'
 import { SubscriptionTokenRepositoryInterface } from '../../Subscription/SubscriptionTokenRepositoryInterface'
 
@@ -8,20 +8,16 @@ import { CreateSubscriptionToken } from './CreateSubscriptionToken'
 
 describe('CreateSubscriptionToken', () => {
   let subscriptionTokenRepository: SubscriptionTokenRepositoryInterface
-  let cryptoNode: SnCryptoNode
+  let cryptoNode: CryptoNode
   let timer: TimerInterface
 
-  const createUseCase = () => new CreateSubscriptionToken(
-    subscriptionTokenRepository,
-    cryptoNode,
-    timer,
-  )
+  const createUseCase = () => new CreateSubscriptionToken(subscriptionTokenRepository, cryptoNode, timer)
 
   beforeEach(() => {
     subscriptionTokenRepository = {} as jest.Mocked<SubscriptionTokenRepositoryInterface>
     subscriptionTokenRepository.save = jest.fn()
 
-    cryptoNode = {} as jest.Mocked<SnCryptoNode>
+    cryptoNode = {} as jest.Mocked<CryptoNode>
     cryptoNode.generateRandomKey = jest.fn().mockReturnValueOnce('random-string')
 
     timer = {} as jest.Mocked<TimerInterface>

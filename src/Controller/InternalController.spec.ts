@@ -19,12 +19,8 @@ describe('InternalController', () => {
   let request: express.Request
   let user: User
 
-  const createController = () => new InternalController(
-    getUserFeatures,
-    getSetting,
-    muteFailedBackupsEmails,
-    muteSignInEmails,
-  )
+  const createController = () =>
+    new InternalController(getUserFeatures, getSetting, muteFailedBackupsEmails, muteSignInEmails)
 
   beforeEach(() => {
     user = {} as jest.Mocked<User>
@@ -54,7 +50,7 @@ describe('InternalController', () => {
 
     getUserFeatures.execute = jest.fn().mockReturnValue({ success: true })
 
-    const httpResponse = <results.JsonResult> await createController().getFeatures(request)
+    const httpResponse = <results.JsonResult>await createController().getFeatures(request)
     const result = await httpResponse.executeAsync()
 
     expect(getUserFeatures.execute).toHaveBeenCalledWith({
@@ -70,7 +66,7 @@ describe('InternalController', () => {
 
     getUserFeatures.execute = jest.fn().mockReturnValue({ success: false })
 
-    const httpResponse = <results.JsonResult> await createController().getFeatures(request)
+    const httpResponse = <results.JsonResult>await createController().getFeatures(request)
     const result = await httpResponse.executeAsync()
 
     expect(getUserFeatures.execute).toHaveBeenCalledWith({ userUuid: '1-2-3', offline: false })
@@ -84,7 +80,7 @@ describe('InternalController', () => {
 
     getSetting.execute = jest.fn().mockReturnValue({ success: true })
 
-    const httpResponse = <results.JsonResult> await createController().getSetting(request)
+    const httpResponse = <results.JsonResult>await createController().getSetting(request)
     const result = await httpResponse.executeAsync()
 
     expect(getSetting.execute).toHaveBeenCalledWith({
@@ -102,7 +98,7 @@ describe('InternalController', () => {
 
     getSetting.execute = jest.fn().mockReturnValue({ success: false })
 
-    const httpResponse = <results.JsonResult> await createController().getSetting(request)
+    const httpResponse = <results.JsonResult>await createController().getSetting(request)
     const result = await httpResponse.executeAsync()
 
     expect(getSetting.execute).toHaveBeenCalledWith({
@@ -119,7 +115,7 @@ describe('InternalController', () => {
 
     muteFailedBackupsEmails.execute = jest.fn().mockReturnValue({ success: true })
 
-    const httpResponse = <results.JsonResult> await createController().muteFailedBackupsEmails(request)
+    const httpResponse = <results.JsonResult>await createController().muteFailedBackupsEmails(request)
     const result = await httpResponse.executeAsync()
 
     expect(muteFailedBackupsEmails.execute).toHaveBeenCalledWith({ settingUuid: '1-2-3' })
@@ -132,7 +128,7 @@ describe('InternalController', () => {
 
     muteFailedBackupsEmails.execute = jest.fn().mockReturnValue({ success: false })
 
-    const httpResponse = <results.JsonResult> await createController().muteFailedBackupsEmails(request)
+    const httpResponse = <results.JsonResult>await createController().muteFailedBackupsEmails(request)
     const result = await httpResponse.executeAsync()
 
     expect(muteFailedBackupsEmails.execute).toHaveBeenCalledWith({ settingUuid: '1-2-3' })
@@ -145,7 +141,7 @@ describe('InternalController', () => {
 
     muteSignInEmails.execute = jest.fn().mockReturnValue({ success: true })
 
-    const httpResponse = <results.JsonResult> await createController().muteSignInEmails(request)
+    const httpResponse = <results.JsonResult>await createController().muteSignInEmails(request)
     const result = await httpResponse.executeAsync()
 
     expect(muteSignInEmails.execute).toHaveBeenCalledWith({ settingUuid: '1-2-3' })
@@ -158,7 +154,7 @@ describe('InternalController', () => {
 
     muteSignInEmails.execute = jest.fn().mockReturnValue({ success: false })
 
-    const httpResponse = <results.JsonResult> await createController().muteSignInEmails(request)
+    const httpResponse = <results.JsonResult>await createController().muteSignInEmails(request)
     const result = await httpResponse.executeAsync()
 
     expect(muteSignInEmails.execute).toHaveBeenCalledWith({ settingUuid: '1-2-3' })

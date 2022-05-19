@@ -4,7 +4,7 @@ import { BaseMiddleware } from 'inversify-express-utils'
 
 @injectable()
 export class SessionMiddleware extends BaseMiddleware {
-  async handler (_request: Request, response: Response, next: NextFunction): Promise<void> {
+  async handler(_request: Request, response: Response, next: NextFunction): Promise<void> {
     try {
       if (!response.locals.session) {
         response.status(400).send({

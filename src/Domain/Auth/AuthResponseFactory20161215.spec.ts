@@ -13,11 +13,7 @@ describe('AuthResponseFactory20161215', () => {
   let user: User
   let logger: Logger
 
-  const createFactory = () => new AuthResponseFactory20161215(
-    userProjector,
-    tokenEncoder,
-    logger
-  )
+  const createFactory = () => new AuthResponseFactory20161215(userProjector, tokenEncoder, logger)
 
   beforeEach(() => {
     logger = {} as jest.Mocked<Logger>

@@ -2,17 +2,19 @@ import 'reflect-metadata'
 
 import { SubscriptionName } from '@standardnotes/common'
 
-import { SelectQueryBuilder, UpdateQueryBuilder } from 'typeorm'
+import { Repository, SelectQueryBuilder, UpdateQueryBuilder } from 'typeorm'
 import { UserSubscription } from '../../Domain/Subscription/UserSubscription'
 
 import { MySQLUserSubscriptionRepository } from './MySQLUserSubscriptionRepository'
 import { UserSubscriptionType } from '../../Domain/Subscription/UserSubscriptionType'
 
 describe('MySQLUserSubscriptionRepository', () => {
-  let repository: MySQLUserSubscriptionRepository
+  let ormRepository: Repository<UserSubscription>
   let selectQueryBuilder: SelectQueryBuilder<UserSubscription>
   let updateQueryBuilder: UpdateQueryBuilder<UserSubscription>
   let subscription: UserSubscription
+
+  const createRepository = () => new MySQLUserSubscriptionRepository(ormRepository)
 
   beforeEach(() => {
     selectQueryBuilder = {} as jest.Mocked<SelectQueryBuilder<UserSubscription>>
@@ -23,8 +25,15 @@ describe('MySQLUserSubscriptionRepository', () => {
       cancelled: false,
     } as jest.Mocked<UserSubscription>
 
-    repository = new MySQLUserSubscriptionRepository()
-    jest.spyOn(repository, 'createQueryBuilder')
+    ormRepository = {} as jest.Mocked<Repository<UserSubscription>>
+    ormRepository.createQueryBuilder = jest.fn().mockImplementation(() => selectQueryBuilder)
+    ormRepository.save = jest.fn()
+  })
+
+  it('should save', async () => {
+    await createRepository().save(subscription)
+
+    expect(ormRepository.save).toHaveBeenCalledWith(subscription)
   })
 
   it('should find one longest lasting uncanceled subscription by user uuid if there are canceled ones', async () => {
@@ -33,148 +42,139 @@ describe('MySQLUserSubscriptionRepository', () => {
       cancelled: true,
     } as jest.Mocked<UserSubscription>
 
-    repository.createQueryBuilder = jest.fn().mockImplementation(() => selectQueryBuilder)
+    ormRepository.createQueryBuilder = jest.fn().mockImplementation(() => selectQueryBuilder)
 
     selectQueryBuilder.where = jest.fn().mockReturnThis()
     selectQueryBuilder.orderBy = jest.fn().mockReturnThis()
     selectQueryBuilder.getMany = jest.fn().mockReturnValue([canceledSubscription, subscription])
 
-    const result = await repository.findOneByUserUuid('123')
+    const result = await createRepository().findOneByUserUuid('123')
 
-    expect(selectQueryBuilder.where).toHaveBeenCalledWith(
-      'user_uuid = :user_uuid',
-      {
-        user_uuid: '123',
-      },
-    )
-    expect(selectQueryBuilder.orderBy).toHaveBeenCalledWith(
-      'ends_at', 'DESC'
-    )
+    expect(selectQueryBuilder.where).toHaveBeenCalledWith('user_uuid = :user_uuid', {
+      user_uuid: '123',
+    })
+    expect(selectQueryBuilder.orderBy).toHaveBeenCalledWith('ends_at', 'DESC')
     expect(selectQueryBuilder.getMany).toHaveBeenCalled()
     expect(result).toEqual(subscription)
   })
 
   it('should find one, longest lasting subscription by user uuid if there are no canceled ones', async () => {
-    repository.createQueryBuilder = jest.fn().mockImplementation(() => selectQueryBuilder)
+    ormRepository.createQueryBuilder = jest.fn().mockImplementation(() => selectQueryBuilder)
 
     selectQueryBuilder.where = jest.fn().mockReturnThis()
     selectQueryBuilder.orderBy = jest.fn().mockReturnThis()
     selectQueryBuilder.getMany = jest.fn().mockReturnValue([subscription])
 
-    const result = await repository.findOneByUserUuid('123')
+    const result = await createRepository().findOneByUserUuid('123')
 
-    expect(selectQueryBuilder.where).toHaveBeenCalledWith(
-      'user_uuid = :user_uuid',
-      {
-        user_uuid: '123',
-      },
-    )
-    expect(selectQueryBuilder.orderBy).toHaveBeenCalledWith(
-      'ends_at', 'DESC'
-    )
+    expect(selectQueryBuilder.where).toHaveBeenCalledWith('user_uuid = :user_uuid', {
+      user_uuid: '123',
+    })
+    expect(selectQueryBuilder.orderBy).toHaveBeenCalledWith('ends_at', 'DESC')
+    expect(selectQueryBuilder.getMany).toHaveBeenCalled()
+    expect(result).toEqual(subscription)
+  })
+
+  it('should find one, longest lasting subscription by user uuid if there are no ucanceled ones', async () => {
+    subscription.cancelled = true
+
+    ormRepository.createQueryBuilder = jest.fn().mockImplementation(() => selectQueryBuilder)
+
+    selectQueryBuilder.where = jest.fn().mockReturnThis()
+    selectQueryBuilder.orderBy = jest.fn().mockReturnThis()
+    selectQueryBuilder.getMany = jest.fn().mockReturnValue([subscription])
+
+    const result = await createRepository().findOneByUserUuid('123')
+
+    expect(selectQueryBuilder.where).toHaveBeenCalledWith('user_uuid = :user_uuid', {
+      user_uuid: '123',
+    })
+    expect(selectQueryBuilder.orderBy).toHaveBeenCalledWith('ends_at', 'DESC')
     expect(selectQueryBuilder.getMany).toHaveBeenCalled()
     expect(result).toEqual(subscription)
   })
 
   it('should find none if there are no subscriptions for the user', async () => {
-    repository.createQueryBuilder = jest.fn().mockImplementation(() => selectQueryBuilder)
+    ormRepository.createQueryBuilder = jest.fn().mockImplementation(() => selectQueryBuilder)
 
     selectQueryBuilder.where = jest.fn().mockReturnThis()
     selectQueryBuilder.orderBy = jest.fn().mockReturnThis()
     selectQueryBuilder.getMany = jest.fn().mockReturnValue([])
 
-    const result = await repository.findOneByUserUuid('123')
+    const result = await createRepository().findOneByUserUuid('123')
 
-    expect(selectQueryBuilder.where).toHaveBeenCalledWith(
-      'user_uuid = :user_uuid',
-      {
-        user_uuid: '123',
-      },
-    )
-    expect(selectQueryBuilder.orderBy).toHaveBeenCalledWith(
-      'ends_at', 'DESC'
-    )
+    expect(selectQueryBuilder.where).toHaveBeenCalledWith('user_uuid = :user_uuid', {
+      user_uuid: '123',
+    })
+    expect(selectQueryBuilder.orderBy).toHaveBeenCalledWith('ends_at', 'DESC')
     expect(selectQueryBuilder.getMany).toHaveBeenCalled()
-    expect(result).toBeUndefined()
+    expect(result).toBeNull()
   })
 
   it('should update ends at by subscription id', async () => {
-    repository.createQueryBuilder = jest.fn().mockImplementation(() => updateQueryBuilder)
+    ormRepository.createQueryBuilder = jest.fn().mockImplementation(() => updateQueryBuilder)
 
     updateQueryBuilder.update = jest.fn().mockReturnThis()
     updateQueryBuilder.set = jest.fn().mockReturnThis()
     updateQueryBuilder.where = jest.fn().mockReturnThis()
     updateQueryBuilder.execute = jest.fn()
 
-    await repository.updateEndsAt(1, 1000, 1000)
+    await createRepository().updateEndsAt(1, 1000, 1000)
 
     expect(updateQueryBuilder.update).toHaveBeenCalled()
-    expect(updateQueryBuilder.set).toHaveBeenCalledWith(
-      {
-        updatedAt: expect.any(Number),
-        endsAt: 1000,
-      }
-    )
-    expect(updateQueryBuilder.where).toHaveBeenCalledWith(
-      'subscription_id = :subscriptionId',
-      {
-        subscriptionId: 1,
-      }
-    )
+    expect(updateQueryBuilder.set).toHaveBeenCalledWith({
+      updatedAt: expect.any(Number),
+      endsAt: 1000,
+    })
+    expect(updateQueryBuilder.where).toHaveBeenCalledWith('subscription_id = :subscriptionId', {
+      subscriptionId: 1,
+    })
     expect(updateQueryBuilder.execute).toHaveBeenCalled()
   })
 
   it('should update cancelled by subscription id', async () => {
-    repository.createQueryBuilder = jest.fn().mockImplementation(() => updateQueryBuilder)
+    ormRepository.createQueryBuilder = jest.fn().mockImplementation(() => updateQueryBuilder)
 
     updateQueryBuilder.update = jest.fn().mockReturnThis()
     updateQueryBuilder.set = jest.fn().mockReturnThis()
     updateQueryBuilder.where = jest.fn().mockReturnThis()
     updateQueryBuilder.execute = jest.fn()
 
-    await repository.updateCancelled(1, true, 1000)
+    await createRepository().updateCancelled(1, true, 1000)
 
     expect(updateQueryBuilder.update).toHaveBeenCalled()
-    expect(updateQueryBuilder.set).toHaveBeenCalledWith(
-      {
-        updatedAt: expect.any(Number),
-        cancelled: true,
-      }
-    )
-    expect(updateQueryBuilder.where).toHaveBeenCalledWith(
-      'subscription_id = :subscriptionId',
-      {
-        subscriptionId: 1,
-      }
-    )
+    expect(updateQueryBuilder.set).toHaveBeenCalledWith({
+      updatedAt: expect.any(Number),
+      cancelled: true,
+    })
+    expect(updateQueryBuilder.where).toHaveBeenCalledWith('subscription_id = :subscriptionId', {
+      subscriptionId: 1,
+    })
     expect(updateQueryBuilder.execute).toHaveBeenCalled()
   })
 
   it('should find subscriptions by id', async () => {
-    repository.createQueryBuilder = jest.fn().mockImplementation(() => selectQueryBuilder)
+    ormRepository.createQueryBuilder = jest.fn().mockImplementation(() => selectQueryBuilder)
 
     selectQueryBuilder.where = jest.fn().mockReturnThis()
     selectQueryBuilder.getMany = jest.fn().mockReturnValue([subscription])
 
-    const result = await repository.findBySubscriptionId(123)
+    const result = await createRepository().findBySubscriptionId(123)
 
-    expect(selectQueryBuilder.where).toHaveBeenCalledWith(
-      'subscription_id = :subscriptionId',
-      {
-        subscriptionId: 123,
-      },
-    )
+    expect(selectQueryBuilder.where).toHaveBeenCalledWith('subscription_id = :subscriptionId', {
+      subscriptionId: 123,
+    })
     expect(selectQueryBuilder.getMany).toHaveBeenCalled()
     expect(result).toEqual([subscription])
   })
 
   it('should find subscriptions by id and type', async () => {
-    repository.createQueryBuilder = jest.fn().mockImplementation(() => selectQueryBuilder)
+    ormRepository.createQueryBuilder = jest.fn().mockImplementation(() => selectQueryBuilder)
 
     selectQueryBuilder.where = jest.fn().mockReturnThis()
     selectQueryBuilder.getMany = jest.fn().mockReturnValue([subscription])
 
-    const result = await repository.findBySubscriptionIdAndType(123, UserSubscriptionType.Regular)
+    const result = await createRepository().findBySubscriptionIdAndType(123, UserSubscriptionType.Regular)
 
     expect(selectQueryBuilder.where).toHaveBeenCalledWith(
       'subscription_id = :subscriptionId AND subscription_type = :type',
@@ -188,12 +188,12 @@ describe('MySQLUserSubscriptionRepository', () => {
   })
 
   it('should find one subscription by id and user uuid', async () => {
-    repository.createQueryBuilder = jest.fn().mockImplementation(() => selectQueryBuilder)
+    ormRepository.createQueryBuilder = jest.fn().mockImplementation(() => selectQueryBuilder)
 
     selectQueryBuilder.where = jest.fn().mockReturnThis()
     selectQueryBuilder.getOne = jest.fn().mockReturnValue(subscription)
 
-    const result = await repository.findOneByUserUuidAndSubscriptionId('1-2-3', 5)
+    const result = await createRepository().findOneByUserUuidAndSubscriptionId('1-2-3', 5)
 
     expect(selectQueryBuilder.where).toHaveBeenCalledWith(
       'user_uuid = :userUuid AND subscription_id = :subscriptionId',
@@ -207,19 +207,16 @@ describe('MySQLUserSubscriptionRepository', () => {
   })
 
   it('should find one subscription by uuid', async () => {
-    repository.createQueryBuilder = jest.fn().mockImplementation(() => selectQueryBuilder)
+    ormRepository.createQueryBuilder = jest.fn().mockImplementation(() => selectQueryBuilder)
 
     selectQueryBuilder.where = jest.fn().mockReturnThis()
     selectQueryBuilder.getOne = jest.fn().mockReturnValue(subscription)
 
-    const result = await repository.findOneByUuid('1-2-3')
+    const result = await createRepository().findOneByUuid('1-2-3')
 
-    expect(selectQueryBuilder.where).toHaveBeenCalledWith(
-      'uuid = :uuid',
-      {
-        uuid: '1-2-3',
-      },
-    )
+    expect(selectQueryBuilder.where).toHaveBeenCalledWith('uuid = :uuid', {
+      uuid: '1-2-3',
+    })
     expect(selectQueryBuilder.getOne).toHaveBeenCalled()
     expect(result).toEqual(subscription)
   })

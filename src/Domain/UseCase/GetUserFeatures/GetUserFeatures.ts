@@ -11,8 +11,7 @@ export class GetUserFeatures implements UseCaseInterface {
   constructor(
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
     @inject(TYPES.FeatureService) private featureService: FeatureServiceInterface,
-  ) {
-  }
+  ) {}
 
   async execute(dto: GetUserFeaturesDto): Promise<GetUserFeaturesResponse> {
     if (dto.offline) {
@@ -26,7 +25,7 @@ export class GetUserFeatures implements UseCaseInterface {
 
     const user = await this.userRepository.findOneByUuid(dto.userUuid)
 
-    if (user === undefined) {
+    if (user === null) {
       return {
         success: false,
         error: {

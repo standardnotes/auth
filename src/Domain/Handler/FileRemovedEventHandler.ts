@@ -1,7 +1,4 @@
-import {
-  DomainEventHandlerInterface,
-  FileRemovedEvent,
-} from '@standardnotes/domain-events'
+import { DomainEventHandlerInterface, FileRemovedEvent } from '@standardnotes/domain-events'
 import { SubscriptionSettingName } from '@standardnotes/settings'
 import { inject, injectable } from 'inversify'
 import { Logger } from 'winston'
@@ -17,13 +14,13 @@ export class FileRemovedEventHandler implements DomainEventHandlerInterface {
   constructor(
     @inject(TYPES.UserSubscriptionService) private userSubscriptionService: UserSubscriptionServiceInterface,
     @inject(TYPES.SubscriptionSettingService) private subscriptionSettingService: SubscriptionSettingServiceInterface,
-    @inject(TYPES.Logger) private logger: Logger
-  ) {
-  }
+    @inject(TYPES.Logger) private logger: Logger,
+  ) {}
 
   async handle(event: FileRemovedEvent): Promise<void> {
-    const { regularSubscription, sharedSubscription } = await this.userSubscriptionService.findRegularSubscriptionForUserUuid(event.payload.userUuid)
-    if (regularSubscription === undefined) {
+    const { regularSubscription, sharedSubscription } =
+      await this.userSubscriptionService.findRegularSubscriptionForUserUuid(event.payload.userUuid)
+    if (regularSubscription === null) {
       this.logger.warn(`Could not find regular user subscription for user with uuid: ${event.payload.userUuid}`)
 
       return
@@ -31,7 +28,7 @@ export class FileRemovedEventHandler implements DomainEventHandlerInterface {
 
     await this.updateUploadBytesUsedSetting(regularSubscription, event.payload.fileByteSize)
 
-    if (sharedSubscription !== undefined) {
+    if (sharedSubscription !== null) {
       await this.updateUploadBytesUsedSetting(sharedSubscription, event.payload.fileByteSize)
     }
   }
@@ -43,7 +40,7 @@ export class FileRemovedEventHandler implements DomainEventHandlerInterface {
       userSubscriptionUuid: subscription.uuid,
       subscriptionSettingName: SubscriptionSettingName.FileUploadBytesUsed,
     })
-    if (bytesUsedSetting === undefined) {
+    if (bytesUsedSetting === null) {
       this.logger.warn(`Could not find bytes used setting for user with uuid: ${user.uuid}`)
 
       return
@@ -55,7 +52,7 @@ export class FileRemovedEventHandler implements DomainEventHandlerInterface {
       userSubscription: subscription,
       props: {
         name: SubscriptionSettingName.FileUploadBytesUsed,
-        unencryptedValue: (+(bytesUsed) - byteSize).toString(),
+        unencryptedValue: (+bytesUsed - byteSize).toString(),
         sensitive: false,
         serverEncryptionVersion: EncryptionVersion.Unencrypted,
       },

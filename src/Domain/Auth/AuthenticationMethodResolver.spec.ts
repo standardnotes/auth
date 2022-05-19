@@ -19,7 +19,8 @@ describe('AuthenticationMethodResolver', () => {
   let session: Session
   let revokedSession: RevokedSession
 
-  const createResolver = () => new AuthenticationMethodResolver(userRepository, sessionService, sessionTokenDecoder, fallbackTokenDecoder)
+  const createResolver = () =>
+    new AuthenticationMethodResolver(userRepository, sessionService, sessionTokenDecoder, fallbackTokenDecoder)
 
   beforeEach(() => {
     user = {} as jest.Mocked<User>
@@ -71,6 +72,7 @@ describe('AuthenticationMethodResolver', () => {
     expect(await createResolver().resolve('test')).toEqual({
       revokedSession,
       type: 'revoked',
+      user: null,
     })
 
     expect(sessionService.markRevokedSessionAsReceived).toHaveBeenCalled()

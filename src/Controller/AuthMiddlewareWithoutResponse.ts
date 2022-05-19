@@ -6,15 +6,15 @@ import { AuthenticateRequest } from '../Domain/UseCase/AuthenticateRequest'
 
 @injectable()
 export class AuthMiddlewareWithoutResponse extends BaseMiddleware {
-  constructor (
-    @inject(TYPES.AuthenticateRequest) private authenticateRequest: AuthenticateRequest
-  ) {
+  constructor(@inject(TYPES.AuthenticateRequest) private authenticateRequest: AuthenticateRequest) {
     super()
   }
 
-  async handler (request: Request, response: Response, next: NextFunction): Promise<void> {
+  async handler(request: Request, response: Response, next: NextFunction): Promise<void> {
     try {
-      const authenticateRequestResponse = await this.authenticateRequest.execute({ authorizationHeader: request.headers.authorization })
+      const authenticateRequestResponse = await this.authenticateRequest.execute({
+        authorizationHeader: request.headers.authorization,
+      })
 
       if (!authenticateRequestResponse.success) {
         return next()

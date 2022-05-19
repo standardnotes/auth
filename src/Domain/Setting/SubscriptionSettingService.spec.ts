@@ -24,13 +24,14 @@ describe('SubscriptionSettingService', () => {
   let settingDecrypter: SettingDecrypterInterface
   let logger: Logger
 
-  const createService = () => new SubscriptionSettingService(
-    factory,
-    subscriptionSettingRepository,
-    subscriptionSettingsAssociationService,
-    settingDecrypter,
-    logger
-  )
+  const createService = () =>
+    new SubscriptionSettingService(
+      factory,
+      subscriptionSettingRepository,
+      subscriptionSettingsAssociationService,
+      settingDecrypter,
+      logger,
+    )
 
   beforeEach(() => {
     user = {} as jest.Mocked<User>
@@ -47,18 +48,22 @@ describe('SubscriptionSettingService', () => {
     factory.createSubscriptionSettingReplacement = jest.fn().mockReturnValue(setting)
 
     subscriptionSettingRepository = {} as jest.Mocked<SubscriptionSettingRepositoryInterface>
-    subscriptionSettingRepository.findLastByNameAndUserSubscriptionUuid = jest.fn().mockReturnValue(undefined)
-    subscriptionSettingRepository.save = jest.fn().mockImplementation(setting => setting)
+    subscriptionSettingRepository.findLastByNameAndUserSubscriptionUuid = jest.fn().mockReturnValue(null)
+    subscriptionSettingRepository.save = jest.fn().mockImplementation((setting) => setting)
 
     subscriptionSettingsAssociationService = {} as jest.Mocked<SubscriptionSettingsAssociationServiceInterface>
-    subscriptionSettingsAssociationService.getDefaultSettingsAndValuesForSubscriptionName = jest.fn().mockReturnValue(new Map([
-      [SubscriptionSettingName.FileUploadBytesUsed,
-        {
-          value: '0',
-          sensitive: 0,
-          serverEncryptionVersion: EncryptionVersion.Unencrypted,
-        }],
-    ]))
+    subscriptionSettingsAssociationService.getDefaultSettingsAndValuesForSubscriptionName = jest.fn().mockReturnValue(
+      new Map([
+        [
+          SubscriptionSettingName.FileUploadBytesUsed,
+          {
+            value: '0',
+            sensitive: 0,
+            serverEncryptionVersion: EncryptionVersion.Unencrypted,
+          },
+        ],
+      ]),
+    )
 
     settingDecrypter = {} as jest.Mocked<SettingDecrypterInterface>
     settingDecrypter.decryptSettingValue = jest.fn().mockReturnValue('decrypted')
@@ -69,21 +74,23 @@ describe('SubscriptionSettingService', () => {
     logger.error = jest.fn()
   })
 
-  it ('should create default settings for a subscription', async () => {
+  it('should create default settings for a subscription', async () => {
     await createService().applyDefaultSubscriptionSettingsForSubscription(userSubscription, SubscriptionName.PlusPlan)
 
     expect(subscriptionSettingRepository.save).toHaveBeenCalledWith(setting)
   })
 
-  it ('should not create default settings for a subscription if subscription has no defaults', async () => {
-    subscriptionSettingsAssociationService.getDefaultSettingsAndValuesForSubscriptionName = jest.fn().mockReturnValue(undefined)
+  it('should not create default settings for a subscription if subscription has no defaults', async () => {
+    subscriptionSettingsAssociationService.getDefaultSettingsAndValuesForSubscriptionName = jest
+      .fn()
+      .mockReturnValue(undefined)
 
     await createService().applyDefaultSubscriptionSettingsForSubscription(userSubscription, SubscriptionName.PlusPlan)
 
     expect(subscriptionSettingRepository.save).not.toHaveBeenCalled()
   })
 
-  it ('should create setting if it doesn\'t exist', async () => {
+  it("should create setting if it doesn't exist", async () => {
     const result = await createService().createOrReplace({
       userSubscription,
       props: {
@@ -97,8 +104,8 @@ describe('SubscriptionSettingService', () => {
     expect(result.status).toEqual('created')
   })
 
-  it ('should create setting with a given uuid if it does not exist', async () => {
-    subscriptionSettingRepository.findOneByUuid = jest.fn().mockReturnValue(undefined)
+  it('should create setting with a given uuid if it does not exist', async () => {
+    subscriptionSettingRepository.findOneByUuid = jest.fn().mockReturnValue(null)
 
     const result = await createService().createOrReplace({
       userSubscription,
@@ -114,7 +121,7 @@ describe('SubscriptionSettingService', () => {
     expect(result.status).toEqual('created')
   })
 
-  it ('should replace setting if it does exist', async () => {
+  it('should replace setting if it does exist', async () => {
     subscriptionSettingRepository.findLastByNameAndUserSubscriptionUuid = jest.fn().mockReturnValue(setting)
 
     const result = await createService().createOrReplace({
@@ -129,7 +136,7 @@ describe('SubscriptionSettingService', () => {
     expect(result.status).toEqual('replaced')
   })
 
-  it ('should replace setting with a given uuid if it does exist', async () => {
+  it('should replace setting with a given uuid if it does exist', async () => {
     subscriptionSettingRepository.findOneByUuid = jest.fn().mockReturnValue(setting)
 
     const result = await createService().createOrReplace({
@@ -153,7 +160,13 @@ describe('SubscriptionSettingService', () => {
 
     subscriptionSettingRepository.findLastByNameAndUserSubscriptionUuid = jest.fn().mockReturnValue(setting)
 
-    expect(await createService().findSubscriptionSettingWithDecryptedValue({ userSubscriptionUuid: '2-3-4', userUuid: '1-2-3', subscriptionSettingName: 'test' as SubscriptionSettingName })).toEqual({
+    expect(
+      await createService().findSubscriptionSettingWithDecryptedValue({
+        userSubscriptionUuid: '2-3-4',
+        userUuid: '1-2-3',
+        subscriptionSettingName: 'test' as SubscriptionSettingName,
+      }),
+    ).toEqual({
       serverEncryptionVersion: 1,
       value: 'decrypted',
     })

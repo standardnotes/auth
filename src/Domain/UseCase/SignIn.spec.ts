@@ -14,6 +14,8 @@ import { RoleServiceInterface } from '../Role/RoleServiceInterface'
 import { SettingServiceInterface } from '../Setting/SettingServiceInterface'
 import { Setting } from '../Setting/Setting'
 import { MuteSignInEmailsOption } from '@standardnotes/settings'
+import { PKCERepositoryInterface } from '../User/PKCERepositoryInterface'
+import { CrypterInterface } from '../Encryption/CrypterInterface'
 
 describe('SignIn', () => {
   let user: User
@@ -27,17 +29,22 @@ describe('SignIn', () => {
   let logger: Logger
   let settingService: SettingServiceInterface
   let setting: Setting
+  let pkceRepository: PKCERepositoryInterface
+  let crypter: CrypterInterface
 
-  const createUseCase = () => new SignIn(
-    userRepository,
-    authResponseFactoryResolver,
-    domainEventPublisher,
-    domainEventFactory,
-    sessionService,
-    roleService,
-    settingService,
-    logger
-  )
+  const createUseCase = () =>
+    new SignIn(
+      userRepository,
+      authResponseFactoryResolver,
+      domainEventPublisher,
+      domainEventFactory,
+      sessionService,
+      roleService,
+      settingService,
+      pkceRepository,
+      crypter,
+      logger,
+    )
 
   beforeEach(() => {
     user = {
@@ -80,19 +87,54 @@ describe('SignIn', () => {
       setting,
     })
 
+    pkceRepository = {} as jest.Mocked<PKCERepositoryInterface>
+    pkceRepository.removeCodeChallenge = jest.fn().mockReturnValue(true)
+
+    crypter = {} as jest.Mocked<CrypterInterface>
+    crypter.base64URLEncode = jest.fn().mockReturnValue('base64-url-encoded')
+    crypter.sha256Hash = jest.fn().mockReturnValue('sha256-hashed')
+
     logger = {} as jest.Mocked<Logger>
     logger.debug = jest.fn()
     logger.error = jest.fn()
   })
 
   it('should sign in a user', async () => {
-    expect(await createUseCase().execute({
-      email: 'test@test.te',
-      password: 'qweqwe123123',
-      userAgent: 'Google Chrome',
-      apiVersion: '20190520',
-      ephemeralSession: false,
-    })).toEqual({
+    expect(
+      await createUseCase().execute({
+        email: 'test@test.te',
+        password: 'qweqwe123123',
+        userAgent: 'Google Chrome',
+        apiVersion: '20190520',
+        ephemeralSession: false,
+      }),
+    ).toEqual({
+      success: true,
+      authResponse: { foo: 'bar' },
+    })
+
+    expect(domainEventFactory.createUserSignedInEvent).toHaveBeenCalledWith({
+      browser: 'Firefox 1',
+      device: 'iOS 1',
+      userEmail: 'test@test.com',
+      userUuid: '1-2-3',
+      signInAlertEnabled: true,
+      muteSignInEmailsSettingUuid: '3-4-5',
+    })
+    expect(domainEventPublisher.publish).toHaveBeenCalled()
+  })
+
+  it('should sign in a user with valid code verifier', async () => {
+    expect(
+      await createUseCase().execute({
+        email: 'test@test.te',
+        password: 'qweqwe123123',
+        userAgent: 'Google Chrome',
+        apiVersion: '20190520',
+        ephemeralSession: false,
+        codeVerifier: 'test',
+      }),
+    ).toEqual({
       success: true,
       authResponse: { foo: 'bar' },
     })
@@ -116,13 +158,15 @@ describe('SignIn', () => {
 
     settingService.findSettingWithDecryptedValue = jest.fn().mockReturnValue(setting)
 
-    expect(await createUseCase().execute({
-      email: 'test@test.te',
-      password: 'qweqwe123123',
-      userAgent: 'Google Chrome',
-      apiVersion: '20190520',
-      ephemeralSession: false,
-    })).toEqual({
+    expect(
+      await createUseCase().execute({
+        email: 'test@test.te',
+        password: 'qweqwe123123',
+        userAgent: 'Google Chrome',
+        apiVersion: '20190520',
+        ephemeralSession: false,
+      }),
+    ).toEqual({
       success: true,
       authResponse: { foo: 'bar' },
     })
@@ -139,15 +183,17 @@ describe('SignIn', () => {
   })
 
   it('should sign in a user and create mute sign in email setting if it does not exist', async () => {
-    settingService.findSettingWithDecryptedValue = jest.fn().mockReturnValue(undefined)
+    settingService.findSettingWithDecryptedValue = jest.fn().mockReturnValue(null)
 
-    expect(await createUseCase().execute({
-      email: 'test@test.te',
-      password: 'qweqwe123123',
-      userAgent: 'Google Chrome',
-      apiVersion: '20190520',
-      ephemeralSession: false,
-    })).toEqual({
+    expect(
+      await createUseCase().execute({
+        email: 'test@test.te',
+        password: 'qweqwe123123',
+        userAgent: 'Google Chrome',
+        apiVersion: '20190520',
+        ephemeralSession: false,
+      }),
+    ).toEqual({
       success: true,
       authResponse: { foo: 'bar' },
     })
@@ -181,41 +227,65 @@ describe('SignIn', () => {
       throw new Error('Oops')
     })
 
-    expect(await createUseCase().execute({
-      email: 'test@test.te',
-      password: 'qweqwe123123',
-      userAgent: 'Google Chrome',
-      apiVersion: '20190520',
-      ephemeralSession: false,
-    })).toEqual({
+    expect(
+      await createUseCase().execute({
+        email: 'test@test.te',
+        password: 'qweqwe123123',
+        userAgent: 'Google Chrome',
+        apiVersion: '20190520',
+        ephemeralSession: false,
+      }),
+    ).toEqual({
       success: true,
       authResponse: { foo: 'bar' },
     })
   })
 
   it('should not sign in a user with wrong credentials', async () => {
-    expect(await createUseCase().execute({
-      email: 'test@test.te',
-      password: 'asdasd123123',
-      userAgent: 'Google Chrome',
-      apiVersion: '20190520',
-      ephemeralSession: false,
-    })).toEqual({
+    expect(
+      await createUseCase().execute({
+        email: 'test@test.te',
+        password: 'asdasd123123',
+        userAgent: 'Google Chrome',
+        apiVersion: '20190520',
+        ephemeralSession: false,
+      }),
+    ).toEqual({
+      success: false,
+      errorMessage: 'Invalid email or password',
+    })
+  })
+
+  it('should not sign in a user with invalid code verifier', async () => {
+    pkceRepository.removeCodeChallenge = jest.fn().mockReturnValue(false)
+
+    expect(
+      await createUseCase().execute({
+        email: 'test@test.te',
+        password: 'qweqwe123123',
+        userAgent: 'Google Chrome',
+        apiVersion: '20190520',
+        ephemeralSession: false,
+        codeVerifier: 'test',
+      }),
+    ).toEqual({
       success: false,
       errorMessage: 'Invalid email or password',
     })
   })
 
   it('should not sign in a user that does not exist', async () => {
-    userRepository.findOneByEmail = jest.fn().mockReturnValue(undefined)
+    userRepository.findOneByEmail = jest.fn().mockReturnValue(null)
 
-    expect(await createUseCase().execute({
-      email: 'test@test.te',
-      password: 'asdasd123123',
-      userAgent: 'Google Chrome',
-      apiVersion: '20190520',
-      ephemeralSession: false,
-    })).toEqual({
+    expect(
+      await createUseCase().execute({
+        email: 'test@test.te',
+        password: 'asdasd123123',
+        userAgent: 'Google Chrome',
+        apiVersion: '20190520',
+        ephemeralSession: false,
+      }),
+    ).toEqual({
       success: false,
       errorMessage: 'Invalid email or password',
     })

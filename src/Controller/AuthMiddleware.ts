@@ -7,16 +7,18 @@ import { AuthenticateRequest } from '../Domain/UseCase/AuthenticateRequest'
 
 @injectable()
 export class AuthMiddleware extends BaseMiddleware {
-  constructor (
+  constructor(
     @inject(TYPES.AuthenticateRequest) private authenticateRequest: AuthenticateRequest,
     @inject(TYPES.Logger) private logger: Logger,
   ) {
     super()
   }
 
-  async handler (request: Request, response: Response, next: NextFunction): Promise<void> {
+  async handler(request: Request, response: Response, next: NextFunction): Promise<void> {
     try {
-      const authenticateRequestResponse = await this.authenticateRequest.execute({ authorizationHeader: request.headers.authorization })
+      const authenticateRequestResponse = await this.authenticateRequest.execute({
+        authorizationHeader: request.headers.authorization,
+      })
 
       if (!authenticateRequestResponse.success) {
         this.logger.debug('AuthMiddleware authentication failure.')

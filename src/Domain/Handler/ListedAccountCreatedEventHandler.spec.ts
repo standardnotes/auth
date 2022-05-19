@@ -15,11 +15,7 @@ describe('ListedAccountCreatedEventHandler', () => {
   let user: User
   let logger: Logger
 
-  const createHandler = () => new ListedAccountCreatedEventHandler(
-    userRepository,
-    settingService,
-    logger
-  )
+  const createHandler = () => new ListedAccountCreatedEventHandler(userRepository, settingService, logger)
 
   beforeEach(() => {
     user = {} as jest.Mocked<User>
@@ -28,7 +24,7 @@ describe('ListedAccountCreatedEventHandler', () => {
     userRepository.findOneByEmail = jest.fn().mockReturnValue(user)
 
     settingService = {} as jest.Mocked<SettingServiceInterface>
-    settingService.findSettingWithDecryptedValue = jest.fn().mockReturnValue(undefined)
+    settingService.findSettingWithDecryptedValue = jest.fn().mockReturnValue(null)
     settingService.createOrReplace = jest.fn()
 
     event = {} as jest.Mocked<ListedAccountCreatedEvent>
@@ -45,7 +41,7 @@ describe('ListedAccountCreatedEventHandler', () => {
   })
 
   it('should not save the listed secret if user is not found', async () => {
-    userRepository.findOneByEmail = jest.fn().mockReturnValue(undefined)
+    userRepository.findOneByEmail = jest.fn().mockReturnValue(null)
 
     await createHandler().handle(event)
 
@@ -77,7 +73,8 @@ describe('ListedAccountCreatedEventHandler', () => {
       props: {
         name: 'LISTED_AUTHOR_SECRETS',
         sensitive: false,
-        unencryptedValue: '[{"authorId":2,"secret":"old-secret","hostUrl":"https://dev.listed.to"},{"authorId":1,"secret":"new-secret","hostUrl":"https://dev.listed.to"}]',
+        unencryptedValue:
+          '[{"authorId":2,"secret":"old-secret","hostUrl":"https://dev.listed.to"},{"authorId":1,"secret":"new-secret","hostUrl":"https://dev.listed.to"}]',
       },
     })
   })

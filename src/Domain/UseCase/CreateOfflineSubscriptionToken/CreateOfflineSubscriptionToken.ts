@@ -1,5 +1,5 @@
 import { DomainEventPublisherInterface } from '@standardnotes/domain-events'
-import { SnCryptoNode } from '@standardnotes/sncrypto-node'
+import { CryptoNode } from '@standardnotes/sncrypto-node'
 import { TimerInterface } from '@standardnotes/time'
 import { inject, injectable } from 'inversify'
 import { Logger } from 'winston'
@@ -15,19 +15,20 @@ import { CreateOfflineSubscriptionTokenResponse } from './CreateOfflineSubscript
 @injectable()
 export class CreateOfflineSubscriptionToken implements UseCaseInterface {
   constructor(
-    @inject(TYPES.OfflineSubscriptionTokenRepository) private offlineSubscriptionTokenRepository: OfflineSubscriptionTokenRepositoryInterface,
-    @inject(TYPES.OfflineUserSubscriptionRepository) private offlineUserSubscriptionRepository: OfflineUserSubscriptionRepositoryInterface,
-    @inject(TYPES.SnCryptoNode) private cryptoNode: SnCryptoNode,
+    @inject(TYPES.OfflineSubscriptionTokenRepository)
+    private offlineSubscriptionTokenRepository: OfflineSubscriptionTokenRepositoryInterface,
+    @inject(TYPES.OfflineUserSubscriptionRepository)
+    private offlineUserSubscriptionRepository: OfflineUserSubscriptionRepositoryInterface,
+    @inject(TYPES.CryptoNode) private cryptoNode: CryptoNode,
     @inject(TYPES.DomainEventPublisher) private domainEventPublisher: DomainEventPublisherInterface,
     @inject(TYPES.DomainEventFactory) private domainEventFactory: DomainEventFactoryInterface,
     @inject(TYPES.Timer) private timer: TimerInterface,
     @inject(TYPES.Logger) private logger: Logger,
-  ) {
-  }
+  ) {}
 
   async execute(dto: CreateOfflineSubscriptionTokenDTO): Promise<CreateOfflineSubscriptionTokenResponse> {
     const existingSubscription = await this.offlineUserSubscriptionRepository.findOneByEmail(dto.userEmail)
-    if (existingSubscription === undefined) {
+    if (existingSubscription === null) {
       return {
         success: false,
         error: 'no-subscription',
@@ -53,9 +54,7 @@ export class CreateOfflineSubscriptionToken implements UseCaseInterface {
     const offlineSubscriptionToken = {
       userEmail: dto.userEmail,
       token,
-      expiresAt: this.timer.convertStringDateToMicroseconds(
-        this.timer.getUTCDateNHoursAhead(3).toString()
-      ),
+      expiresAt: this.timer.convertStringDateToMicroseconds(this.timer.getUTCDateNHoursAhead(3).toString()),
     }
 
     this.logger.debug('Created offline subscription token: %O', offlineSubscriptionToken)
@@ -63,7 +62,7 @@ export class CreateOfflineSubscriptionToken implements UseCaseInterface {
     await this.offlineSubscriptionTokenRepository.save(offlineSubscriptionToken)
 
     await this.domainEventPublisher.publish(
-      this.domainEventFactory.createOfflineSubscriptionTokenCreatedEvent(token, dto.userEmail)
+      this.domainEventFactory.createOfflineSubscriptionTokenCreatedEvent(token, dto.userEmail),
     )
 
     return {

@@ -17,35 +17,39 @@ describe('InviteToSharedSubscription', () => {
   let domainEventPublisher: DomainEventPublisherInterface
   let domainEventFactory: DomainEventFactoryInterface
 
-  const createUseCase = () => new InviteToSharedSubscription(
-    userSubscriptionRepository,
-    timer,
-    sharedSubscriptionInvitationRepository,
-    domainEventPublisher,
-    domainEventFactory
-  )
+  const createUseCase = () =>
+    new InviteToSharedSubscription(
+      userSubscriptionRepository,
+      timer,
+      sharedSubscriptionInvitationRepository,
+      domainEventPublisher,
+      domainEventFactory,
+    )
 
   beforeEach(() => {
     userSubscriptionRepository = {} as jest.Mocked<UserSubscriptionRepositoryInterface>
-    userSubscriptionRepository.findOneByUserUuid = jest.fn().mockReturnValue({ subscriptionId: 2 } as jest.Mocked<UserSubscription>)
+    userSubscriptionRepository.findOneByUserUuid = jest
+      .fn()
+      .mockReturnValue({ subscriptionId: 2 } as jest.Mocked<UserSubscription>)
 
     timer = {} as jest.Mocked<TimerInterface>
     timer.getTimestampInMicroseconds = jest.fn().mockReturnValue(1)
 
     sharedSubscriptionInvitationRepository = {} as jest.Mocked<SharedSubscriptionInvitationRepositoryInterface>
-    sharedSubscriptionInvitationRepository.save = jest.fn().mockImplementation(same => ({ uuid: '1-2-3', ...same }))
+    sharedSubscriptionInvitationRepository.save = jest.fn().mockImplementation((same) => ({ ...same, uuid: '1-2-3' }))
     sharedSubscriptionInvitationRepository.countByInviterEmailAndStatus = jest.fn().mockReturnValue(2)
 
     domainEventPublisher = {} as jest.Mocked<DomainEventPublisherInterface>
     domainEventPublisher.publish = jest.fn()
 
     domainEventFactory = {} as jest.Mocked<DomainEventFactoryInterface>
-    domainEventFactory.createSharedSubscriptionInvitationCreatedEvent =
-      jest.fn().mockReturnValue({} as jest.Mocked<SharedSubscriptionInvitationCreatedEvent>)
+    domainEventFactory.createSharedSubscriptionInvitationCreatedEvent = jest
+      .fn()
+      .mockReturnValue({} as jest.Mocked<SharedSubscriptionInvitationCreatedEvent>)
   })
 
   it('should not create an inivitation for sharing the subscription if inviter has no subscription', async () => {
-    userSubscriptionRepository.findOneByUserUuid = jest.fn().mockReturnValue(undefined)
+    userSubscriptionRepository.findOneByUserUuid = jest.fn().mockReturnValue(null)
 
     await createUseCase().execute({
       inviteeIdentifier: 'invitee@test.te',
@@ -61,12 +65,14 @@ describe('InviteToSharedSubscription', () => {
   })
 
   it('should not create an inivitation if user is not a pro user', async () => {
-    expect(await createUseCase().execute({
-      inviteeIdentifier: 'invitee@test.te',
-      inviterUuid: '1-2-3',
-      inviterEmail: 'inviter@test.te',
-      inviterRoles: [RoleName.PlusUser],
-    })).toEqual({
+    expect(
+      await createUseCase().execute({
+        inviteeIdentifier: 'invitee@test.te',
+        inviterUuid: '1-2-3',
+        inviterEmail: 'inviter@test.te',
+        inviterRoles: [RoleName.PlusUser],
+      }),
+    ).toEqual({
       success: false,
     })
 
@@ -79,12 +85,14 @@ describe('InviteToSharedSubscription', () => {
   it('should not create an inivitation if user is already reached the max limit of invites', async () => {
     sharedSubscriptionInvitationRepository.countByInviterEmailAndStatus = jest.fn().mockReturnValue(5)
 
-    expect(await createUseCase().execute({
-      inviteeIdentifier: 'invitee@test.te',
-      inviterUuid: '1-2-3',
-      inviterEmail: 'inviter@test.te',
-      inviterRoles: [RoleName.ProUser],
-    })).toEqual({
+    expect(
+      await createUseCase().execute({
+        inviteeIdentifier: 'invitee@test.te',
+        inviterUuid: '1-2-3',
+        inviterEmail: 'inviter@test.te',
+        inviterRoles: [RoleName.ProUser],
+      }),
+    ).toEqual({
       success: false,
     })
 

@@ -39,8 +39,7 @@ describe('DeleteSessionForUser', () => {
   })
 
   it('should delete a session for a given user', async () => {
-    expect(await createUseCase().execute({ userUuid: '1-2-3', sessionUuid: '2-3-4' }))
-      .toEqual({ success: true })
+    expect(await createUseCase().execute({ userUuid: '1-2-3', sessionUuid: '2-3-4' })).toEqual({ success: true })
 
     expect(sessionRepository.deleteOneByUuid).toHaveBeenCalledWith('2-3-4')
     expect(ephemeralSessionRepository.deleteOne).toHaveBeenCalledWith('2-3-4', '1-2-3')
@@ -48,10 +47,9 @@ describe('DeleteSessionForUser', () => {
   })
 
   it('should delete an ephemeral session for a given user', async () => {
-    sessionRepository.findOneByUuidAndUserUuid = jest.fn().mockReturnValue(undefined)
+    sessionRepository.findOneByUuidAndUserUuid = jest.fn().mockReturnValue(null)
 
-    expect(await createUseCase().execute({ userUuid: '1-2-3', sessionUuid: '2-3-4' }))
-      .toEqual({ success: true })
+    expect(await createUseCase().execute({ userUuid: '1-2-3', sessionUuid: '2-3-4' })).toEqual({ success: true })
 
     expect(sessionRepository.deleteOneByUuid).toHaveBeenCalledWith('2-3-4')
     expect(ephemeralSessionRepository.deleteOne).toHaveBeenCalledWith('2-3-4', '1-2-3')
@@ -59,11 +57,13 @@ describe('DeleteSessionForUser', () => {
   })
 
   it('should not delete a session if it does not exist for a given user', async () => {
-    sessionRepository.findOneByUuidAndUserUuid = jest.fn().mockReturnValue(undefined)
-    ephemeralSessionRepository.findOneByUuidAndUserUuid = jest.fn().mockReturnValue(undefined)
+    sessionRepository.findOneByUuidAndUserUuid = jest.fn().mockReturnValue(null)
+    ephemeralSessionRepository.findOneByUuidAndUserUuid = jest.fn().mockReturnValue(null)
 
-    expect(await createUseCase().execute({ userUuid: '1-2-3', sessionUuid: '2-3-4' }))
-      .toEqual({ success: false, errorMessage: 'No session exists with the provided identifier.' })
+    expect(await createUseCase().execute({ userUuid: '1-2-3', sessionUuid: '2-3-4' })).toEqual({
+      success: false,
+      errorMessage: 'No session exists with the provided identifier.',
+    })
 
     expect(sessionRepository.deleteOneByUuid).not.toHaveBeenCalled()
     expect(ephemeralSessionRepository.deleteOne).not.toHaveBeenCalled()

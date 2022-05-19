@@ -15,10 +15,7 @@ describe('ApiGatewayOfflineAuthMiddleware', () => {
     debug: jest.fn(),
   } as unknown as jest.Mocked<Logger>
 
-  const createMiddleware = () => new ApiGatewayOfflineAuthMiddleware(
-    tokenDecoder,
-    logger,
-  )
+  const createMiddleware = () => new ApiGatewayOfflineAuthMiddleware(tokenDecoder, logger)
 
   beforeEach(() => {
     tokenDecoder = {} as jest.Mocked<TokenDecoderInterface<OfflineUserTokenData>>

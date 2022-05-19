@@ -1,55 +1,57 @@
-import { injectable } from 'inversify'
-import { EntityRepository, Repository } from 'typeorm'
+import { inject, injectable } from 'inversify'
+import { Repository } from 'typeorm'
+import TYPES from '../../Bootstrap/Types'
+
 import { InvitationStatus } from '../../Domain/SharedSubscription/InvitationStatus'
 import { SharedSubscriptionInvitation } from '../../Domain/SharedSubscription/SharedSubscriptionInvitation'
 import { SharedSubscriptionInvitationRepositoryInterface } from '../../Domain/SharedSubscription/SharedSubscriptionInvitationRepositoryInterface'
 
 @injectable()
-@EntityRepository(SharedSubscriptionInvitation)
-export class MySQLSharedSubscriptionInvitationRepository extends Repository<SharedSubscriptionInvitation> implements SharedSubscriptionInvitationRepositoryInterface {
+export class MySQLSharedSubscriptionInvitationRepository implements SharedSubscriptionInvitationRepositoryInterface {
+  constructor(
+    @inject(TYPES.ORMSharedSubscriptionInvitationRepository)
+    private ormRepository: Repository<SharedSubscriptionInvitation>,
+  ) {}
+
+  async save(sharedSubscriptionInvitation: SharedSubscriptionInvitation): Promise<SharedSubscriptionInvitation> {
+    return this.ormRepository.save(sharedSubscriptionInvitation)
+  }
+
   async findByInviterEmail(inviterEmail: string): Promise<SharedSubscriptionInvitation[]> {
-    return this.createQueryBuilder('invitation')
-      .where(
-        'invitation.inviter_identifier = :inviterEmail',
-        {
-          inviterEmail,
-        }
-      )
+    return this.ormRepository
+      .createQueryBuilder('invitation')
+      .where('invitation.inviter_identifier = :inviterEmail', {
+        inviterEmail,
+      })
       .getMany()
   }
 
   async countByInviterEmailAndStatus(inviterEmail: string, statuses: InvitationStatus[]): Promise<number> {
-    return this.createQueryBuilder('invitation')
-      .where(
-        'invitation.inviter_identifier = :inviterEmail AND invitation.status IN (:...statuses)',
-        {
-          inviterEmail,
-          statuses,
-        }
-      )
+    return this.ormRepository
+      .createQueryBuilder('invitation')
+      .where('invitation.inviter_identifier = :inviterEmail AND invitation.status IN (:...statuses)', {
+        inviterEmail,
+        statuses,
+      })
       .getCount()
   }
 
-  async findOneByUuid(uuid: string): Promise<SharedSubscriptionInvitation | undefined> {
-    return this.createQueryBuilder('invitation')
-      .where(
-        'invitation.uuid = :uuid',
-        {
-          uuid,
-        }
-      )
+  async findOneByUuid(uuid: string): Promise<SharedSubscriptionInvitation | null> {
+    return this.ormRepository
+      .createQueryBuilder('invitation')
+      .where('invitation.uuid = :uuid', {
+        uuid,
+      })
       .getOne()
   }
 
-  async findOneByUuidAndStatus(uuid: string, status: InvitationStatus): Promise<SharedSubscriptionInvitation | undefined> {
-    return this.createQueryBuilder('invitation')
-      .where(
-        'invitation.uuid = :uuid AND invitation.status = :status',
-        {
-          uuid,
-          status,
-        }
-      )
+  async findOneByUuidAndStatus(uuid: string, status: InvitationStatus): Promise<SharedSubscriptionInvitation | null> {
+    return this.ormRepository
+      .createQueryBuilder('invitation')
+      .where('invitation.uuid = :uuid AND invitation.status = :status', {
+        uuid,
+        status,
+      })
       .getOne()
   }
 }

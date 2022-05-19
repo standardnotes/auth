@@ -31,22 +31,25 @@ describe('SubscriptionPurchasedEventHandler', () => {
   let subscriptionSettingService: SubscriptionSettingServiceInterface
   let timestamp: number
 
-  const createHandler = () => new SubscriptionPurchasedEventHandler(
-    userRepository,
-    userSubscriptionRepository,
-    offlineUserSubscriptionRepository,
-    roleService,
-    subscriptionSettingService,
-    logger
-  )
+  const createHandler = () =>
+    new SubscriptionPurchasedEventHandler(
+      userRepository,
+      userSubscriptionRepository,
+      offlineUserSubscriptionRepository,
+      roleService,
+      subscriptionSettingService,
+      logger,
+    )
 
   beforeEach(() => {
     user = {
       uuid: '123',
       email: 'test@test.com',
-      roles: Promise.resolve([{
-        name: RoleName.CoreUser,
-      }]),
+      roles: Promise.resolve([
+        {
+          name: RoleName.CoreUser,
+        },
+      ]),
     } as jest.Mocked<User>
     subscription = {
       subscriptionType: UserSubscriptionType.Regular,
@@ -69,7 +72,7 @@ describe('SubscriptionPurchasedEventHandler', () => {
     roleService.addUserRole = jest.fn()
     roleService.setOfflineUserRole = jest.fn()
 
-    subscriptionExpiresAt = timestamp + 365*1000
+    subscriptionExpiresAt = timestamp + 365 * 1000
 
     event = {} as jest.Mocked<SubscriptionPurchasedEvent>
     event.createdAt = new Date(1)
@@ -100,7 +103,10 @@ describe('SubscriptionPurchasedEventHandler', () => {
   it('should update user default settings', async () => {
     await createHandler().handle(event)
 
-    expect(subscriptionSettingService.applyDefaultSubscriptionSettingsForSubscription).toHaveBeenCalledWith(subscription, SubscriptionName.ProPlan)
+    expect(subscriptionSettingService.applyDefaultSubscriptionSettingsForSubscription).toHaveBeenCalledWith(
+      subscription,
+      SubscriptionName.ProPlan,
+    )
   })
 
   it('should update the offline user role', async () => {
@@ -120,9 +126,7 @@ describe('SubscriptionPurchasedEventHandler', () => {
     subscription.user = Promise.resolve(user)
 
     expect(userRepository.findOneByEmail).toHaveBeenCalledWith('test@test.com')
-    expect(
-      userSubscriptionRepository.save
-    ).toHaveBeenCalledWith({
+    expect(userSubscriptionRepository.save).toHaveBeenCalledWith({
       ...subscription,
       createdAt: expect.any(Number),
       updatedAt: expect.any(Number),
@@ -135,9 +139,7 @@ describe('SubscriptionPurchasedEventHandler', () => {
 
     await createHandler().handle(event)
 
-    expect(
-      offlineUserSubscriptionRepository.save
-    ).toHaveBeenCalledWith({
+    expect(offlineUserSubscriptionRepository.save).toHaveBeenCalledWith({
       endsAt: subscriptionExpiresAt,
       subscriptionId: 1,
       planName: 'PRO_PLAN',
@@ -149,7 +151,7 @@ describe('SubscriptionPurchasedEventHandler', () => {
   })
 
   it('should not do anything if no user is found for specified email', async () => {
-    userRepository.findOneByEmail = jest.fn().mockReturnValue(undefined)
+    userRepository.findOneByEmail = jest.fn().mockReturnValue(null)
 
     await createHandler().handle(event)
 

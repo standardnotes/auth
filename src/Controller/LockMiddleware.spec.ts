@@ -53,7 +53,7 @@ describe('LockMiddleware', () => {
   })
 
   it('should return locked response if user is not found but the email is locked', async () => {
-    userRepository.findOneByEmail = jest.fn().mockReturnValue(undefined)
+    userRepository.findOneByEmail = jest.fn().mockReturnValue(null)
 
     await createMiddleware().handler(request, response, next)
 

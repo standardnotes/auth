@@ -2,9 +2,8 @@ import { inject, injectable } from 'inversify'
 import { SubscriptionName } from '@standardnotes/common'
 import { TimerInterface } from '@standardnotes/time'
 import { TokenEncoderInterface, ValetTokenData } from '@standardnotes/auth'
-import { CreateValetTokenPayload } from '@standardnotes/payloads'
+import { CreateValetTokenPayload, CreateValetTokenResponseData } from '@standardnotes/responses'
 import { SubscriptionSettingName } from '@standardnotes/settings'
-import { CreateValetTokenResponseData } from '@standardnotes/responses'
 
 import TYPES from '../../../Bootstrap/Types'
 import { UseCaseInterface } from '../UseCaseInterface'
@@ -19,17 +18,18 @@ export class CreateValetToken implements UseCaseInterface {
   constructor(
     @inject(TYPES.ValetTokenEncoder) private tokenEncoder: TokenEncoderInterface<ValetTokenData>,
     @inject(TYPES.SubscriptionSettingService) private subscriptionSettingService: SubscriptionSettingServiceInterface,
-    @inject(TYPES.SubscriptionSettingsAssociationService) private subscriptionSettingsAssociationService: SubscriptionSettingsAssociationServiceInterface,
+    @inject(TYPES.SubscriptionSettingsAssociationService)
+    private subscriptionSettingsAssociationService: SubscriptionSettingsAssociationServiceInterface,
     @inject(TYPES.UserSubscriptionService) private userSubscriptionService: UserSubscriptionServiceInterface,
     @inject(TYPES.Timer) private timer: TimerInterface,
     @inject(TYPES.VALET_TOKEN_TTL) private valetTokenTTL: number,
-  ) {
-  }
+  ) {}
 
   async execute(dto: CreateValetTokenDTO): Promise<CreateValetTokenResponseData> {
     const { userUuid, ...payload } = dto
-    const { regularSubscription, sharedSubscription } = await this.userSubscriptionService.findRegularSubscriptionForUserUuid(userUuid)
-    if (regularSubscription === undefined) {
+    const { regularSubscription, sharedSubscription } =
+      await this.userSubscriptionService.findRegularSubscriptionForUserUuid(userUuid)
+    if (regularSubscription === null) {
       return {
         success: false,
         reason: 'no-subscription',
@@ -58,23 +58,26 @@ export class CreateValetToken implements UseCaseInterface {
       userSubscriptionUuid: regularSubscription.uuid,
       subscriptionSettingName: SubscriptionSettingName.FileUploadBytesUsed,
     })
-    if (uploadBytesUsedSetting !== undefined) {
+    if (uploadBytesUsedSetting !== null) {
       uploadBytesUsed = +(uploadBytesUsedSetting.value as string)
     }
 
-    const defaultUploadBytesLimitForSubscription = await this.subscriptionSettingsAssociationService.getFileUploadLimit(regularSubscription.planName as SubscriptionName)
+    const defaultUploadBytesLimitForSubscription = await this.subscriptionSettingsAssociationService.getFileUploadLimit(
+      regularSubscription.planName as SubscriptionName,
+    )
     let uploadBytesLimit = defaultUploadBytesLimitForSubscription
-    const overwriteWithUserUploadBytesLimitSetting = await this.subscriptionSettingService.findSubscriptionSettingWithDecryptedValue({
-      userUuid: regularSubscriptionUserUuid,
-      userSubscriptionUuid: regularSubscription.uuid,
-      subscriptionSettingName: SubscriptionSettingName.FileUploadBytesLimit,
-    })
-    if (overwriteWithUserUploadBytesLimitSetting !== undefined) {
+    const overwriteWithUserUploadBytesLimitSetting =
+      await this.subscriptionSettingService.findSubscriptionSettingWithDecryptedValue({
+        userUuid: regularSubscriptionUserUuid,
+        userSubscriptionUuid: regularSubscription.uuid,
+        subscriptionSettingName: SubscriptionSettingName.FileUploadBytesLimit,
+      })
+    if (overwriteWithUserUploadBytesLimitSetting !== null) {
       uploadBytesLimit = +(overwriteWithUserUploadBytesLimitSetting.value as string)
     }
 
     let sharedSubscriptionUuid = undefined
-    if (sharedSubscription !== undefined) {
+    if (sharedSubscription !== null) {
       sharedSubscriptionUuid = sharedSubscription.uuid
     }
 

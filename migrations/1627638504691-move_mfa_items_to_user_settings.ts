@@ -8,20 +8,24 @@ import { EncryptionVersion } from '../src/Domain/Encryption/EncryptionVersion'
 
 export class moveMfaItemsToUserSettings1627638504691 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
-    const itemsTableExistsQueryResult = await queryRunner.manager.query('SELECT COUNT(*) as count FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = "items"')
+    const itemsTableExistsQueryResult = await queryRunner.manager.query(
+      'SELECT COUNT(*) as count FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = "items"',
+    )
     const itemsTableExists = itemsTableExistsQueryResult[0].count === 1
     if (!itemsTableExists) {
       return
     }
 
-    const items = await queryRunner.manager.query('SELECT * FROM items WHERE content_type = "SF|MFA" ORDER BY updated_at_timestamp ASC')
+    const items = await queryRunner.manager.query(
+      'SELECT * FROM items WHERE content_type = "SF|MFA" ORDER BY updated_at_timestamp ASC',
+    )
 
     const usersMFAStatus = new Map<string, number>()
     const usersMFAUpdatedAt = new Map<string, number>()
 
     for (const item of items) {
       const user = await queryRunner.manager.findOne(User, item['user_uuid'])
-      if (user === undefined) {
+      if (user === null) {
         continue
       }
 

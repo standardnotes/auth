@@ -12,15 +12,11 @@ export class CreateListedAccount implements UseCaseInterface {
   constructor(
     @inject(TYPES.DomainEventPublisher) private domainEventPublisher: DomainEventPublisherInterface,
     @inject(TYPES.DomainEventFactory) private domainEventFactory: DomainEventFactoryInterface,
-  ) {
-  }
+  ) {}
 
   async execute(dto: CreateListedAccountDTO): Promise<CreateListedAccountResponse> {
     await this.domainEventPublisher.publish(
-      this.domainEventFactory.createListedAccountRequestedEvent(
-        dto.userUuid,
-        dto.userEmail,
-      )
+      this.domainEventFactory.createListedAccountRequestedEvent(dto.userUuid, dto.userEmail),
     )
 
     return {

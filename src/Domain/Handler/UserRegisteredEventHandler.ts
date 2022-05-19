@@ -7,13 +7,12 @@ import TYPES from '../../Bootstrap/Types'
 
 @injectable()
 export class UserRegisteredEventHandler implements DomainEventHandlerInterface {
-  constructor (
+  constructor(
     @inject(TYPES.HTTPClient) private httpClient: AxiosInstance,
     @inject(TYPES.USER_SERVER_REGISTRATION_URL) private userServerRegistrationUrl: string,
     @inject(TYPES.USER_SERVER_AUTH_KEY) private userServerAuthKey: string,
-    @inject(TYPES.Logger) private logger: Logger
-  ) {
-  }
+    @inject(TYPES.Logger) private logger: Logger,
+  ) {}
 
   async handle(event: UserRegisteredEvent): Promise<void> {
     if (!this.userServerRegistrationUrl) {
@@ -21,24 +20,23 @@ export class UserRegisteredEventHandler implements DomainEventHandlerInterface {
       return
     }
 
-    await this.httpClient
-      .request({
-        method: 'POST',
-        url: this.userServerRegistrationUrl,
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
+    await this.httpClient.request({
+      method: 'POST',
+      url: this.userServerRegistrationUrl,
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      data: {
+        key: this.userServerAuthKey,
+        user: {
+          email: event.payload.email,
+          created_at: event.createdAt,
         },
-        data: {
-          key: this.userServerAuthKey,
-          user: {
-            email: event.payload.email,
-            created_at: event.createdAt,
-          },
-        },
-        validateStatus:
-          /* istanbul ignore next */
-          (status: number) => status >= 200 && status < 500,
-      })
+      },
+      validateStatus:
+        /* istanbul ignore next */
+        (status: number) => status >= 200 && status < 500,
+    })
   }
 }

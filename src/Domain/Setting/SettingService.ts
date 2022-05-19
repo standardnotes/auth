@@ -23,8 +23,7 @@ export class SettingService implements SettingServiceInterface {
     @inject(TYPES.SettingInterpreter) private settingInterpreter: SettingInterpreterInterface,
     @inject(TYPES.SettingDecrypter) private settingDecrypter: SettingDecrypterInterface,
     @inject(TYPES.Logger) private logger: Logger,
-  ) {
-  }
+  ) {}
 
   async applyDefaultSettingsUponRegistration(user: User): Promise<void> {
     let defaultSettingsWithValues = this.settingsAssociationService.getDefaultSettingsAndValuesForNewUser()
@@ -33,7 +32,13 @@ export class SettingService implements SettingServiceInterface {
     }
 
     for (const settingName of defaultSettingsWithValues.keys()) {
-      const setting = defaultSettingsWithValues.get(settingName) as { value: string, sensitive: boolean, serverEncryptionVersion: number }
+      this.logger.debug(`Creating setting ${settingName} for user ${user.uuid}`)
+
+      const setting = defaultSettingsWithValues.get(settingName) as {
+        value: string
+        sensitive: boolean
+        serverEncryptionVersion: number
+      }
 
       await this.createOrReplace({
         user,
@@ -47,16 +52,16 @@ export class SettingService implements SettingServiceInterface {
     }
   }
 
-  async findSettingWithDecryptedValue(dto: FindSettingDTO): Promise<Setting | undefined> {
-    let setting: Setting | undefined
+  async findSettingWithDecryptedValue(dto: FindSettingDTO): Promise<Setting | null> {
+    let setting: Setting | null
     if (dto.settingUuid !== undefined) {
       setting = await this.settingRepository.findOneByUuid(dto.settingUuid)
     } else {
       setting = await this.settingRepository.findLastByNameAndUserUuid(dto.settingName, dto.userUuid)
     }
 
-    if (setting === undefined) {
-      return undefined
+    if (setting === null) {
+      return null
     }
 
     setting.value = await this.settingDecrypter.decryptSettingValue(setting, dto.userUuid)
@@ -73,7 +78,7 @@ export class SettingService implements SettingServiceInterface {
       settingUuid: props.uuid,
     })
 
-    if (existing === undefined) {
+    if (existing === null) {
       const setting = await this.settingRepository.save(await this.factory.create(props, user))
 
       this.logger.debug('[%s] Created setting %s: %O', user.uuid, props.name, setting)

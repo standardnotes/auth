@@ -35,18 +35,19 @@ describe('AuthController', () => {
   let session: Session
   let logger: Logger
 
-  const createController = () => new AuthController(
-    sessionService,
-    verifyMFA,
-    signIn,
-    getUserKeyParams,
-    clearLoginAttempts,
-    increaseLoginAttempts,
-    register,
-    domainEventPublisher,
-    domainEventFactory,
-    logger,
-  )
+  const createController = () =>
+    new AuthController(
+      sessionService,
+      verifyMFA,
+      signIn,
+      getUserKeyParams,
+      clearLoginAttempts,
+      increaseLoginAttempts,
+      register,
+      domainEventPublisher,
+      domainEventFactory,
+      logger,
+    )
 
   beforeEach(() => {
     logger = {} as jest.Mocked<Logger>
@@ -107,7 +108,7 @@ describe('AuthController', () => {
 
     register.execute = jest.fn().mockReturnValue({ success: true, authResponse: { user } })
 
-    const httpResponse = <results.JsonResult> await createController().register(request)
+    const httpResponse = <results.JsonResult>await createController().register(request)
     const result = await httpResponse.executeAsync()
 
     expect(register.execute).toHaveBeenCalledWith({
@@ -137,7 +138,7 @@ describe('AuthController', () => {
 
     register.execute = jest.fn().mockReturnValue({ success: true, authResponse: { user } })
 
-    const httpResponse = <results.JsonResult> await createController().register(request)
+    const httpResponse = <results.JsonResult>await createController().register(request)
     const result = await httpResponse.executeAsync()
 
     expect(register.execute).toHaveBeenCalledWith({
@@ -166,7 +167,7 @@ describe('AuthController', () => {
 
     register.execute = jest.fn().mockReturnValue({ success: true, authResponse: { user } })
 
-    const httpResponse = <results.JsonResult> await createController().register(request)
+    const httpResponse = <results.JsonResult>await createController().register(request)
     const result = await httpResponse.executeAsync()
 
     expect(register.execute).toHaveBeenCalledWith({
@@ -190,7 +191,7 @@ describe('AuthController', () => {
 
     request.body.email = 'test@test.te'
 
-    const httpResponse = <results.JsonResult> await createController().register(request)
+    const httpResponse = <results.JsonResult>await createController().register(request)
     const result = await httpResponse.executeAsync()
 
     expect(domainEventPublisher.publish).not.toHaveBeenCalled()
@@ -201,7 +202,7 @@ describe('AuthController', () => {
   it('should not register a user if request param is missing', async () => {
     request.body.email = 'test@test.te'
 
-    const httpResponse = <results.JsonResult> await createController().register(request)
+    const httpResponse = <results.JsonResult>await createController().register(request)
     const result = await httpResponse.executeAsync()
 
     expect(domainEventPublisher.publish).not.toHaveBeenCalled()
@@ -219,7 +220,7 @@ describe('AuthController', () => {
 
     register.execute = jest.fn().mockReturnValue({ success: false, errorMessage: 'Something bad happened' })
 
-    const httpResponse = <results.JsonResult> await createController().register(request)
+    const httpResponse = <results.JsonResult>await createController().register(request)
     const result = await httpResponse.executeAsync()
 
     expect(domainEventPublisher.publish).not.toHaveBeenCalled()
@@ -237,7 +238,7 @@ describe('AuthController', () => {
       },
     })
 
-    const httpResponse = <results.JsonResult> await createController().params(request, response)
+    const httpResponse = <results.JsonResult>await createController().params(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(getUserKeyParams.execute).toHaveBeenCalledWith({
@@ -263,7 +264,7 @@ describe('AuthController', () => {
 
     request.query.email = 'test2@test.te'
 
-    const httpResponse = <results.JsonResult> await createController().params(request, response)
+    const httpResponse = <results.JsonResult>await createController().params(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(getUserKeyParams.execute).toHaveBeenCalledWith({
@@ -286,7 +287,7 @@ describe('AuthController', () => {
 
     verifyMFA.execute = jest.fn().mockReturnValue({ success: false })
 
-    const httpResponse = <results.JsonResult> await createController().params(request, response)
+    const httpResponse = <results.JsonResult>await createController().params(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(result.statusCode).toEqual(401)
@@ -301,7 +302,7 @@ describe('AuthController', () => {
 
     verifyMFA.execute = jest.fn().mockReturnValue({ success: true })
 
-    const httpResponse = <results.JsonResult> await createController().params(request, response)
+    const httpResponse = <results.JsonResult>await createController().params(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(result.statusCode).toEqual(400)
@@ -317,7 +318,7 @@ describe('AuthController', () => {
 
     signIn.execute = jest.fn().mockReturnValue({ success: true })
 
-    const httpResponse = <results.JsonResult> await createController().signIn(request)
+    const httpResponse = <results.JsonResult>await createController().signIn(request)
     const result = await httpResponse.executeAsync()
 
     expect(signIn.execute).toHaveBeenCalledWith({
@@ -344,7 +345,7 @@ describe('AuthController', () => {
 
     signIn.execute = jest.fn().mockReturnValue({ success: true })
 
-    const httpResponse = <results.JsonResult> await createController().signIn(request)
+    const httpResponse = <results.JsonResult>await createController().signIn(request)
     const result = await httpResponse.executeAsync()
 
     expect(signIn.execute).toHaveBeenCalledWith({
@@ -363,7 +364,7 @@ describe('AuthController', () => {
   it('should not sign in a user if request param is missing', async () => {
     request.body.email = 'test@test.te'
 
-    const httpResponse = <results.JsonResult> await createController().signIn(request)
+    const httpResponse = <results.JsonResult>await createController().signIn(request)
     const result = await httpResponse.executeAsync()
 
     expect(result.statusCode).toEqual(401)
@@ -375,7 +376,7 @@ describe('AuthController', () => {
 
     verifyMFA.execute = jest.fn().mockReturnValue({ success: false })
 
-    const httpResponse = <results.JsonResult> await createController().signIn(request)
+    const httpResponse = <results.JsonResult>await createController().signIn(request)
     const result = await httpResponse.executeAsync()
 
     expect(result.statusCode).toEqual(401)
@@ -389,7 +390,7 @@ describe('AuthController', () => {
 
     signIn.execute = jest.fn().mockReturnValue({ success: false })
 
-    const httpResponse = <results.JsonResult> await createController().signIn(request)
+    const httpResponse = <results.JsonResult>await createController().signIn(request)
     const result = await httpResponse.executeAsync()
 
     expect(increaseLoginAttempts.execute).toHaveBeenCalledWith({ email: 'test@test.te' })
@@ -400,7 +401,7 @@ describe('AuthController', () => {
   it('should delete a session by authorization header token', async () => {
     request.headers.authorization = 'Bearer test'
 
-    const httpResponse = <results.StatusCodeResult> await createController().signOut(request, response)
+    const httpResponse = <results.StatusCodeResult>await createController().signOut(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(result.statusCode).toEqual(204)
@@ -410,9 +411,199 @@ describe('AuthController', () => {
     response.locals.readOnlyAccess = true
     request.headers.authorization = 'Bearer test'
 
-    const httpResponse = <results.StatusCodeResult> await createController().signOut(request, response)
+    const httpResponse = <results.StatusCodeResult>await createController().signOut(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(result.statusCode).toEqual(401)
+  })
+
+  describe('PKCE authentication', () => {
+    it('should get auth params for an authenticated user', async () => {
+      response.locals.user = user
+      response.locals.session = session
+
+      getUserKeyParams.execute = jest.fn().mockReturnValue({
+        keyParams: {
+          foo: 'bar',
+        },
+      })
+
+      request.body.code_challenge = 'test'
+
+      const httpResponse = <results.JsonResult>await createController().pkceParams(request, response)
+      const result = await httpResponse.executeAsync()
+
+      expect(getUserKeyParams.execute).toHaveBeenCalledWith({
+        authenticatedUser: {
+          email: 'test@test.te',
+        },
+        authenticated: true,
+        email: 'test@test.te',
+        codeChallenge: 'test',
+      })
+
+      expect(result.statusCode).toEqual(200)
+      expect(await result.content.readAsStringAsync()).toEqual('{"foo":"bar"}')
+    })
+
+    it('should get auth params for unauthenticated user', async () => {
+      getUserKeyParams.execute = jest.fn().mockReturnValue({
+        keyParams: {
+          foo: 'bar',
+        },
+      })
+
+      verifyMFA.execute = jest.fn().mockReturnValue({ success: true })
+
+      request.body.code_challenge = 'test'
+      request.body.email = 'test2@test.te'
+
+      const httpResponse = <results.JsonResult>await createController().pkceParams(request, response)
+      const result = await httpResponse.executeAsync()
+
+      expect(getUserKeyParams.execute).toHaveBeenCalledWith({
+        email: 'test2@test.te',
+        authenticated: false,
+        codeChallenge: 'test',
+      })
+
+      expect(result.statusCode).toEqual(200)
+      expect(await result.content.readAsStringAsync()).toEqual('{"foo":"bar"}')
+    })
+
+    it('should not get auth params for invalid MFA authentication', async () => {
+      getUserKeyParams.execute = jest.fn().mockReturnValue({
+        keyParams: {
+          foo: 'bar',
+        },
+      })
+
+      request.body.code_challenge = 'test'
+      request.body.email = 'test2@test.te'
+
+      verifyMFA.execute = jest.fn().mockReturnValue({ success: false })
+
+      const httpResponse = <results.JsonResult>await createController().pkceParams(request, response)
+      const result = await httpResponse.executeAsync()
+
+      expect(result.statusCode).toEqual(401)
+    })
+
+    it('should not get auth params for missing email parameter', async () => {
+      getUserKeyParams.execute = jest.fn().mockReturnValue({
+        keyParams: {
+          foo: 'bar',
+        },
+      })
+
+      request.body.code_challenge = 'test'
+
+      verifyMFA.execute = jest.fn().mockReturnValue({ success: true })
+
+      const httpResponse = <results.JsonResult>await createController().pkceParams(request, response)
+      const result = await httpResponse.executeAsync()
+
+      expect(result.statusCode).toEqual(400)
+    })
+
+    it('should not get auth params for missing code_challenge parameter', async () => {
+      getUserKeyParams.execute = jest.fn().mockReturnValue({
+        keyParams: {
+          foo: 'bar',
+        },
+      })
+
+      request.body.email = 'test2@test.te'
+
+      verifyMFA.execute = jest.fn().mockReturnValue({ success: true })
+
+      const httpResponse = <results.JsonResult>await createController().pkceParams(request, response)
+      const result = await httpResponse.executeAsync()
+
+      expect(result.statusCode).toEqual(400)
+    })
+
+    it('should sign in a user', async () => {
+      request.body.api = '20200115'
+      request.headers['user-agent'] = 'Google Chrome'
+      request.body.email = 'test@test.te'
+      request.body.password = 'qwerty'
+      request.body.code_verifier = 'test'
+
+      verifyMFA.execute = jest.fn().mockReturnValue({ success: true })
+
+      signIn.execute = jest.fn().mockReturnValue({ success: true })
+
+      const httpResponse = <results.JsonResult>await createController().pkceSignIn(request)
+      const result = await httpResponse.executeAsync()
+
+      expect(signIn.execute).toHaveBeenCalledWith({
+        apiVersion: '20200115',
+        email: 'test@test.te',
+        ephemeralSession: false,
+        password: 'qwerty',
+        userAgent: 'Google Chrome',
+        codeVerifier: 'test',
+      })
+
+      expect(clearLoginAttempts.execute).toHaveBeenCalledWith({ email: 'test@test.te' })
+
+      expect(result.statusCode).toEqual(200)
+    })
+
+    it('should sign in a user with an ephemeral session', async () => {
+      request.body.api = '20200115'
+      request.headers['user-agent'] = 'Safari'
+      request.body.email = 'test@test.te'
+      request.body.password = 'qwerty'
+      request.body.ephemeral = true
+      request.body.code_verifier = 'test'
+
+      verifyMFA.execute = jest.fn().mockReturnValue({ success: true })
+
+      signIn.execute = jest.fn().mockReturnValue({ success: true })
+
+      const httpResponse = <results.JsonResult>await createController().pkceSignIn(request)
+      const result = await httpResponse.executeAsync()
+
+      expect(signIn.execute).toHaveBeenCalledWith({
+        apiVersion: '20200115',
+        email: 'test@test.te',
+        ephemeralSession: true,
+        password: 'qwerty',
+        userAgent: 'Safari',
+        codeVerifier: 'test',
+      })
+
+      expect(clearLoginAttempts.execute).toHaveBeenCalledWith({ email: 'test@test.te' })
+
+      expect(result.statusCode).toEqual(200)
+    })
+
+    it('should not sign in a user if request param is missing', async () => {
+      request.body.email = 'test@test.te'
+
+      const httpResponse = <results.JsonResult>await createController().pkceSignIn(request)
+      const result = await httpResponse.executeAsync()
+
+      expect(result.statusCode).toEqual(401)
+    })
+
+    it('should not sign in a user if sign in procedure fails', async () => {
+      request.body.email = 'test@test.te'
+      request.body.password = 'qwerty'
+      request.body.code_verifier = 'test'
+
+      verifyMFA.execute = jest.fn().mockReturnValue({ success: true })
+
+      signIn.execute = jest.fn().mockReturnValue({ success: false })
+
+      const httpResponse = <results.JsonResult>await createController().pkceSignIn(request)
+      const result = await httpResponse.executeAsync()
+
+      expect(increaseLoginAttempts.execute).toHaveBeenCalledWith({ email: 'test@test.te' })
+
+      expect(result.statusCode).toEqual(401)
+    })
   })
 })

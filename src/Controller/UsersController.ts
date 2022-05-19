@@ -37,25 +37,31 @@ export class UsersController extends BaseHttpController {
   @httpPatch('/:userId', TYPES.ApiGatewayAuthMiddleware)
   async update(request: Request, response: Response): Promise<results.JsonResult> {
     if (response.locals.readOnlyAccess) {
-      return this.json({
-        error: {
-          tag: ErrorTag.ReadOnlyAccess,
-          message: 'Session has read-only access.',
+      return this.json(
+        {
+          error: {
+            tag: ErrorTag.ReadOnlyAccess,
+            message: 'Session has read-only access.',
+          },
         },
-      }, 401)
+        401,
+      )
     }
 
     if (request.params.userId !== response.locals.user.uuid) {
-      return this.json({
-        error: {
-          message: 'Operation not allowed.',
+      return this.json(
+        {
+          error: {
+            message: 'Operation not allowed.',
+          },
         },
-      }, 401)
+        401,
+      )
     }
 
     const updateResult = await this.updateUser.execute({
       user: response.locals.user,
-      updatedWithUserAgent: <string> request.headers['user-agent'],
+      updatedWithUserAgent: <string>request.headers['user-agent'],
       apiVersion: request.body.api,
       pwFunc: request.body.pw_func,
       pwAlg: request.body.pw_alg,
@@ -72,24 +78,30 @@ export class UsersController extends BaseHttpController {
       return this.json(updateResult.authResponse)
     }
 
-    return this.json({
-      error: {
-        message: 'Could not update user.',
+    return this.json(
+      {
+        error: {
+          message: 'Could not update user.',
+        },
       },
-    }, 400)
+      400,
+    )
   }
 
   @httpGet('/params')
   async keyParams(request: Request): Promise<results.JsonResult> {
-    const email = 'email' in request.query ? <string> request.query.email : undefined
-    const userUuid = 'uuid' in request.query ? <string> request.query.uuid : undefined
+    const email = 'email' in request.query ? <string>request.query.email : undefined
+    const userUuid = 'uuid' in request.query ? <string>request.query.uuid : undefined
 
-    if(!email && !userUuid) {
-      return this.json({
-        error: {
-          message: 'Missing mandatory request query parameters.',
+    if (!email && !userUuid) {
+      return this.json(
+        {
+          error: {
+            message: 'Missing mandatory request query parameters.',
+          },
         },
-      }, 400)
+        400,
+      )
     }
 
     const result = await this.getUserKeyParams.execute({
@@ -113,11 +125,14 @@ export class UsersController extends BaseHttpController {
   @httpGet('/:userUuid/subscription', TYPES.ApiGatewayAuthMiddleware)
   async getSubscription(request: Request, response: Response): Promise<results.JsonResult> {
     if (request.params.userUuid !== response.locals.user.uuid) {
-      return this.json({
-        error: {
-          message: 'Operation not allowed.',
+      return this.json(
+        {
+          error: {
+            message: 'Operation not allowed.',
+          },
         },
-      }, 401)
+        401,
+      )
     }
 
     const result = await this.doGetUserSubscription.execute({
@@ -134,36 +149,49 @@ export class UsersController extends BaseHttpController {
   @httpPut('/:userId/attributes/credentials', TYPES.AuthMiddleware)
   async changeCredentials(request: Request, response: Response): Promise<results.JsonResult> {
     if (response.locals.readOnlyAccess) {
-      return this.json({
-        error: {
-          tag: ErrorTag.ReadOnlyAccess,
-          message: 'Session has read-only access.',
+      return this.json(
+        {
+          error: {
+            tag: ErrorTag.ReadOnlyAccess,
+            message: 'Session has read-only access.',
+          },
         },
-      }, 401)
+        401,
+      )
     }
 
     if (!request.body.current_password) {
-      return this.json({
-        error: {
-          message: 'Your current password is required to change your password. Please update your application if you do not see this option.',
+      return this.json(
+        {
+          error: {
+            message:
+              'Your current password is required to change your password. Please update your application if you do not see this option.',
+          },
         },
-      }, 400)
+        400,
+      )
     }
 
     if (!request.body.new_password) {
-      return this.json({
-        error: {
-          message: 'Your new password is required to change your password. Please try again.',
+      return this.json(
+        {
+          error: {
+            message: 'Your new password is required to change your password. Please try again.',
+          },
         },
-      }, 400)
+        400,
+      )
     }
 
     if (!request.body.pw_nonce) {
-      return this.json({
-        error: {
-          message: 'The change password request is missing new auth parameters. Please try again.',
+      return this.json(
+        {
+          error: {
+            message: 'The change password request is missing new auth parameters. Please try again.',
+          },
         },
-      }, 400)
+        400,
+      )
     }
 
     const changeCredentialsResult = await this.changeCredentialsUseCase.execute({
@@ -175,18 +203,21 @@ export class UsersController extends BaseHttpController {
       pwNonce: request.body.pw_nonce,
       kpCreated: request.body.created,
       kpOrigination: request.body.origination,
-      updatedWithUserAgent: <string> request.headers['user-agent'],
+      updatedWithUserAgent: <string>request.headers['user-agent'],
       protocolVersion: request.body.version,
     })
 
     if (!changeCredentialsResult.success) {
       await this.increaseLoginAttempts.execute({ email: response.locals.user.email })
 
-      return this.json({
-        error: {
-          message: changeCredentialsResult.errorMessage,
+      return this.json(
+        {
+          error: {
+            message: changeCredentialsResult.errorMessage,
+          },
         },
-      }, 401)
+        401,
+      )
     }
 
     await this.clearLoginAttempts.execute({ email: response.locals.user.email })

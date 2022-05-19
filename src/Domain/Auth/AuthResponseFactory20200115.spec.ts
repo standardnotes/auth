@@ -19,13 +19,8 @@ describe('AuthResponseFactory20200115', () => {
   let logger: Logger
   let tokenEncoder: TokenEncoderInterface<SessionTokenData>
 
-  const createFactory = () => new AuthResponseFactory20200115(
-    sessionService,
-    keyParamsFactory,
-    userProjector,
-    tokenEncoder,
-    logger
-  )
+  const createFactory = () =>
+    new AuthResponseFactory20200115(sessionService, keyParamsFactory, userProjector, tokenEncoder, logger)
 
   beforeEach(() => {
     logger = {} as jest.Mocked<Logger>

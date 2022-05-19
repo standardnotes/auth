@@ -8,9 +8,9 @@ import { OfflineUserSubscriptionRepositoryInterface } from '../../Subscription/O
 @injectable()
 export class GetUserOfflineSubscription implements UseCaseInterface {
   constructor(
-    @inject(TYPES.OfflineUserSubscriptionRepository) private offlineUserSubscriptionRepository: OfflineUserSubscriptionRepositoryInterface,
-  ) {
-  }
+    @inject(TYPES.OfflineUserSubscriptionRepository)
+    private offlineUserSubscriptionRepository: OfflineUserSubscriptionRepositoryInterface,
+  ) {}
 
   async execute(dto: GetUserOfflineSubscriptionDto): Promise<GetUserOfflineSubscriptionResponse> {
     const userSubscription = await this.offlineUserSubscriptionRepository.findOneByEmail(dto.userEmail)

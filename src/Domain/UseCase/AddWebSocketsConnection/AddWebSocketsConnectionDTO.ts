@@ -1,4 +1,4 @@
 export type AddWebSocketsConnectionDTO = {
-  userUuid: string,
-  connectionId: string,
+  userUuid: string
+  connectionId: string
 }

@@ -1,7 +1,4 @@
-import {
-  DomainEventHandlerInterface,
-  ExtensionKeyGrantedEvent,
-} from '@standardnotes/domain-events'
+import { DomainEventHandlerInterface, ExtensionKeyGrantedEvent } from '@standardnotes/domain-events'
 import { SettingName } from '@standardnotes/settings'
 import { OfflineFeaturesTokenData } from '@standardnotes/auth'
 import { ContentDecoderInterface } from '@standardnotes/common'
@@ -22,14 +19,15 @@ export class ExtensionKeyGrantedEventHandler implements DomainEventHandlerInterf
     @inject(TYPES.SettingService) private settingService: SettingServiceInterface,
     @inject(TYPES.OfflineSettingService) private offlineSettingService: OfflineSettingServiceInterface,
     @inject(TYPES.ContenDecoder) private contentDecoder: ContentDecoderInterface,
-    @inject(TYPES.Logger) private logger: Logger
-  ) {
-  }
+    @inject(TYPES.Logger) private logger: Logger,
+  ) {}
 
   async handle(event: ExtensionKeyGrantedEvent): Promise<void> {
     if (event.payload.offline) {
-      const offlineFeaturesTokenDecoded =
-        this.contentDecoder.decode(event.payload.offlineFeaturesToken as string, 0) as OfflineFeaturesTokenData
+      const offlineFeaturesTokenDecoded = this.contentDecoder.decode(
+        event.payload.offlineFeaturesToken as string,
+        0,
+      ) as OfflineFeaturesTokenData
 
       if (!offlineFeaturesTokenDecoded.extensionKey) {
         this.logger.warn('Could not decode offline features token')
@@ -46,14 +44,10 @@ export class ExtensionKeyGrantedEventHandler implements DomainEventHandlerInterf
       return
     }
 
-    const user = await this.userRepository.findOneByEmail(
-      event.payload.userEmail
-    )
+    const user = await this.userRepository.findOneByEmail(event.payload.userEmail)
 
-    if (user === undefined) {
-      this.logger.warn(
-        `Could not find user with email: ${event.payload.userEmail}`
-      )
+    if (user === null) {
+      this.logger.warn(`Could not find user with email: ${event.payload.userEmail}`)
       return
     }
 

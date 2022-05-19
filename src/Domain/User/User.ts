@@ -1,37 +1,38 @@
-import { Column, Entity, Index, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
+import { Column, Entity, Index, JoinTable, ManyToMany, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm'
 import { RevokedSession } from '../Session/RevokedSession'
 import { Role } from '../Role/Role'
 import { Setting } from '../Setting/Setting'
 import { UserSubscription } from '../Subscription/UserSubscription'
+import { AnalyticsEntity } from '../Analytics/AnalyticsEntity'
+import { ProtocolVersion } from '@standardnotes/common'
 
 @Entity({ name: 'users' })
 export class User {
-  private readonly SESSIONS_PROTOCOL_VERSION = 4
   static readonly PASSWORD_HASH_COST = 11
   static readonly DEFAULT_ENCRYPTION_VERSION = 1
 
   @PrimaryGeneratedColumn('uuid')
-  uuid: string
+  declare uuid: string
 
   @Column({
     length: 255,
     nullable: true,
   })
-  version: string
+  declare version: string
 
   @Column({
     length: 255,
     nullable: true,
   })
   @Index('index_users_on_email')
-  email: string
+  declare email: string
 
   @Column({
     name: 'pw_nonce',
     length: 255,
     nullable: true,
   })
-  pwNonce: string
+  declare pwNonce: string
 
   @Column({
     name: 'encrypted_server_key',
@@ -39,28 +40,28 @@ export class User {
     type: 'varchar',
     nullable: true,
   })
-  encryptedServerKey: string | null
+  declare encryptedServerKey: string | null
 
   @Column({
     name: 'server_encryption_version',
     type: 'tinyint',
     default: 0,
   })
-  serverEncryptionVersion: number
+  declare serverEncryptionVersion: number
 
   @Column({
     name: 'kp_created',
     length: 255,
     nullable: true,
   })
-  kpCreated: string
+  declare kpCreated: string
 
   @Column({
     name: 'kp_origination',
     length: 255,
     nullable: true,
   })
-  kpOrigination: string
+  declare kpOrigination: string
 
   @Column({
     name: 'pw_cost',
@@ -68,7 +69,7 @@ export class User {
     type: 'int',
     nullable: true,
   })
-  pwCost: number
+  declare pwCost: number
 
   @Column({
     name: 'pw_key_size',
@@ -76,53 +77,53 @@ export class User {
     type: 'int',
     nullable: true,
   })
-  pwKeySize: number
+  declare pwKeySize: number
 
   @Column({
     name: 'pw_salt',
     length: 255,
     nullable: true,
   })
-  pwSalt: string
+  declare pwSalt: string
 
   @Column({
     name: 'pw_alg',
     length: 255,
     nullable: true,
   })
-  pwAlg: string
+  declare pwAlg: string
 
   @Column({
     name: 'pw_func',
     length: 255,
     nullable: true,
   })
-  pwFunc: string
+  declare pwFunc: string
 
   @Column({
     name: 'encrypted_password',
     length: 255,
   })
-  encryptedPassword: string
+  declare encryptedPassword: string
 
   @Column({
     name: 'created_at',
     type: 'datetime',
   })
-  createdAt: Date
+  declare createdAt: Date
 
   @Column({
     name: 'updated_at',
     type: 'datetime',
   })
-  updatedAt: Date
+  declare updatedAt: Date
 
   @Column({
     name: 'locked_until',
     type: 'datetime',
     nullable: true,
   })
-  lockedUntil: Date | null
+  declare lockedUntil: Date | null
 
   @Column({
     name: 'num_failed_attempts',
@@ -130,27 +131,33 @@ export class User {
     width: 11,
     nullable: true,
   })
-  numberOfFailedAttempts: number | null
+  declare numberOfFailedAttempts: number | null
 
   @OneToMany(
     /* istanbul ignore next */
     () => RevokedSession,
     /* istanbul ignore next */
-    revokedSession => revokedSession.user
+    (revokedSession) => revokedSession.user,
+    /* istanbul ignore next */
+    { lazy: true, eager: false },
   )
-  revokedSessions: Promise<RevokedSession[]>
+  declare revokedSessions: Promise<RevokedSession[]>
 
   @OneToMany(
     /* istanbul ignore next */
     () => Setting,
     /* istanbul ignore next */
-    setting => setting.user
+    (setting) => setting.user,
+    /* istanbul ignore next */
+    { lazy: true, eager: false },
   )
-  settings: Promise<Setting[]>
+  declare settings: Promise<Setting[]>
 
   @ManyToMany(
     /* istanbul ignore next */
-    () => Role
+    () => Role,
+    /* istanbul ignore next */
+    { lazy: true, eager: false },
   )
   @JoinTable({
     name: 'user_roles',
@@ -163,18 +170,30 @@ export class User {
       referencedColumnName: 'uuid',
     },
   })
-  roles: Promise<Array<Role>>
+  declare roles: Promise<Array<Role>>
 
   @OneToMany(
     /* istanbul ignore next */
     () => UserSubscription,
     /* istanbul ignore next */
-    subscription => subscription.user
+    (subscription) => subscription.user,
+    /* istanbul ignore next */
+    { lazy: true, eager: false },
   )
-  subscriptions: Promise<UserSubscription[]>
+  declare subscriptions: Promise<UserSubscription[]>
+
+  @OneToOne(
+    /* istanbul ignore next */
+    () => AnalyticsEntity,
+    /* istanbul ignore next */
+    (analyticsEntity) => analyticsEntity.user,
+    /* istanbul ignore next */
+    { lazy: true, eager: false },
+  )
+  declare analyticsEntity: Promise<AnalyticsEntity>
 
   supportsSessions(): boolean {
-    return parseInt(this.version) >= this.SESSIONS_PROTOCOL_VERSION
+    return parseInt(this.version) >= parseInt(ProtocolVersion.V004)
   }
 
   isPotentiallyAVaultAccount(): boolean {
