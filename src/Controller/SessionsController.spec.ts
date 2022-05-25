@@ -11,6 +11,7 @@ import { AuthenticateRequest } from '../Domain/UseCase/AuthenticateRequest'
 import { User } from '../Domain/User/User'
 import { Role } from '../Domain/Role/Role'
 import { CrossServiceTokenData, TokenEncoderInterface } from '@standardnotes/auth'
+import { GetUserAnalyticsId } from '../Domain/UseCase/GetUserAnalyticsId/GetUserAnalyticsId'
 
 describe('SessionsController', () => {
   let getActiveSessionsForUser: GetActiveSessionsForUser
@@ -25,6 +26,7 @@ describe('SessionsController', () => {
   let response: express.Response
   let user: User
   let role: Role
+  let getUserAnalyticsId: GetUserAnalyticsId
 
   const createController = () =>
     new SessionsController(
@@ -34,6 +36,7 @@ describe('SessionsController', () => {
       sessionProjector,
       roleProjector,
       tokenEncoder,
+      getUserAnalyticsId,
       jwtTTL,
     )
 
@@ -61,6 +64,9 @@ describe('SessionsController', () => {
 
     tokenEncoder = {} as jest.Mocked<TokenEncoderInterface<CrossServiceTokenData>>
     tokenEncoder.encodeExpirableToken = jest.fn().mockReturnValue('foobar')
+
+    getUserAnalyticsId = {} as jest.Mocked<GetUserAnalyticsId>
+    getUserAnalyticsId.execute = jest.fn().mockReturnValue({ analyticsId: 123 })
 
     request = {
       params: {},
@@ -106,6 +112,25 @@ describe('SessionsController', () => {
     const result = await httpResponse.executeAsync()
     const httpResponseContent = await result.content.readAsStringAsync()
     const httpResponseJSON = JSON.parse(httpResponseContent)
+
+    expect(tokenEncoder.encodeExpirableToken).toHaveBeenCalledWith(
+      {
+        analyticsId: 123,
+        roles: [
+          {
+            name: 'role1',
+            uuid: '1-3-4',
+          },
+        ],
+        session: {
+          test: 'test',
+        },
+        user: {
+          bar: 'baz',
+        },
+      },
+      60,
+    )
 
     expect(httpResponseJSON.authToken).toEqual('foobar')
   })

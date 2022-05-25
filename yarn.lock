@@ -350,14 +350,14 @@
     lodash.camelcase "^4.3.0"
     protobufjs "^6.8.6"
 
-"@grpc/proto-loader@^0.6.4", "@grpc/proto-loader@^0.6.9":
-  version "0.6.11"
-  resolved "https://registry.yarnpkg.com/@grpc/proto-loader/-/proto-loader-0.6.11.tgz#07d8a0e8851ec383492c4e05eeaa45c215845750"
-  integrity sha512-MRiPjTjNgKxMupQ0M8mM9Mcljb2aZvE3Y/oEv+dacozIs2TwTdiPbvfkZpMeghfjGtoDJhDjyCtmFzJcjdDTUQ==
+"@grpc/proto-loader@^0.6.12", "@grpc/proto-loader@^0.6.4":
+  version "0.6.12"
+  resolved "https://registry.yarnpkg.com/@grpc/proto-loader/-/proto-loader-0.6.12.tgz#459b619b8b9b67794bf0d1cb819653a38c63e164"
+  integrity sha512-filTVbETFnxb9CyRX98zN18ilChTuf/C5scZ2xyaOTp0EHGq0/ufX8rjqXUcSb1Gpv7eZq4M2jDvbh9BogKnrg==
   dependencies:
     "@types/long" "^4.0.1"
     lodash.camelcase "^4.3.0"
-    long "^4.0.0 || ^5.2.0"
+    long "^4.0.0"
     protobufjs "^6.10.0"
     yargs "^16.2.0"
 
@@ -886,15 +886,23 @@
     "@standardnotes/common" "^1.19.7"
     jsonwebtoken "^8.5.1"
 
+"@standardnotes/auth@^3.19.0":
+  version "3.19.0"
+  resolved "https://registry.yarnpkg.com/@standardnotes/auth/-/auth-3.19.0.tgz#ca0ce3494fb147906b5d0f5c6cafe494f2f3a590"
+  integrity sha512-4ZieJuhlhqVQ7nwKjVdNubhEZkoHEaI5kW4wHdCcRNXCVofzHBctPdBSaRHzriJTUNSWfK66H0i5MOoU68etRQ==
+  dependencies:
+    "@standardnotes/common" "^1.22.0"
+    jsonwebtoken "^8.5.1"
+
 "@standardnotes/common@^1.19.7":
   version "1.19.7"
   resolved "https://registry.yarnpkg.com/@standardnotes/common/-/common-1.19.7.tgz#0f22762667002a9b89a1e692d8c9eb62213dd13d"
   integrity sha512-K0BypGlS2e4Wq6QokWBtICM1JHZT/eO5xGvOnQdI6XUIaNPvLDd5KZpyvj5UfA+Pmr69nsk/cSJSedWk+H6zlw==
 
-"@standardnotes/common@^1.21.0":
-  version "1.21.0"
-  resolved "https://registry.yarnpkg.com/@standardnotes/common/-/common-1.21.0.tgz#57cd8ddd65ca827966d65801c5270f17aa16189d"
-  integrity sha512-TZKH/l2colOc68mn8FRTCoILpRHw5ZaJjpt/LPtPoRDy0ZPYbyKzRRzYVdoqZeEvJwDmGG24o3QB4xQpf3K0dA==
+"@standardnotes/common@^1.22.0":
+  version "1.22.0"
+  resolved "https://registry.yarnpkg.com/@standardnotes/common/-/common-1.22.0.tgz#397604fb4b92901bac276940a2647509b70a7ad2"
+  integrity sha512-xg2SU/Pq36O2ksSotuJm94ZEaVdFzpR6rVNwBAaZzjNtW41K4e107LOVfpu1Nv6Qykv79AKBbGzZ600f5QJ3jg==
 
 "@standardnotes/config@^2.4.3":
   version "2.4.3"
@@ -907,12 +915,12 @@
     eslint-plugin-prettier "^4.0.0"
     prettier "^2.6.2"
 
-"@standardnotes/domain-events-infra@^1.4.109":
-  version "1.4.109"
-  resolved "https://registry.yarnpkg.com/@standardnotes/domain-events-infra/-/domain-events-infra-1.4.109.tgz#2a5d65a5982f17f73e3ce955d1190a2568066c7a"
-  integrity sha512-ex4v7IB+XA9j4hL1GYzCFEFmUBV4zyFID3G9FFv/6jv2nosUDRdDlROgJD2dtDRoPBXwuEuZUN1OcnLQR6AvUQ==
+"@standardnotes/domain-events-infra@^1.4.123":
+  version "1.4.123"
+  resolved "https://registry.yarnpkg.com/@standardnotes/domain-events-infra/-/domain-events-infra-1.4.123.tgz#35664ea701f77a35b20b77397b16b28c40f56325"
+  integrity sha512-2o61seS7+FCXpJaVWF8AxJpPJbWC45AaCmTrIj0wLHAeu4sFJdnUmTcyeG3xA7JMTiZuywV8Y3jgLlt8kGx4LQ==
   dependencies:
-    "@standardnotes/domain-events" "^2.27.15"
+    "@standardnotes/domain-events" "^2.28.12"
     aws-sdk "^2.1082.0"
     ioredis "^4.28.5"
     newrelic "^8.8.0"
@@ -920,13 +928,13 @@
     sqs-consumer "^5.6.0"
     winston "^3.6.0"
 
-"@standardnotes/domain-events@^2.27.15":
-  version "2.27.15"
-  resolved "https://registry.yarnpkg.com/@standardnotes/domain-events/-/domain-events-2.27.15.tgz#ff6fba882b88ccb6b4eace4058b8a16d1d25fd5e"
-  integrity sha512-Eiyt4Fl+VnEqHhvCR4XTW48XtzPpWXjVdCrOyCIOt0QOTcHbIgmis1Wd2X5rUJN1xLyrWCLPgO1E44Ys3VYvuQ==
+"@standardnotes/domain-events@^2.28.12":
+  version "2.28.12"
+  resolved "https://registry.yarnpkg.com/@standardnotes/domain-events/-/domain-events-2.28.12.tgz#8d57310273523685c9b27ee322a5e0a8bab40848"
+  integrity sha512-slFANjwfYzATjFvGl/zlPUkcRQoxZ5Z8xYq1Se4UTtNw5Gogw03qpnzX09LWs4NFPuy9AbInH1WFqxkLknOlHQ==
   dependencies:
-    "@standardnotes/auth" "^3.18.12"
-    "@standardnotes/features" "^1.40.1"
+    "@standardnotes/auth" "^3.19.0"
+    "@standardnotes/features" "^1.44.4"
 
 "@standardnotes/features@^1.40.1":
   version "1.40.1"
@@ -935,6 +943,14 @@
   dependencies:
     "@standardnotes/auth" "^3.18.12"
     "@standardnotes/common" "^1.19.7"
+
+"@standardnotes/features@^1.44.4":
+  version "1.44.4"
+  resolved "https://registry.yarnpkg.com/@standardnotes/features/-/features-1.44.4.tgz#9f8bd5d1ad6c67e0edccc92720928d62825e0fb5"
+  integrity sha512-85J1M3Snq/6wVz4ysmWAw6iDIdSmDRjkhwA8sq/EMY+cRTHcD4OU/oT0otU+fFfSJ7VEp1fzLeciH+SvFvajqw==
+  dependencies:
+    "@standardnotes/auth" "^3.19.0"
+    "@standardnotes/common" "^1.22.0"
 
 "@standardnotes/responses@^1.6.15":
   version "1.6.15"
@@ -1437,9 +1453,9 @@ async@^3.2.3:
   integrity sha512-spZRyzKL5l5BZQrr/6m/SqFdBN0q3OCI0f9rjfBzCMBIP4p75P620rR3gTmaksNOhmzgdxcaxdNfMy6anrbM0g==
 
 aws-sdk@^2.1082.0:
-  version "2.1127.0"
-  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.1127.0.tgz#c5dc814bb876ea896eddcbc7891ab6493f1a5153"
-  integrity sha512-jtP0CV89m2XNfgi1SnomrK798QqLmR+340w4KOMF0vBkY9kvGzPLV9GBNcg3JPj45tML1H4hSIonYkUUFSLkYw==
+  version "2.1142.0"
+  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.1142.0.tgz#8fca9cfa100153d10d753afbc11a3ad7af6fe72b"
+  integrity sha512-ii+4Q8jqN31CiXpn9i/4vGCjqo02TGihmre5b44OUsTiKNXSjqr/aRrcirMsfuBFWRdrdcU12ez7Mg+N9GDNjw==
   dependencies:
     buffer "4.9.2"
     events "1.1.1"
@@ -3754,11 +3770,6 @@ long@^4.0.0:
   resolved "https://registry.yarnpkg.com/long/-/long-4.0.0.tgz#9a7b71cfb7d361a194ea555241c92f7468d5bf28"
   integrity sha512-XsP+KhQif4bjX1kbuSiySJFNAehNxgLb6hPRGJ9QsUr8ajHkuXGdrHmFUTUUXhDwVX2R5bY4JNZEwbUiMhV+MA==
 
-"long@^4.0.0 || ^5.2.0":
-  version "5.2.0"
-  resolved "https://registry.yarnpkg.com/long/-/long-5.2.0.tgz#2696dadf4b4da2ce3f6f6b89186085d94d52fd61"
-  integrity sha512-9RTUNjK60eJbx3uz+TEGF7fUr29ZDxR5QzXcyDpeSfeH28S9ycINflOgOlppit5U+4kNTe83KQnMEerw7GmE8w==
-
 lowercase-keys@^1.0.0, lowercase-keys@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/lowercase-keys/-/lowercase-keys-1.0.1.tgz#6f9e30b47084d971a7c820ff15a6c5167b74c26f"
@@ -3984,12 +3995,12 @@ newrelic@8.6.0:
     "@newrelic/native-metrics" "^7.0.1"
 
 newrelic@^8.8.0:
-  version "8.10.0"
-  resolved "https://registry.yarnpkg.com/newrelic/-/newrelic-8.10.0.tgz#b3e9531e0690cc241588c953601ea6cd1634318c"
-  integrity sha512-7gBtVsdblR074M262zuyMIrkOCIzJ+uJsmKrRfqkoqFos0ck/SpnahNSp+Q5LDiVq3Q+03G3sBVErK2yShv6iQ==
+  version "8.12.0"
+  resolved "https://registry.yarnpkg.com/newrelic/-/newrelic-8.12.0.tgz#f5aedc4928ca8d6dc1b07fb72ad4befaf541d522"
+  integrity sha512-7ys2ttHjt0TRPty+8lcFoLxEIDDKqVNWr9EnXUGMMEPg7P1ZRBsLUmMdHFwq+q9T3LrePQqds0zyF+uhpS3uTg==
   dependencies:
     "@grpc/grpc-js" "^1.5.5"
-    "@grpc/proto-loader" "^0.6.9"
+    "@grpc/proto-loader" "^0.6.12"
     "@newrelic/aws-sdk" "^4.1.1"
     "@newrelic/koa" "^6.1.1"
     "@newrelic/superagent" "^5.1.0"
@@ -4317,9 +4328,9 @@ prompts@^2.0.1:
     sisteransi "^1.0.5"
 
 protobufjs@^6.10.0:
-  version "6.11.2"
-  resolved "https://registry.yarnpkg.com/protobufjs/-/protobufjs-6.11.2.tgz#de39fabd4ed32beaa08e9bb1e30d08544c1edf8b"
-  integrity sha512-4BQJoPooKJl2G9j3XftkIXjoC9C0Av2NOrWmbLWT1vH32GcSUHjM0Arra6UfTsVyfMAuFzaLucXn1sadxJydAw==
+  version "6.11.3"
+  resolved "https://registry.yarnpkg.com/protobufjs/-/protobufjs-6.11.3.tgz#637a527205a35caa4f3e2a9a4a13ddffe0e7af74"
+  integrity sha512-xL96WDdCZYdU7Slin569tFX712BxsxslWwAfAhCYjQKGTq7dAU91Lomy6nLLhh/dyGhk/YH4TwTSRxTzhuHyZg==
   dependencies:
     "@protobufjs/aspromise" "^1.1.2"
     "@protobufjs/base64" "^1.1.2"

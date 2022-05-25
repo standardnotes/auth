@@ -185,6 +185,7 @@ import { UserRepositoryInterface } from '../Domain/User/UserRepositoryInterface'
 import { AnalyticsEntity } from '../Domain/Analytics/AnalyticsEntity'
 import { AnalyticsEntityRepositoryInterface } from '../Domain/Analytics/AnalyticsEntityRepositoryInterface'
 import { MySQLAnalyticsEntityRepository } from '../Infra/MySQL/MySQLAnalyticsEntityRepository'
+import { GetUserAnalyticsId } from '../Domain/UseCase/GetUserAnalyticsId/GetUserAnalyticsId'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const newrelicWinstonEnricher = require('@newrelic/winston-enricher')
@@ -414,6 +415,7 @@ export class ContainerConfigLoader {
       .bind<ListSharedSubscriptionInvitations>(TYPES.ListSharedSubscriptionInvitations)
       .to(ListSharedSubscriptionInvitations)
     container.bind<GetSubscriptionSetting>(TYPES.GetSubscriptionSetting).to(GetSubscriptionSetting)
+    container.bind<GetUserAnalyticsId>(TYPES.GetUserAnalyticsId).to(GetUserAnalyticsId)
 
     // Handlers
     container.bind<UserRegisteredEventHandler>(TYPES.UserRegisteredEventHandler).to(UserRegisteredEventHandler)
