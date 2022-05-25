@@ -18,6 +18,7 @@ import { ProjectorInterface } from '../Projection/ProjectorInterface'
 import { SessionProjector } from '../Projection/SessionProjector'
 import { CrossServiceTokenData, TokenEncoderInterface } from '@standardnotes/auth'
 import { RoleName } from '@standardnotes/common'
+import { GetUserAnalyticsId } from '../Domain/UseCase/GetUserAnalyticsId/GetUserAnalyticsId'
 
 @controller('/sessions')
 export class SessionsController extends BaseHttpController {
@@ -28,6 +29,7 @@ export class SessionsController extends BaseHttpController {
     @inject(TYPES.SessionProjector) private sessionProjector: ProjectorInterface<Session>,
     @inject(TYPES.RoleProjector) private roleProjector: ProjectorInterface<Role>,
     @inject(TYPES.CrossServiceTokenEncoder) private tokenEncoder: TokenEncoderInterface<CrossServiceTokenData>,
+    @inject(TYPES.GetUserAnalyticsId) private getUserAnalyticsId: GetUserAnalyticsId,
     @inject(TYPES.AUTH_JWT_TTL) private jwtTTL: number,
   ) {
     super()
@@ -51,10 +53,15 @@ export class SessionsController extends BaseHttpController {
       )
     }
 
-    const roles = await (authenticateRequestResponse.user as User).roles
+    const user = authenticateRequestResponse.user as User
+
+    const roles = await user.roles
+
+    const { analyticsId } = await this.getUserAnalyticsId.execute({ userUuid: user.uuid })
 
     const authTokenData: CrossServiceTokenData = {
-      user: this.projectUser(<User>authenticateRequestResponse.user),
+      user: this.projectUser(user),
+      analyticsId,
       roles: this.projectRoles(roles),
     }
 
