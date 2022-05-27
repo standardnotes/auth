@@ -37,6 +37,7 @@ describe('SessionsController', () => {
       roleProjector,
       tokenEncoder,
       getUserAnalyticsId,
+      true,
       jwtTTL,
     )
 
@@ -116,6 +117,56 @@ describe('SessionsController', () => {
     expect(tokenEncoder.encodeExpirableToken).toHaveBeenCalledWith(
       {
         analyticsId: 123,
+        roles: [
+          {
+            name: 'role1',
+            uuid: '1-3-4',
+          },
+        ],
+        session: {
+          test: 'test',
+        },
+        user: {
+          bar: 'baz',
+        },
+      },
+      60,
+    )
+
+    expect(httpResponseJSON.authToken).toEqual('foobar')
+  })
+
+  it('should validate a session from an incoming request - disabled analytics', async () => {
+    authenticateRequest.execute = jest.fn().mockReturnValue({
+      success: true,
+      user,
+      session,
+    })
+
+    request.headers.authorization = 'test'
+
+    const controller = new SessionsController(
+      getActiveSessionsForUser,
+      authenticateRequest,
+      userProjector,
+      sessionProjector,
+      roleProjector,
+      tokenEncoder,
+      getUserAnalyticsId,
+      false,
+      jwtTTL,
+    )
+
+    const httpResponse = await controller.validate(request)
+
+    expect(httpResponse).toBeInstanceOf(results.JsonResult)
+
+    const result = await httpResponse.executeAsync()
+    const httpResponseContent = await result.content.readAsStringAsync()
+    const httpResponseJSON = JSON.parse(httpResponseContent)
+
+    expect(tokenEncoder.encodeExpirableToken).toHaveBeenCalledWith(
+      {
         roles: [
           {
             name: 'role1',

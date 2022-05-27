@@ -30,6 +30,7 @@ export class SessionsController extends BaseHttpController {
     @inject(TYPES.RoleProjector) private roleProjector: ProjectorInterface<Role>,
     @inject(TYPES.CrossServiceTokenEncoder) private tokenEncoder: TokenEncoderInterface<CrossServiceTokenData>,
     @inject(TYPES.GetUserAnalyticsId) private getUserAnalyticsId: GetUserAnalyticsId,
+    @inject(TYPES.ANALYTICS_ENABLED) private analyticsEnabled: boolean,
     @inject(TYPES.AUTH_JWT_TTL) private jwtTTL: number,
   ) {
     super()
@@ -57,12 +58,14 @@ export class SessionsController extends BaseHttpController {
 
     const roles = await user.roles
 
-    const { analyticsId } = await this.getUserAnalyticsId.execute({ userUuid: user.uuid })
-
     const authTokenData: CrossServiceTokenData = {
       user: this.projectUser(user),
-      analyticsId,
       roles: this.projectRoles(roles),
+    }
+
+    if (this.analyticsEnabled) {
+      const { analyticsId } = await this.getUserAnalyticsId.execute({ userUuid: user.uuid })
+      authTokenData.analyticsId = analyticsId
     }
 
     if (authenticateRequestResponse.session !== undefined) {
