@@ -17,7 +17,6 @@ describe('MySQLAnalyticsEntityRepository', () => {
     analyticsEntity = {} as jest.Mocked<AnalyticsEntity>
 
     queryBuilder = {} as jest.Mocked<SelectQueryBuilder<AnalyticsEntity>>
-    queryBuilder.cache = jest.fn().mockReturnThis()
 
     ormRepository = {} as jest.Mocked<Repository<AnalyticsEntity>>
     ormRepository.save = jest.fn()
@@ -30,14 +29,13 @@ describe('MySQLAnalyticsEntityRepository', () => {
     expect(ormRepository.save).toHaveBeenCalledWith(analyticsEntity)
   })
 
-  it('should find one by user uuid and cache it for an hour', async () => {
+  it('should find one by user uuid', async () => {
     queryBuilder.where = jest.fn().mockReturnThis()
     queryBuilder.getOne = jest.fn().mockReturnValue(analyticsEntity)
 
     const result = await createRepository().findOneByUserUuid('123')
 
     expect(queryBuilder.where).toHaveBeenCalledWith('analytics_entity.user_uuid = :userUuid', { userUuid: '123' })
-    expect(queryBuilder.cache).toHaveBeenCalledWith('analytics_entity_user_123', 3_600_000)
 
     expect(result).toEqual(analyticsEntity)
   })

@@ -17,7 +17,6 @@ export class MySQLAnalyticsEntityRepository implements AnalyticsEntityRepository
     return this.ormRepository
       .createQueryBuilder('analytics_entity')
       .where('analytics_entity.user_uuid = :userUuid', { userUuid })
-      .cache(`analytics_entity_user_${userUuid}`, 3_600_000)
       .getOne()
   }
 
