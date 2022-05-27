@@ -41,6 +41,7 @@ export class RefreshSessionToken {
     return {
       success: true,
       sessionPayload,
+      userUuid: session.userUuid,
     }
   }
 }

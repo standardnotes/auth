@@ -257,7 +257,7 @@ export class AuthController extends BaseHttpController {
   }
 
   @httpPost('/sign_out', TYPES.AuthMiddlewareWithoutResponse)
-  async signOut(request: Request, response: Response): Promise<results.JsonResult | results.StatusCodeResult> {
+  async signOut(request: Request, response: Response): Promise<results.JsonResult | void> {
     if (response.locals.readOnlyAccess) {
       return this.json(
         {
@@ -272,9 +272,12 @@ export class AuthController extends BaseHttpController {
 
     const authorizationHeader = <string>request.headers.authorization
 
-    await this.sessionService.deleteSessionByToken(authorizationHeader.replace('Bearer ', ''))
+    const userUuid = await this.sessionService.deleteSessionByToken(authorizationHeader.replace('Bearer ', ''))
 
-    return this.statusCode(204)
+    if (userUuid !== null) {
+      response.setHeader('X-Invalidate-Cache', userUuid)
+    }
+    response.status(204).send()
   }
 
   @httpPost('/')

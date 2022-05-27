@@ -35,7 +35,7 @@ export class UsersController extends BaseHttpController {
   }
 
   @httpPatch('/:userId', TYPES.ApiGatewayAuthMiddleware)
-  async update(request: Request, response: Response): Promise<results.JsonResult> {
+  async update(request: Request, response: Response): Promise<results.JsonResult | void> {
     if (response.locals.readOnlyAccess) {
       return this.json(
         {
@@ -75,7 +75,10 @@ export class UsersController extends BaseHttpController {
     })
 
     if (updateResult.success) {
-      return this.json(updateResult.authResponse)
+      response.setHeader('X-Invalidate-Cache', response.locals.user.uuid)
+      response.send(updateResult.authResponse)
+
+      return
     }
 
     return this.json(
@@ -147,7 +150,7 @@ export class UsersController extends BaseHttpController {
   }
 
   @httpPut('/:userId/attributes/credentials', TYPES.AuthMiddleware)
-  async changeCredentials(request: Request, response: Response): Promise<results.JsonResult> {
+  async changeCredentials(request: Request, response: Response): Promise<results.JsonResult | void> {
     if (response.locals.readOnlyAccess) {
       return this.json(
         {
@@ -222,6 +225,7 @@ export class UsersController extends BaseHttpController {
 
     await this.clearLoginAttempts.execute({ email: response.locals.user.email })
 
-    return this.json(changeCredentialsResult.authResponse)
+    response.setHeader('X-Invalidate-Cache', response.locals.user.uuid)
+    response.send(changeCredentialsResult.authResponse)
   }
 }

@@ -35,6 +35,9 @@ describe('SessionController', () => {
     response = {
       locals: {},
     } as jest.Mocked<express.Response>
+    response.status = jest.fn().mockReturnThis()
+    response.setHeader = jest.fn()
+    response.send = jest.fn()
   })
 
   it('should refresh session tokens', async () => {
@@ -51,9 +54,9 @@ describe('SessionController', () => {
       },
     })
 
-    const httpResponse = await createController().refresh(request, response)
+    await createController().refresh(request, response)
 
-    expect(httpResponse.json).toEqual({
+    expect(response.send).toHaveBeenCalledWith({
       session: {
         access_token: '1231',
         refresh_token: '2341',
@@ -61,11 +64,10 @@ describe('SessionController', () => {
         refresh_expiration: 123123,
       },
     })
-    expect(httpResponse.statusCode).toEqual(200)
   })
 
   it('should return bad request if tokens are missing from refresh token request', async () => {
-    const httpResponse = await createController().refresh(request, response)
+    const httpResponse = <results.JsonResult>await createController().refresh(request, response)
     expect(httpResponse.statusCode).toEqual(400)
   })
 
@@ -79,7 +81,7 @@ describe('SessionController', () => {
       errorMessage: 'something bad happened',
     })
 
-    const httpResponse = await createController().refresh(request, response)
+    const httpResponse = <results.JsonResult>await createController().refresh(request, response)
 
     expect(httpResponse.json).toEqual({
       error: {
@@ -101,14 +103,14 @@ describe('SessionController', () => {
     }
     request.body.uuid = '123'
 
-    const httpResponse = await createController().deleteSession(request, response)
+    await createController().deleteSession(request, response)
 
     expect(deleteSessionForUser.execute).toBeCalledWith({
       userUuid: '123',
       sessionUuid: '123',
     })
 
-    expect(httpResponse).toBeInstanceOf(results.StatusCodeResult)
+    expect(response.status).toHaveBeenCalledWith(204)
   })
 
   it('should not delete a specific session is current session has read only access', async () => {
@@ -123,7 +125,7 @@ describe('SessionController', () => {
     request.body.uuid = '123'
     response.locals.readOnlyAccess = true
 
-    const httpResponse = await createController().deleteSession(request, response)
+    const httpResponse = <results.JsonResult>await createController().deleteSession(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(deleteSessionForUser.execute).not.toHaveBeenCalled()
@@ -193,14 +195,15 @@ describe('SessionController', () => {
         uuid: '234',
       },
     }
-    const httpResponse = await createController().deleteAllSessions(request, response)
+    await createController().deleteAllSessions(request, response)
 
     expect(deletePreviousSessionsForUser.execute).toHaveBeenCalledWith({
       userUuid: '123',
       currentSessionUuid: '234',
     })
 
-    expect(httpResponse).toBeInstanceOf(results.StatusCodeResult)
+    expect(response.status).toHaveBeenCalledWith(204)
+    expect(response.send).toHaveBeenCalled()
   })
 
   it('should not delete all sessions if current sessions has read only access', async () => {
@@ -214,7 +217,7 @@ describe('SessionController', () => {
     }
     response.locals.readOnlyAccess = true
 
-    const httpResponse = await createController().deleteAllSessions(request, response)
+    const httpResponse = <results.JsonResult>await createController().deleteAllSessions(request, response)
     const result = await httpResponse.executeAsync()
 
     expect(deletePreviousSessionsForUser.execute).not.toHaveBeenCalled()

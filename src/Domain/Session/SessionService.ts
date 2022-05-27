@@ -19,6 +19,7 @@ import { RevokedSessionRepositoryInterface } from './RevokedSessionRepositoryInt
 import { SettingServiceInterface } from '../Setting/SettingServiceInterface'
 import { LogSessionUserAgentOption, SettingName } from '@standardnotes/settings'
 import { SessionBody } from '@standardnotes/responses'
+import { Uuid } from '@standardnotes/common'
 
 @injectable()
 export class SessionService implements SessionServiceInterface {
@@ -118,7 +119,7 @@ export class SessionService implements SessionServiceInterface {
 
       return osInfo
     } catch (error) {
-      this.logger.warn(`Could not parse operating system info. User agent: ${userAgent}: ${error.message}`)
+      this.logger.warn(`Could not parse operating system info. User agent: ${userAgent}: ${(error as Error).message}`)
 
       return 'Unknown OS'
     }
@@ -139,7 +140,7 @@ export class SessionService implements SessionServiceInterface {
 
       return clientInfo
     } catch (error) {
-      this.logger.warn(`Could not parse browser info. User agent: ${userAgent}: ${error.message}`)
+      this.logger.warn(`Could not parse browser info. User agent: ${userAgent}: ${(error as Error).message}`)
 
       return 'Unknown Client'
     }
@@ -205,13 +206,17 @@ export class SessionService implements SessionServiceInterface {
     return this.revokedSessionRepository.save(revokedSession)
   }
 
-  async deleteSessionByToken(token: string): Promise<void> {
+  async deleteSessionByToken(token: string): Promise<Uuid | null> {
     const session = await this.getSessionFromToken(token)
 
     if (session) {
       await this.sessionRepository.deleteOneByUuid(session.uuid)
       await this.ephemeralSessionRepository.deleteOne(session.uuid, session.userUuid)
+
+      return session.userUuid
     }
+
+    return null
   }
 
   async createRevokedSession(session: Session): Promise<RevokedSession> {
