@@ -339,7 +339,7 @@ export class ContainerConfigLoader {
     container.bind(TYPES.JWT_SECRET).toConstantValue(env.get('JWT_SECRET'))
     container.bind(TYPES.LEGACY_JWT_SECRET).toConstantValue(env.get('LEGACY_JWT_SECRET'))
     container.bind(TYPES.AUTH_JWT_SECRET).toConstantValue(env.get('AUTH_JWT_SECRET'))
-    container.bind(TYPES.AUTH_JWT_TTL).toConstantValue(env.get('AUTH_JWT_TTL'))
+    container.bind(TYPES.AUTH_JWT_TTL).toConstantValue(+env.get('AUTH_JWT_TTL'))
     container.bind(TYPES.VALET_TOKEN_SECRET).toConstantValue(env.get('VALET_TOKEN_SECRET', true))
     container.bind(TYPES.VALET_TOKEN_TTL).toConstantValue(+env.get('VALET_TOKEN_TTL', true))
     container.bind(TYPES.ENCRYPTION_SERVER_KEY).toConstantValue(env.get('ENCRYPTION_SERVER_KEY'))
