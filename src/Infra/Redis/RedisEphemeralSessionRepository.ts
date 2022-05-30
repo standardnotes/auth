@@ -8,6 +8,7 @@ import { EphemeralSessionRepositoryInterface } from '../../Domain/Session/Epheme
 @injectable()
 export class RedisEphemeralSessionRepository implements EphemeralSessionRepositoryInterface {
   private readonly PREFIX = 'session'
+  private readonly USER_SESSIONS_PREFIX = 'user-sessions'
 
   constructor(
     @inject(TYPES.Redis) private redisClient: IORedis.Redis,
@@ -15,8 +16,13 @@ export class RedisEphemeralSessionRepository implements EphemeralSessionReposito
   ) {}
 
   async deleteOne(uuid: string, userUuid: string): Promise<void> {
-    await this.redisClient.del(`${this.PREFIX}:${uuid}`)
-    await this.redisClient.del(`${this.PREFIX}:${uuid}:${userUuid}`)
+    const pipeline = this.redisClient.pipeline()
+
+    pipeline.del(`${this.PREFIX}:${uuid}`)
+    pipeline.del(`${this.PREFIX}:${uuid}:${userUuid}`)
+    pipeline.srem(`${this.USER_SESSIONS_PREFIX}:${userUuid}`, uuid)
+
+    await pipeline.exec()
   }
 
   async updateTokensAndExpirationDates(
@@ -40,22 +46,17 @@ export class RedisEphemeralSessionRepository implements EphemeralSessionReposito
   }
 
   async findAllByUserUuid(userUuid: string): Promise<Array<EphemeralSession>> {
-    let cursor = '0'
-    let sessionKeys: Array<string> = []
-    do {
-      const scanResult = await this.redisClient.scan(cursor, 'MATCH', `${this.PREFIX}:*:${userUuid}`)
+    const ephemeralSessionUuids = await this.redisClient.smembers(`${this.USER_SESSIONS_PREFIX}:${userUuid}`)
 
-      cursor = scanResult[0]
-      sessionKeys = sessionKeys.concat(scanResult[1])
-    } while (cursor !== '0')
-
-    if (!sessionKeys.length) {
-      return []
+    const sessions = []
+    for (const ephemeralSessionUuid of ephemeralSessionUuids) {
+      const stringifiedSession = await this.redisClient.get(`${this.PREFIX}:${ephemeralSessionUuid}`)
+      if (stringifiedSession !== null) {
+        sessions.push(JSON.parse(stringifiedSession))
+      }
     }
 
-    const sessions = await this.redisClient.mget(sessionKeys)
-
-    return (<string[]>sessions.filter((value) => value)).map((stringifiedSession) => JSON.parse(stringifiedSession))
+    return sessions
   }
 
   async findOneByUuid(uuid: string): Promise<EphemeralSession | null> {
@@ -77,14 +78,18 @@ export class RedisEphemeralSessionRepository implements EphemeralSessionReposito
   }
 
   async save(ephemeralSession: EphemeralSession): Promise<void> {
-    const bySessionAndUserKey = `${this.PREFIX}:${ephemeralSession.uuid}:${ephemeralSession.userUuid}`
-    const bySessionKey = `${this.PREFIX}:${ephemeralSession.uuid}`
-
     const ttl = this.ephemeralSessionAge
 
     const stringifiedSession = JSON.stringify(ephemeralSession)
 
-    await this.redisClient.setex(bySessionAndUserKey, ttl, stringifiedSession)
-    await this.redisClient.setex(bySessionKey, ttl, stringifiedSession)
+    const pipeline = this.redisClient.pipeline()
+
+    pipeline.setex(`${this.PREFIX}:${ephemeralSession.uuid}:${ephemeralSession.userUuid}`, ttl, stringifiedSession)
+    pipeline.setex(`${this.PREFIX}:${ephemeralSession.uuid}`, ttl, stringifiedSession)
+
+    pipeline.sadd(`${this.USER_SESSIONS_PREFIX}:${ephemeralSession.userUuid}`, ephemeralSession.uuid)
+    pipeline.expire(`${this.USER_SESSIONS_PREFIX}:${ephemeralSession.userUuid}`, ttl)
+
+    await pipeline.exec()
   }
 }
