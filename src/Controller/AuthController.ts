@@ -275,7 +275,7 @@ export class AuthController extends BaseHttpController {
     const userUuid = await this.sessionService.deleteSessionByToken(authorizationHeader.replace('Bearer ', ''))
 
     if (userUuid !== null) {
-      response.setHeader('X-Invalidate-Cache', userUuid)
+      response.setHeader('x-invalidate-cache', userUuid)
     }
     response.status(204).send()
   }

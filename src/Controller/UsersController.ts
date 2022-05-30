@@ -75,7 +75,7 @@ export class UsersController extends BaseHttpController {
     })
 
     if (updateResult.success) {
-      response.setHeader('X-Invalidate-Cache', response.locals.user.uuid)
+      response.setHeader('x-invalidate-cache', response.locals.user.uuid)
       response.send(updateResult.authResponse)
 
       return
@@ -225,7 +225,7 @@ export class UsersController extends BaseHttpController {
 
     await this.clearLoginAttempts.execute({ email: response.locals.user.email })
 
-    response.setHeader('X-Invalidate-Cache', response.locals.user.uuid)
+    response.setHeader('x-invalidate-cache', response.locals.user.uuid)
     response.send(changeCredentialsResult.authResponse)
   }
 }

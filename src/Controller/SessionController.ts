@@ -76,7 +76,7 @@ export class SessionController extends BaseHttpController {
       )
     }
 
-    response.setHeader('X-Invalidate-Cache', response.locals.user.uuid)
+    response.setHeader('x-invalidate-cache', response.locals.user.uuid)
     response.status(204).send()
   }
 
@@ -110,7 +110,7 @@ export class SessionController extends BaseHttpController {
       currentSessionUuid: response.locals.session.uuid,
     })
 
-    response.setHeader('X-Invalidate-Cache', response.locals.user.uuid)
+    response.setHeader('x-invalidate-cache', response.locals.user.uuid)
     response.status(204).send()
   }
 
@@ -144,7 +144,7 @@ export class SessionController extends BaseHttpController {
       )
     }
 
-    response.setHeader('X-Invalidate-Cache', result.userUuid as string)
+    response.setHeader('x-invalidate-cache', result.userUuid as string)
     response.send({
       session: result.sessionPayload,
     })
