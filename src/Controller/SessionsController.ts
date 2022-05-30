@@ -105,6 +105,8 @@ export class SessionsController extends BaseHttpController {
     updated_at: string
     device_info: string
     readonly_access: boolean
+    access_expiration: string
+    refresh_expiration: string
   } {
     return <
       {
@@ -114,6 +116,8 @@ export class SessionsController extends BaseHttpController {
         updated_at: string
         device_info: string
         readonly_access: boolean
+        access_expiration: string
+        refresh_expiration: string
       }
     >this.sessionProjector.projectSimple(session)
   }
