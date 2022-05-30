@@ -1,5 +1,5 @@
+import { TimerInterface } from '@standardnotes/time'
 import { inject, injectable } from 'inversify'
-import * as dayjs from 'dayjs'
 import TYPES from '../Bootstrap/Types'
 
 import { Session } from '../Domain/Session/Session'
@@ -10,16 +10,21 @@ import { ProjectorInterface } from './ProjectorInterface'
 export class SessionProjector implements ProjectorInterface<Session> {
   static readonly CURRENT_SESSION_PROJECTION = 'CURRENT_SESSION_PROJECTION'
 
-  constructor(@inject(TYPES.SessionService) private sessionService: SessionServiceInterface) {}
+  constructor(
+    @inject(TYPES.SessionService) private sessionService: SessionServiceInterface,
+    @inject(TYPES.Timer) private timer: TimerInterface,
+  ) {}
 
   projectSimple(session: Session): Record<string, unknown> {
     return {
       uuid: session.uuid,
       api_version: session.apiVersion,
-      created_at: dayjs.utc(session.createdAt).toISOString(),
-      updated_at: dayjs.utc(session.updatedAt).toISOString(),
+      created_at: this.timer.convertDateToISOString(session.createdAt),
+      updated_at: this.timer.convertDateToISOString(session.updatedAt),
       device_info: this.sessionService.getDeviceInfo(session),
       readonly_access: session.readonlyAccess,
+      access_expiration: this.timer.convertDateToISOString(session.accessExpiration),
+      refresh_expiration: this.timer.convertDateToISOString(session.refreshExpiration),
     }
   }
 
@@ -29,8 +34,8 @@ export class SessionProjector implements ProjectorInterface<Session> {
         return {
           uuid: session.uuid,
           api_version: session.apiVersion,
-          created_at: dayjs.utc(session.createdAt).toISOString(),
-          updated_at: dayjs.utc(session.updatedAt).toISOString(),
+          created_at: this.timer.convertDateToISOString(session.createdAt),
+          updated_at: this.timer.convertDateToISOString(session.updatedAt),
           device_info: this.sessionService.getDeviceInfo(session),
           current: session.uuid === currentSession.uuid,
           readonly_access: session.readonlyAccess,

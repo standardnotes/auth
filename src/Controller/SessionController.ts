@@ -25,7 +25,7 @@ export class SessionController extends BaseHttpController {
   }
 
   @httpDelete('/', TYPES.AuthMiddleware, TYPES.SessionMiddleware)
-  async deleteSession(request: Request, response: Response): Promise<results.JsonResult | results.StatusCodeResult> {
+  async deleteSession(request: Request, response: Response): Promise<results.JsonResult | void> {
     if (response.locals.readOnlyAccess) {
       return this.json(
         {
@@ -76,14 +76,12 @@ export class SessionController extends BaseHttpController {
       )
     }
 
-    return this.statusCode(204)
+    response.setHeader('x-invalidate-cache', response.locals.user.uuid)
+    response.status(204).send()
   }
 
   @httpDelete('/all', TYPES.AuthMiddleware, TYPES.SessionMiddleware)
-  async deleteAllSessions(
-    _request: Request,
-    response: Response,
-  ): Promise<results.JsonResult | results.StatusCodeResult> {
+  async deleteAllSessions(_request: Request, response: Response): Promise<results.JsonResult | void> {
     if (response.locals.readOnlyAccess) {
       return this.json(
         {
@@ -112,11 +110,12 @@ export class SessionController extends BaseHttpController {
       currentSessionUuid: response.locals.session.uuid,
     })
 
-    return this.statusCode(204)
+    response.setHeader('x-invalidate-cache', response.locals.user.uuid)
+    response.status(204).send()
   }
 
   @httpPost('/refresh')
-  async refresh(request: Request, _response: Response): Promise<results.JsonResult> {
+  async refresh(request: Request, response: Response): Promise<results.JsonResult | void> {
     if (!request.body.access_token || !request.body.refresh_token) {
       return this.json(
         {
@@ -145,7 +144,8 @@ export class SessionController extends BaseHttpController {
       )
     }
 
-    return this.json({
+    response.setHeader('x-invalidate-cache', result.userUuid as string)
+    response.send({
       session: result.sessionPayload,
     })
   }

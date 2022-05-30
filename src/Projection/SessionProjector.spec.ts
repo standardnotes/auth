@@ -1,16 +1,17 @@
 import 'reflect-metadata'
-import * as dayjs from 'dayjs'
 
 import { SessionServiceInterface } from '../Domain/Session/SessionServiceInterface'
 import { SessionProjector } from './SessionProjector'
 import { Session } from '../Domain/Session/Session'
+import { TimerInterface } from '@standardnotes/time'
 
 describe('SessionProjector', () => {
   let session: Session
   let currentSession: Session
   let sessionService: SessionServiceInterface
+  let timer: TimerInterface
 
-  const createProjector = () => new SessionProjector(sessionService)
+  const createProjector = () => new SessionProjector(sessionService, timer)
 
   beforeEach(() => {
     session = new Session()
@@ -18,8 +19,10 @@ describe('SessionProjector', () => {
     session.hashedAccessToken = 'hashed access token'
     session.userUuid = '234'
     session.apiVersion = '004'
-    session.createdAt = dayjs.utc('2020-11-26 13:34').toDate()
-    session.updatedAt = dayjs.utc('2020-11-26 13:34').toDate()
+    session.createdAt = new Date(1)
+    session.updatedAt = new Date(1)
+    session.accessExpiration = new Date(1)
+    session.refreshExpiration = new Date(1)
     session.readonlyAccess = false
 
     currentSession = new Session()
@@ -27,6 +30,9 @@ describe('SessionProjector', () => {
 
     sessionService = {} as jest.Mocked<SessionServiceInterface>
     sessionService.getDeviceInfo = jest.fn().mockReturnValue('Some Device Info')
+
+    timer = {} as jest.Mocked<TimerInterface>
+    timer.convertDateToISOString = jest.fn().mockReturnValue('2020-11-26T13:34:00.000Z')
   })
 
   it('should create a simple projection of a session', () => {
@@ -38,6 +44,8 @@ describe('SessionProjector', () => {
       updated_at: '2020-11-26T13:34:00.000Z',
       device_info: 'Some Device Info',
       readonly_access: false,
+      access_expiration: '2020-11-26T13:34:00.000Z',
+      refresh_expiration: '2020-11-26T13:34:00.000Z',
     })
   })
 
@@ -86,7 +94,7 @@ describe('SessionProjector', () => {
     } catch (e) {
       error = e
     }
-    expect(error.message).toEqual('Not supported projection type: test')
+    expect((error as Error).message).toEqual('Not supported projection type: test')
   })
 
   it('should throw error on not implemetned full projection', () => {
@@ -96,6 +104,6 @@ describe('SessionProjector', () => {
     } catch (e) {
       error = e
     }
-    expect(error.message).toEqual('not implemented')
+    expect((error as Error).message).toEqual('not implemented')
   })
 })

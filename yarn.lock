@@ -894,10 +894,10 @@
     "@standardnotes/common" "^1.22.0"
     jsonwebtoken "^8.5.1"
 
-"@standardnotes/auth@^3.19.1":
-  version "3.19.1"
-  resolved "https://registry.yarnpkg.com/@standardnotes/auth/-/auth-3.19.1.tgz#09b1bf2a7c22bfb351b3f5af5a193566bfe4410c"
-  integrity sha512-ozzCan/uSdN8oQ2YSid5kVGts+13f63eKMyuiGesS1a/l0ezKWJHaFa3ulXETobhjJEF60yNQIjQ7sfdv+4L9A==
+"@standardnotes/auth@^3.19.2":
+  version "3.19.2"
+  resolved "https://registry.yarnpkg.com/@standardnotes/auth/-/auth-3.19.2.tgz#a2758cdde588190eebd30e567fe7756c6823adcd"
+  integrity sha512-m7MvSN2BHHh8+FZ3tUe6IpoPGzu/I1lmQF8snlYfuBmSxVdwVLTYhIbFAjfi4PST/Rx3FXnaoMnfJSR0k+OmWw==
   dependencies:
     "@standardnotes/common" "^1.22.0"
     jsonwebtoken "^8.5.1"

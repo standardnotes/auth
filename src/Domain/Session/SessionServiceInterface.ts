@@ -1,3 +1,4 @@
+import { Uuid } from '@standardnotes/common'
 import { SessionBody } from '@standardnotes/responses'
 import { User } from '../User/User'
 import { RevokedSession } from './RevokedSession'
@@ -20,7 +21,7 @@ export interface SessionServiceInterface {
   getSessionFromToken(token: string): Promise<Session | undefined>
   getRevokedSessionFromToken(token: string): Promise<RevokedSession | null>
   markRevokedSessionAsReceived(revokedSession: RevokedSession): Promise<RevokedSession>
-  deleteSessionByToken(token: string): Promise<void>
+  deleteSessionByToken(token: string): Promise<Uuid | null>
   isRefreshTokenValid(session: Session, token: string): boolean
   getDeviceInfo(session: Session): string
   getOperatingSystemInfoFromUserAgent(userAgent: string): string

@@ -77,6 +77,10 @@ describe('UsersController', () => {
     response = {
       locals: {},
     } as jest.Mocked<express.Response>
+
+    response.status = jest.fn().mockReturnThis()
+    response.setHeader = jest.fn()
+    response.send = jest.fn()
   })
 
   it('should update user', async () => {
@@ -89,8 +93,7 @@ describe('UsersController', () => {
 
     updateUser.execute = jest.fn().mockReturnValue({ success: true, authResponse: { foo: 'bar' } })
 
-    const httpResponse = <results.JsonResult>await createController().update(request, response)
-    const result = await httpResponse.executeAsync()
+    await createController().update(request, response)
 
     expect(updateUser.execute).toHaveBeenCalledWith({
       apiVersion: '20190520',
@@ -103,8 +106,7 @@ describe('UsersController', () => {
       },
     })
 
-    expect(result.statusCode).toEqual(200)
-    expect(await result.content.readAsStringAsync()).toEqual('{"foo":"bar"}')
+    expect(response.send).toHaveBeenCalledWith({ foo: 'bar' })
   })
 
   it('should not update user if session has read only access', async () => {
@@ -302,8 +304,7 @@ describe('UsersController', () => {
 
     changeCredentials.execute = jest.fn().mockReturnValue({ success: true, authResponse: { foo: 'bar' } })
 
-    const httpResponse = <results.JsonResult>await createController().changeCredentials(request, response)
-    const result = await httpResponse.executeAsync()
+    await createController().changeCredentials(request, response)
 
     expect(changeCredentials.execute).toHaveBeenCalledWith({
       apiVersion: '20190520',
@@ -322,8 +323,7 @@ describe('UsersController', () => {
 
     expect(clearLoginAttempts.execute).toHaveBeenCalled()
 
-    expect(result.statusCode).toEqual(200)
-    expect(await result.content.readAsStringAsync()).toEqual('{"foo":"bar"}')
+    expect(response.send).toHaveBeenCalledWith({ foo: 'bar' })
   })
 
   it('should not change a password if session has read only access', async () => {
