@@ -178,6 +178,7 @@ const TYPES = {
   ProtocolVersionSelector: Symbol.for('ProtocolVersionSelector'),
   BooleanSelector: Symbol.for('BooleanSelector'),
   UserSubscriptionService: Symbol.for('UserSubscriptionService'),
+  AnalyticsStore: Symbol.for('AnalyticsStore'),
 }
 
 export default TYPES
