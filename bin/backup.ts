@@ -7,6 +7,7 @@ import { Stream } from 'stream'
 import { Logger } from 'winston'
 import * as dayjs from 'dayjs'
 import * as utc from 'dayjs/plugin/utc'
+import { AnalyticsActivity, AnalyticsStoreInterface } from '@standardnotes/analytics'
 
 import { ContainerConfigLoader } from '../src/Bootstrap/Container'
 import TYPES from '../src/Bootstrap/Types'
@@ -18,6 +19,7 @@ import { MuteFailedBackupsEmailsOption, MuteFailedCloudBackupsEmailsOption, Sett
 import { RoleServiceInterface } from '../src/Domain/Role/RoleServiceInterface'
 import { PermissionName } from '@standardnotes/features'
 import { SettingServiceInterface } from '../src/Domain/Setting/SettingServiceInterface'
+import { AnalyticsEntityRepositoryInterface } from '../src/Domain/Analytics/AnalyticsEntityRepositoryInterface'
 
 const inputArgs = process.argv.slice(2)
 const backupProvider = inputArgs[0]
@@ -29,6 +31,8 @@ const requestBackups = async (
   settingService: SettingServiceInterface,
   domainEventFactory: DomainEventFactoryInterface,
   domainEventPublisher: DomainEventPublisherInterface,
+  analyticsEntityRepository: AnalyticsEntityRepositoryInterface,
+  analyticsStore: AnalyticsStoreInterface,
 ): Promise<void> => {
   let settingName: SettingName,
     permissionName: PermissionName,
@@ -95,6 +99,13 @@ const requestBackups = async (
             }
 
             if (backupProvider === 'email') {
+              const analyticsEntity = await analyticsEntityRepository.findOneByUserUuid(setting.setting_user_uuid)
+              if (analyticsEntity === null) {
+                callback()
+
+                return
+              }
+
               await domainEventPublisher.publish(
                 domainEventFactory.createEmailBackupRequestedEvent(
                   setting.setting_user_uuid,
@@ -102,6 +113,9 @@ const requestBackups = async (
                   userHasEmailsMuted,
                 ),
               )
+
+              await analyticsStore.markActivity(AnalyticsActivity.EmailBackup, analyticsEntity.id)
+
               callback()
 
               return
@@ -151,9 +165,19 @@ void container.load().then((container) => {
   const settingService: SettingServiceInterface = container.get(TYPES.SettingService)
   const domainEventFactory: DomainEventFactoryInterface = container.get(TYPES.DomainEventFactory)
   const domainEventPublisher: DomainEventPublisherInterface = container.get(TYPES.DomainEventPublisher)
+  const analyticsEntityRepository: AnalyticsEntityRepositoryInterface = container.get(TYPES.AnalyticsEntityRepository)
+  const analyticsStore: AnalyticsStoreInterface = container.get(TYPES.AnalyticsStore)
 
   Promise.resolve(
-    requestBackups(settingRepository, roleService, settingService, domainEventFactory, domainEventPublisher),
+    requestBackups(
+      settingRepository,
+      roleService,
+      settingService,
+      domainEventFactory,
+      domainEventPublisher,
+      analyticsEntityRepository,
+      analyticsStore,
+    ),
   )
     .then(() => {
       logger.info(`${backupFrequency} ${backupProvider} backup requesting complete`)
