@@ -878,10 +878,10 @@
   resolved "https://registry.yarnpkg.com/@sqltools/formatter/-/formatter-1.2.3.tgz#1185726610acc37317ddab11c3c7f9066966bd20"
   integrity sha512-O3uyB/JbkAEMZaP3YqyHH7TMnex7tWyCbCI4EfJdOCoN6HIhqdJBWTM6aCCiWQ/5f5wxjgU735QAIpJbjDvmzg==
 
-"@standardnotes/analytics@^1.4.1":
-  version "1.4.1"
-  resolved "https://registry.yarnpkg.com/@standardnotes/analytics/-/analytics-1.4.1.tgz#72a274d6c57b7fad0f5147dc189edc1daa0168eb"
-  integrity sha512-fnrWDx9RMH6iJvw8ECWh40OGQ7J++kiDlxjOp1mYdmED+goM7YDPSJwKkWUunNF+NSR0iiXKBfERWkIYFXjp0A==
+"@standardnotes/analytics@^1.5.0":
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/@standardnotes/analytics/-/analytics-1.5.0.tgz#122489eb1ace4974e5ac325fad17add8df98438f"
+  integrity sha512-erCwFYr73tVQ4MvN5/gAUqfXa8ye0eu/ogXWNvKsc9igU9HS0nU78xBLQjkRDpItxeasDOKKVRXa4Gi3CaLhfg==
 
 "@standardnotes/auth@^3.18.12":
   version "3.18.12"

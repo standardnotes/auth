@@ -25,6 +25,47 @@ const inputArgs = process.argv.slice(2)
 const backupProvider = inputArgs[0]
 const backupFrequency = inputArgs[1]
 
+const shouldEmailBackupBeTriggered = async (
+  analyticsId: number,
+  analyticsStore: AnalyticsStoreInterface,
+): Promise<boolean> => {
+  if (backupFrequency === 'daily') {
+    const wasUnBackedUpDataCreatedYesterday = await analyticsStore.wasActivityDoneYesterday(
+      AnalyticsActivity.EmailUnbackedUpData,
+      analyticsId,
+    )
+    if (wasUnBackedUpDataCreatedYesterday) {
+      return true
+    }
+
+    const wasUnBackedUpDataCreatedToday = await analyticsStore.wasActivityDoneToday(
+      AnalyticsActivity.EmailUnbackedUpData,
+      analyticsId,
+    )
+    if (wasUnBackedUpDataCreatedToday) {
+      return true
+    }
+  } else if (backupFrequency === 'weekly') {
+    const wasUnBackedUpDataCreatedLastWeek = await analyticsStore.wasActivityDoneLastWeek(
+      AnalyticsActivity.EmailUnbackedUpData,
+      analyticsId,
+    )
+    if (wasUnBackedUpDataCreatedLastWeek) {
+      return true
+    }
+
+    const wasUnBackedUpDataCreatedThisWeek = await analyticsStore.wasActivityDoneThisWeek(
+      AnalyticsActivity.EmailUnbackedUpData,
+      analyticsId,
+    )
+    if (wasUnBackedUpDataCreatedThisWeek) {
+      return true
+    }
+  }
+
+  return false
+}
+
 const requestBackups = async (
   settingRepository: SettingRepositoryInterface,
   roleService: RoleServiceInterface,
@@ -106,6 +147,16 @@ const requestBackups = async (
                 return
               }
 
+              const emailBackupsShouldBeTriggered = await shouldEmailBackupBeTriggered(
+                analyticsEntity.id,
+                analyticsStore,
+              )
+              if (!emailBackupsShouldBeTriggered) {
+                callback()
+
+                return
+              }
+
               await domainEventPublisher.publish(
                 domainEventFactory.createEmailBackupRequestedEvent(
                   setting.setting_user_uuid,
@@ -114,7 +165,7 @@ const requestBackups = async (
                 ),
               )
 
-              await analyticsStore.markActivity(AnalyticsActivity.EmailBackup, analyticsEntity.id)
+              await analyticsStore.markActivityForToday(AnalyticsActivity.EmailBackup, analyticsEntity.id)
 
               callback()
 
