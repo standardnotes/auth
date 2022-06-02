@@ -7,7 +7,7 @@ import { Stream } from 'stream'
 import { Logger } from 'winston'
 import * as dayjs from 'dayjs'
 import * as utc from 'dayjs/plugin/utc'
-import { AnalyticsActivity, AnalyticsStoreInterface } from '@standardnotes/analytics'
+import { AnalyticsActivity, AnalyticsStoreInterface, Period } from '@standardnotes/analytics'
 
 import { ContainerConfigLoader } from '../src/Bootstrap/Container'
 import TYPES from '../src/Bootstrap/Types'
@@ -29,36 +29,18 @@ const shouldEmailBackupBeTriggered = async (
   analyticsId: number,
   analyticsStore: AnalyticsStoreInterface,
 ): Promise<boolean> => {
-  if (backupFrequency === 'daily') {
-    const wasUnBackedUpDataCreatedYesterday = await analyticsStore.wasActivityDoneYesterday(
-      AnalyticsActivity.EmailUnbackedUpData,
-      analyticsId,
-    )
-    if (wasUnBackedUpDataCreatedYesterday) {
-      return true
-    }
+  let periods = [Period.Today, Period.Yesterday]
+  if (backupFrequency === 'weekly') {
+    periods = [Period.ThisWeek, Period.LastWeek]
+  }
 
-    const wasUnBackedUpDataCreatedToday = await analyticsStore.wasActivityDoneToday(
+  for (const period of periods) {
+    const wasUnBackedUpDataCreatedInPeriod = await analyticsStore.wasActivityDone(
       AnalyticsActivity.EmailUnbackedUpData,
       analyticsId,
+      period,
     )
-    if (wasUnBackedUpDataCreatedToday) {
-      return true
-    }
-  } else if (backupFrequency === 'weekly') {
-    const wasUnBackedUpDataCreatedLastWeek = await analyticsStore.wasActivityDoneLastWeek(
-      AnalyticsActivity.EmailUnbackedUpData,
-      analyticsId,
-    )
-    if (wasUnBackedUpDataCreatedLastWeek) {
-      return true
-    }
-
-    const wasUnBackedUpDataCreatedThisWeek = await analyticsStore.wasActivityDoneThisWeek(
-      AnalyticsActivity.EmailUnbackedUpData,
-      analyticsId,
-    )
-    if (wasUnBackedUpDataCreatedThisWeek) {
+    if (wasUnBackedUpDataCreatedInPeriod) {
       return true
     }
   }
@@ -165,7 +147,14 @@ const requestBackups = async (
                 ),
               )
 
-              await analyticsStore.markActivityForToday(AnalyticsActivity.EmailBackup, analyticsEntity.id)
+              await analyticsStore.markActivity([AnalyticsActivity.EmailBackup], analyticsEntity.id, [
+                Period.Today,
+                Period.ThisWeek,
+              ])
+              await analyticsStore.unmarkActivity([AnalyticsActivity.EmailUnbackedUpData], analyticsEntity.id, [
+                Period.Today,
+                Period.ThisWeek,
+              ])
 
               callback()
 
