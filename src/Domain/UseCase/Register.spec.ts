@@ -1,7 +1,6 @@
 import 'reflect-metadata'
 import { TimerInterface } from '@standardnotes/time'
-import { AuthResponseFactoryInterface } from '../Auth/AuthResponseFactoryInterface'
-import { AuthResponseFactoryResolverInterface } from '../Auth/AuthResponseFactoryResolverInterface'
+
 import { CrypterInterface } from '../Encryption/CrypterInterface'
 import { Role } from '../Role/Role'
 import { RoleRepositoryInterface } from '../Role/RoleRepositoryInterface'
@@ -11,12 +10,12 @@ import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { Register } from './Register'
 import { SettingServiceInterface } from '../Setting/SettingServiceInterface'
 import { AnalyticsEntityRepositoryInterface } from '../Analytics/AnalyticsEntityRepositoryInterface'
+import { AuthResponseFactory20200115 } from '../Auth/AuthResponseFactory20200115'
 
 describe('Register', () => {
   let userRepository: UserRepositoryInterface
   let roleRepository: RoleRepositoryInterface
-  let authResponseFactoryResolver: AuthResponseFactoryResolverInterface
-  let authResponseFactory: AuthResponseFactoryInterface
+  let authResponseFactory: AuthResponseFactory20200115
   let settingService: SettingServiceInterface
   let user: User
   let crypter: CrypterInterface
@@ -27,7 +26,7 @@ describe('Register', () => {
     new Register(
       userRepository,
       roleRepository,
-      authResponseFactoryResolver,
+      authResponseFactory,
       crypter,
       false,
       settingService,
@@ -43,11 +42,8 @@ describe('Register', () => {
     roleRepository = {} as jest.Mocked<RoleRepositoryInterface>
     roleRepository.findOneByName = jest.fn().mockReturnValue(null)
 
-    authResponseFactory = {} as jest.Mocked<AuthResponseFactoryInterface>
+    authResponseFactory = {} as jest.Mocked<AuthResponseFactory20200115>
     authResponseFactory.createResponse = jest.fn().mockReturnValue({ foo: 'bar' })
-
-    authResponseFactoryResolver = {} as jest.Mocked<AuthResponseFactoryResolverInterface>
-    authResponseFactoryResolver.resolveAuthResponseFactoryVersion = jest.fn().mockReturnValue(authResponseFactory)
 
     crypter = {} as jest.Mocked<CrypterInterface>
     crypter.generateEncryptedUserServerKey = jest.fn().mockReturnValue('test')
@@ -70,7 +66,7 @@ describe('Register', () => {
         email: 'test@test.te',
         password: 'asdzxc',
         updatedWithUserAgent: 'Mozilla',
-        apiVersion: '20190520',
+        apiVersion: '20200115',
         ephemeralSession: false,
         version: '004',
         pwCost: 11,
@@ -109,7 +105,7 @@ describe('Register', () => {
         email: 'test@test.te',
         password: 'asdzxc',
         updatedWithUserAgent: 'Mozilla',
-        apiVersion: '20190520',
+        apiVersion: '20200115',
         ephemeralSession: false,
         version: '004',
         pwCost: 11,
@@ -143,7 +139,7 @@ describe('Register', () => {
         email: 'test@test.te',
         password: 'asdzxc',
         updatedWithUserAgent: 'Mozilla',
-        apiVersion: '20190520',
+        apiVersion: '20200115',
         ephemeralSession: false,
         version: '004',
         pwCost: 11,
@@ -158,6 +154,27 @@ describe('Register', () => {
     expect(userRepository.save).not.toHaveBeenCalled()
   })
 
+  it('should fail to register for legacy api versions', async () => {
+    expect(
+      await createUseCase().execute({
+        email: 'test@test.te',
+        password: 'asdzxc',
+        updatedWithUserAgent: 'Mozilla',
+        apiVersion: '20190520',
+        ephemeralSession: false,
+        version: '004',
+        pwCost: 11,
+        pwSalt: 'qweqwe',
+        pwNonce: undefined,
+      }),
+    ).toEqual({
+      success: false,
+      errorMessage: 'Unsupported api version: 20190520',
+    })
+
+    expect(userRepository.save).not.toHaveBeenCalled()
+  })
+
   it('should fail to register if a registration is disabled', async () => {
     userRepository.findOneByEmail = jest.fn().mockReturnValue(user)
 
@@ -165,7 +182,7 @@ describe('Register', () => {
       await new Register(
         userRepository,
         roleRepository,
-        authResponseFactoryResolver,
+        authResponseFactory,
         crypter,
         true,
         settingService,
@@ -175,7 +192,7 @@ describe('Register', () => {
         email: 'test@test.te',
         password: 'asdzxc',
         updatedWithUserAgent: 'Mozilla',
-        apiVersion: '20190520',
+        apiVersion: '20200115',
         version: '004',
         ephemeralSession: false,
         pwCost: 11,

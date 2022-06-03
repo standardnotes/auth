@@ -4,13 +4,10 @@ export type RegisterDTO = {
   updatedWithUserAgent: string
   apiVersion: string
   ephemeralSession: boolean
-  pwFunc?: string
-  pwAlg?: string
   pwCost?: number
-  pwKeySize?: number
   pwNonce?: string
   pwSalt?: string
   kpOrigination?: string
-  kpCreated?: Date
+  kpCreated?: string
   version?: string
 }

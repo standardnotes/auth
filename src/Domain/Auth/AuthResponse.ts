@@ -1,3 +1,8 @@
+import { Uuid } from '@standardnotes/common'
+
 export interface AuthResponse {
-  user: Record<string, unknown>
+  user: {
+    uuid: Uuid
+    email: string
+  }
 }

@@ -1,5 +1,6 @@
 import * as bcrypt from 'bcryptjs'
 import { RoleName } from '@standardnotes/common'
+import { ApiVersion } from '@standardnotes/api'
 
 import { v4 as uuidv4 } from 'uuid'
 import { inject, injectable } from 'inversify'
@@ -9,21 +10,21 @@ import { UserRepositoryInterface } from '../User/UserRepositoryInterface'
 import { RegisterDTO } from './RegisterDTO'
 import { RegisterResponse } from './RegisterResponse'
 import { UseCaseInterface } from './UseCaseInterface'
-import { AuthResponseFactoryResolverInterface } from '../Auth/AuthResponseFactoryResolverInterface'
 import { RoleRepositoryInterface } from '../Role/RoleRepositoryInterface'
 import { CrypterInterface } from '../Encryption/CrypterInterface'
 import { TimerInterface } from '@standardnotes/time'
 import { SettingServiceInterface } from '../Setting/SettingServiceInterface'
 import { AnalyticsEntityRepositoryInterface } from '../Analytics/AnalyticsEntityRepositoryInterface'
 import { AnalyticsEntity } from '../Analytics/AnalyticsEntity'
+import { AuthResponseFactory20200115 } from '../Auth/AuthResponseFactory20200115'
+import { AuthResponse20200115 } from '../Auth/AuthResponse20200115'
 
 @injectable()
 export class Register implements UseCaseInterface {
   constructor(
     @inject(TYPES.UserRepository) private userRepository: UserRepositoryInterface,
     @inject(TYPES.RoleRepository) private roleRepository: RoleRepositoryInterface,
-    @inject(TYPES.AuthResponseFactoryResolver)
-    private authResponseFactoryResolver: AuthResponseFactoryResolverInterface,
+    @inject(TYPES.AuthResponseFactory20200115) private authResponseFactory20200115: AuthResponseFactory20200115,
     @inject(TYPES.Crypter) private crypter: CrypterInterface,
     @inject(TYPES.DISABLE_USER_REGISTRATION) private disableUserRegistration: boolean,
     @inject(TYPES.SettingService) private settingService: SettingServiceInterface,
@@ -40,6 +41,13 @@ export class Register implements UseCaseInterface {
     }
 
     const { email, password, apiVersion, ephemeralSession, ...registrationFields } = dto
+
+    if (apiVersion !== ApiVersion.v0) {
+      return {
+        success: false,
+        errorMessage: `Unsupported api version: ${apiVersion}`,
+      }
+    }
 
     const existingUser = await this.userRepository.findOneByEmail(email)
     if (existingUser) {
@@ -73,17 +81,15 @@ export class Register implements UseCaseInterface {
     analyticsEntity.user = Promise.resolve(user)
     await this.analyticsEntityRepository.save(analyticsEntity)
 
-    const authResponseFactory = this.authResponseFactoryResolver.resolveAuthResponseFactoryVersion(apiVersion)
-
     return {
       success: true,
-      authResponse: await authResponseFactory.createResponse({
+      authResponse: (await this.authResponseFactory20200115.createResponse({
         user,
         apiVersion,
         userAgent: dto.updatedWithUserAgent,
         ephemeralSession,
         readonlyAccess: false,
-      }),
+      })) as AuthResponse20200115,
     }
   }
 }

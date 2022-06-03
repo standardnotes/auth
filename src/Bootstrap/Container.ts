@@ -187,6 +187,7 @@ import { AnalyticsEntity } from '../Domain/Analytics/AnalyticsEntity'
 import { AnalyticsEntityRepositoryInterface } from '../Domain/Analytics/AnalyticsEntityRepositoryInterface'
 import { MySQLAnalyticsEntityRepository } from '../Infra/MySQL/MySQLAnalyticsEntityRepository'
 import { GetUserAnalyticsId } from '../Domain/UseCase/GetUserAnalyticsId/GetUserAnalyticsId'
+import { AuthController } from '../Controller/AuthController'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const newrelicWinstonEnricher = require('@newrelic/winston-enricher')
@@ -245,6 +246,9 @@ export class ContainerConfigLoader {
       }
       container.bind<AWS.SQS>(TYPES.SQS).toConstantValue(new AWS.SQS(sqsConfig))
     }
+
+    // Controller
+    container.bind<AuthController>(TYPES.AuthController).to(AuthController)
 
     // Repositories
     container.bind<SessionRepositoryInterface>(TYPES.SessionRepository).to(MySQLSessionRepository)
