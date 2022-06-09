@@ -56,6 +56,7 @@ const requestBackups = async (
   domainEventPublisher: DomainEventPublisherInterface,
   analyticsEntityRepository: AnalyticsEntityRepositoryInterface,
   analyticsStore: AnalyticsStoreInterface,
+  logger: Logger,
 ): Promise<void> => {
   let settingName: SettingName,
     permissionName: PermissionName,
@@ -134,9 +135,9 @@ const requestBackups = async (
                 analyticsStore,
               )
               if (!emailBackupsShouldBeTriggered) {
-                callback()
-
-                return
+                logger.info(
+                  `Email backup for user ${setting.setting_user_uuid} should not be triggered due to inactivity. It will be triggered until further changes.`,
+                )
               }
 
               await domainEventPublisher.publish(
@@ -217,6 +218,7 @@ void container.load().then((container) => {
       domainEventPublisher,
       analyticsEntityRepository,
       analyticsStore,
+      logger,
     ),
   )
     .then(() => {
