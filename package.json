@@ -36,7 +36,7 @@
     "@standardnotes/common": "^1.22.0",
     "@standardnotes/domain-events": "^2.29.0",
     "@standardnotes/domain-events-infra": "^1.4.127",
-    "@standardnotes/features": "^1.40.1",
+    "@standardnotes/features": "^1.45.2",
     "@standardnotes/responses": "^1.6.15",
     "@standardnotes/settings": "^1.14.2",
     "@standardnotes/sncrypto-common": "^1.8.1",

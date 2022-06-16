@@ -957,6 +957,14 @@
     "@standardnotes/auth" "^3.19.2"
     "@standardnotes/common" "^1.22.0"
 
+"@standardnotes/features@^1.45.2":
+  version "1.45.2"
+  resolved "https://registry.yarnpkg.com/@standardnotes/features/-/features-1.45.2.tgz#5fcf51eb60687ed53a83294cc79cad1ebadcb8ef"
+  integrity sha512-Mw2L4U7aICDTenOX3uAMLhJfXiNIj2uq5wv0jb+uF16ZLrAz0bmLWihVcTu5Tz1Ds+vN4SUZLAz/I8oHJRF0PQ==
+  dependencies:
+    "@standardnotes/auth" "^3.19.2"
+    "@standardnotes/common" "^1.22.0"
+
 "@standardnotes/responses@^1.6.15":
   version "1.6.15"
   resolved "https://registry.yarnpkg.com/@standardnotes/responses/-/responses-1.6.15.tgz#4129d58555bc45e50822cf368f60cb124f7eaad6"
