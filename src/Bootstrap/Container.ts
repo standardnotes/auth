@@ -188,6 +188,8 @@ import { AnalyticsEntityRepositoryInterface } from '../Domain/Analytics/Analytic
 import { MySQLAnalyticsEntityRepository } from '../Infra/MySQL/MySQLAnalyticsEntityRepository'
 import { GetUserAnalyticsId } from '../Domain/UseCase/GetUserAnalyticsId/GetUserAnalyticsId'
 import { AuthController } from '../Controller/AuthController'
+import { VerifyPredicate } from '../Domain/UseCase/VerifyPredicate/VerifyPredicate'
+import { PredicateVerificationRequestedEventHandler } from '../Domain/Handler/PredicateVerificationRequestedEventHandler'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const newrelicWinstonEnricher = require('@newrelic/winston-enricher')
@@ -422,6 +424,7 @@ export class ContainerConfigLoader {
       .to(ListSharedSubscriptionInvitations)
     container.bind<GetSubscriptionSetting>(TYPES.GetSubscriptionSetting).to(GetSubscriptionSetting)
     container.bind<GetUserAnalyticsId>(TYPES.GetUserAnalyticsId).to(GetUserAnalyticsId)
+    container.bind<VerifyPredicate>(TYPES.VerifyPredicate).to(VerifyPredicate)
 
     // Handlers
     container.bind<UserRegisteredEventHandler>(TYPES.UserRegisteredEventHandler).to(UserRegisteredEventHandler)
@@ -467,6 +470,9 @@ export class ContainerConfigLoader {
     container
       .bind<SharedSubscriptionInvitationCreatedEventHandler>(TYPES.SharedSubscriptionInvitationCreatedEventHandler)
       .to(SharedSubscriptionInvitationCreatedEventHandler)
+    container
+      .bind<PredicateVerificationRequestedEventHandler>(TYPES.PredicateVerificationRequestedEventHandler)
+      .to(PredicateVerificationRequestedEventHandler)
 
     // Services
     container.bind<UAParser>(TYPES.DeviceDetector).toConstantValue(new UAParser())
@@ -564,6 +570,7 @@ export class ContainerConfigLoader {
         container.get(TYPES.UserDisabledSessionUserAgentLoggingEventHandler),
       ],
       ['SHARED_SUBSCRIPTION_INVITATION_CREATED', container.get(TYPES.SharedSubscriptionInvitationCreatedEventHandler)],
+      ['PREDICATE_VERIFICATION_REQUESTED', container.get(TYPES.PredicateVerificationRequestedEventHandler)],
     ])
 
     if (env.get('SQS_QUEUE_URL', true)) {

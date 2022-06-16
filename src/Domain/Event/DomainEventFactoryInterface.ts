@@ -1,4 +1,5 @@
 import { Uuid, RoleName } from '@standardnotes/common'
+import { Predicate, PredicateVerificationResult } from '@standardnotes/scheduler'
 import {
   AccountDeletionRequestedEvent,
   CloudBackupRequestedEvent,
@@ -12,6 +13,7 @@ import {
   UserDisabledSessionUserAgentLoggingEvent,
   SharedSubscriptionInvitationCreatedEvent,
   SharedSubscriptionInvitationCanceledEvent,
+  PredicateVerifiedEvent,
 } from '@standardnotes/domain-events'
 import { InviteeIdentifierType } from '../SharedSubscription/InviteeIdentifierType'
 
@@ -64,4 +66,9 @@ export interface DomainEventFactoryInterface {
     inviteeIdentifierType: InviteeIdentifierType
     sharedSubscriptionInvitationUuid: Uuid
   }): SharedSubscriptionInvitationCanceledEvent
+  createPredicateVerifiedEvent(dto: {
+    userUuid: Uuid
+    predicate: Predicate
+    predicateVerificationResult: PredicateVerificationResult
+  }): PredicateVerifiedEvent
 }
