@@ -12,7 +12,9 @@ import {
   UserDisabledSessionUserAgentLoggingEvent,
   SharedSubscriptionInvitationCreatedEvent,
   SharedSubscriptionInvitationCanceledEvent,
+  PredicateVerifiedEvent,
 } from '@standardnotes/domain-events'
+import { Predicate, PredicateVerificationResult } from '@standardnotes/scheduler'
 import { TimerInterface } from '@standardnotes/time'
 import { inject, injectable } from 'inversify'
 import TYPES from '../../Bootstrap/Types'
@@ -22,6 +24,25 @@ import { DomainEventFactoryInterface } from './DomainEventFactoryInterface'
 @injectable()
 export class DomainEventFactory implements DomainEventFactoryInterface {
   constructor(@inject(TYPES.Timer) private timer: TimerInterface) {}
+
+  createPredicateVerifiedEvent(dto: {
+    userUuid: Uuid
+    predicate: Predicate
+    predicateVerificationResult: PredicateVerificationResult
+  }): PredicateVerifiedEvent {
+    const { userUuid, ...payload } = dto
+    return {
+      type: 'PREDICATE_VERIFIED',
+      createdAt: this.timer.getUTCDate(),
+      meta: {
+        correlation: {
+          userIdentifier: userUuid,
+          userIdentifierType: 'uuid',
+        },
+      },
+      payload,
+    }
+  }
 
   createSharedSubscriptionInvitationCanceledEvent(dto: {
     inviterEmail: string

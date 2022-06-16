@@ -1,6 +1,7 @@
 import 'reflect-metadata'
 
 import { RoleName } from '@standardnotes/common'
+import { PredicateName, PredicateAuthority, PredicateVerificationResult } from '@standardnotes/scheduler'
 import { TimerInterface } from '@standardnotes/time'
 
 import { DomainEventFactory } from './DomainEventFactory'
@@ -15,6 +16,37 @@ describe('DomainEventFactory', () => {
     timer = {} as jest.Mocked<TimerInterface>
     timer.getTimestampInMicroseconds = jest.fn().mockReturnValue(1)
     timer.getUTCDate = jest.fn().mockReturnValue(new Date(1))
+  })
+
+  it('should create a PREDICATE_VERIFIED event', () => {
+    expect(
+      createFactory().createPredicateVerifiedEvent({
+        predicate: {
+          authority: PredicateAuthority.Auth,
+          jobUuid: '1-2-3',
+          name: PredicateName.EmailBackupsEnabled,
+        },
+        predicateVerificationResult: PredicateVerificationResult.Affirmed,
+        userUuid: '2-3-4',
+      }),
+    ).toEqual({
+      createdAt: expect.any(Date),
+      meta: {
+        correlation: {
+          userIdentifier: '2-3-4',
+          userIdentifierType: 'uuid',
+        },
+      },
+      payload: {
+        predicate: {
+          authority: 'auth',
+          jobUuid: '1-2-3',
+          name: 'email-backups-enabled',
+        },
+        predicateVerificationResult: 'affirmed',
+      },
+      type: 'PREDICATE_VERIFIED',
+    })
   })
 
   it('should create a SHARED_SUBSCRIPTION_INVITATION_CANCELED event', () => {

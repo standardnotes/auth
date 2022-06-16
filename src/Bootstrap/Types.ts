@@ -122,6 +122,7 @@ const TYPES = {
   ListSharedSubscriptionInvitations: Symbol.for('ListSharedSubscriptionInvitations'),
   GetSubscriptionSetting: Symbol.for('GetSubscriptionSetting'),
   GetUserAnalyticsId: Symbol.for('GetUserAnalyticsId'),
+  VerifyPredicate: Symbol.for('VerifyPredicate'),
   // Handlers
   UserRegisteredEventHandler: Symbol.for('UserRegisteredEventHandler'),
   AccountDeletionRequestedEventHandler: Symbol.for('AccountDeletionRequestedEventHandler'),
@@ -140,6 +141,7 @@ const TYPES = {
   ListedAccountDeletedEventHandler: Symbol.for('ListedAccountDeletedEventHandler'),
   UserDisabledSessionUserAgentLoggingEventHandler: Symbol.for('UserDisabledSessionUserAgentLoggingEventHandler'),
   SharedSubscriptionInvitationCreatedEventHandler: Symbol.for('SharedSubscriptionInvitationCreatedEventHandler'),
+  PredicateVerificationRequestedEventHandler: Symbol.for('PredicateVerificationRequestedEventHandler'),
   // Services
   DeviceDetector: Symbol.for('DeviceDetector'),
   SessionService: Symbol.for('SessionService'),
