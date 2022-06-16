@@ -52,6 +52,7 @@ describe('PredicateVerificationRequestedEventHandler', () => {
 
     logger = {} as jest.Mocked<Logger>
     logger.warn = jest.fn()
+    logger.info = jest.fn()
 
     event = {} as jest.Mocked<PredicateVerificationRequestedEvent>
     event.meta = {
